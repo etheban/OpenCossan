@@ -1,0 +1,302 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialEvaluator</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialEvaluator.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Tutorial for the Evaluator object</a></li><li><a href="#2">Define a user define model based on a Matlab function</a></li><li><a href="#3">Construct the Evaluator</a></li><li><a href="#4">Define an Input</a></li><li><a href="#5">TestX evaluetor</a></li><li><a href="#6">Second example</a></li><li><a href="#7">Deterministic Analysis</a></li></ul></div><h2>Tutorial for the Evaluator object<a name="1"></a></h2><p>The evaluator object provides a common interface for the Model object to the user defined solvers or model (i.e. a FE solver or a Matlab script/function).</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Evaluator">http://mechanik.uibk.ac.at/wiki/index.php/@Evaluator</a></p><p><img src="TutorialEvaluator_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialEvaluator_eq82982.png" alt="$Author:~Edoardo~Patelli$"></p><pre class="codeinput"><span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(56236)
+</pre><h2>Define a user define model based on a Matlab function<a name="2"></a></h2><pre class="codeinput"><span class="comment">% Construct a Mio object</span>
+Xm=Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out1=sqrt(Tinput(j).RV1^2+Tinput(j).RV2^2); end'</span>, <span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'out1'</span>},<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'RV1'</span> <span class="string">'RV2'</span>},<span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+</pre><h2>Construct the Evaluator<a name="3"></a></h2><p>Construct evaluator using only Mio object</p><pre class="codeinput">Xeval1 = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'fist Evaluator'</span>);
+
+<span class="comment">% In order to be able to test our Evaluator we need an Input object:</span>
+</pre><h2>Define an Input<a name="4"></a></h2><p>Define RVs</p><pre class="codeinput">RV1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+RV2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+Xpar1=Parameter(<span class="string">'value'</span>,3);
+Xpar2=Parameter(<span class="string">'value'</span>,6);
+<span class="comment">% Define the RVset</span>
+Xrvs1=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>, <span class="string">'RV2'</span>});
+<span class="comment">% Define Xinput</span>
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input for Tutorial Evaluator'</span>);
+Xin = add(Xin,Xrvs1);
+Xin = add(Xin,Xpar1);
+Xin = add(Xin,Xpar2);
+Xin = sample(Xin,<span class="string">'Nsamples'</span>,2);
+</pre><h2>TestX evaluetor<a name="5"></a></h2><pre class="codeinput">Xo1=Xeval1.apply(Xin);
+display(Xo1)
+Vout=Xo1.getValues(<span class="string">'Cnames'</span>,Xeval1.Coutputnames);
+
+
+<span class="comment">% Validate Solution</span>
+Vreference= [1.1261e+00;7.6901e-01];
+assert(max(abs(Vout-Vreference))&lt;1e-4,<span class="keyword">...</span>
+    <span class="string">'CossanX:Tutorials:TutorialEvaluator'</span>,<span class="string">'Reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">[Status] Processing solver 1/1
+===================================================================
+ SimulationData Object  -   Description:  - apply(@evaluator)
+===================================================================
+* Number of Variables: 5
+RV1
+RV2
+Xpar1
+Xpar2
+out1
+* Batch: 1 - Number of realizations: 2
+* Values stored in a structure format only
+* Exit Flag: 
+</pre><h2>Second example<a name="6"></a></h2><p>The evaluator can contain more the one Mio or Connectors and the output of a Mio/Connector can be used as input for the next Mio/Connector/SolutionSequence object. Hence the order of the objects defined in the Evaluator is important. Please refer to the Tutorial of the JobManager</p><pre class="codeinput"><span class="comment">% Construct a Mio object</span>
+Xm2=Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out2=Tinput(j).out1+3; end'</span>, <span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'out2'</span>},<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'out1'</span>},<span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+
+<span class="comment">% Construct a Mio object</span>
+Xm3=Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out3=Tinput(j).out2+Tinput(j).RV1; end'</span>, <span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'out3'</span>},<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'out2'</span> <span class="string">'RV1'</span>},<span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false);
+
+XevALL=Evaluator(<span class="string">'CXmembers'</span>,{Xm Xm2 Xm3});
+
+<span class="comment">% The input factors required to evaluate the object are shown in the field</span>
+<span class="comment">% Cinputname. Please note that out1 and out2 are that are required to evaluate</span>
+<span class="comment">% Xm2 and Xm3, respectively are not shown in this field because they are</span>
+<span class="comment">% factors computed internally to the evaluator object.</span>
+XevALL.Cinputnames
+<span class="comment">% The provided output are shows in the field Coutputnames</span>
+XevALL.Coutputnames
+
+Xout=XevALL.apply(Xin);
+display(Xout)
+</pre><pre class="codeoutput">
+ans = 
+
+    'RV1'    'RV2'
+
+
+ans = 
+
+    'out1'    'out2'    'out3'
+
+[Status] Processing solver 1/3
+[Status] Processing solver 2/3
+[Status] Processing solver 3/3
+===================================================================
+ SimulationData Object  -   Description:  - apply(@evaluator)
+===================================================================
+* Number of Variables: 7
+RV1
+RV2
+Xpar1
+Xpar2
+out1
+out2
+out3
+* Batch: 1 - Number of realizations: 2
+* Values stored in a structure format only
+* Exit Flag: 
+</pre><h2>Deterministic Analysis<a name="7"></a></h2><pre class="codeinput">Xoutdet=XevALL.deterministicAnalysis(Xin);
+display(Xoutdet)
+Vout=Xoutdet.getValues(<span class="string">'Sname'</span>,<span class="string">'out3'</span>);
+
+<span class="comment">% Validate Solution</span>
+Vreference= 3;
+assert(abs(Vout-Vreference)&lt;1e-4,<span class="keyword">...</span>
+    <span class="string">'CossanX:Tutorials:TutorialEvaluator'</span>,<span class="string">'Reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">[Status] Processing solver 1/3
+[Status] Processing solver 2/3
+[Status] Processing solver 3/3
+===================================================================
+ SimulationData Object  -   Description:  - apply(@evaluator)
+===================================================================
+* Number of Variables: 7
+RV1
+RV2
+Xpar1
+Xpar2
+out1
+out2
+out3
+* Batch: 1 - Number of realizations: 1
+* Values stored in a matrix and structure format
+* Exit Flag: 
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the Evaluator object
+% The evaluator object provides a common interface for the Model object to
+% the user defined solvers or model (i.e. a FE solver or a Matlab
+% script/function).
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@Evaluator
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Edoardo~Patelli$ 
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(56236)
+
+%% Define a user define model based on a Matlab function
+
+% Construct a Mio object
+Xm=Mio('Sdescription', 'Performance function', ...
+    'Sscript','for j=1:length(Tinput), Toutput(j).out1=sqrt(Tinput(j).RV1^2+Tinput(j).RV2^2); end', ...
+    'Coutputnames',{'out1'},...
+    'Cinputnames',{'RV1' 'RV2'},...
+    'Liostructure',true,...
+    'Lfunction',false); % This flag specify if the .m file is a script or a function.
+
+
+%% Construct the Evaluator
+% Construct evaluator using only Mio object
+
+Xeval1 = Evaluator('Xmio',Xm,'Sdescription','fist Evaluator');
+
+% In order to be able to test our Evaluator we need an Input object:
+
+%% Define an Input
+% Define RVs
+RV1=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);
+RV2=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);
+Xpar1=Parameter('value',3);
+Xpar2=Parameter('value',6);
+% Define the RVset
+Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'});
+% Define Xinput
+Xin = Input('Sdescription','Input for Tutorial Evaluator');
+Xin = add(Xin,Xrvs1);
+Xin = add(Xin,Xpar1);
+Xin = add(Xin,Xpar2);
+Xin = sample(Xin,'Nsamples',2);
+
+%% TestX evaluetor
+Xo1=Xeval1.apply(Xin);
+display(Xo1)
+Vout=Xo1.getValues('Cnames',Xeval1.Coutputnames);
+
+
+% Validate Solution
+Vreference= [1.1261e+00;7.6901e-01];
+assert(max(abs(Vout-Vreference))<1e-4,...
+    'CossanX:Tutorials:TutorialEvaluator','Reference Solution does not match.')
+
+%% Second example
+% The evaluator can contain more the one Mio or Connectors and the output of a
+% Mio/Connector can be used as input for the next Mio/Connector/SolutionSequence
+% object. Hence the order of the objects defined in the Evaluator is important. 
+% Please refer to the Tutorial of the JobManager
+
+
+
+% Construct a Mio object
+Xm2=Mio('Sdescription', 'Performance function', ...
+    'Sscript','for j=1:length(Tinput), Toutput(j).out2=Tinput(j).out1+3; end', ...
+    'Coutputnames',{'out2'},...
+    'Cinputnames',{'out1'},...
+    'Liostructure',true,...
+    'Lfunction',false); % This flag specify if the .m file is a script or a function.
+
+% Construct a Mio object
+Xm3=Mio('Sdescription', 'Performance function', ...
+    'Sscript','for j=1:length(Tinput), Toutput(j).out3=Tinput(j).out2+Tinput(j).RV1; end', ...
+    'Coutputnames',{'out3'},...
+    'Cinputnames',{'out2' 'RV1'},...
+    'Liostructure',true,...
+    'Lfunction',false);
+
+XevALL=Evaluator('CXmembers',{Xm Xm2 Xm3});
+
+% The input factors required to evaluate the object are shown in the field
+% Cinputname. Please note that out1 and out2 are that are required to evaluate
+% Xm2 and Xm3, respectively are not shown in this field because they are
+% factors computed internally to the evaluator object.
+XevALL.Cinputnames
+% The provided output are shows in the field Coutputnames
+XevALL.Coutputnames
+
+Xout=XevALL.apply(Xin);
+display(Xout)
+%% Deterministic Analysis
+%
+Xoutdet=XevALL.deterministicAnalysis(Xin);
+display(Xoutdet)
+Vout=Xoutdet.getValues('Sname','out3');
+
+% Validate Solution
+Vreference= 3;
+assert(abs(Vout-Vreference)<1e-4,...
+    'CossanX:Tutorials:TutorialEvaluator','Reference Solution does not match.')
+
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,191 @@
+# PATRON 
+# ANALYSE STATIQUE
+# 2D
+
+DEBUT();
+
+# MISE EN DONNEES
+
+MAIL=LIRE_MAILLAGE(UNITE=20,
+                   FORMAT='MED',);
+
+MAIL=DEFI_GROUP(reuse =MAIL,
+                MAILLAGE=MAIL,
+                CREA_GROUP_MA=_F(NOM='VOL',
+                                 TOUT='OUI',),);
+
+MODMECA=AFFE_MODELE(MAILLAGE=MAIL,
+                    AFFE=_F(GROUP_MA='VOL',
+                            PHENOMENE='MECANIQUE',
+                            MODELISATION='C_PLAN',),);
+
+ACIER=DEFI_MATERIAU(ELAS=_F(E=<cossan name="E" format="%9.3e" original="2.100e11" />,
+                            NU=0.3,),);
+
+# Crack
+
+CHMAT=AFFE_MATERIAU(MAILLAGE=MAIL,
+                    AFFE=_F(TOUT='OUI',
+                            MATER=ACIER,),);
+
+#
+
+leng1=<cossan name="leng1" format="%9.3e" original="5e-3" />
+leng2=<cossan name="leng2" format="%9.3e" original="5e-3" />
+leng3=<cossan name="leng3" format="%9.3e" original="5e-3" />
+leng4=<cossan name="leng4" format="%9.3e" original="5e-3" />
+
+LN = FORMULE(VALE='Y-0.1',
+             NOM_PARA=('X','Y',),);
+
+LT = FORMULE(VALE='(X-0.116- leng1)*(X-0.116+leng2)',
+             NOM_PARA=('X','Y',),);
+
+LN2 = FORMULE(VALE='Y-0.1',
+              NOM_PARA=('X','Y',),);
+
+LT2 = FORMULE(VALE='(X-0.148- leng3)*(X-0.148+leng4)',
+              NOM_PARA=('X','Y',),);
+
+fiss=DEFI_FISS_XFEM(MODELE=MODMECA,
+                    DEFI_FISS=_F(FONC_LT=LT,
+                                 FONC_LN=LN,),
+                    GROUP_MA_ENRI='VOL',);
+
+fiss2=DEFI_FISS_XFEM(MODELE=MODMECA,
+                     DEFI_FISS=_F(FONC_LT=LT2,
+                                  FONC_LN=LN2,),
+                     GROUP_MA_ENRI='VOL',);
+
+# xfem
+
+modelk=MODI_MODELE_XFEM(MODELE_IN=MODMECA,
+                        FISSURE=(fiss2,fiss,),);
+
+loadxfem=AFFE_CHAR_MECA(MODELE=modelk,
+                        LIAISON_XFEM='OUI',);
+
+load=AFFE_CHAR_MECA(MODELE=modelk,
+                    DDL_IMPO=(_F(GROUP_NO='bot',
+                                 DY=0.0,),
+                              _F(GROUP_NO='node1',
+                                 DX=0.0,),),
+                    FORCE_NODALE=(_F(GROUP_NO='top',
+                                     FY=1380000.0,),
+                                  _F(GROUP_NO='top1_2',
+                                     FY=690000.0,),),);
+
+list=DEFI_LIST_REEL(DEBUT=0.0,
+                    INTERVALLE=_F(JUSQU_A=1.0,
+                                  NOMBRE=1,),);
+
+#Defining the calculation model using previously defined model and load ('meca' and 'load' )
+
+resu2=STAT_NON_LINE(MODELE=modelk,
+                    CHAM_MATER=CHMAT,
+                    EXCIT=(_F(CHARGE=load,),
+                           _F(CHARGE=loadxfem,),),
+                    COMP_ELAS=_F(RELATION='ELAS',
+                                 GROUP_MA='VOL',),
+                    INCREMENT=_F(LIST_INST=list,),
+                    NEWTON=_F(REAC_ITER=1,),
+                    SOLVEUR=_F(METHODE='MULT_FRONT',),);
+
+#
+
+meshxfem=POST_MAIL_XFEM(MODELE=modelk,
+                        MAILLAGE_SAIN=MAIL,);
+
+#
+
+modVisu=AFFE_MODELE(MAILLAGE=meshxfem,
+                    AFFE=_F(TOUT='OUI',
+                            PHENOMENE='MECANIQUE',
+                            MODELISATION='C_PLAN',),);
+
+resuxfem=POST_CHAM_XFEM(MAILLAGE_SAIN=MAIL,
+                        MAILLAGE_FISS=meshxfem,
+                        NOM_CHAM=('DEPL','SIEF_ELGA',),
+                        MODELE=modelk,
+                        RESULTAT=resu2,
+                        MODELE_VISU=modVisu,
+                        INFO=2,);
+
+resuxfem=CALC_ELEM(reuse =resuxfem,
+                   RESULTAT=resuxfem,
+                   OPTION=('EQUI_ELGA_SIGM','EQUI_ELNO_SIGM','SIEF_ELNO_ELGA',),);
+
+resuxfem=CALC_NO(reuse =resuxfem,
+                 RESULTAT=resuxfem,
+                 OPTION=('EQUI_NOEU_SIGM','DEGE_NOEU_DEPL',),);
+
+IMPR_RESU(FORMAT='MED',
+          RESU=(_F(RESULTAT=resuxfem,
+                   NOM_CHAM=('DEPL','SIEF_ELNO_ELGA','DEPL_ABSOLU',),),
+                _F(RESULTAT=resu2,
+                   NOM_CHAM=('DEPL','DEPL_ABSOLU',),),),);
+
+
+sif=POST_K1_K2_K3(MODELISATION='C_PLAN',
+                  FISSURE=fiss,
+                  MAILLAGE=MAIL,
+                  NUME_FOND=2,
+                  MATER=ACIER,
+                  RESULTAT=resu2,
+                  ABSC_CURV_MAXI=1.0,
+                  INFO=1,);
+
+sif2=CALC_G(THETA=_F(FISSURE=fiss,
+                     NUME_FOND=2,
+                     R_INF=0.001,
+                     R_SUP=.004,
+                     DIRECTION=(-1.0,0.0,0.0,),),
+            RESULTAT=resu2,
+            LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                       LISSAGE_G='LAGRANGE',),
+            OPTION='CALC_K_G',
+            INFO=2,);
+
+sif3=CALC_G(THETA=_F(FISSURE=fiss,
+                     NUME_FOND=2,
+                     R_INF=0.004,
+                     R_SUP=.005,
+                     DIRECTION=(-1.0,0.0,0.0,),),
+            RESULTAT=resu2,
+            LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                       LISSAGE_G='LAGRANGE',),
+            OPTION='CALC_K_G',
+            INFO=2,);
+sif4=CALC_G(THETA=_F(FISSURE=fiss,
+                     NUME_FOND=2,
+                     R_INF=0.005,
+                     R_SUP=.006,
+                     DIRECTION=(-1.0,0.0,0.0,),),
+            RESULTAT=resu2,
+            LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                       LISSAGE_G='LAGRANGE',),
+            OPTION='CALC_K_G',
+            INFO=2,);
+
+sif5=CALC_G(THETA=_F(FISSURE=fiss,
+                     NUME_FOND=2,
+                     R_INF=0.004,
+                     R_SUP=.0045,
+                     DIRECTION=(-1.0,0.0,0.0,),),
+            RESULTAT=resu2,
+            LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                       LISSAGE_G='LAGRANGE',),
+            OPTION='CALC_K_G',
+            INFO=2,);
+
+#IMPR_TABLE(TABLE=sif,);
+
+#IMPR_TABLE(TABLE=sif2,);
+
+IMPR_TABLE(TABLE=sif3,);
+
+#IMPR_TABLE(TABLE=sif4,);
+
+#IMPR_TABLE(TABLE=sif5,);
+
+FIN();

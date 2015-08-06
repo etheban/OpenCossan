@@ -1,0 +1,197 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialCargoCrane</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialCargoCrane.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Cargo Crane Tutorial</a></li><li><a href="#2">Define connector</a></li><li><a href="#3">Define table extractor</a></li><li><a href="#4">Add extractor to connector</a></li><li><a href="#5">Execute deterministic analysis</a></li><li><a href="#6">Visualize extracted response</a></li><li><a href="#7">Close figure and validate solution</a></li><li><a href="#8">Remove simulation files</a></li></ul></div><h2>Cargo Crane Tutorial<a name="1"></a></h2><p>This example shows how to extract the time dependent response in a transient analysis using the FE software Abaqus. The model used is a cargo crane which is loaded by a dropped tip load. The response of tip of the structure is extracted and visualized. In this example, all the structural parameters and also the load characteristics are deteministic.</p><pre class="codeinput"><span class="comment">% See Also: http://mechanik.uibk.ac.at/wiki/index.php/Cargo_Crain</span>
+<span class="comment">%</span>
+<span class="comment">% This tutorial used an FE-input file of a cargo crane which has been</span>
+<span class="comment">% taken from the documentation of Abaqus 6.9</span>
+
+<span class="comment">% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$</span>
+<span class="comment">% $Author: Barbara Goller$</span>
+</pre><h2>Define connector<a name="2"></a></h2><pre class="codeinput">Sdirectory = fileparts(which(<span class="string">'TutorialCargoCrane'</span>));
+Xconn1 = Connector(<span class="string">'SpredefinedType'</span>,<span class="string">'Abaqus'</span>,<span class="keyword">...</span>
+    <span class="string">'Smaininputpath'</span>,Sdirectory,<span class="keyword">...</span>
+    <span class="string">'Smaininputfile'</span>,<span class="string">'crane.inp'</span>,<span class="keyword">...</span>
+    <span class="string">'Caddfiles'</span>,{<span class="string">'Readresults.py'</span>},<span class="keyword">...</span>
+    <span class="string">'Sworkingdirectory'</span>,Sdirectory, <span class="keyword">...</span>
+    <span class="string">'SpostExecutionCommand'</span>,<span class="string">'/usr/site/bin/abq673 cae noGUI=Readresults.py'</span>);
+</pre><h2>Define table extractor<a name="3"></a></h2><pre class="codeinput">Xte1 = TableExtractor(<span class="string">'Sdescription'</span>,<span class="string">'Spatial displacement: U1 at Node 104 in NSET TIP'</span>, <span class="keyword">...</span>
+             <span class="string">'Srelativepath'</span>,<span class="string">'./'</span>, <span class="keyword">...</span><span class="comment"> % path where results file is located</span>
+             <span class="string">'Sfile'</span>,<span class="string">'results.txt'</span>, <span class="keyword">...</span><span class="comment"> % name of the result file</span>
+             <span class="string">'Nheaderlines'</span>, 3, <span class="keyword">...</span><span class="comment"> % number of header lines</span>
+             <span class="string">'Sdelimiter'</span>, <span class="string">' '</span>,<span class="keyword">...</span><span class="comment"> % delimiter between columns</span>
+             <span class="string">'Soutputname'</span>,<span class="string">'U1_Node104'</span>); <span class="comment">% name of time dependent response</span>
+</pre><h2>Add extractor to connector<a name="4"></a></h2><pre class="codeinput">Xconn1 = Xconn1.add(Xte1);
+</pre><pre class="codeoutput">Add Extractor Object to Connector
+</pre><h2>Execute deterministic analysis<a name="5"></a></h2><pre class="codeinput">Xout1 = Xconn1.deterministicAnalysis();
+</pre><pre class="codeoutput">Simulation #1 of 1
+[COSSAN-X.Connector.run]  Prepare execution command: 'cd /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Tutorials/CargoCrane/20110518T194744_sim_1; pwd;/usr/site/bin/abq673 interactive ask_delete=off job=crane.inp 
+[COSSAN-X.Connector.run]  Creating SimulationData object
+[COSSAN-X.Connector.run]   - END -18-May-2011 19:48:06
+</pre><h2>Visualize extracted response<a name="6"></a></h2><pre class="codeinput">f1=figure;
+plot(Xout1.Tvalues.U1_Node104.Mcoord,Xout1.Tvalues.U1_Node104.Mdata)
+</pre><img vspace="5" hspace="5" src="TutorialCargoCrane_01.png" alt=""> <h2>Close figure and validate solution<a name="7"></a></h2><pre class="codeinput">close(f1);
+
+<span class="comment">% reference solution (response of tip due to dropped load)</span>
+Vreference = [0  1.1296e-04  6.0031e-04  1.2209e-03  1.7666e-03  2.4168e-03 <span class="keyword">...</span>
+     3.0162e-03  3.4425e-03  3.6957e-03  3.6469e-03  3.2817e-03  2.8180e-03 <span class="keyword">...</span>
+     2.3059e-03  1.6838e-03  1.1684e-03  9.5108e-04  9.9018e-04  1.2522e-03 <span class="keyword">...</span>
+     1.6610e-03  2.1058e-03  2.5696e-03  2.9903e-03  3.2392e-03  3.2808e-03 <span class="keyword">...</span>
+     3.1527e-03  2.8682e-03  2.4562e-03  2.0065e-03  1.6190e-03  1.3821e-03 <span class="keyword">...</span>
+     1.3346e-03  1.4347e-03  1.6447e-03  1.9530e-03  2.3116e-03  2.6440e-03 <span class="keyword">...</span>
+     2.8846e-03  2.9929e-03  2.9590e-03  2.7963e-03  2.5300e-03  2.0989e-03 <span class="keyword">...</span>
+     1.3185e-03  4.8885e-04 -1.6090e-04 -8.0587e-04 -1.2962e-03 -1.5277e-03 <span class="keyword">...</span>
+    -1.5319e-03 -1.2291e-03 -6.5720e-04 -6.9253e-05  4.6698e-04  1.0100e-03 <span class="keyword">...</span>
+     1.3619e-03  1.3700e-03  1.1194e-03  6.8090e-04  1.5667e-04 -3.2833e-04 <span class="keyword">...</span>
+    -7.5148e-04];
+
+assert(all(abs(Xout1.Tvalues.U1_Node104.Mdata-Vreference)&lt;1e-4),<span class="keyword">...</span>
+    <span class="string">'CossanX:Tutorials:TutorialCragoCrane'</span>,<span class="string">'Reference Solution does not match.'</span>)
+</pre><h2>Remove simulation files<a name="8"></a></h2><pre class="codeinput">delete(<span class="string">'crane.com'</span>,<span class="string">'crane.dat'</span>,<span class="string">'crane.fil'</span>, <span class="keyword">...</span>
+       <span class="string">'crane.msg'</span>,<span class="string">'crane.odb'</span>,<span class="string">'crane.prt'</span>, <span class="keyword">...</span>
+       <span class="string">'crane.sta'</span>,<span class="string">'results.txt'</span>,<span class="string">'abaqus.rpy*'</span>)
+</pre><pre class="codeoutput">Warning: File 'crane.com' not found. 
+Warning: File 'crane.dat' not found. 
+Warning: File 'crane.fil' not found. 
+Warning: File 'crane.msg' not found. 
+Warning: File 'crane.odb' not found. 
+Warning: File 'crane.prt' not found. 
+Warning: File 'crane.sta' not found. 
+Warning: File 'results.txt' not found. 
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Cargo Crane Tutorial
+% 
+% This example shows how to extract the time dependent response in a
+% transient analysis using the FE software Abaqus. The model used is a
+% cargo crane which is loaded by a dropped tip load. The response of tip of
+% the structure is extracted and visualized. In this example, all the
+% structural parameters and also the load characteristics are deteministic.
+
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/Cargo_Crain
+%
+% This tutorial used an FE-input file of a cargo crane which has been 
+% taken from the documentation of Abaqus 6.9
+
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Barbara Goller$ 
+
+
+%% Define connector
+Sdirectory = fileparts(which('TutorialCargoCrane'));
+Xconn1 = Connector('SpredefinedType','Abaqus',...
+    'Smaininputpath',Sdirectory,...
+    'Smaininputfile','crane.inp',...
+    'Caddfiles',{'Readresults.py'},... 
+    'Sworkingdirectory',Sdirectory, ...
+    'SpostExecutionCommand','/usr/site/bin/abq673 cae noGUI=Readresults.py');
+
+%% Define table extractor
+Xte1 = TableExtractor('Sdescription','Spatial displacement: U1 at Node 104 in NSET TIP', ...
+             'Srelativepath','./', ... % path where results file is located
+             'Sfile','results.txt', ... % name of the result file
+             'Nheaderlines', 3, ... % number of header lines
+             'Sdelimiter', ' ',... % delimiter between columns
+             'Soutputname','U1_Node104'); % name of time dependent response
+ 
+%% Add extractor to connector 
+Xconn1 = Xconn1.add(Xte1);
+         
+%% Execute deterministic analysis
+Xout1 = Xconn1.deterministicAnalysis();
+
+%% Visualize extracted response
+f1=figure;
+plot(Xout1.Tvalues.U1_Node104.Mcoord,Xout1.Tvalues.U1_Node104.Mdata)
+
+%% Close figure and validate solution
+close(f1);
+
+% reference solution (response of tip due to dropped load)
+Vreference = [0  1.1296e-04  6.0031e-04  1.2209e-03  1.7666e-03  2.4168e-03 ...
+     3.0162e-03  3.4425e-03  3.6957e-03  3.6469e-03  3.2817e-03  2.8180e-03 ...
+     2.3059e-03  1.6838e-03  1.1684e-03  9.5108e-04  9.9018e-04  1.2522e-03 ...
+     1.6610e-03  2.1058e-03  2.5696e-03  2.9903e-03  3.2392e-03  3.2808e-03 ...
+     3.1527e-03  2.8682e-03  2.4562e-03  2.0065e-03  1.6190e-03  1.3821e-03 ...
+     1.3346e-03  1.4347e-03  1.6447e-03  1.9530e-03  2.3116e-03  2.6440e-03 ...
+     2.8846e-03  2.9929e-03  2.9590e-03  2.7963e-03  2.5300e-03  2.0989e-03 ...
+     1.3185e-03  4.8885e-04 -1.6090e-04 -8.0587e-04 -1.2962e-03 -1.5277e-03 ...
+    -1.5319e-03 -1.2291e-03 -6.5720e-04 -6.9253e-05  4.6698e-04  1.0100e-03 ...
+     1.3619e-03  1.3700e-03  1.1194e-03  6.8090e-04  1.5667e-04 -3.2833e-04 ...
+    -7.5148e-04];
+
+assert(all(abs(Xout1.Tvalues.U1_Node104.Mdata-Vreference)<1e-4),...
+    'CossanX:Tutorials:TutorialCragoCrane','Reference Solution does not match.')
+
+
+%% Remove simulation files
+delete('crane.com','crane.dat','crane.fil', ...
+       'crane.msg','crane.odb','crane.prt', ...
+       'crane.sta','results.txt','abaqus.rpy*')
+
+
+
+##### SOURCE END #####
+--></body></html>

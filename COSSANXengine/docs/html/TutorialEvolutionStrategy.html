@@ -1,0 +1,181 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALEVOLUTIONSTRATEGY</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialEvolutionStrategy.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALEVOLUTIONSTRATEGY</h1><!--introduction--><pre> Optimization of Himmelblau Function using
+ Evolution Strategy</pre><p>See Also:  <a href="http://mechanik.uibk.ac.at/wiki/index.php/@EvolutionStrategy">http://mechanik.uibk.ac.at/wiki/index.php/@EvolutionStrategy</a></p><p><img src="TutorialEvolutionStrategy_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialEvolutionStrategy_eq82982.png" alt="$Author:~Edoardo~Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">prepate Input objects</a></li><li><a href="#2">prepate Input objects</a></li><li><a href="#3">Create objective function</a></li><li><a href="#4">Define OptimizationProblem</a></li><li><a href="#5">Create optimizer object CrossEntropy</a></li><li><a href="#6">Solve optimization problem</a></li><li><a href="#7">Reference Solution</a></li></ul></div><h2>prepate Input objects<a name="1"></a></h2><p>The Himmelblau function requires two design variables. The design variables are defined by means of the parameters objects.</p><h2>prepate Input objects<a name="2"></a></h2><p>The Himmelblau function requires two design variables. The design variables are defined by means of the parameters objects.</p><pre class="codeinput"><span class="comment">% Create DesignVariable objects</span>
+X1      = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 1'</span>,<span class="string">'value'</span>,0);
+X2      = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 2'</span>,<span class="string">'value'</span>,0);
+<span class="comment">% Create an Input object containing the design variables</span>
+Xin     = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input for the Himmelblau function'</span>,<span class="string">'CSmembers'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>},<span class="string">'CXmembers'</span>,{X1 X2});
+</pre><h2>Create objective function<a name="3"></a></h2><pre class="codeinput">Xofun   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'Himmelblau function'</span>, <span class="keyword">...</span>
+         <span class="string">'Lfunction'</span>,true,<span class="string">'Liomatrix'</span>,true,<span class="string">'Liostructure'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'X1'</span>,<span class="string">'X2'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+          <span class="string">'Spath'</span>,fullfile(COSSANX.ScossanRoot,<span class="string">'examples'</span>,<span class="string">'Matlab_functions'</span>,<span class="string">'Himmelblau'</span>),<span class="keyword">...</span>
+          <span class="string">'Sfile'</span>,<span class="string">'Himmelblau'</span>,<span class="keyword">...</span><span class="comment"> % external file</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fobj'</span>}); <span class="comment">% Define the outputs</span>
+</pre><h2>Define OptimizationProblem<a name="4"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Himmelblau optimization problem'</span>,<span class="string">'Xinput'</span>,Xin,<span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>, Xofun);<span class="comment">%,'MinitialSolutions',Minisol);</span>
+</pre><h2>Create optimizer object CrossEntropy<a name="5"></a></h2><pre class="codeinput">Xes     = EvolutionStrategy(<span class="string">'toleranceObjectiveFunction'</span>,1e-3,<span class="string">'Nmaxiterations'</span>,10,<span class="keyword">...</span>
+    <span class="string">'Vsigma'</span>,[0.5 1],<span class="string">'Nmu'</span>,4,<span class="string">'Nlambda'</span>,8,<span class="string">'Nrho'</span>,2);
+
+<span class="comment">% Show details of the object</span>
+display(Xes)
+</pre><pre class="codeoutput"> EvolutionStrategy Object  -  Description: EvolutionStrategies object
+** Timeout                     : Inf
+** Iterations                  : 10
+** Function Evaluation         : 100000
+** Limit Objective Function    : -Inf
+** Tolerance Objective Function: 0.001
+** Tolerance Constraint        : 0.001
+** Tolerance Design Variables  : 0.001
+** parent population            :4
+** offspring population         :8
+** Recombination size           :2
+** Recombination function       :discrete
+** Selection function           :+
+** Vsigma                       : 5.000e-01 1.000e+00
+</pre><h2>Solve optimization problem<a name="6"></a></h2><pre class="codeinput">Xoptimum  = Xes.apply(<span class="string">'XoptimizationProblem'</span>,Xop);
+
+display(Xoptimum)
+</pre><pre class="codeoutput">Optimum Object  -  Description: 
+|-- Termination criterion : deltaObjectiveFunction termination criteria archived (0)
+</pre><h2>Reference Solution<a name="7"></a></h2><pre class="codeinput">CossanX.cossanDisp(<span class="string">' '</span>);
+CossanX.cossanDisp(<span class="string">'Reference solution'</span>);
+CossanX.cossanDisp(<span class="string">'f(3.0,2.0) = 0.0'</span>);
+CossanX.cossanDisp(<span class="string">'f(-2.805118, 3.131312) = 0.0'</span>);
+CossanX.cossanDisp(<span class="string">'f(-3.779310, -3.283186) = 0.0'</span>);
+CossanX.cossanDisp(<span class="string">'f(3.584428, -1.848126) = 0.0'</span>);
+</pre><pre class="codeoutput"> 
+Reference solution
+f(3.0,2.0) = 0.0
+f(-2.805118, 3.131312) = 0.0
+f(-3.779310, -3.283186) = 0.0
+f(3.584428, -1.848126) = 0.0
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALEVOLUTIONSTRATEGY
+%
+%   Optimization of Himmelblau Function using 
+%   Evolution Strategy
+%   
+%
+% See Also:  http://mechanik.uibk.ac.at/wiki/index.php/@EvolutionStrategy
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Edoardo~Patelli$ 
+
+%% prepate Input objects
+% The Himmelblau function requires two design variables. The design variables
+% are defined by means of the parameters objects.
+
+%% prepate Input objects
+% The Himmelblau function requires two design variables. The design variables
+% are defined by means of the parameters objects.
+
+% Create DesignVariable objects
+X1      = DesignVariable('Sdescription','design variable 1','value',0); 
+X2      = DesignVariable('Sdescription','design variable 2','value',0); 
+% Create an Input object containing the design variables
+Xin     = Input('Sdescription','Input for the Himmelblau function','CSmembers',{'X1' 'X2'},'CXmembers',{X1 X2});
+
+%% Create objective function
+Xofun   = ObjectiveFunction('Sdescription','Himmelblau function', ...
+         'Lfunction',true,'Liomatrix',true,'Liostructure',false,...
+          'Cinputnames',{'X1','X2'},... % Define the inputs 
+          'Spath',fullfile(COSSANX.ScossanRoot,'examples','Matlab_functions','Himmelblau'),...
+          'Sfile','Himmelblau',... % external file
+          'Coutputnames',{'fobj'}); % Define the outputs
+      
+
+
+%% Define OptimizationProblem
+Xop     = OptimizationProblem('Sdescription','Himmelblau optimization problem','Xinput',Xin,...
+    'XobjectiveFunction', Xofun);%,'MinitialSolutions',Minisol);
+
+%% Create optimizer object CrossEntropy
+Xes     = EvolutionStrategy('toleranceObjectiveFunction',1e-3,'Nmaxiterations',10,...
+    'Vsigma',[0.5 1],'Nmu',4,'Nlambda',8,'Nrho',2);
+
+% Show details of the object
+display(Xes)
+
+%% Solve optimization problem
+Xoptimum  = Xes.apply('XoptimizationProblem',Xop);
+
+display(Xoptimum)
+%%  Reference Solution
+CossanX.cossanDisp(' ');
+CossanX.cossanDisp('Reference solution');
+CossanX.cossanDisp('f(3.0,2.0) = 0.0');
+CossanX.cossanDisp('f(-2.805118, 3.131312) = 0.0');
+CossanX.cossanDisp('f(-3.779310, -3.283186) = 0.0');
+CossanX.cossanDisp('f(3.584428, -1.848126) = 0.0');
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

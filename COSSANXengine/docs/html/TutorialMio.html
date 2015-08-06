@@ -1,0 +1,637 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialMio</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialMio.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Define additional objects</a></li><li><a href="#3">Define MIO</a></li><li><a href="#4">Define Matlab Functions</a></li><li><a href="#5">CASE A</a></li><li><a href="#6">First test - Use MonteCarlo simulation</a></li><li><a href="#7">CASE B</a></li><li><a href="#8">Second - Use MonteCarlo simulation</a></li><li><a href="#9">CASE C</a></li><li><a href="#10">Define Matlab Script</a></li><li><a href="#11">Third test - Use MonteCarlo simulation</a></li></ul></div><pre class="codeinput"><span class="comment">% Tutorial for Mio.</span>
+<span class="comment">% This tutorial shows how to construct and use a Mio object.</span>
+
+StutorialPath = fileparts(which(<span class="string">'TutorialMio.m'</span>));
+</pre><h2>Define additional objects<a name="2"></a></h2><p>In order to use a Mio, it is necessary to create an Input object and create a Model with such an input and the Mio. Please refer to the relevant objects tutorials for additional help.</p><pre class="codeinput"><span class="comment">% Create random variables and random variable set</span>
+Nrv = 7;
+RV=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+<span class="comment">% Define a set of Random Variables of Nrv independent, identically</span>
+<span class="comment">% distributed random variables</span>
+Xrvs1=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV'</span>},<span class="string">'CXmembers'</span>,{RV},<span class="string">'Nrviid'</span>,Nrv);
+
+<span class="comment">% Add a parameter</span>
+<span class="comment">% The parameter is unnecessary here but it is used to test the behaviour of</span>
+<span class="comment">% the Mio object.</span>
+Xpar=Parameter(<span class="string">'value'</span>,5);
+
+<span class="comment">% Define Input object</span>
+Xinp  = Input;
+Xinp  = add(Xinp,Xrvs1);
+Xinp  = add(Xinp,Xpar);
+
+<span class="comment">% Add some samples to the Input</span>
+Xinp = Xinp.sample(<span class="string">'Nsamples'</span>,10);
+</pre><h2>Define MIO<a name="3"></a></h2><p>There are different ways to create a Mio object. The Mio can be a Matlab function or a Matlab script</p><h2>Define Matlab Functions<a name="4"></a></h2><p>The input and Output can be passed as: A) Matlab structures B) Matlab arrays (each array correspond to a variable) C) single array (each column of the array correspond to a variable)</p><h2>CASE A<a name="5"></a></h2><p>Matlab structures are used here for Input/Output. All the quantities contained in the input can be obtained in the input structure, in field names equal to the name of the input quantity.</p><p>E.g.: Tinput(1).RV_1 contains the value of RV_1 for the first sample</p><p>The Matlab function used is found in 'Files4Mio/ExampleMioStructure.m'</p><pre class="codeinput">Xm  = Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+                <span class="string">'Spath'</span>,fullfile(StutorialPath,<span class="string">'Files4Mio'</span>), <span class="keyword">...</span>
+                <span class="string">'Sfile'</span>,<span class="string">'ExampleMioStructure.m'</span>, <span class="keyword">...</span>
+                <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span><span class="comment"> % This flag specify the type of I/O</span>
+                <span class="string">'Liomatrix'</span>,false, <span class="keyword">...</span><span class="comment">  % This flag specify the type of I/O</span>
+                <span class="string">'Coutputnames'</span>,{<span class="string">'Out1'</span>;<span class="string">'Out2'</span>},<span class="keyword">...</span><span class="comment"> % This field is mandatory</span>
+                <span class="string">'Cinputnames'</span>,{<span class="string">'RV_1'</span>;<span class="string">'RV_2'</span>},<span class="keyword">...</span><span class="comment">  % This field is mandatory</span>
+				<span class="string">'Lfunction'</span>,true); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+
+<span class="comment">% Test the Mio function</span>
+XoutA = run(Xm,Xinp);
+<span class="comment">% The run mio return a SimulationData containg only the results of the</span>
+<span class="comment">% Mio</span>
+display(XoutA)
+</pre><pre class="codeoutput">===================================================================
+ SimulationData Object  -   Description: generated by: run(@mio)
+===================================================================
+* Number of Variables: 2
+Out1
+Out2
+* Batch: 1 - Number of realizations: 10
+* Values stored in a structure format only
+* Exit Flag: 
+</pre><h2>First test - Use MonteCarlo simulation<a name="6"></a></h2><pre>Define Evaluator</pre><pre class="codeinput">Xev     = Evaluator(<span class="string">'Xmio'</span>,Xm);
+<span class="comment">%  Define probmodel</span>
+Xmodel  = Model(<span class="string">'XInput'</span>,Xinp,<span class="string">'XEvaluator'</span>,Xev);
+<span class="comment">%  Apply</span>
+CossanX.cossanDisp(<span class="string">'Test 1: 100 samples (20 batches) - MCS - MIO I/O Structures'</span>);
+Xmc     = MonteCarlo(<span class="string">'Nsamples'</span>,100,<span class="string">'Nbatches'</span>,20);
+Xo      = Xmc.apply(Xmodel);
+
+<span class="comment">% The SimulationOuput Xo contains now also the realization of the random</span>
+<span class="comment">% variables the values of parameters and functions if defined in the Input</span>
+<span class="comment">% object</span>
+display(Xo)
+</pre><pre class="codeoutput">Test 1: 100 samples (20 batches) - MCS - MIO I/O Structures
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_1_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #1 written in 0.02796
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_1_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_2_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #2 written in 0.015049
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_2_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_3_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #3 written in 0.014399
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_3_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_4_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #4 written in 0.014256
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_4_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_5_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #5 written in 0.014272
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_5_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_6_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #6 written in 0.014526
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_6_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_7_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #7 written in 0.014371
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_7_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_8_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #8 written in 0.014391
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_8_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_9_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #9 written in 0.014306
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_9_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_10_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #10 written in 0.014241
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_10_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_11_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #11 written in 0.014336
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_11_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_12_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #12 written in 0.01423
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_12_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_13_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #13 written in 0.014231
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_13_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_14_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #14 written in 0.014258
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_14_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_15_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #15 written in 0.01421
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_15_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_16_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #16 written in 0.014226
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_16_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_17_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #17 written in 0.014301
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_17_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_18_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #18 written in 0.014263
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_18_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_19_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #19 written in 0.014266
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_19_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_20_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #20 written in 0.014305
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_20_of_20
+Maximum no. of samples reached. Samples computed 100; Maximum allowed samples: 100
+===================================================================
+ SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+===================================================================
+* Number of Variables: 10
+RV_1
+RV_2
+RV_3
+RV_4
+RV_5
+RV_6
+RV_7
+Xpar
+Out1
+Out2
+* Batch: 1 - Number of realizations: 5
+* Values stored in a structure format only
+* Exit Flag: Maximum no. of samples reached. Samples computed 100; Maximum allowed samples: 100
+</pre><h2>CASE B<a name="7"></a></h2><p>Multiple vectors are used here for Input/Output. The input quantities are passed as a vector of sampled quantities in the order specified in the CinputNames field. Note that only mono-dimensional Parameters and Functions can be used with this input/output type.</p><p>The Matlab function used is found in 'Files4Mio/ExampleMioFunction.m'</p><pre class="codeinput">Xm  = Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+                <span class="string">'Spath'</span>,fullfile(StutorialPath,<span class="string">'Files4Mio'</span>), <span class="keyword">...</span>
+                <span class="string">'Sfile'</span>,<span class="string">'ExampleMioFunction'</span>, <span class="keyword">...</span>
+                <span class="string">'Coutputnames'</span>,{<span class="string">'Out1'</span> <span class="string">'Out2'</span>},<span class="keyword">...</span><span class="comment"> % This field is mandatory</span>
+                <span class="string">'Cinputnames'</span>,{<span class="string">'RV_1'</span> <span class="string">'RV_2'</span> <span class="string">'Xpar'</span>},<span class="keyword">...</span><span class="comment">    % This field is mandatory</span>
+                <span class="string">'Liostructure'</span>,false,<span class="keyword">...</span><span class="comment">     % This flag specify the type of I/O</span>
+                <span class="string">'Liomatrix'</span>,false, <span class="keyword">...</span><span class="comment">  % This flag specify the type of I/O</span>
+				<span class="string">'Lfunction'</span>,true); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+
+<span class="comment">% Test the Mio function</span>
+XoutB = run(Xm,Xinp);
+</pre><h2>Second - Use MonteCarlo simulation<a name="8"></a></h2><pre> Define Evaluator</pre><pre class="codeinput">Xev     = Evaluator(<span class="string">'Xmio'</span>,Xm);
+<span class="comment">%  Define probmodel</span>
+Xmodel  = Model(<span class="string">'XInput'</span>,Xinp,<span class="string">'XEvaluator'</span>,Xev);
+<span class="comment">%   Apply</span>
+CossanX.cossanDisp(<span class="string">'Test 2: 100 samples (20 batches) - MCS - MIO Function'</span>);
+Xmc     = MonteCarlo(<span class="string">'Nsamples'</span>,100,<span class="string">'Nbatches'</span>,20);
+Xo      = Xmc.apply(Xmodel);
+</pre><pre class="codeoutput">Test 2: 100 samples (20 batches) - MCS - MIO Function
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_1_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #1 written in 0.015266
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_1_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_2_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #2 written in 0.014511
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_2_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_3_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #3 written in 0.015513
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_3_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_4_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #4 written in 0.014868
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_4_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_5_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #5 written in 0.014687
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_5_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_6_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #6 written in 0.014593
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_6_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_7_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #7 written in 0.014545
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_7_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_8_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #8 written in 0.014506
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_8_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_9_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #9 written in 0.014554
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_9_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_10_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #10 written in 0.014522
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_10_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_11_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #11 written in 0.014469
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_11_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_12_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #12 written in 0.014536
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_12_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_13_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #13 written in 0.014688
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_13_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_14_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #14 written in 0.014602
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_14_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_15_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #15 written in 0.014584
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_15_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_16_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #16 written in 0.014495
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_16_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_17_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #17 written in 0.014487
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_17_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_18_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #18 written in 0.014519
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_18_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_19_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #19 written in 0.014531
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_19_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_20_of_20) on the folder: /tmp/COSSAN20110518T193704
+[Simulation:exportResults] Batch #20 written in 0.01449
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193704/SimulationData_batch_20_of_20
+Maximum no. of samples reached. Samples computed 100; Maximum allowed samples: 100
+</pre><h2>CASE C<a name="9"></a></h2><p>Matlab matrices are used here for Input/Output. Each row of the matrix correspond to a sample, and each column to an input quantity, in the order specified by the CinputNames field. As an example, the elements (9,2) of the matrix in the Mio will contain the 9-th sampled value of RV_2. Please note that only random variables can be accessed with this input/output strategy.</p><p>The Matlab function used is found in 'Files4Mio/ExampleMioMatrix.m'</p><pre class="codeinput">Xm  = Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+                <span class="string">'Spath'</span>,fullfile(StutorialPath,<span class="string">'Files4Mio'</span>), <span class="keyword">...</span>
+                <span class="string">'Sfile'</span> ,<span class="string">'ExampleMioMatrix'</span>, <span class="keyword">...</span>
+                <span class="string">'Coutputnames'</span>,{<span class="string">'Out1'</span>;<span class="string">'Out2'</span>},<span class="keyword">...</span><span class="comment"> % This field is mandatory</span>
+                <span class="string">'Cinputnames'</span>,{<span class="string">'RV_1'</span>;<span class="string">'RV_2'</span>},<span class="keyword">...</span><span class="comment">    % This field is mandatory</span>
+                <span class="string">'Liostructure'</span>,false,<span class="keyword">...</span><span class="comment">     % This flag specify the type of I/O</span>
+                <span class="string">'Liomatrix'</span>,true, <span class="keyword">...</span><span class="comment">  % This flag specify the type of I/O</span>
+				<span class="string">'Lfunction'</span>,true); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+
+<span class="comment">% Test the Mio function</span>
+XoutC = run(Xm,Xinp);
+display(XoutC)
+</pre><pre class="codeoutput">===================================================================
+ SimulationData Object  -   Description: generated by: run(@mio)
+===================================================================
+* Number of Variables: 2
+Out1
+Out2
+* Batch: 1 - Number of realizations: 10
+* Values stored in a matrix and structure format
+* Exit Flag: 
+</pre><h2>Define Matlab Script<a name="10"></a></h2><p>In this Mio, a script is used instead of a function. matlab script can be either passed from a file (not shown here), or passed in a single-line string, as shown here. When using a script, either the structure or the matrix input/output can be used. When structure I/O is used, the "Tinput" and "Toutput" must mandatorily used as names of the input and output variables respectively. On the other hand, when matrix I/O is used, the names "Minput" and "Moutput" must be used.</p><pre class="codeinput">Sscript=[<span class="string">'for i=1:length(Tinput),'</span><span class="keyword">...</span>
+    <span class="string">'Toutput(i).Out1   = Tinput(i).RV_2;'</span><span class="keyword">...</span>
+    <span class="string">'Toutput(i).Out2   = Tinput(i).RV_1;'</span><span class="keyword">...</span>
+    <span class="string">'end'</span>];
+
+XmD  = Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+                <span class="string">'Sscript'</span>,Sscript, <span class="keyword">...</span><span class="comment"> % Define the script</span>
+                <span class="string">'Coutputnames'</span>,{<span class="string">'Out1'</span>;<span class="string">'Out2'</span>},<span class="keyword">...</span><span class="comment"> % This field is mandatory</span>
+                <span class="string">'Cinputnames'</span>,{<span class="string">'RV_1'</span>;<span class="string">'RV_2'</span>},<span class="keyword">...</span><span class="comment">    % This field is mandatory</span>
+                <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span><span class="comment">     % This flag specify the type of I/O</span>
+                <span class="string">'Liomatrix'</span>,false, <span class="keyword">...</span><span class="comment">  % This flag specify the type of I/O</span>
+				<span class="string">'Lfunction'</span>,false); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+
+<span class="comment">% Test the Mio function</span>
+XoutD = run(XmD,Xinp);
+display(XoutD)
+<span class="comment">% All the three different interface should produce</span>
+</pre><pre class="codeoutput">===================================================================
+ SimulationData Object  -   Description: generated by: run(@mio)
+===================================================================
+* Number of Variables: 2
+Out1
+Out2
+* Batch: 1 - Number of realizations: 10
+* Values stored in a structure format only
+* Exit Flag: 
+</pre><h2>Third test - Use MonteCarlo simulation<a name="11"></a></h2><pre class="codeinput"><span class="comment">%8.1.   Define Evaluator</span>
+Xev     = Evaluator(<span class="string">'Xmio'</span>,Xm);
+<span class="comment">%8.2.   Define probmodel</span>
+Xmodel  = Model(<span class="string">'XInput'</span>,Xinp,<span class="string">'XEvaluator'</span>,Xev);
+<span class="comment">%8.3.   Apply</span>
+CossanX.cossanDisp(<span class="string">'Test 3: 100 samples (20 batches) - MCS - MIO Matrix'</span>);
+Xmc     = MonteCarlo(<span class="string">'Nsamples'</span>,100,<span class="string">'Nbatches'</span>,20);
+Xo      = Xmc.apply(Xmodel);
+</pre><pre class="codeoutput">Test 3: 100 samples (20 batches) - MCS - MIO Matrix
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_1_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #1 written in 0.015583
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_1_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_2_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #2 written in 0.016573
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_2_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_3_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #3 written in 0.014687
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_3_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_4_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #4 written in 0.014475
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_4_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_5_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #5 written in 0.014447
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_5_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_6_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #6 written in 0.014413
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_6_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_7_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #7 written in 0.014418
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_7_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_8_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #8 written in 0.014357
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_8_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_9_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #9 written in 0.014429
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_9_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_10_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #10 written in 0.014416
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_10_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_11_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #11 written in 0.014407
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_11_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_12_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #12 written in 0.014569
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_12_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_13_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #13 written in 0.0145
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_13_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_14_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #14 written in 0.014452
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_14_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_15_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #15 written in 0.014382
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_15_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_16_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #16 written in 0.014444
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_16_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_17_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #17 written in 0.014365
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_17_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_18_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #18 written in 0.014531
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_18_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_19_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #19 written in 0.014482
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_19_of_20
+[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_batch_20_of_20) on the folder: /tmp/COSSAN20110518T193705
+[Simulation:exportResults] Batch #20 written in 0.014436
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193705/SimulationData_batch_20_of_20
+Maximum no. of samples reached. Samples computed 100; Maximum allowed samples: 100
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+% Tutorial for Mio.
+% This tutorial shows how to construct and use a Mio object.
+
+StutorialPath = fileparts(which('TutorialMio.m'));
+
+%% Define additional objects
+% In order to use a Mio, it is necessary to create an Input object and
+% create a Model with such an input and the Mio. Please refer to the
+% relevant objects tutorials for additional help.
+
+% Create random variables and random variable set
+Nrv = 7;
+RV=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);
+% Define a set of Random Variables of Nrv independent, identically
+% distributed random variables
+Xrvs1=RandomVariableSet('Cmembers',{'RV'},'CXmembers',{RV},'Nrviid',Nrv); 
+
+% Add a parameter
+% The parameter is unnecessary here but it is used to test the behaviour of
+% the Mio object.
+Xpar=Parameter('value',5);
+
+% Define Input object
+Xinp  = Input;
+Xinp  = add(Xinp,Xrvs1);
+Xinp  = add(Xinp,Xpar);
+
+% Add some samples to the Input
+Xinp = Xinp.sample('Nsamples',10);
+%% Define MIO 
+% There are different ways to create a Mio object.
+% The Mio can be a Matlab function or a Matlab script
+
+%% Define Matlab Functions
+% The input and Output can be passed as:
+% A) Matlab structures
+% B) Matlab arrays (each array correspond to a variable)
+% C) single array (each column of the array correspond to a variable)
+
+%% CASE A
+% Matlab structures are used here for Input/Output. All the quantities
+% contained in the input can be obtained in the input structure, in field
+% names equal to the name of the input quantity.
+%
+% E.g.: Tinput(1).RV_1 contains the value of RV_1 for the first sample
+%
+% The Matlab function used is found in 'Files4Mio/ExampleMioStructure.m'
+
+Xm  = Mio('Sdescription', 'Performance function', ...
+                'Spath',fullfile(StutorialPath,'Files4Mio'), ...
+                'Sfile','ExampleMioStructure.m', ...
+                'Liostructure',true,... % This flag specify the type of I/O
+                'Liomatrix',false, ...  % This flag specify the type of I/O
+                'Coutputnames',{'Out1';'Out2'},... % This field is mandatory
+                'Cinputnames',{'RV_1';'RV_2'},...  % This field is mandatory
+				'Lfunction',true); % This flag specify if the .m file is a script or a function. 
+
+% Test the Mio function 
+XoutA = run(Xm,Xinp);
+% The run mio return a SimulationData containg only the results of the
+% Mio
+display(XoutA)
+
+            
+
+%% First test - Use MonteCarlo simulation
+%  Define Evaluator
+Xev     = Evaluator('Xmio',Xm);
+%  Define probmodel
+Xmodel  = Model('XInput',Xinp,'XEvaluator',Xev); 
+%  Apply
+CossanX.cossanDisp('Test 1: 100 samples (20 batches) - MCS - MIO I/O Structures');
+Xmc     = MonteCarlo('Nsamples',100,'Nbatches',20);
+Xo      = Xmc.apply(Xmodel);
+
+% The SimulationOuput Xo contains now also the realization of the random
+% variables the values of parameters and functions if defined in the Input
+% object
+display(Xo)
+
+%% CASE B
+% Multiple vectors are used here for Input/Output. The input quantities are
+% passed as a vector of sampled quantities in the order specified in the
+% CinputNames field.
+% Note that only mono-dimensional Parameters and Functions can be used with
+% this input/output type.
+%
+% The Matlab function used is found in 'Files4Mio/ExampleMioFunction.m'
+Xm  = Mio('Sdescription', 'Performance function', ...
+                'Spath',fullfile(StutorialPath,'Files4Mio'), ...
+                'Sfile','ExampleMioFunction', ...
+                'Coutputnames',{'Out1' 'Out2'},... % This field is mandatory
+                'Cinputnames',{'RV_1' 'RV_2' 'Xpar'},...    % This field is mandatory
+                'Liostructure',false,...     % This flag specify the type of I/O
+                'Liomatrix',false, ...  % This flag specify the type of I/O
+				'Lfunction',true); % This flag specify if the .m file is a script or a function. 
+
+% Test the Mio function 
+XoutB = run(Xm,Xinp);
+
+    
+%%  Second - Use MonteCarlo simulation
+%   Define Evaluator
+Xev     = Evaluator('Xmio',Xm);
+%  Define probmodel
+Xmodel  = Model('XInput',Xinp,'XEvaluator',Xev); 
+%   Apply
+CossanX.cossanDisp('Test 2: 100 samples (20 batches) - MCS - MIO Function');
+Xmc     = MonteCarlo('Nsamples',100,'Nbatches',20);
+Xo      = Xmc.apply(Xmodel);
+
+%% CASE C
+% Matlab matrices are used here for Input/Output. Each row of the matrix
+% correspond to a sample, and each column to an input quantity, in the
+% order specified by the CinputNames field. As an example, the elements 
+% (9,2) of the matrix in the Mio will contain the 9-th sampled value of
+% RV_2.
+% Please note that only random variables can be accessed with this
+% input/output strategy.
+%
+% The Matlab function used is found in 'Files4Mio/ExampleMioMatrix.m'
+Xm  = Mio('Sdescription', 'Performance function', ...
+                'Spath',fullfile(StutorialPath,'Files4Mio'), ...
+                'Sfile' ,'ExampleMioMatrix', ...
+                'Coutputnames',{'Out1';'Out2'},... % This field is mandatory
+                'Cinputnames',{'RV_1';'RV_2'},...    % This field is mandatory
+                'Liostructure',false,...     % This flag specify the type of I/O
+                'Liomatrix',true, ...  % This flag specify the type of I/O
+				'Lfunction',true); % This flag specify if the .m file is a script or a function. 
+
+% Test the Mio function 
+XoutC = run(Xm,Xinp);
+display(XoutC)
+
+%% Define Matlab Script
+% In this Mio, a script is used instead of a function. matlab script can be
+% either passed from a file (not shown here), or passed in a single-line
+% string, as shown here. 
+% When using a script, either the structure or the matrix input/output can
+% be used. When structure I/O is used, the "Tinput" and "Toutput" must
+% mandatorily used as names of the input and output variables respectively.
+% On the other hand, when matrix I/O is used, the names "Minput" and
+% "Moutput" must be used.
+
+Sscript=['for i=1:length(Tinput),'...
+    'Toutput(i).Out1   = Tinput(i).RV_2;'...
+    'Toutput(i).Out2   = Tinput(i).RV_1;'...
+    'end'];
+
+XmD  = Mio('Sdescription', 'Performance function', ...
+                'Sscript',Sscript, ... % Define the script
+                'Coutputnames',{'Out1';'Out2'},... % This field is mandatory
+                'Cinputnames',{'RV_1';'RV_2'},...    % This field is mandatory
+                'Liostructure',true,...     % This flag specify the type of I/O
+                'Liomatrix',false, ...  % This flag specify the type of I/O
+				'Lfunction',false); % This flag specify if the .m file is a script or a function. 
+
+% Test the Mio function 
+XoutD = run(XmD,Xinp);
+display(XoutD)
+% All the three different interface should produce 
+
+
+%% Third test - Use MonteCarlo simulation
+%8.1.   Define Evaluator
+Xev     = Evaluator('Xmio',Xm);
+%8.2.   Define probmodel
+Xmodel  = Model('XInput',Xinp,'XEvaluator',Xev); 
+%8.3.   Apply
+CossanX.cossanDisp('Test 3: 100 samples (20 batches) - MCS - MIO Matrix');
+Xmc     = MonteCarlo('Nsamples',100,'Nbatches',20);
+Xo      = Xmc.apply(Xmodel);
+
+
+##### SOURCE END #####
+--></body></html>

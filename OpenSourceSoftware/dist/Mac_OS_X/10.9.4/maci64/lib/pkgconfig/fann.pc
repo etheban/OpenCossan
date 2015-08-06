@@ -1,0 +1,10 @@
+prefix=/Users/mbroggi/Workspace/OpenSourceSoftware/dist/Mac_OS_X/10.9.4/maci64
+exec_prefix=/Users/mbroggi/Workspace/OpenSourceSoftware/dist/Mac_OS_X/10.9.4/maci64/bin
+libdir=/Users/mbroggi/Workspace/OpenSourceSoftware/dist/Mac_OS_X/10.9.4/maci64/lib
+includedir=/Users/mbroggi/Workspace/OpenSourceSoftware/dist/Mac_OS_X/10.9.4/maci64/include
+ 
+Name: fann
+Description: Fast Artificial Neural Network Library
+Version: 2.2.0
+Libs: -L${libdir} -lm -lfann
+Cflags: -I${includedir}

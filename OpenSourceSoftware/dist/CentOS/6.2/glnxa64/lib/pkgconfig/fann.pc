@@ -1,0 +1,10 @@
+prefix=/home/builduser/workspace/OpenSourceSoftware/dist/CentOS/6.2/glnxa64
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+ 
+Name: fann
+Description: Fast Artificial Neural Network Library
+Version: 2.1.0
+Libs: -L${libdir} -lm -lfann
+Cflags: -I${includedir}

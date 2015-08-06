@@ -1,0 +1,10 @@
+<cossan name="XEmod" format="nastran8" original="2.1E+11" />, 1, <cossan name="Xnu" format="nastran8" original="0.3"/>, <cossan name="XP" format="nastran8" original="10000" />
+<cossan name="XEmod" format="nastran8" original="2.1E+11" />, 2, <cossan name="Xnu" format="nastran8" original="0.3"/>, <cossan name="XP" format="nastran8" original="10000" />
+<cossan name="XEmod" format="nastran8" original="2.1E+11" />, 3, <cossan name="Xnu" format="nastran8" original="0.3"/>, <cossan name="XP" format="nastran8" original="10000" />
+<cossan name="XEmod" format="nastran8" original="2.1E+11" />, 4, <cossan name="Xnu" format="nastran8" original="0.3"/>, <cossan name="XP" format="nastran8" original="10000" />
+<cossan name="XEmod" format="nastran8" original="2.1E+11" />, 5, <cossan name="Xnu" format="nastran8" original="0.3"/>, <cossan name="XP" format="nastran8" original="10000" />
+<cossan name="XEmod" format="nastran16" original="2.1E+11" />, 6, <cossan name="Xnu" format="nastran16" original="0.3"/>, <cossan name="XP" format="nastran16" original="10000" />
+<cossan name="XEmod" format="nastran16" original="2.1E+11" />, 7, <cossan name="Xnu" format="nastran16" original="0.3"/>, <cossan name="XP" format="nastran16" original="10000" />
+<cossan name="XEmod" format="nastran16" original="2.1E+11" />, 8, <cossan name="Xnu" format="nastran16" original="0.3"/>, <cossan name="XP" format="nastran16" original="10000" />
+<cossan name="XEmod" format="nastran16" original="2.1E+11" />, 9, <cossan name="Xnu" format="nastran16" original="0.3"/>, <cossan name="XP" format="nastran16" original="10000" />
+<cossan name="XEmod" format="nastran16" original="2.1E+11" />, 10, <cossan name="Xnu" format="nastran16" original="0.3"/>, <cossan name="XP" format="nastran16" original="10000" />

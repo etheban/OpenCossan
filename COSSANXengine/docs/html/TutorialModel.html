@@ -1,0 +1,242 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialModel</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialModel.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Tutorial for the Model object</a></li><li><a href="#2">Define Required object</a></li><li><a href="#3">Construct the Evaluator</a></li><li><a href="#4">Define an Input</a></li><li><a href="#5">Construct the Model</a></li><li><a href="#6">Perform Analysis</a></li><li><a href="#7">Validate Tutorial</a></li></ul></div><h2>Tutorial for the Model object<a name="1"></a></h2><p>The Model object defines the user defined model compoused by an Input object and an Evaluator object.</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Model">http://mechanik.uibk.ac.at/wiki/index.php/@Model</a></p><p><img src="TutorialModel_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialModel_eq82982.png" alt="$Author:~Edoardo~Patelli$"></p><pre class="codeinput"><span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(56236)
+</pre><h2>Define Required object<a name="2"></a></h2><pre>user define model based on a Matlab function</pre><p>Construct a Mio object</p><pre class="codeinput">Xm=Mio( <span class="string">'Sdescription'</span>, <span class="string">'This is our Model'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out=-Tinput(j).RV1+Tinput(j).RV2; end'</span>, <span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'out'</span>},<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>},<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+</pre><h2>Construct the Evaluator<a name="3"></a></h2><p>First mode (The object are passed by reference)</p><pre class="codeinput">Xeval1 = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'fist Evaluator'</span>);
+
+<span class="comment">% In order to be able to construct our Model an Input object must be</span>
+<span class="comment">% defined</span>
+</pre><h2>Define an Input<a name="4"></a></h2><p>Define RVs</p><pre class="codeinput">RV1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);  <span class="comment">%#ok&lt;SNASGU&gt;</span>
+RV2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);  <span class="comment">%#ok&lt;SNASGU&gt;</span>
+<span class="comment">% Define the RVset</span>
+Xrvs1=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>, <span class="string">'RV2'</span>});
+<span class="comment">% Define Xinput</span>
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input satellite_inp'</span>);
+Xin = add(Xin,Xrvs1);
+Xin = sample(Xin,<span class="string">'Nsamples'</span>,10);
+</pre><h2>Construct the Model<a name="5"></a></h2><pre class="codeinput">Xmdl=Model(<span class="string">'Cmembers'</span>,{<span class="string">'Xin'</span>,<span class="string">'Xeval1'</span>}); <span class="comment">%#ok&lt;NASGU&gt;</span>
+<span class="comment">% or</span>
+Xmdl=Model(<span class="string">'Xinput'</span>,Xin,<span class="string">'Xevaluator'</span>,Xeval1,<span class="string">'Sdescription'</span>,<span class="string">'The Model'</span>);
+
+<span class="comment">% Show Model details</span>
+display(Xmdl)
+</pre><pre class="codeoutput">===================================================================
+ Model Object  -  Description: The Model
+===================================================================
+Required Inputs :  RV1; RV2;
+Provided Outputs :  out;
+The Model contains 1 solvers
+</pre><h2>Perform Analysis<a name="6"></a></h2><p>Perform a deterministic Analysis</p><pre class="codeinput">Xo1=Xmdl.deterministicAnalysis;
+
+<span class="comment">% The output contains only 1 values</span>
+display(Xo1)
+
+<span class="comment">% Perform simulation (using the samples present in the Input</span>
+Xo2=Xmdl.apply(Xin);
+
+<span class="comment">% The output contains now 10 values (The samples defined in the input)</span>
+display(Xo2)
+</pre><pre class="codeoutput">[Status] Processing solver 1/1
+[Simulation:exportResults] Writing partial results (SimulationData_Deterministic_Analysis) on the folder: /tmp/COSSAN20110518T193540
+[Simulation:exportResults] Batch #0 written in 0.039792
+[Simulation:exportResults] Results stored in the folder: /tmp/COSSAN20110518T193540/SimulationData_Deterministic_Analysis
+===================================================================
+ SimulationData Object  -   Description:  - apply(@evaluator) - deterministicAnalysis(@Model)
+===================================================================
+* Number of Variables: 3
+RV1
+RV2
+out
+* Batch: 1 - Number of realizations: 1
+* Values stored in a matrix and structure format
+* Exit Flag: 
+[Status] Processing solver 1/1
+===================================================================
+ SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+===================================================================
+* Number of Variables: 3
+RV1
+RV2
+out
+* Batch: 1 - Number of realizations: 10
+* Values stored in a structure format only
+* Exit Flag: 
+</pre><h2>Validate Tutorial<a name="7"></a></h2><pre class="codeinput">MX=Xo2.getValues(<span class="string">'Cnames'</span>,Xo2.Cnames);
+
+Vreference=[ <span class="keyword">...</span>
+    -8.091978556823285e-01    -4.151745464932572e-01     3.940233091890713e-01;
+    -7.595250572281091e-01     2.308585423070265e+00     3.068110480298374e+00;
+     7.831505638559783e-01    -4.655275078461927e-01    -1.248678071702171e+00;
+    -1.204346453797460e-01    -3.208617659750095e-01    -2.004271205952635e-01;
+    -9.341788238354498e-01    -9.351590937866989e-01    -9.802699512491131e-04;
+    -2.681342527817951e-01     1.919650594995507e-01     4.600993122813458e-01;
+     1.615179924353552e+00    -2.260762716518154e-01    -1.841256196005367e+00;
+    -2.768288053623363e-01    -3.882282999633929e-01    -1.113994946010566e-01;
+    -4.757549186442647e-02     1.541400652627784e+00     1.588976144492210e+00;
+    -4.184300939342735e-01     6.438032534175224e-01     1.062233347351796e+00];
+
+<span class="comment">% Check solution</span>
+assert(max(max(Vreference-MX))&lt;1e-15,<span class="string">'COSSANX:Tutorial'</span>,<span class="string">'wrong results'</span>)
+
+disp(<span class="string">'Tutorial terminated successfully'</span>)
+</pre><pre class="codeoutput">Tutorial terminated successfully
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the Model object 
+% 
+%
+% The Model object defines the user defined model compoused by an Input
+% object and an Evaluator object.
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@Model
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Edoardo~Patelli$ 
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(56236)
+
+%% Define Required object
+%  user define model based on a Matlab function 
+%
+% Construct a Mio object
+Xm=Mio( 'Sdescription', 'This is our Model', ...
+    'Sscript','for j=1:length(Tinput), Toutput(j).out=-Tinput(j).RV1+Tinput(j).RV2; end', ...
+    'Liostructure',true,...
+    'Coutputnames',{'out'},...
+    'Cinputnames',{'RV1','RV2'},...
+    'Lfunction',false); % This flag specify if the .m file is a script or a function.
+            
+%% Construct the Evaluator
+% First mode (The object are passed by reference) 
+Xeval1 = Evaluator('Xmio',Xm,'Sdescription','fist Evaluator');
+
+% In order to be able to construct our Model an Input object must be
+% defined
+
+%% Define an Input
+% Define RVs
+RV1=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);  %#ok<SNASGU>
+RV2=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);  %#ok<SNASGU>
+% Define the RVset
+Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'}); 
+% Define Xinput
+Xin = Input('Sdescription','Input satellite_inp');
+Xin = add(Xin,Xrvs1);
+Xin = sample(Xin,'Nsamples',10);
+
+%%  Construct the Model
+Xmdl=Model('Cmembers',{'Xin','Xeval1'}); %#ok<NASGU>
+% or
+Xmdl=Model('Xinput',Xin,'Xevaluator',Xeval1,'Sdescription','The Model');
+
+% Show Model details
+display(Xmdl)
+
+%% Perform Analysis
+% Perform a deterministic Analysis
+Xo1=Xmdl.deterministicAnalysis;
+
+% The output contains only 1 values
+display(Xo1)
+
+% Perform simulation (using the samples present in the Input 
+Xo2=Xmdl.apply(Xin);
+
+% The output contains now 10 values (The samples defined in the input)
+display(Xo2)
+
+%% Validate Tutorial
+MX=Xo2.getValues('Cnames',Xo2.Cnames);
+
+Vreference=[ ...
+    -8.091978556823285e-01    -4.151745464932572e-01     3.940233091890713e-01;
+    -7.595250572281091e-01     2.308585423070265e+00     3.068110480298374e+00;
+     7.831505638559783e-01    -4.655275078461927e-01    -1.248678071702171e+00;
+    -1.204346453797460e-01    -3.208617659750095e-01    -2.004271205952635e-01;
+    -9.341788238354498e-01    -9.351590937866989e-01    -9.802699512491131e-04;
+    -2.681342527817951e-01     1.919650594995507e-01     4.600993122813458e-01;
+     1.615179924353552e+00    -2.260762716518154e-01    -1.841256196005367e+00;
+    -2.768288053623363e-01    -3.882282999633929e-01    -1.113994946010566e-01;
+    -4.757549186442647e-02     1.541400652627784e+00     1.588976144492210e+00;
+    -4.184300939342735e-01     6.438032534175224e-01     1.062233347351796e+00];
+    
+% Check solution
+assert(max(max(Vreference-MX))<1e-15,'COSSANX:Tutorial','wrong results')
+
+disp('Tutorial terminated successfully')
+
+
+##### SOURCE END #####
+--></body></html>

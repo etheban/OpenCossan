@@ -1,0 +1,22 @@
+
+$***************************************************************************
+$ This DMAP routine will output the DOFs
+$ 
+$ Format   = punch file
+$ DOF set  = A-SET (Analysis Set) 
+$ Analysis = SOL101
+$
+$***************************************************************************
+
+COMPILE PHASE1B  $
+ALTER 'CALL.*SEKMR' $
+VEC USET/VGAX/'G'/'COMP'/'A' $
+PARAM //'STSR'/52/-64 $
+MATMOD VGAX,EQEXINS,,,,/UASET/16/1/0/1/////////'UASET'/// $ 
+
+
+
+
+
+
+

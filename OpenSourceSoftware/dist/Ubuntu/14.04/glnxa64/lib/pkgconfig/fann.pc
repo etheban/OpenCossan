@@ -1,0 +1,10 @@
+prefix=/home/mbroggi/workspace/trunk/OpenSourceSoftware/dist/Ubuntu/14.04/glnxa64
+exec_prefix=/home/mbroggi/workspace/trunk/OpenSourceSoftware/dist/Ubuntu/14.04/glnxa64/bin
+libdir=/home/mbroggi/workspace/trunk/OpenSourceSoftware/dist/Ubuntu/14.04/glnxa64/lib
+includedir=/home/mbroggi/workspace/trunk/OpenSourceSoftware/dist/Ubuntu/14.04/glnxa64/include
+ 
+Name: fann
+Description: Fast Artificial Neural Network Library
+Version: 2.2.0
+Libs: -L${libdir} -lm -lfann
+Cflags: -I${includedir}

@@ -1,0 +1,334 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for the Importance Sampling method</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialImportanceSampling.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for the Importance Sampling method</h1><!--introduction--><p>This tutorial is focus on the use and definition of the Importance Samplincg</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@ImportanceSampling">http://mechanik.uibk.ac.at/wiki/index.php/@ImportanceSampling</a></p><p><img src="TutorialImportanceSampling_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialImportanceSampling_eq55270.png" alt="$Author: Edoardo~Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Importance Sampling Distribution</a></li><li><a href="#2">Problem Definition</a></li><li><a href="#3">Define the Evaluator (i.e. how our model is evaluate)</a></li><li><a href="#4">Define the Physical Model based on the Input and the Evaluator</a></li><li><a href="#5">Define ImportanceSampling object</a></li><li><a href="#6">Perform IS simulation</a></li><li><a href="#7">Redifine the proposal distribution</a></li><li><a href="#8">Apply the Importance sampling simulation method to a ProbabilisticModel</a></li><li><a href="#9">Construct the performance function</a></li><li><a href="#10">Check the weights</a></li><li><a href="#11">Estimate the Failure Probability</a></li><li><a href="#12">Validate Solutions</a></li></ul></div><h2>Importance Sampling Distribution<a name="1"></a></h2><p>Any kind of user define distribution can be used. It is always defined by a collection of RandomVariableSet. The Random Variable defined in the RandomVariableSet may be correlated. Any combination of mapping between the RandomVariable defined in the Importance Sampling Distribution and the Random Variables defined in the problem can be used</p><p>Example: The model contains 2 RandomVariableSet: RVS1 and RVS2 RVS1 contains RV1, RV2 and RV3 that may be correlated RVS2 contains RV4, RV5 that may be correlated.</p><p>It is possible to define a Importance Sampling density defining a randomvariableset RVSIS that contains two RandomVariable, namely RV6 and RV7 that may be correlated. The distribution f(RV6,RV7) can be used instead RV3 and RV4 defined the followin mapping: Cmapping={'RV6' 'RV3'; 'RV7' 'RV4'}</p><h2>Problem Definition<a name="2"></a></h2><p>Here we define our problem Define the Input Define RandomVariable</p><pre class="codeinput">RV1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,2,<span class="string">'std'</span>,1);
+RV2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,2);
+<span class="comment">% Define the RandomVariableSet</span>
+Xrvs1=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>, <span class="string">'RV2'</span>});
+<span class="comment">% Construct Input Object</span>
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input Object of our model'</span>);
+Xin = add(Xin,Xrvs1);
+Xthreshold=Parameter(<span class="string">'value'</span>,1);
+Xin = add(Xin,Xthreshold);
+</pre><h2>Define the Evaluator (i.e. how our model is evaluate)<a name="3"></a></h2><p>Construct a Mio object</p><pre class="codeinput">Xm=Mio( <span class="string">'Sdescription'</span>, <span class="string">'This is our Model'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out=-Tinput(j).RV1+Tinput(j).RV2; end'</span>, <span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'out'</span>},<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>},<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+<span class="comment">% Construct the Evaluator</span>
+Xeval = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'Evaluator for the IS tutorial'</span>);
+</pre><h2>Define the Physical Model based on the Input and the Evaluator<a name="4"></a></h2><pre class="codeinput">Xmdl=Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xin);
+</pre><h2>Define ImportanceSampling object<a name="5"></a></h2><p>The InportanceSampling object required the definition of a "Proposal Sampling Distribution". A. Define the proposal distribution</p><pre class="codeinput">RV3=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1); <span class="comment">%#ok&lt;NASGU&gt;</span>
+RV4=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1); <span class="comment">%#ok&lt;NASGU&gt;</span>
+XrvsIS=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV3'</span>;<span class="string">'RV4'</span>});
+<span class="comment">% Define the mapping between the random variables present in the Importance</span>
+<span class="comment">% Sampling distribution and the random variable defined in the problem</span>
+Cmapping={<span class="string">'RV3'</span> <span class="string">'RV1'</span>; <span class="string">'RV4'</span> <span class="string">'RV2'</span>};
+<span class="comment">% Construct the Simulation object</span>
+Xis=ImportanceSampling(<span class="string">'Nsamples'</span>,10,<span class="string">'Nbatches'</span>,2,<span class="string">'CXrvset'</span>,{XrvsIS},<span class="string">'Cmapping'</span>,Cmapping);
+</pre><h2>Perform IS simulation<a name="6"></a></h2><pre class="codeinput">Xo=Xis.apply(Xmdl);
+<span class="comment">% Show summary of the results</span>
+display(Xo)
+<span class="comment">% The simulation is performed adopting the number of samples defined in the</span>
+<span class="comment">% object Xis. Use Xin.Nsamples to retrive the number of samples defined</span>
+
+Xis.Nsamples=200;
+Xo=Xis.apply(Xmdl);
+<span class="comment">% Show summary of the results</span>
+display(Xo)
+
+<span class="comment">% If you need to define the name of variable used to store the weights use</span>
+<span class="comment">% the field SweightsName of the ImportanceSampling object</span>
+Xis.SweightsName=<span class="string">'myWeights'</span>;
+display(Xo)
+<span class="comment">% The weights are magically stored in the SimulationData ;)</span>
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+ SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+ SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+</pre><h2>Redifine the proposal distribution<a name="7"></a></h2><p>it is possible to define the proposal distribution only for selected random variable. The cellarray Cmapping is used to perform this ckeck!</p><pre class="codeinput">Cmapping={<span class="string">'RV3'</span> <span class="string">'RV1'</span>}; <span class="comment">% Now only the distribution of the RV1 is replace</span>
+<span class="comment">% The original distribution is used for RV2</span>
+
+Xis=ImportanceSampling(<span class="string">'Nsamples'</span>,10,<span class="string">'Nbatches'</span>,2,<span class="string">'CXrvset'</span>,{XrvsIS},<span class="string">'Cmapping'</span>,Cmapping);
+
+<span class="comment">% Perform IS simulation</span>
+Xo=Xis.apply(Xmdl);
+display(Xo)
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+</pre><h2>Apply the Importance sampling simulation method to a ProbabilisticModel<a name="8"></a></h2><p>Define a probabilisti model (Requires a Model object and a PerfomanceFunction object Construct the performance function</p><h2>Construct the performance function<a name="9"></a></h2><pre class="codeinput">Xpf=PerformanceFunction(<span class="string">'Scapacity'</span>,<span class="string">'Xthreshold'</span>,<span class="string">'Sdemand'</span>,<span class="string">'out'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Vg'</span>);
+
+<span class="comment">% Construct a ProbabilisticModel Object</span>
+Xpm=ProbabilisticModel(<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'XperformanceFunction'</span>,Xpf);
+<span class="comment">% now we can apply the ImportanceSampling object and estimate also</span>
+<span class="comment">% the performance function</span>
+<span class="comment">% ProbabilisticModel</span>
+Xopf=Xis.apply(Xpm);
+display(Xopf)
+
+Xopf.getValues(<span class="string">'Sname'</span>,Xpf.Soutputname)
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model) - apply(@ProbabilisticModel)
+
+ans =
+
+     4.384074777884583e+00
+     2.673755049732121e+00
+    -2.178096341468803e+00
+     4.668136624916671e+00
+    -1.248126107940021e+00
+
+</pre><h2>Check the weights<a name="10"></a></h2><p>use as Importance Sampling density the same distribution of RV1 and RV2. By doing so, all the weigth must be equal 1!</p><pre class="codeinput">RV3=RV1; <span class="comment">%#ok&lt;SNASGU&gt;</span>
+RV4=RV2; <span class="comment">%#ok&lt;SNASGU&gt;</span>
+XrvsIS=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV3'</span>;<span class="string">'RV4'</span>});
+Cmapping={<span class="string">'RV3'</span> <span class="string">'RV1'</span>; <span class="string">'RV4'</span> <span class="string">'RV2'</span>};
+<span class="comment">% Construct the Simulation object</span>
+Xis=ImportanceSampling(<span class="string">'Nsamples'</span>,10,<span class="string">'Nbatches'</span>,2,<span class="string">'CXrvset'</span>,{XrvsIS},<span class="string">'Cmapping'</span>,Cmapping);
+
+XoTest=Xis.apply(Xpm);
+display(XoTest)
+XoTest.getValues(<span class="string">'Sname'</span>,Xis.SweightsName)
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model) - apply(@ProbabilisticModel)
+
+ans =
+
+     1
+     1
+     1
+     1
+     1
+
+</pre><h2>Estimate the Failure Probability<a name="11"></a></h2><p>Set RandomNumber stream</p><pre class="codeinput">CossanX.resetRandomNumberGenerator(51125)
+Xpf=Xis.pf(Xpm);
+display(Xpf)
+
+<span class="comment">% Verificate the procedure</span>
+Xis.Nbatches=1;
+Xis.Nsamples=20000;
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,1e5);
+XpfMC=pf(Xpm,Xmc);
+XpfIS=pf(Xpm,Xis);
+
+display(XpfMC)
+display(XpfIS)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+</pre><h2>Validate Solutions<a name="12"></a></h2><pre class="codeinput">assert(abs(Xpf.pfhat-0.2)&lt;1e-4,<span class="string">'COSSANX:Tutorials'</span>,<span class="string">'Wrong results'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the Importance Sampling method
+% This tutorial is focus on the use and definition of the Importance Samplincg
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@ImportanceSampling
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo~Patelli$ 
+
+%% Importance Sampling Distribution
+% Any kind of user define distribution can be used. It is always defined by
+% a collection of RandomVariableSet. The Random Variable defined in the
+% RandomVariableSet may be correlated.
+% Any combination of mapping between the RandomVariable defined in the
+% Importance Sampling Distribution and the Random Variables defined in the
+% problem can be used
+%
+% Example:
+% The model contains 2 RandomVariableSet: RVS1 and RVS2
+% RVS1 contains RV1, RV2 and RV3 that may be correlated
+% RVS2 contains RV4, RV5 that may be correlated.
+%
+% It is possible to define a Importance Sampling density defining a
+% randomvariableset RVSIS that contains two RandomVariable, namely RV6 and
+% RV7 that may be correlated.
+% The distribution f(RV6,RV7) can be used instead RV3 and RV4 defined the
+% followin mapping:
+% Cmapping={'RV6' 'RV3'; 'RV7' 'RV4'}
+
+
+%% Problem Definition
+% Here we define our problem
+% Define the Input
+% Define RandomVariable
+RV1=RandomVariable('Sdistribution','normal', 'mean',2,'std',1);
+RV2=RandomVariable('Sdistribution','normal', 'mean',0,'std',2);
+% Define the RandomVariableSet
+Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'});
+% Construct Input Object
+Xin = Input('Sdescription','Input Object of our model');
+Xin = add(Xin,Xrvs1);
+Xthreshold=Parameter('value',1);
+Xin = add(Xin,Xthreshold);
+
+%% Define the Evaluator (i.e. how our model is evaluate)
+% Construct a Mio object
+Xm=Mio( 'Sdescription', 'This is our Model', ...
+    'Sscript','for j=1:length(Tinput), Toutput(j).out=-Tinput(j).RV1+Tinput(j).RV2; end', ...
+    'Liostructure',true,...
+    'Coutputnames',{'out'},...
+    'Cinputnames',{'RV1','RV2'},...
+    'Lfunction',false); % This flag specify if the .m file is a script or a function.
+% Construct the Evaluator
+Xeval = Evaluator('Xmio',Xm,'Sdescription','Evaluator for the IS tutorial');
+
+%% Define the Physical Model based on the Input and the Evaluator
+Xmdl=Model('Xevaluator',Xeval,'Xinput',Xin);
+
+%% Define ImportanceSampling object
+% The InportanceSampling object required the definition of a "Proposal
+% Sampling Distribution".
+% A. Define the proposal distribution
+RV3=RandomVariable('Sdistribution','normal', 'mean',0,'std',1); %#ok<NASGU>
+RV4=RandomVariable('Sdistribution','normal', 'mean',0,'std',1); %#ok<NASGU>
+XrvsIS=RandomVariableSet('Cmembers',{'RV3';'RV4'});
+% Define the mapping between the random variables present in the Importance
+% Sampling distribution and the random variable defined in the problem
+Cmapping={'RV3' 'RV1'; 'RV4' 'RV2'};
+% Construct the Simulation object
+Xis=ImportanceSampling('Nsamples',10,'Nbatches',2,'CXrvset',{XrvsIS},'Cmapping',Cmapping);
+
+%% Perform IS simulation
+Xo=Xis.apply(Xmdl);
+% Show summary of the results
+display(Xo)
+% The simulation is performed adopting the number of samples defined in the
+% object Xis. Use Xin.Nsamples to retrive the number of samples defined
+
+Xis.Nsamples=200;
+Xo=Xis.apply(Xmdl);
+% Show summary of the results
+display(Xo)
+
+% If you need to define the name of variable used to store the weights use
+% the field SweightsName of the ImportanceSampling object
+Xis.SweightsName='myWeights';
+display(Xo)
+% The weights are magically stored in the SimulationData ;)
+
+%% Redifine the proposal distribution
+% it is possible to define the proposal distribution only for selected
+% random variable.
+% The cellarray Cmapping is used to perform this ckeck!
+Cmapping={'RV3' 'RV1'}; % Now only the distribution of the RV1 is replace
+% The original distribution is used for RV2
+
+Xis=ImportanceSampling('Nsamples',10,'Nbatches',2,'CXrvset',{XrvsIS},'Cmapping',Cmapping);
+
+% Perform IS simulation
+Xo=Xis.apply(Xmdl);
+display(Xo)
+
+%% Apply the Importance sampling simulation method to a ProbabilisticModel
+% Define a probabilisti model (Requires a Model object and a PerfomanceFunction object
+% Construct the performance function
+
+%% Construct the performance function
+Xpf=PerformanceFunction('Scapacity','Xthreshold','Sdemand','out','Soutputname','Vg');
+
+% Construct a ProbabilisticModel Object
+Xpm=ProbabilisticModel('Xmodel',Xmdl,'XperformanceFunction',Xpf);
+% now we can apply the ImportanceSampling object and estimate also
+% the performance function
+% ProbabilisticModel
+Xopf=Xis.apply(Xpm);
+display(Xopf)
+
+Xopf.getValues('Sname',Xpf.Soutputname)
+
+
+%% Check the weights
+% use as Importance Sampling density the same distribution of RV1 and RV2.
+% By doing so, all the weigth must be equal 1!
+RV3=RV1; %#ok<SNASGU>
+RV4=RV2; %#ok<SNASGU>
+XrvsIS=RandomVariableSet('Cmembers',{'RV3';'RV4'});
+Cmapping={'RV3' 'RV1'; 'RV4' 'RV2'};
+% Construct the Simulation object
+Xis=ImportanceSampling('Nsamples',10,'Nbatches',2,'CXrvset',{XrvsIS},'Cmapping',Cmapping);
+
+XoTest=Xis.apply(Xpm);
+display(XoTest)
+XoTest.getValues('Sname',Xis.SweightsName)
+
+
+%% Estimate the Failure Probability
+% Set RandomNumber stream
+CossanX.resetRandomNumberGenerator(51125)
+Xpf=Xis.pf(Xpm);
+display(Xpf)
+
+% Verificate the procedure
+Xis.Nbatches=1;
+Xis.Nsamples=20000;
+Xmc=MonteCarlo('Nsamples',1e5);
+XpfMC=pf(Xpm,Xmc);
+XpfIS=pf(Xpm,Xis);
+
+display(XpfMC)
+display(XpfIS)
+
+%% Validate Solutions
+assert(abs(Xpf.pfhat-0.2)<1e-4,'COSSANX:Tutorials','Wrong results')
+
+##### SOURCE END #####
+--></body></html>

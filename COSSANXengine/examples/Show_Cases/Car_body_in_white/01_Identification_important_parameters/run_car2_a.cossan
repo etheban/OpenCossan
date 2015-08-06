@@ -1,0 +1,144 @@
+ID CALCUL NASTRAN
+$
+SOL 103
+TIME 100000 $ MINUTES
+$
+CEND
+$
+ECHO = NONE
+METHOD = 1
+$
+SET 1 = 1 THRU 16
+$
+include '843_63100_a.dat'
+$
+$----------------------------------------------------------------------------------------------------------------
+PSHELL        11       1<cossan name="xrv_pshell_11" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        12       1<cossan name="xrv_pshell_12" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        13       1<cossan name="xrv_pshell_13" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        14       1<cossan name="xrv_pshell_14" format="nastran8" original="1" />       11.0            10.833   0.0
+PSHELL        15       1<cossan name="xrv_pshell_15" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        16       1<cossan name="xrv_pshell_16" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        17       1<cossan name="xrv_pshell_17" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        18       1<cossan name="xrv_pshell_18" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        19       1<cossan name="xrv_pshell_19" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        20       1<cossan name="xrv_pshell_20" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        21       1<cossan name="xrv_pshell_21" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        22       1<cossan name="xrv_pshell_22" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        23       1<cossan name="xrv_pshell_23" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        24       1<cossan name="xrv_pshell_24" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        25       1<cossan name="xrv_pshell_25" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        26       1<cossan name="xrv_pshell_26" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        27       1<cossan name="xrv_pshell_27" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        28       1<cossan name="xrv_pshell_28" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        29       1<cossan name="xrv_pshell_29" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        30       1<cossan name="xrv_pshell_30" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        31       1<cossan name="xrv_pshell_31" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        32       1<cossan name="xrv_pshell_32" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        33       1<cossan name="xrv_pshell_33" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        34       1<cossan name="xrv_pshell_34" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        35       1<cossan name="xrv_pshell_35" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        36       1<cossan name="xrv_pshell_36" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        37       1<cossan name="xrv_pshell_37" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        38       1<cossan name="xrv_pshell_38" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        39       1<cossan name="xrv_pshell_39" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        40       1<cossan name="xrv_pshell_40" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        41       1<cossan name="xrv_pshell_41" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        42       1<cossan name="xrv_pshell_42" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        43       1<cossan name="xrv_pshell_43" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        44       1<cossan name="xrv_pshell_44" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        45       1<cossan name="xrv_pshell_45" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        46       1<cossan name="xrv_pshell_46" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        47       1<cossan name="xrv_pshell_47" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        48       1<cossan name="xrv_pshell_48" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        49       1<cossan name="xrv_pshell_49" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        50       1<cossan name="xrv_pshell_50" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        51       1<cossan name="xrv_pshell_51" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        52       1<cossan name="xrv_pshell_52" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        53       1<cossan name="xrv_pshell_53" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        54       1<cossan name="xrv_pshell_54" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        55       1<cossan name="xrv_pshell_55" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        56       1<cossan name="xrv_pshell_56" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        57       1<cossan name="xrv_pshell_57" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        58       1<cossan name="xrv_pshell_58" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        59       1<cossan name="xrv_pshell_59" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        60       1<cossan name="xrv_pshell_60" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        61       1<cossan name="xrv_pshell_61" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        62       1<cossan name="xrv_pshell_62" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        63       1<cossan name="xrv_pshell_63" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        64       1<cossan name="xrv_pshell_64" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        65       1<cossan name="xrv_pshell_65" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        66       1<cossan name="xrv_pshell_66" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        67       1<cossan name="xrv_pshell_67" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        68       1<cossan name="xrv_pshell_68" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        69       1<cossan name="xrv_pshell_69" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        70       1<cossan name="xrv_pshell_70" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        71       1<cossan name="xrv_pshell_71" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        72       1<cossan name="xrv_pshell_72" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        73       1<cossan name="xrv_pshell_73" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        74       1<cossan name="xrv_pshell_74" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        75       1<cossan name="xrv_pshell_75" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        78       1<cossan name="xrv_pshell_78" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        79       1<cossan name="xrv_pshell_79" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL        80       2<cossan name="xrv_pshell_80" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        81       2<cossan name="xrv_pshell_81" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        82       2<cossan name="xrv_pshell_82" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        83       2<cossan name="xrv_pshell_83" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        84       2<cossan name="xrv_pshell_84" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        85       2<cossan name="xrv_pshell_85" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        86       2<cossan name="xrv_pshell_86" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        87       2<cossan name="xrv_pshell_87" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        88       3<cossan name="xrv_pshell_88" format="nastran8" original="1" />       31.0            30.833333
+PSHELL        89       3<cossan name="xrv_pshell_89" format="nastran8" original="1" />       31.0            30.833333
+PSHELL        90       2<cossan name="xrv_pshell_90" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        91       2<cossan name="xrv_pshell_91" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        92       2<cossan name="xrv_pshell_92" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        93       2<cossan name="xrv_pshell_93" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        94       2<cossan name="xrv_pshell_94" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        95       2<cossan name="xrv_pshell_95" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        96       2<cossan name="xrv_pshell_96" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        97       2<cossan name="xrv_pshell_97" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        98       2<cossan name="xrv_pshell_98" format="nastran8" original="1" />       21.0            20.833333
+PSHELL        99       2<cossan name="xrv_pshell_99" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       100       2<cossan name="xrv_pshell_100" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       101       2<cossan name="xrv_pshell_101" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       102       2<cossan name="xrv_pshell_102" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       103       2<cossan name="xrv_pshell_103" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       104       2<cossan name="xrv_pshell_104" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       105       2<cossan name="xrv_pshell_105" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       106       2<cossan name="xrv_pshell_106" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       107       2<cossan name="xrv_pshell_107" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       108       2<cossan name="xrv_pshell_108" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       109       4<cossan name="xrv_pshell_109" format="nastran8" original="1" />       41.0            40.833333
+PSHELL       110       2<cossan name="xrv_pshell_110" format="nastran8" original="1" />       21.0            20.833333
+PSHELL       111       1<cossan name="xrv_pshell_111" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL       115       1<cossan name="xrv_pshell_115" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL       116       1<cossan name="xrv_pshell_116" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL       117       1<cossan name="xrv_pshell_117" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL       118       1<cossan name="xrv_pshell_118" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL       119       1<cossan name="xrv_pshell_119" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL       120       1<cossan name="xrv_pshell_120" format="nastran8" original="1" />       11.0            10.8333330.0
+PSHELL       121       1<cossan name="xrv_pshell_121" format="nastran8" original="1" />       11.0            10.8333330.0
+$
+PSOLID       113       5
+$
+PBAR           1       31300.0  125000.0125000.0250000.00.0
+$
+MAT1           1190000.0        0.3     7.80E-09
+MAT1           2190000.0        0.3     7.80E-09
+MAT1           3190000.0        0.3     7.80E-09
+MAT1           470000.0         0.3     2.40E-09
+MAT1           53.6             0.49    1.05E-09
+$
+$----------------------------------------------------------------------------------------------------------------
+$
+EIGRL          1    45.0  50.00      
+$
+PARAM    BAILOUT      -1
+PARAM     GRDPNT       0
+PARAM     PRGPST      NO
+PARAM      K6ROT     0.0 
+PARAM    SNORM      20.0
+$
+ENDDATA
+                                                                         

@@ -1,0 +1,1120 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialStochasticProcess</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialStochasticProcess.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">TUTORIALSTOCHASTICPROCESS</a></li><li><a href="#2">1D-STOCHASTIC PROCESS</a></li><li><a href="#3">close figures and validate solution</a></li><li><a href="#4">2D-STOCHASTIC PROCESS</a></li><li><a href="#5">close figures and validate solution (part of samples of SP1)</a></li><li><a href="#6">3D-STOCHASTIC PROCESS</a></li><li><a href="#7">close figures and validate solution (part of samples of SP5)</a></li><li><a href="#8">NON-HOMOGENEOUS STOCHASTIC PROCESS</a></li><li><a href="#9">close figures and validate solution (part of samples of SP6)</a></li><li><a href="#10">USAGE OF STOCHASTIC PROCESS WITH INPUT OBJECT</a></li><li><a href="#11">validate solution (part of samples of SP1)</a></li><li><a href="#12">USAGE OF STOCHASTIC PROCESS AS INPUT FOR ABAQUS FE-ANALYSIS</a></li><li><a href="#13">close figure and validate solution</a></li><li><a href="#14">USAGE OF STOCHASTIC PROCESS AS INPUT FOR NASTRAN FE-ANALYSIS</a></li><li><a href="#15">close figures and delete simulation files</a></li></ul></div><h2>TUTORIALSTOCHASTICPROCESS<a name="1"></a></h2><p>In this tutorial it is shown how to construct a StochasticProcess object and how to use it as an input to a dynamic, transient FE-analysis</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@StochasticProcess">http://mechanik.uibk.ac.at/wiki/index.php/@StochasticProcess</a></p><p><img src="TutorialStochasticProcess_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialStochasticProcess_eq60638.png" alt="$Author:~Barbara~Goller$"></p><pre class="codeinput"><span class="comment">% Reset the random number generator in order to always obtain the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(51125)
+
+<span class="comment">% copy FE-input file with COSSAN-identifiers to working directory</span>
+StutorialPath = fileparts(which(<span class="string">'TutorialStochasticProcess.m'</span>));
+copyfile([StutorialPath <span class="string">'/Connector/ABAQUS/crane.cossan'</span>],<span class="keyword">...</span>
+    fullfile(CossanX.getCossanWorkingPath),<span class="string">'f'</span>);
+copyfile([StutorialPath <span class="string">'/Connector/ABAQUS/Readresults.py'</span>],<span class="keyword">...</span>
+    fullfile(CossanX.getCossanWorkingPath),<span class="string">'f'</span>);
+copyfile([StutorialPath <span class="string">'/Connector/NASTRAN/plate_SP.cossan'</span>],<span class="keyword">...</span>
+    fullfile(CossanX.getCossanWorkingPath),<span class="string">'f'</span>);
+</pre><h2>1D-STOCHASTIC PROCESS<a name="2"></a></h2><pre class="codeinput"><span class="comment">% Define covariance matrix</span>
+Xcovfun  = CovarianceFunction(<span class="string">'Sdescription'</span>,<span class="string">'covariance function'</span>, <span class="keyword">...</span>
+          <span class="string">'Lfunction'</span>,false,<span class="string">'Liostructure'</span>,true,<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'t1'</span>,<span class="string">'t2'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+          <span class="string">'Sscript'</span>, <span class="string">'sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*abs(Tinput(i).t2-Tinput(i).t1)); end'</span>, <span class="keyword">...</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fcov'</span>}); <span class="comment">% Define the outputs</span>
+
+
+<span class="comment">% Define stochastic process</span>
+Vtime =  0:0.1:5; <span class="comment">% time steps</span>
+SP1    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,0,<span class="string">'Xcovariancefunction'</span>,Xcovfun,<span class="string">'Mcoord'</span>,Vtime,<span class="string">'Lhomogeneous'</span>,true);
+SP1    = KL_terms(SP1,<span class="string">'NKL_terms'</span>,30,<span class="string">'LcovarianceAssemble'</span>,false); <span class="comment">% compute 30 Karhunen-Loeve terms</span>
+
+<span class="comment">% Generate 3 samples of stochastic process</span>
+ds1 = SP1.sample(<span class="string">'Nsamples'</span>,3);
+f1=figure;
+plot(ds1.Xdataseries.Mcoord,ds1.Xdataseries.Mdata);
+grid <span class="string">on</span>
+xlabel(<span class="string">'time [s]'</span>)
+ylabel(<span class="string">'function value'</span>)
+legend(<span class="string">'sample no. 1'</span>,<span class="string">'sample no. 2'</span>,<span class="string">'sample no. 3'</span>)
+title(<span class="string">'3 samples of 1D-stochastic process'</span>)
+
+<span class="comment">% compare covariance matrix of samples and analytical covariance matrix</span>
+ds1 = SP1.sample(<span class="string">'Nsamples'</span>,1000); <span class="comment">% use 1000 samples</span>
+Mcov = cov(ds1.Xdataseries.Mdata);
+f2=figure;
+mesh(ds1.Xdataseries.Mcoord,ds1.Xdataseries.Mcoord,Mcov)
+xlim([0 5])
+ylim([0 5])
+xlabel(<span class="string">'\Delta t'</span>)
+ylabel(<span class="string">'\Delta t'</span>)
+zlabel(<span class="string">'covariance'</span>)
+title(<span class="string">'Covariance matrix of stationary 1D-stochastic process estimated from 1000 samples'</span>)
+
+
+<span class="comment">% Define StochasticProcess object by passing the covariance function without assembling the matrix</span>
+Vtime =  0:0.1:5;
+SP2    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,0,<span class="string">'Xcovariancefunction'</span>,Xcovfun,<span class="string">'Mcoord'</span>,Vtime,<span class="string">'Lhomogeneous'</span>,false);
+SP2    = KL_terms(SP2,<span class="string">'NKL_terms'</span>,30,<span class="string">'LcovarianceAssemble'</span>,false);
+
+<span class="comment">% Define StochasticProcess object by passing the covariance matrix</span>
+Vtime = 0:0.1:5;
+[Mtime1 Mtime2]= meshgrid(Vtime,Vtime);
+Vcovariance = evaluate(Xcovfun,[Mtime1(:); Mtime2(:)]);
+Mcovariance = reshape(Vcovariance,length(Vtime),length(Vtime));
+
+SP3    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,5,<span class="string">'Mcovariance'</span>,Mcovariance,<span class="string">'Mcoord'</span>,Vtime);
+SP3    = KL_terms(SP3,<span class="string">'NKL_terms'</span>,30);
+
+f3=figure;
+mesh(Mtime1,Mtime2,Mcovariance)
+xlim([0 5])
+ylim([0 5])
+xlabel(<span class="string">'\Delta t'</span>)
+ylabel(<span class="string">'\Delta t'</span>)
+zlabel(<span class="string">'covariance'</span>)
+title(<span class="string">'Analytical covariance matrix of stationary 1D-stochastic process'</span>)
+</pre><img vspace="5" hspace="5" src="TutorialStochasticProcess_01.png" alt=""> <img vspace="5" hspace="5" src="TutorialStochasticProcess_02.png" alt=""> <img vspace="5" hspace="5" src="TutorialStochasticProcess_03.png" alt=""> <h2>close figures and validate solution<a name="3"></a></h2><pre class="codeinput">close(f1);
+close(f2);
+close(f3);
+
+<span class="comment">% samples of SP1</span>
+assert(all(abs(ds1.Xdataseries.Mdata(1:10)-[-0.2498, 0.7228, 1.2090, 1.1573, <span class="keyword">...</span>
+                      -0.1174, 1.1550, -0.6256, 0.0369, -1.1383, 0.3414])&lt;1.e-4),<span class="keyword">...</span>
+                     <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+                     <span class="string">'Reference Solution ds1 does not match.'</span>);
+
+<span class="comment">% eigenvalues of covariance matrix of SP2</span>
+assert(all(abs(SP2.VcovarianceEigenvalues(1:10)'-[9.4080, 7.8957, 6.1779, 4.6928, <span class="keyword">...</span>
+                     3.5571, 2.7295, 2.1327, 1.6992, 1.3794, 1.1393])&lt;1.e-4),<span class="keyword">...</span>
+                     <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+                     <span class="string">'Reference Solution SP2 does not match.'</span>);
+
+<span class="comment">% eigenvalues of covariance matrix of SP3</span>
+assert(all(abs(SP3.VcovarianceEigenvalues(1:10)'-[9.4080, 7.8957, 6.1779, 4.6928, <span class="keyword">...</span>
+                     3.5571, 2.7295, 2.1327, 1.6992, 1.3794, 1.1393])&lt;1.e-4),<span class="keyword">...</span>
+                     <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+                     <span class="string">'Reference Solution SP3 does not match.'</span>);
+</pre><pre class="codeoutput">Error using ==&gt; TutorialStochasticProcess at 96
+Reference Solution ds1 does not match.
+</pre><h2>2D-STOCHASTIC PROCESS<a name="4"></a></h2><pre class="codeinput"><span class="comment">% Define covariance matrix</span>
+Xcovfun  = CovarianceFunction(<span class="string">'Sdescription'</span>,<span class="string">'covariance function'</span>, <span class="keyword">...</span>
+          <span class="string">'Lfunction'</span>,false,<span class="string">'Liostructure'</span>,true,<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'x1'</span>,<span class="string">'x2'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+          <span class="string">'Sscript'</span>,<span class="string">'sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*sqrt((Tinput(i).x2-Tinput(i).x1)''*(Tinput(i).x2-Tinput(i).x1))); end'</span>, <span class="keyword">...</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fcov'</span>}); <span class="comment">% Define the outputs</span>
+
+<span class="comment">% Define StochasticProcess object by passing the covariance function and assembling the matrix</span>
+[Vx ,Vy]  = meshgrid(0:0.5:5,0:0.5:5);
+Vx = Vx(:)';
+Vy = Vy(:)';
+Vxy = [Vx; Vy];
+SP4    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,0,<span class="string">'Xcovariancefunction'</span>,Xcovfun,<span class="string">'Mcoord'</span>,Vxy);
+SP4    = KL_terms(SP4,<span class="string">'NKL_terms'</span>,30,<span class="string">'LcovarianceAssemble'</span>,false);
+
+<span class="comment">% Generate samples of the stochastic process and visualize them</span>
+ds1 = SP4.sample(<span class="string">'Nsamples'</span>,1000);
+f1=figure;
+surf(reshape(Vx,11,[]),reshape(Vy,11,[]),reshape(ds1.Xdataseries.Mdata(1,:),11,[]))
+title(<span class="string">'Sample of random field'</span>)
+xlabel(<span class="string">'x'</span>)
+ylabel(<span class="string">'y'</span>)
+
+<span class="comment">% compare covariance matrix computed from samples and analytical one</span>
+
+[Mindex1 Mindex2]= meshgrid(1:length(Vx),1:length(Vx));
+Vcov_true = evaluate(Xcovfun,[Vxy(:,Mindex1(:));Vxy(:,Mindex2(:))]);
+Mcov_true = reshape(Vcov_true,length(Vxy),length(Vxy));
+f2=figure;
+mesh(Mindex1,Mindex2,Mcov_true)
+view(0,90)
+title(<span class="string">'Analytical covariance matrix of homogeneous 2D random field'</span>)
+xlabel(<span class="string">'\Delta x'</span>)
+ylabel(<span class="string">'\Delta y'</span>)
+
+Mcov_stat = cov(ds1.Xdataseries.Mdata);
+f3=figure;
+mesh(Mindex1,Mindex2,Mcov_stat)
+view(0,90)
+title(<span class="string">'Covariance matrix of homogeneous, 2D random field estimated from 1000 samples'</span>)
+</pre><h2>close figures and validate solution (part of samples of SP1)<a name="5"></a></h2><pre class="codeinput">close(f1)
+close(f2)
+close(f3)
+
+assert(all(abs(ds1.Xdataseries.Mdata(1:10)-[ 0.0014, -0.8278, -0.6386, 1.4141 <span class="keyword">...</span>
+                      -0.4269, -0.3820, -0.0387, -0.7184, 1.1703, -0.0869])&lt;1.e-4),<span class="keyword">...</span>
+                     <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+                     <span class="string">'Reference Solution ds1 does not match.'</span>);
+</pre><h2>3D-STOCHASTIC PROCESS<a name="6"></a></h2><pre class="codeinput">Xcovfun  = CovarianceFunction(<span class="string">'Sdescription'</span>,<span class="string">'covariance function'</span>, <span class="keyword">...</span>
+          <span class="string">'Lfunction'</span>,false,<span class="string">'Liostructure'</span>,true,<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'x1'</span>,<span class="string">'x2'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+          <span class="string">'Sscript'</span>,<span class="string">'sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*sqrt((Tinput(i).x2-Tinput(i).x1)''*(Tinput(i).x2-Tinput(i).x1))); end'</span>,<span class="keyword">...</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fcov'</span>}); <span class="comment">% Define the outputs</span>
+
+<span class="comment">% Define 3d-coordinates for random field</span>
+[Vx, Vy, Vz]  = meshgrid(0:0.5:5,0:0.5:5,0:0.5:5);
+Vx = Vx(:)';
+Vy = Vy(:)';
+Vz = Vz(:)';
+Vxyz = [Vx; Vy; Vz];
+
+<span class="comment">% Define random field</span>
+SP5    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,0,<span class="keyword">...</span>
+    <span class="string">'Xcovariancefunction'</span>,Xcovfun,<span class="string">'Mcoord'</span>,Vxyz);
+SP5    = KL_terms(SP5,<span class="string">'NKL_terms'</span>,30,<span class="string">'LcovarianceAssemble'</span>,true);
+
+<span class="comment">% Generate 1 sample</span>
+ds1 = SP5.sample(<span class="string">'Nsamples'</span>,1);
+
+<span class="comment">% visualization of volumetric evolution using 4 slices</span>
+[Vx, Vy, Vz]  = meshgrid(0:0.5:5,0:0.5:5,0:0.5:5);
+Vv = ds1.Xdataseries.Mdata(1,:);
+Vv = reshape(Vv, size(Vx));
+xmin = min(Vx(:));
+ymin = min(Vy(:));
+zmin = min(Vz(:));
+
+xmax = max(Vx(:));
+ymax = max(Vy(:));
+zmax = max(Vz(:));
+
+<span class="comment">% create 45 degrees slice</span>
+f1 = figure;
+hslice = surf(linspace(xmin,xmax,20),<span class="keyword">...</span>
+	linspace(ymin,ymax,20),<span class="keyword">...</span>
+	2.5+zeros(20));
+rotate(hslice,[-1,0,0],-45)
+xd = get(hslice,<span class="string">'XData'</span>);
+yd = get(hslice,<span class="string">'YData'</span>);
+zd = get(hslice,<span class="string">'ZData'</span>);
+delete(hslice)
+
+h = slice(Vx,Vy,Vz,Vv,xd,yd,zd);
+set(h,<span class="string">'FaceColor'</span>,<span class="string">'interp'</span>,<span class="keyword">...</span>
+	<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="keyword">...</span>
+	<span class="string">'DiffuseStrength'</span>,.8)
+
+<span class="comment">% create slices in x, y and z directions</span>
+hold <span class="string">on</span>
+hx = slice(Vx,Vy,Vz,Vv,xmax,[],[]);
+set(hx,<span class="string">'FaceColor'</span>,<span class="string">'interp'</span>,<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>)
+
+hy = slice(Vx,Vy,Vz,Vv,[],ymax,[]);
+set(hy,<span class="string">'FaceColor'</span>,<span class="string">'interp'</span>,<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>)
+
+hz = slice(Vx,Vy,Vz,Vv,[],[],zmin);
+set(hz,<span class="string">'FaceColor'</span>,<span class="string">'interp'</span>,<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>)
+
+<span class="comment">% change the view and add light to make the plot prettier</span>
+daspect([1,1,1])
+axis <span class="string">tight</span>
+box <span class="string">on</span>
+view(-38.5,16)
+lightangle(-45,45)
+set(gcf,<span class="string">'Renderer'</span>,<span class="string">'zbuffer'</span>)
+xlabel(<span class="string">'x'</span>)
+ylabel(<span class="string">'y'</span>)
+zlabel(<span class="string">'z'</span>)
+title(<span class="string">'1 sample of 3D-stochastic process visualized on 4 planes'</span>)
+</pre><h2>close figures and validate solution (part of samples of SP5)<a name="7"></a></h2><pre class="codeinput">close(f1)
+assert(all(abs(ds1.Xdataseries.Mdata(1:10)-[0.0398, 0.1818, 0.3964, 0.6118, <span class="keyword">...</span>
+                      0.7505, 0.7777, 0.7134, 0.6062, 0.4939, 0.3829])&lt;1.e-4),<span class="keyword">...</span>
+                     <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+                     <span class="string">'Reference Solution ds1 does not match.'</span>);
+</pre><h2>NON-HOMOGENEOUS STOCHASTIC PROCESS<a name="8"></a></h2><pre class="codeinput">Xcovfun  = CovarianceFunction(<span class="string">'Sdescription'</span>,<span class="string">'covariance function'</span>, <span class="keyword">...</span>
+          <span class="string">'Lfunction'</span>,false,<span class="string">'Liostructure'</span>,true,<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'t1'</span>,<span class="string">'t2'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+          <span class="string">'Sscript'</span>,<span class="string">'for i=1:length(Tinput),Toutput(i).fcov = min(Tinput(i).t1,Tinput(i).t2); end'</span>,<span class="keyword">...</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fcov'</span>}); <span class="comment">% Define the outputs</span>
+
+<span class="comment">% Create StochasticProcess object by passing the covariance function and assembling the matrix</span>
+
+Vtime =  linspace(0,5,100);
+SP6    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,0,<span class="string">'Xcovariancefunction'</span>,Xcovfun,<span class="string">'Mcoord'</span>,Vtime);
+SP6    = KL_terms(SP6,<span class="string">'NKL_terms'</span>,30,<span class="string">'LcovarianceAssemble'</span>,true);
+
+<span class="comment">% Generate 1000 samples</span>
+ds1 = SP6.sample(<span class="string">'Nsamples'</span>,1000);
+
+<span class="comment">% Compare the analytical covariance to the statisctical covariance</span>
+[Mtime1 Mtime2]= meshgrid(Vtime,Vtime);
+Vcov_true = evaluate(Xcovfun,[Mtime1(:);Mtime2(:)]);
+Mcov_true = reshape(Vcov_true,length(Vtime),length(Vtime));
+
+f1=figure;
+surf(Mtime1,Mtime2,Mcov_true)
+view(0,90)
+title(<span class="string">'Analytical covariance matrix of non-homogeneous stochastic process'</span>)
+xlabel(<span class="string">'x'</span>)
+ylabel(<span class="string">'y'</span>)
+
+Mcov_stat = cov(ds1.Xdataseries.Mdata);
+f2=figure;
+surf(Mtime1,Mtime2,Mcov_stat)
+view(0,90)
+title(<span class="string">'covariance matrix of non-homogeneous stochastic process estimated from 1000 samples'</span>)
+xlabel(<span class="string">'x'</span>)
+ylabel(<span class="string">'y'</span>)
+</pre><h2>close figures and validate solution (part of samples of SP6)<a name="9"></a></h2><pre class="codeinput">close(f1)
+close(f2)
+
+assert(all(abs(ds1.Xdataseries.Mdata(1:10)-zeros(1,10))&lt;1.e-4),<span class="keyword">...</span>
+                     <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+                     <span class="string">'Reference Solution ds1 does not match.'</span>);
+</pre><h2>USAGE OF STOCHASTIC PROCESS WITH INPUT OBJECT<a name="10"></a></h2><pre class="codeinput">Xin    = Input(<span class="string">'CXmembers'</span>,{SP1,SP2,SP3},<span class="string">'CSmembers'</span>,{<span class="string">'SP1'</span>,<span class="string">'SP2'</span>,<span class="string">'SP3'</span>});
+
+<span class="comment">% Generate samples of all defined stochastic processes</span>
+Xin = Xin.sample(<span class="string">'Nsamples'</span>,2);
+Xs  = Xin.Xsamples;
+ds2 = Xs.Xdataseries; <span class="comment">% dataseries collection</span>
+display(ds2);
+
+Xin = sample(Xin,<span class="string">'Nsamples'</span>,15,<span class="string">'Ladd'</span>,true); <span class="comment">% add samples to already generates samples in Xin</span>
+Xs  = get(Xin,<span class="string">'Xsamples'</span>);
+ds2 = Xs.Xdataseries;
+display(ds2);
+
+<span class="comment">% Define parameters, functions, random variables and random variable sets</span>
+
+Xmat1   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'material 1 E'</span>,<span class="string">'value'</span>,7E+7);
+Xmat2   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'material 2 E'</span>,<span class="string">'value'</span>,2E+7);
+Xmat3   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'material 3 E'</span>,<span class="string">'value'</span>,1E+4);
+Mconf   = unidrnd(3,16,16);
+Xconfiguration  = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'material configuration'</span>,<span class="string">'Mvalue'</span>,Mconf);
+
+Xin = add(Xin,Xmat1);
+Xin = add(Xin,Xmat2);
+Xin = add(Xin,Xmat3);
+Xin = add(Xin,Xconfiguration);
+
+Xfun1   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #1'</span>,<span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;Xmat3&amp;&gt;*&lt;&amp;x1&amp;&gt;'</span>);
+Xfun2   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #2'</span>,<span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;Xmat3&amp;&gt;+1'</span>);
+Xin = add( Xin,Xfun2);
+x1  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,2.763,<span class="string">'std'</span>,0.4);
+x2  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,1.25,<span class="string">'std'</span>,0.4);
+x3  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,4,<span class="string">'std'</span>,0.4);
+x4  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'mean'</span>,5,<span class="string">'std'</span>,1);
+
+Cmems   = {<span class="string">'x1'</span>; <span class="string">'x2'</span>};
+Xrvs1     = RandomVariableSet(<span class="string">'Cmembers'</span>,Cmems);
+Cmems   = {<span class="string">'x3'</span>; <span class="string">'x4'</span>};
+Xrvs2   = RandomVariableSet(<span class="string">'Cmembers'</span>,Cmems);
+Xin     = add(Xin,Xrvs1);
+Xin     = add(Xin,Xrvs2);
+
+<span class="comment">% Generate samples of random variables and stochastic processes</span>
+
+Xin = Xin.sample(<span class="string">'Nsamples'</span>,10);
+display(Xin)
+</pre><h2>validate solution (part of samples of SP1)<a name="11"></a></h2><pre class="codeinput">assert(all(abs(Xin.Xsamples.Xdataseries(1).Mdata(1:10)-[-0.7873, -0.2009, 0.0471, -0.5896, <span class="keyword">...</span>
+                      -0.4904, -0.1975, -0.5541, -0.2605, -0.1376, 1.7310])&lt;1.e-4),<span class="keyword">...</span>
+                     <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+                     <span class="string">'Reference Solution ds1 does not match.'</span>);
+</pre><h2>USAGE OF STOCHASTIC PROCESS AS INPUT FOR ABAQUS FE-ANALYSIS<a name="12"></a></h2><p>FE-input file taken from the tutorial database of Abaqus</p><pre class="codeinput"><span class="comment">% define random variables</span>
+Emod  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,200.E9,<span class="string">'std'</span>,200E8);
+density  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,7800.,<span class="string">'std'</span>,780.);
+Cmems   = {<span class="string">'Emod'</span>; <span class="string">'density'</span>};
+Xrvs1     = RandomVariableSet(<span class="string">'Cmembers'</span>,Cmems);
+Xin     = Input;
+Xin     = add(Xin,Xrvs1);
+
+<span class="comment">% Definition of stochastic process</span>
+
+Xcovfun  = CovarianceFunction(<span class="string">'Sdescription'</span>,<span class="string">'covariance function'</span>, <span class="keyword">...</span>
+          <span class="string">'Lfunction'</span>,false,<span class="string">'Liostructure'</span>,true,<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'t1'</span>,<span class="string">'t2'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+          <span class="string">'Sscript'</span>, <span class="string">'sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*abs(Tinput(i).t2-Tinput(i).t1)); end'</span>, <span class="keyword">...</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fcov'</span>}); <span class="comment">% Define the outputs</span>
+
+time   = 0:0.001:0.5;
+SP1    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,1.0,<span class="string">'Xcovariancefunction'</span>,Xcovfun,<span class="string">'Mcoord'</span>,time,<span class="string">'Lhomogeneous'</span>,true);
+SP1    = KL_terms(SP1,<span class="string">'NKL_terms'</span>,30,<span class="string">'Lcovarianceassemble'</span>,false);
+
+Xin    = add(Xin,SP1);
+
+<span class="comment">% Generation of samples of random variables and stochastic processes</span>
+
+Xin = sample(Xin,<span class="string">'Nsamples'</span>,3);
+
+<span class="comment">% Create the Injector</span>
+
+Xi=Injector(<span class="string">'Sscanfilepath'</span>,CossanX.getCossanWorkingPath,<span class="string">'Sscanfilename'</span>,<span class="string">'crane.cossan'</span>,<span class="string">'Sfile'</span>,<span class="string">'crane.inp'</span>);
+
+<span class="comment">%  Create the TableExtractor which reads the time-dependent displacements</span>
+
+Xte1=TableExtractor(<span class="string">'Sdescription'</span>,<span class="string">'Spatial displacement: U1 at Node 104 in NSET TIP'</span>, <span class="keyword">...</span>
+             <span class="string">'Srelativepath'</span>,<span class="string">'./'</span>, <span class="keyword">...</span>
+             <span class="string">'Sfile'</span>,<span class="string">'results.txt'</span>, <span class="keyword">...</span>
+             <span class="string">'Nheaderlines'</span>, 3, <span class="keyword">...</span>
+             <span class="string">'Sdelimiter'</span>, <span class="string">' '</span>,<span class="keyword">...</span>
+             <span class="string">'Soutputname'</span>,<span class="string">'U1_Node104'</span>);
+
+<span class="comment">% Define connector</span>
+
+Xconn1 = Connector(<span class="string">'SpredefinedType'</span>,<span class="string">'Abaqus'</span>,<span class="keyword">...</span>
+    <span class="string">'Smaininputpath'</span>,CossanX.getCossanWorkingPath,<span class="keyword">...</span>
+    <span class="string">'Smaininputfile'</span>,<span class="string">'crane.inp'</span>,<span class="keyword">...</span>
+    <span class="string">'Caddfiles'</span>,{<span class="string">'Readresults.py'</span>},<span class="keyword">...</span>
+    <span class="string">'Sworkingdirectory'</span>,CossanX.getCossanWorkingPath, <span class="keyword">...</span>
+    <span class="string">'SpostExecutionCommand'</span>,<span class="string">'/usr/site/bin/abq671 cae noGUI=Readresults.py'</span>, <span class="keyword">...</span>
+    <span class="string">'Xinjector'</span>,Xi, <span class="keyword">...</span>
+    <span class="string">'Xextractor'</span>,Xte1);
+
+<span class="comment">% Run the MC simulations and plot the displacements as a function of time</span>
+
+XSimOut = run(Xconn1,Xin);
+
+f1 = figure;
+<span class="keyword">for</span> isample = 1:XSimOut.Nsamples
+    plot(XSimOut.Tvalues(isample).U1_Node104.Mcoord,XSimOut.Tvalues(isample).U1_Node104.Mdata);
+    hold <span class="string">all</span>;
+<span class="keyword">end</span>
+xlabel(<span class="string">'time [s]'</span>);
+ylabel(<span class="string">'Displacement [m]'</span>)
+title(<span class="string">'Tip displacment of crane'</span>)
+legend(<span class="string">'sample 1'</span>,<span class="string">'sample 2'</span>,<span class="string">'sample 3'</span>)
+
+delete([CossanX.getCossanWorkingPath <span class="string">'/crane.*'</span>]);
+</pre><h2>close figure and validate solution<a name="13"></a></h2><pre class="codeinput">close(f1)
+
+assert(all(abs(XSimOut.Tvalues(1).U1_Node104.Mdata(1:10)-[0, -0.0021, -0.0041, -0.0054, <span class="keyword">...</span>
+                      -0.0074, -0.0087, -0.0093, -0.0094, -0.0081, -0.0060])&lt;1.e-4),<span class="keyword">...</span>
+                     <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+                     <span class="string">'Reference Solution of displacement of tip does not match.'</span>);
+</pre><h2>USAGE OF STOCHASTIC PROCESS AS INPUT FOR NASTRAN FE-ANALYSIS<a name="14"></a></h2><pre class="codeinput"><span class="comment">% Definition of random variables</span>
+
+Emod  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,2E11,<span class="string">'std'</span>,2E10);
+t  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0.05,<span class="string">'std'</span>,0.005);
+nu  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0.3,<span class="string">'std'</span>,0.003);
+
+Cmems   = {<span class="string">'Emod'</span>; <span class="string">'t'</span>; <span class="string">'nu'</span>};
+Xrvs1     = RandomVariableSet(<span class="string">'Cmembers'</span>,Cmems);
+
+Xin     = Input;
+Xin     = add(Xin,Xrvs1);
+
+<span class="comment">% Definition of the stochastic processes</span>
+
+time1   = 0:0.01:1;
+time2   = 0:0.01:0.5;
+time3   = 0:0.01:0.75;
+
+Xcovfun  = CovarianceFunction(<span class="string">'Sdescription'</span>,<span class="string">'covariance function'</span>, <span class="keyword">...</span>
+          <span class="string">'Lfunction'</span>,false,<span class="string">'Liostructure'</span>,true,<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'t1'</span>,<span class="string">'t2'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+          <span class="string">'Sscript'</span>, <span class="string">'sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*abs(Tinput(i).t2-Tinput(i).t1)); end'</span>, <span class="keyword">...</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fcov'</span>}); <span class="comment">% Define the outputs</span>
+
+SP1    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,80,<span class="string">'Xcovariancefunction'</span>,Xcovfun,<span class="string">'Mcoord'</span>,time1);
+SP1    = KL_terms(SP1,<span class="string">'NKL_terms'</span>,30,<span class="string">'Lcovarianceassemble'</span>,false);
+SP2    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,50,<span class="string">'Xcovariancefunction'</span>,Xcovfun,<span class="string">'Mcoord'</span>,time2);
+SP2    = KL_terms(SP2,<span class="string">'NKL_terms'</span>,30,<span class="string">'Lcovarianceassemble'</span>,false);
+SP3    = StochasticProcess(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'Vmean'</span>,150,<span class="string">'Xcovariancefunction'</span>,Xcovfun,<span class="string">'Mcoord'</span>,time3);
+SP3    = KL_terms(SP3,<span class="string">'NKL_terms'</span>,30,<span class="string">'Lcovarianceassemble'</span>,false);
+
+Xin    = add(Xin,SP1);
+Xin    = add(Xin,SP2);
+Xin    = add(Xin,SP3);
+
+<span class="comment">% Generation of 3 samples of random variables and stochastic processes</span>
+
+Xin = sample(Xin,<span class="string">'Nsamples'</span>,3);
+
+<span class="comment">% Create the Injector</span>
+
+Xi=Injector(<span class="string">'Sscanfilepath'</span>,CossanX.getCossanWorkingPath,<span class="string">'Sscanfilename'</span>,<span class="string">'plate_SP.cossan'</span>,<span class="string">'Sfile'</span>,<span class="string">'plate_SP.dat'</span>);
+
+<span class="comment">% Define which responses shall be extracted from PCH-file</span>
+
+Xresp1 = Response(<span class="string">'Sname'</span>, <span class="string">'Out_ID170'</span>, <span class="keyword">...</span>
+    <span class="string">'Sfieldformat'</span>, [<span class="string">'%f'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>,<span class="string">'\n'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>], <span class="keyword">...</span>
+    <span class="string">'Clookoutfor'</span>,{<span class="string">'POINT ID =         170'</span>}, <span class="keyword">...</span>
+    <span class="string">'Ncolnum'</span>,1, <span class="keyword">...</span>
+    <span class="string">'Nrownum'</span>,1,<span class="keyword">...</span>
+    <span class="string">'Nrepeat'</span>,inf);
+
+Xresp2 = Response(<span class="string">'Sname'</span>, <span class="string">'Out_ID87'</span>, <span class="keyword">...</span>
+    <span class="string">'Sfieldformat'</span>, [<span class="string">'%f'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>,<span class="string">'\n'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>], <span class="keyword">...</span>
+    <span class="string">'Clookoutfor'</span>,{<span class="string">'POINT ID =         187'</span>}, <span class="keyword">...</span>
+    <span class="string">'Ncolnum'</span>,1, <span class="keyword">...</span>
+    <span class="string">'Nrownum'</span>,1,<span class="keyword">...</span>
+    <span class="string">'Nrepeat'</span>,inf);
+
+Xresp3 = Response(<span class="string">'Sname'</span>, <span class="string">'Out_ID88'</span>, <span class="keyword">...</span>
+    <span class="string">'Sfieldformat'</span>, [<span class="string">'%f'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>,<span class="string">'\n'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>], <span class="keyword">...</span>
+    <span class="string">'Clookoutfor'</span>,{<span class="string">'POINT ID =         188'</span>}, <span class="keyword">...</span>
+    <span class="string">'Ncolnum'</span>,1, <span class="keyword">...</span>
+    <span class="string">'Nrownum'</span>,1,<span class="keyword">...</span>
+    <span class="string">'Nrepeat'</span>,inf);
+
+Xresp4 = Response(<span class="string">'Sname'</span>, <span class="string">'Out_ID89'</span>, <span class="keyword">...</span>
+    <span class="string">'Sfieldformat'</span>, [<span class="string">'%f'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>,<span class="string">'\n'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>], <span class="keyword">...</span>
+    <span class="string">'Clookoutfor'</span>,{<span class="string">'POINT ID =         189'</span>}, <span class="keyword">...</span>
+    <span class="string">'Ncolnum'</span>,1, <span class="keyword">...</span>
+    <span class="string">'Nrownum'</span>,1,<span class="keyword">...</span>
+    <span class="string">'Nrepeat'</span>,inf);
+
+Xresp5 = Response(<span class="string">'Sname'</span>, <span class="string">'Out_ID90'</span>, <span class="keyword">...</span>
+    <span class="string">'Sfieldformat'</span>, [<span class="string">'%f'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>,<span class="string">'\n'</span>,<span class="string">'%*s'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%f'</span>,<span class="string">'%*d'</span>], <span class="keyword">...</span>
+    <span class="string">'Clookoutfor'</span>,{<span class="string">'POINT ID =         190'</span>}, <span class="keyword">...</span>
+    <span class="string">'Ncolnum'</span>,1, <span class="keyword">...</span>
+    <span class="string">'Nrownum'</span>,1,<span class="keyword">...</span>
+    <span class="string">'Nrepeat'</span>,inf);
+
+<span class="comment">% Add Responses to dedicated extractor (=TableExtractor)</span>
+Xte=TableExtractor(<span class="string">'Sdescription'</span>,<span class="string">'Extractor for the tutorial'</span>, <span class="keyword">...</span>
+             <span class="string">'Srelativepath'</span>,<span class="string">'./'</span>, <span class="keyword">...</span>
+             <span class="string">'Sfile'</span>,<span class="string">'plate_SP.pch'</span>, <span class="keyword">...</span>
+             <span class="string">'Xresponse'</span>, [Xresp1 Xresp2 Xresp3 Xresp4 Xresp5]);
+
+<span class="comment">% Define Connector</span>
+Xc = Connector(<span class="string">'SpredefinedType'</span>,<span class="string">'nastran_x86_64'</span>, <span class="keyword">...</span>
+                <span class="string">'Smaininputpath'</span>,CossanX.getCossanWorkingPath, <span class="keyword">...</span>
+                <span class="string">'Smaininputfile'</span>,<span class="string">'plate_SP.dat'</span>, <span class="keyword">...</span>
+                <span class="string">'Sworkingdirectory'</span>,CossanX.getCossanWorkingPath);
+
+<span class="comment">% Add Injector and Extractor to Connector</span>
+Xc = add(Xc,Xi);
+Xc = add(Xc,Xte);
+
+<span class="comment">% Run the analysis</span>
+XSimOut = run(Xc,Xin);
+XSimOut.Sdescription = <span class="string">'Time-dependent response of 5 DOFs'</span>;
+
+<span class="comment">% visualize results</span>
+f1=figure;
+<span class="keyword">for</span> isim = 1:3
+    plot(XSimOut.Tvalues(isim).Out_ID170.Mcoord,XSimOut.Tvalues(isim).Out_ID170.Mdata(3,:)); hold <span class="string">all</span>
+<span class="keyword">end</span>
+xlabel(<span class="string">'time [s]'</span>)
+ylabel(<span class="string">'displacement z [m]'</span>)
+title(<span class="string">'Samples of displacement due to point loads modelled as stochastic processes'</span>)
+legend(<span class="string">'sample 1'</span>,<span class="string">'sample 2'</span>,<span class="string">'sample 3'</span>)
+</pre><h2>close figures and delete simulation files<a name="15"></a></h2><pre class="codeinput">close(f1)
+delete([CossanX.getCossanWorkingPath <span class="string">'/plate_SP.*'</span>]);
+
+<span class="comment">% validate solution</span>
+assert(all(abs(XSimOut.Tvalues(1).Out_ID170.Mdata(10:20)-[ -0.0060, -0.0027, -0.0000, -0.0000, <span class="keyword">...</span>
+                      -0.0000, 0.0043, -0.0149, -0.0088, 0.0000, -0.0000, -0.0000])&lt;1.e-4),<span class="keyword">...</span>
+                     <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+                     <span class="string">'Reference Solution of displacement of tip does not match.'</span>);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALSTOCHASTICPROCESS
+% 
+% In this tutorial it is shown how to construct a StochasticProcess object and
+% how to use it as an input to a dynamic, transient FE-analysis
+%
+%
+% See Also: 
+% http://mechanik.uibk.ac.at/wiki/index.php/@StochasticProcess
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Barbara~Goller$ 
+
+
+% Reset the random number generator in order to always obtain the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(51125)
+
+% copy FE-input file with COSSAN-identifiers to working directory
+StutorialPath = fileparts(which('TutorialStochasticProcess.m'));
+copyfile([StutorialPath '/Connector/ABAQUS/crane.cossan'],...
+    fullfile(CossanX.getCossanWorkingPath),'f');
+copyfile([StutorialPath '/Connector/ABAQUS/Readresults.py'],...
+    fullfile(CossanX.getCossanWorkingPath),'f');
+copyfile([StutorialPath '/Connector/NASTRAN/plate_SP.cossan'],...
+    fullfile(CossanX.getCossanWorkingPath),'f');
+
+%% 1D-STOCHASTIC PROCESS
+
+% Define covariance matrix
+Xcovfun  = CovarianceFunction('Sdescription','covariance function', ...
+          'Lfunction',false,'Liostructure',true,'Liomatrix',false,...
+          'Cinputnames',{'t1','t2'},... % Define the inputs 
+          'Sscript', 'sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*abs(Tinput(i).t2-Tinput(i).t1)); end', ...
+          'Coutputnames',{'fcov'}); % Define the outputs
+
+      
+% Define stochastic process 
+Vtime =  0:0.1:5; % time steps
+SP1    = StochasticProcess('Sdistribution','normal','Vmean',0,'Xcovariancefunction',Xcovfun,'Mcoord',Vtime,'Lhomogeneous',true);
+SP1    = KL_terms(SP1,'NKL_terms',30,'LcovarianceAssemble',false); % compute 30 Karhunen-Loeve terms
+
+% Generate 3 samples of stochastic process
+ds1 = SP1.sample('Nsamples',3); 
+f1=figure;
+plot(ds1.Xdataseries.Mcoord,ds1.Xdataseries.Mdata);
+grid on
+xlabel('time [s]')
+ylabel('function value')
+legend('sample no. 1','sample no. 2','sample no. 3')
+title('3 samples of 1D-stochastic process')
+
+% compare covariance matrix of samples and analytical covariance matrix
+ds1 = SP1.sample('Nsamples',1000); % use 1000 samples
+Mcov = cov(ds1.Xdataseries.Mdata); 
+f2=figure;
+mesh(ds1.Xdataseries.Mcoord,ds1.Xdataseries.Mcoord,Mcov)
+xlim([0 5])
+ylim([0 5])
+xlabel('\Delta t')
+ylabel('\Delta t')
+zlabel('covariance')
+title('Covariance matrix of stationary 1D-stochastic process estimated from 1000 samples')
+
+
+% Define StochasticProcess object by passing the covariance function without assembling the matrix 
+Vtime =  0:0.1:5;
+SP2    = StochasticProcess('Sdistribution','normal','Vmean',0,'Xcovariancefunction',Xcovfun,'Mcoord',Vtime,'Lhomogeneous',false);
+SP2    = KL_terms(SP2,'NKL_terms',30,'LcovarianceAssemble',false);
+
+% Define StochasticProcess object by passing the covariance matrix
+Vtime = 0:0.1:5;
+[Mtime1 Mtime2]= meshgrid(Vtime,Vtime);
+Vcovariance = evaluate(Xcovfun,[Mtime1(:); Mtime2(:)]);
+Mcovariance = reshape(Vcovariance,length(Vtime),length(Vtime));
+
+SP3    = StochasticProcess('Sdistribution','normal','Vmean',5,'Mcovariance',Mcovariance,'Mcoord',Vtime);
+SP3    = KL_terms(SP3,'NKL_terms',30);
+
+f3=figure;
+mesh(Mtime1,Mtime2,Mcovariance)
+xlim([0 5])
+ylim([0 5])
+xlabel('\Delta t')
+ylabel('\Delta t')
+zlabel('covariance')
+title('Analytical covariance matrix of stationary 1D-stochastic process')
+
+
+%% close figures and validate solution
+
+close(f1);
+close(f2);
+close(f3);
+
+% samples of SP1
+assert(all(abs(ds1.Xdataseries.Mdata(1:10)-[-0.2498, 0.7228, 1.2090, 1.1573, ...
+                      -0.1174, 1.1550, -0.6256, 0.0369, -1.1383, 0.3414])<1.e-4),...
+                     'CossanX:Tutorials:TutorialDataseries', ...
+                     'Reference Solution ds1 does not match.');
+                 
+% eigenvalues of covariance matrix of SP2    
+assert(all(abs(SP2.VcovarianceEigenvalues(1:10)'-[9.4080, 7.8957, 6.1779, 4.6928, ...
+                     3.5571, 2.7295, 2.1327, 1.6992, 1.3794, 1.1393])<1.e-4),...
+                     'CossanX:Tutorials:TutorialDataseries', ...
+                     'Reference Solution SP2 does not match.');
+                 
+% eigenvalues of covariance matrix of SP3    
+assert(all(abs(SP3.VcovarianceEigenvalues(1:10)'-[9.4080, 7.8957, 6.1779, 4.6928, ...
+                     3.5571, 2.7295, 2.1327, 1.6992, 1.3794, 1.1393])<1.e-4),...
+                     'CossanX:Tutorials:TutorialDataseries', ...
+                     'Reference Solution SP3 does not match.');
+                 
+              
+%% 2D-STOCHASTIC PROCESS
+
+% Define covariance matrix
+Xcovfun  = CovarianceFunction('Sdescription','covariance function', ...
+          'Lfunction',false,'Liostructure',true,'Liomatrix',false,...
+          'Cinputnames',{'x1','x2'},... % Define the inputs
+          'Sscript','sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*sqrt((Tinput(i).x2-Tinput(i).x1)''*(Tinput(i).x2-Tinput(i).x1))); end', ...
+          'Coutputnames',{'fcov'}); % Define the outputs
+
+% Define StochasticProcess object by passing the covariance function and assembling the matrix 
+[Vx ,Vy]  = meshgrid(0:0.5:5,0:0.5:5);
+Vx = Vx(:)';
+Vy = Vy(:)';
+Vxy = [Vx; Vy];
+SP4    = StochasticProcess('Sdistribution','normal','Vmean',0,'Xcovariancefunction',Xcovfun,'Mcoord',Vxy);
+SP4    = KL_terms(SP4,'NKL_terms',30,'LcovarianceAssemble',false);
+
+% Generate samples of the stochastic process and visualize them
+ds1 = SP4.sample('Nsamples',1000);
+f1=figure;
+surf(reshape(Vx,11,[]),reshape(Vy,11,[]),reshape(ds1.Xdataseries.Mdata(1,:),11,[]))
+title('Sample of random field')
+xlabel('x')
+ylabel('y')
+
+% compare covariance matrix computed from samples and analytical one
+
+[Mindex1 Mindex2]= meshgrid(1:length(Vx),1:length(Vx));
+Vcov_true = evaluate(Xcovfun,[Vxy(:,Mindex1(:));Vxy(:,Mindex2(:))]);
+Mcov_true = reshape(Vcov_true,length(Vxy),length(Vxy));
+f2=figure;
+mesh(Mindex1,Mindex2,Mcov_true)
+view(0,90)
+title('Analytical covariance matrix of homogeneous 2D random field')
+xlabel('\Delta x')
+ylabel('\Delta y')
+
+Mcov_stat = cov(ds1.Xdataseries.Mdata);
+f3=figure;
+mesh(Mindex1,Mindex2,Mcov_stat)
+view(0,90)
+title('Covariance matrix of homogeneous, 2D random field estimated from 1000 samples')
+
+%% close figures and validate solution (part of samples of SP1)
+
+close(f1)
+close(f2)
+close(f3)
+
+assert(all(abs(ds1.Xdataseries.Mdata(1:10)-[ 0.0014, -0.8278, -0.6386, 1.4141 ...
+                      -0.4269, -0.3820, -0.0387, -0.7184, 1.1703, -0.0869])<1.e-4),...
+                     'CossanX:Tutorials:TutorialDataseries', ...
+                     'Reference Solution ds1 does not match.');
+                 
+
+%% 3D-STOCHASTIC PROCESS
+
+Xcovfun  = CovarianceFunction('Sdescription','covariance function', ...
+          'Lfunction',false,'Liostructure',true,'Liomatrix',false,...
+          'Cinputnames',{'x1','x2'},... % Define the inputs 
+          'Sscript','sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*sqrt((Tinput(i).x2-Tinput(i).x1)''*(Tinput(i).x2-Tinput(i).x1))); end',...
+          'Coutputnames',{'fcov'}); % Define the outputs
+
+% Define 3d-coordinates for random field    
+[Vx, Vy, Vz]  = meshgrid(0:0.5:5,0:0.5:5,0:0.5:5);
+Vx = Vx(:)';
+Vy = Vy(:)';
+Vz = Vz(:)';
+Vxyz = [Vx; Vy; Vz];
+
+% Define random field
+SP5    = StochasticProcess('Sdistribution','normal','Vmean',0,...
+    'Xcovariancefunction',Xcovfun,'Mcoord',Vxyz);
+SP5    = KL_terms(SP5,'NKL_terms',30,'LcovarianceAssemble',true);
+
+% Generate 1 sample
+ds1 = SP5.sample('Nsamples',1);
+
+% visualization of volumetric evolution using 4 slices
+[Vx, Vy, Vz]  = meshgrid(0:0.5:5,0:0.5:5,0:0.5:5);
+Vv = ds1.Xdataseries.Mdata(1,:);
+Vv = reshape(Vv, size(Vx));
+xmin = min(Vx(:)); 
+ymin = min(Vy(:)); 
+zmin = min(Vz(:));
+
+xmax = max(Vx(:)); 
+ymax = max(Vy(:)); 
+zmax = max(Vz(:));
+
+% create 45 degrees slice
+f1 = figure;
+hslice = surf(linspace(xmin,xmax,20),...
+	linspace(ymin,ymax,20),...
+	2.5+zeros(20));
+rotate(hslice,[-1,0,0],-45)
+xd = get(hslice,'XData');
+yd = get(hslice,'YData');
+zd = get(hslice,'ZData');
+delete(hslice)
+
+h = slice(Vx,Vy,Vz,Vv,xd,yd,zd);
+set(h,'FaceColor','interp',...
+	'EdgeColor','none',...
+	'DiffuseStrength',.8)
+
+% create slices in x, y and z directions
+hold on
+hx = slice(Vx,Vy,Vz,Vv,xmax,[],[]);
+set(hx,'FaceColor','interp','EdgeColor','none')
+
+hy = slice(Vx,Vy,Vz,Vv,[],ymax,[]);
+set(hy,'FaceColor','interp','EdgeColor','none')
+
+hz = slice(Vx,Vy,Vz,Vv,[],[],zmin);
+set(hz,'FaceColor','interp','EdgeColor','none')
+
+% change the view and add light to make the plot prettier
+daspect([1,1,1])
+axis tight
+box on
+view(-38.5,16)
+lightangle(-45,45)
+set(gcf,'Renderer','zbuffer')
+xlabel('x')
+ylabel('y')
+zlabel('z')
+title('1 sample of 3D-stochastic process visualized on 4 planes')
+
+%% close figures and validate solution (part of samples of SP5)
+
+close(f1)
+assert(all(abs(ds1.Xdataseries.Mdata(1:10)-[0.0398, 0.1818, 0.3964, 0.6118, ...
+                      0.7505, 0.7777, 0.7134, 0.6062, 0.4939, 0.3829])<1.e-4),...
+                     'CossanX:Tutorials:TutorialDataseries', ...
+                     'Reference Solution ds1 does not match.');
+
+                 
+%% NON-HOMOGENEOUS STOCHASTIC PROCESS
+
+Xcovfun  = CovarianceFunction('Sdescription','covariance function', ...
+          'Lfunction',false,'Liostructure',true,'Liomatrix',false,...
+          'Cinputnames',{'t1','t2'},... % Define the inputs 
+          'Sscript','for i=1:length(Tinput),Toutput(i).fcov = min(Tinput(i).t1,Tinput(i).t2); end',... 
+          'Coutputnames',{'fcov'}); % Define the outputs
+      
+% Create StochasticProcess object by passing the covariance function and assembling the matrix 
+
+Vtime =  linspace(0,5,100);
+SP6    = StochasticProcess('Sdistribution','normal','Vmean',0,'Xcovariancefunction',Xcovfun,'Mcoord',Vtime);
+SP6    = KL_terms(SP6,'NKL_terms',30,'LcovarianceAssemble',true);
+
+% Generate 1000 samples
+ds1 = SP6.sample('Nsamples',1000);
+
+% Compare the analytical covariance to the statisctical covariance
+[Mtime1 Mtime2]= meshgrid(Vtime,Vtime);
+Vcov_true = evaluate(Xcovfun,[Mtime1(:);Mtime2(:)]);
+Mcov_true = reshape(Vcov_true,length(Vtime),length(Vtime));
+
+f1=figure;
+surf(Mtime1,Mtime2,Mcov_true)
+view(0,90)
+title('Analytical covariance matrix of non-homogeneous stochastic process')
+xlabel('x')
+ylabel('y')
+
+Mcov_stat = cov(ds1.Xdataseries.Mdata);
+f2=figure;
+surf(Mtime1,Mtime2,Mcov_stat)
+view(0,90)
+title('covariance matrix of non-homogeneous stochastic process estimated from 1000 samples')
+xlabel('x')
+ylabel('y')
+
+%% close figures and validate solution (part of samples of SP6)
+
+close(f1)
+close(f2)
+
+assert(all(abs(ds1.Xdataseries.Mdata(1:10)-zeros(1,10))<1.e-4),...
+                     'CossanX:Tutorials:TutorialDataseries', ...
+                     'Reference Solution ds1 does not match.');
+
+
+%% USAGE OF STOCHASTIC PROCESS WITH INPUT OBJECT
+
+Xin    = Input('CXmembers',{SP1,SP2,SP3},'CSmembers',{'SP1','SP2','SP3'});
+
+% Generate samples of all defined stochastic processes
+Xin = Xin.sample('Nsamples',2);
+Xs  = Xin.Xsamples; 
+ds2 = Xs.Xdataseries; % dataseries collection 
+display(ds2);
+
+Xin = sample(Xin,'Nsamples',15,'Ladd',true); % add samples to already generates samples in Xin
+Xs  = get(Xin,'Xsamples');
+ds2 = Xs.Xdataseries;
+display(ds2);
+
+% Define parameters, functions, random variables and random variable sets
+
+Xmat1   = Parameter('Sdescription','material 1 E','value',7E+7);
+Xmat2   = Parameter('Sdescription','material 2 E','value',2E+7);
+Xmat3   = Parameter('Sdescription','material 3 E','value',1E+4);
+Mconf   = unidrnd(3,16,16);
+Xconfiguration  = Parameter('Sdescription','material configuration','Mvalue',Mconf);
+
+Xin = add(Xin,Xmat1);
+Xin = add(Xin,Xmat2);
+Xin = add(Xin,Xmat3);
+Xin = add(Xin,Xconfiguration);
+
+Xfun1   = Function('Sdescription','function #1','Sexpression','<&Xmat3&>*<&x1&>');
+Xfun2   = Function('Sdescription','function #2','Sexpression','<&Xmat3&>+1');
+Xin = add( Xin,Xfun2);
+x1  = RandomVariable('Sdistribution','normal','mean',2.763,'std',0.4);
+x2  = RandomVariable('Sdistribution','normal','mean',1.25,'std',0.4);
+x3  = RandomVariable('Sdistribution','normal','mean',4,'std',0.4);
+x4  = RandomVariable('Sdistribution','uniform','mean',5,'std',1);
+
+Cmems   = {'x1'; 'x2'};
+Xrvs1     = RandomVariableSet('Cmembers',Cmems);
+Cmems   = {'x3'; 'x4'};
+Xrvs2   = RandomVariableSet('Cmembers',Cmems);
+Xin     = add(Xin,Xrvs1);
+Xin     = add(Xin,Xrvs2);
+
+% Generate samples of random variables and stochastic processes
+
+Xin = Xin.sample('Nsamples',10); 
+display(Xin)
+
+%% validate solution (part of samples of SP1)
+
+
+assert(all(abs(Xin.Xsamples.Xdataseries(1).Mdata(1:10)-[-0.7873, -0.2009, 0.0471, -0.5896, ...
+                      -0.4904, -0.1975, -0.5541, -0.2605, -0.1376, 1.7310])<1.e-4),...
+                     'CossanX:Tutorials:TutorialDataseries', ...
+                     'Reference Solution ds1 does not match.');
+
+
+%% USAGE OF STOCHASTIC PROCESS AS INPUT FOR ABAQUS FE-ANALYSIS
+% FE-input file taken from the tutorial database of Abaqus 
+
+% define random variables
+Emod  = RandomVariable('Sdistribution','normal','mean',200.E9,'std',200E8);
+density  = RandomVariable('Sdistribution','normal','mean',7800.,'std',780.);
+Cmems   = {'Emod'; 'density'};
+Xrvs1     = RandomVariableSet('Cmembers',Cmems);
+Xin     = Input;
+Xin     = add(Xin,Xrvs1);
+
+% Definition of stochastic process
+
+Xcovfun  = CovarianceFunction('Sdescription','covariance function', ...
+          'Lfunction',false,'Liostructure',true,'Liomatrix',false,...
+          'Cinputnames',{'t1','t2'},... % Define the inputs 
+          'Sscript', 'sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*abs(Tinput(i).t2-Tinput(i).t1)); end', ...
+          'Coutputnames',{'fcov'}); % Define the outputs
+      
+time   = 0:0.001:0.5;             
+SP1    = StochasticProcess('Sdistribution','normal','Vmean',1.0,'Xcovariancefunction',Xcovfun,'Mcoord',time,'Lhomogeneous',true);
+SP1    = KL_terms(SP1,'NKL_terms',30,'Lcovarianceassemble',false);
+
+Xin    = add(Xin,SP1);
+
+% Generation of samples of random variables and stochastic processes
+
+Xin = sample(Xin,'Nsamples',3);
+
+% Create the Injector
+
+Xi=Injector('Sscanfilepath',CossanX.getCossanWorkingPath,'Sscanfilename','crane.cossan','Sfile','crane.inp');
+
+%  Create the TableExtractor which reads the time-dependent displacements
+
+Xte1=TableExtractor('Sdescription','Spatial displacement: U1 at Node 104 in NSET TIP', ...
+             'Srelativepath','./', ...
+             'Sfile','results.txt', ...
+             'Nheaderlines', 3, ...
+             'Sdelimiter', ' ',...
+             'Soutputname','U1_Node104');
+
+% Define connector
+
+Xconn1 = Connector('SpredefinedType','Abaqus',...
+    'Smaininputpath',CossanX.getCossanWorkingPath,...
+    'Smaininputfile','crane.inp',...
+    'Caddfiles',{'Readresults.py'},... 
+    'Sworkingdirectory',CossanX.getCossanWorkingPath, ...
+    'SpostExecutionCommand','/usr/site/bin/abq671 cae noGUI=Readresults.py', ...
+    'Xinjector',Xi, ...
+    'Xextractor',Xte1);
+
+% Run the MC simulations and plot the displacements as a function of time
+
+XSimOut = run(Xconn1,Xin);
+
+f1 = figure;
+for isample = 1:XSimOut.Nsamples
+    plot(XSimOut.Tvalues(isample).U1_Node104.Mcoord,XSimOut.Tvalues(isample).U1_Node104.Mdata);
+    hold all;
+end
+xlabel('time [s]');
+ylabel('Displacement [m]')
+title('Tip displacment of crane')
+legend('sample 1','sample 2','sample 3')
+
+delete([CossanX.getCossanWorkingPath '/crane.*']);
+
+%% close figure and validate solution
+
+close(f1)
+
+assert(all(abs(XSimOut.Tvalues(1).U1_Node104.Mdata(1:10)-[0, -0.0021, -0.0041, -0.0054, ...
+                      -0.0074, -0.0087, -0.0093, -0.0094, -0.0081, -0.0060])<1.e-4),...
+                     'CossanX:Tutorials:TutorialDataseries', ...
+                     'Reference Solution of displacement of tip does not match.');
+
+
+%% USAGE OF STOCHASTIC PROCESS AS INPUT FOR NASTRAN FE-ANALYSIS
+
+% Definition of random variables
+
+Emod  = RandomVariable('Sdistribution','normal','mean',2E11,'std',2E10);
+t  = RandomVariable('Sdistribution','normal','mean',0.05,'std',0.005);
+nu  = RandomVariable('Sdistribution','normal','mean',0.3,'std',0.003);
+
+Cmems   = {'Emod'; 't'; 'nu'};
+Xrvs1     = RandomVariableSet('Cmembers',Cmems);
+
+Xin     = Input;
+Xin     = add(Xin,Xrvs1);
+
+% Definition of the stochastic processes
+
+time1   = 0:0.01:1;
+time2   = 0:0.01:0.5;
+time3   = 0:0.01:0.75;
+
+Xcovfun  = CovarianceFunction('Sdescription','covariance function', ...
+          'Lfunction',false,'Liostructure',true,'Liomatrix',false,...
+          'Cinputnames',{'t1','t2'},... % Define the inputs 
+          'Sscript', 'sigma = 1; b = 0.5; for i=1:length(Tinput), Toutput(i).fcov  = sigma^2*exp(-1/b*abs(Tinput(i).t2-Tinput(i).t1)); end', ...
+          'Coutputnames',{'fcov'}); % Define the outputs
+           
+SP1    = StochasticProcess('Sdistribution','normal','Vmean',80,'Xcovariancefunction',Xcovfun,'Mcoord',time1);
+SP1    = KL_terms(SP1,'NKL_terms',30,'Lcovarianceassemble',false);
+SP2    = StochasticProcess('Sdistribution','normal','Vmean',50,'Xcovariancefunction',Xcovfun,'Mcoord',time2);
+SP2    = KL_terms(SP2,'NKL_terms',30,'Lcovarianceassemble',false);
+SP3    = StochasticProcess('Sdistribution','normal','Vmean',150,'Xcovariancefunction',Xcovfun,'Mcoord',time3);
+SP3    = KL_terms(SP3,'NKL_terms',30,'Lcovarianceassemble',false);
+
+Xin    = add(Xin,SP1);
+Xin    = add(Xin,SP2);
+Xin    = add(Xin,SP3);
+
+% Generation of 3 samples of random variables and stochastic processes
+
+Xin = sample(Xin,'Nsamples',3);
+
+% Create the Injector
+
+Xi=Injector('Sscanfilepath',CossanX.getCossanWorkingPath,'Sscanfilename','plate_SP.cossan','Sfile','plate_SP.dat');
+
+% Define which responses shall be extracted from PCH-file 
+
+Xresp1 = Response('Sname', 'Out_ID170', ...
+    'Sfieldformat', ['%f','%*s','%f','%f','%f','%*d','\n','%*s','%f','%f','%f','%*d'], ...
+    'Clookoutfor',{'POINT ID =         170'}, ...
+    'Ncolnum',1, ...
+    'Nrownum',1,...
+    'Nrepeat',inf);
+
+Xresp2 = Response('Sname', 'Out_ID87', ...
+    'Sfieldformat', ['%f','%*s','%f','%f','%f','%*d','\n','%*s','%f','%f','%f','%*d'], ...
+    'Clookoutfor',{'POINT ID =         187'}, ...
+    'Ncolnum',1, ...
+    'Nrownum',1,...
+    'Nrepeat',inf);
+
+Xresp3 = Response('Sname', 'Out_ID88', ...
+    'Sfieldformat', ['%f','%*s','%f','%f','%f','%*d','\n','%*s','%f','%f','%f','%*d'], ...
+    'Clookoutfor',{'POINT ID =         188'}, ...
+    'Ncolnum',1, ...
+    'Nrownum',1,...
+    'Nrepeat',inf);
+
+Xresp4 = Response('Sname', 'Out_ID89', ...
+    'Sfieldformat', ['%f','%*s','%f','%f','%f','%*d','\n','%*s','%f','%f','%f','%*d'], ...
+    'Clookoutfor',{'POINT ID =         189'}, ...
+    'Ncolnum',1, ...
+    'Nrownum',1,...
+    'Nrepeat',inf);
+
+Xresp5 = Response('Sname', 'Out_ID90', ...
+    'Sfieldformat', ['%f','%*s','%f','%f','%f','%*d','\n','%*s','%f','%f','%f','%*d'], ...
+    'Clookoutfor',{'POINT ID =         190'}, ...
+    'Ncolnum',1, ...
+    'Nrownum',1,...
+    'Nrepeat',inf);
+
+% Add Responses to dedicated extractor (=TableExtractor)
+Xte=TableExtractor('Sdescription','Extractor for the tutorial', ...
+             'Srelativepath','./', ...
+             'Sfile','plate_SP.pch', ...
+             'Xresponse', [Xresp1 Xresp2 Xresp3 Xresp4 Xresp5]);
+
+% Define Connector
+Xc = Connector('SpredefinedType','nastran_x86_64', ...
+                'Smaininputpath',CossanX.getCossanWorkingPath, ...
+                'Smaininputfile','plate_SP.dat', ...
+                'Sworkingdirectory',CossanX.getCossanWorkingPath);
+ 
+% Add Injector and Extractor to Connector            
+Xc = add(Xc,Xi);
+Xc = add(Xc,Xte);
+
+% Run the analysis 
+XSimOut = run(Xc,Xin);
+XSimOut.Sdescription = 'Time-dependent response of 5 DOFs';
+   
+% visualize results
+f1=figure;
+for isim = 1:3
+    plot(XSimOut.Tvalues(isim).Out_ID170.Mcoord,XSimOut.Tvalues(isim).Out_ID170.Mdata(3,:)); hold all
+end
+xlabel('time [s]')
+ylabel('displacement z [m]')
+title('Samples of displacement due to point loads modelled as stochastic processes')
+legend('sample 1','sample 2','sample 3')
+
+%% close figures and delete simulation files
+close(f1)
+delete([CossanX.getCossanWorkingPath '/plate_SP.*']);
+
+% validate solution
+assert(all(abs(XSimOut.Tvalues(1).Out_ID170.Mdata(10:20)-[ -0.0060, -0.0027, -0.0000, -0.0000, ...
+                      -0.0000, 0.0043, -0.0149, -0.0088, 0.0000, -0.0000, -0.0000])<1.e-4),...
+                     'CossanX:Tutorials:TutorialDataseries', ...
+                     'Reference Solution of displacement of tip does not match.');
+
+
+##### SOURCE END #####
+--></body></html>

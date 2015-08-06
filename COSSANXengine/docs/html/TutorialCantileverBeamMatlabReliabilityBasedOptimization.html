@@ -1,0 +1,144 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial Cantilever Beam Reliability Based Optimization</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialCantileverBeamMatlabReliabilityBasedOptimization.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial Cantilever Beam Reliability Based Optimization</h1><!--introduction--><p>This tutorial shows how to perform a Reliability Analysis Optimization. It is using the most basic component and a vary simple model</p><p>The aim of this tutorial is optimize a clmped beam under tip load considering uncertainties. The performance function is defined by the maximum allowable stress level minus the actual stress in a clamped beam.</p><pre>                                        |
+//|                                      v
+//|---------------------------------------
+//|</pre><p><img src="TutorialCantileverBeamMatlabReliabilityBasedOptimization_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialCantileverBeamMatlabReliabilityBasedOptimization_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create input</a></li><li><a href="#2">Define a Probabilistic Model</a></li></ul></div><h2>Create input<a name="1"></a></h2><p>Define the Model</p><pre class="codeinput">run(<span class="string">'TutorialCantileverBeam'</span>)
+</pre><pre class="codeoutput">Input Object  - Description: 
+* 1 Sets of RandomVariables
+** Names: "Xrvset" 
+* 3 Parameter object(s)
+** Names: "L" "b" "maxDiplacement" 
+* 1 Functions object(s)
+** Names: "I" 
+</pre><pre class="codeoutput">Error using ==&gt; Mio.runScript at 37
+ The user define function can not be evaluate! 
+ Please check your function 
+ Undefined function or method 'mtimes' for input arguments of type 'cell'.
+
+Error in ==&gt; Mio.run at 182
+        [XsimOut Poutput]=runScript(Xmio,Psamples);
+
+Error in ==&gt; Evaluator.apply at 124
+                XSimOutTmp=Xobj.CXsolvers{n}.run(PinputMio);
+
+Error in ==&gt; Evaluator.deterministicAnalysis at 21
+XSimOut=Xobj.apply(Tinput);
+
+Error in ==&gt; Model.deterministicAnalysis at 14
+Xout = Xobj.Xevaluator.deterministicAnalysis(Xobj.Xinput);
+
+Error in ==&gt; TutorialCantileverBeamMatlab at 56
+Xout=Xmodel.deterministicAnalysis;
+
+Error in ==&gt; run at 74
+    evalin('caller',[script ';']);
+
+Error in ==&gt; TutorialCantileverBeam at 10
+run('TutorialCantileverBeamMatlab')
+
+Error in ==&gt; run at 74
+    evalin('caller',[script ';']);
+
+Error in ==&gt; TutorialCantileverBeamMatlabReliabilityBasedOptimization at 22
+run('TutorialCantileverBeam')
+</pre><h2>Define a Probabilistic Model<a name="2"></a></h2><p>Performance Function</p><pre class="codeinput">Xperfun = PerformanceFunction(<span class="string">'Sdemand'</span>,<span class="string">'w'</span>,<span class="string">'Scapacity'</span>,<span class="string">'maxDiplacement'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Vg'</span>);
+<span class="comment">% Define a Probabilistic Model</span>
+XprobModel=ProbabilisticModel(<span class="string">'Xmodel'</span>,Xmodel,<span class="string">'XperformanceFunction'</span>,Xperfun);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial Cantilever Beam Reliability Based Optimization
+%
+% This tutorial shows how to perform a Reliability Analysis Optimization.
+% It is using the most basic component and a vary simple model
+%
+%
+% The aim of this tutorial is optimize a clmped beam under tip load considering uncertainties.
+% The performance function is defined by the maximum allowable
+% stress level minus the actual stress in a clamped beam.
+%
+%                                          |
+% //|                                      v
+% //|REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% //|
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+
+%% Create input
+% Define the Model
+run('TutorialCantileverBeam')
+
+%% Define a Probabilistic Model
+% Performance Function
+Xperfun = PerformanceFunction('Sdemand','w','Scapacity','maxDiplacement','Soutputname','Vg');
+% Define a Probabilistic Model
+XprobModel=ProbabilisticModel('Xmodel',Xmodel,'XperformanceFunction',Xperfun);
+
+
+##### SOURCE END #####
+--></body></html>

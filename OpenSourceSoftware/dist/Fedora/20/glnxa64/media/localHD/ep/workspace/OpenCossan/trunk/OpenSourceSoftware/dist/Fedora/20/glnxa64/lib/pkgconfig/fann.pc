@@ -1,0 +1,10 @@
+prefix=/media/localHD/ep/workspace/OpenCossan/trunk/OpenSourceSoftware/dist/Fedora/20/glnxa64
+exec_prefix=/media/localHD/ep/workspace/OpenCossan/trunk/OpenSourceSoftware/dist/Fedora/20/glnxa64/bin
+libdir=/media/localHD/ep/workspace/OpenCossan/trunk/OpenSourceSoftware/dist/Fedora/20/glnxa64/lib
+includedir=/media/localHD/ep/workspace/OpenCossan/trunk/OpenSourceSoftware/dist/Fedora/20/glnxa64/include
+ 
+Name: fann
+Description: Fast Artificial Neural Network Library
+Version: 2.2.0
+Libs: -L${libdir} -lm -lfann
+Cflags: -I${includedir}

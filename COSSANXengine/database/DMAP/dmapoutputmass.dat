@@ -1,0 +1,17 @@
+
+
+$***************************************************************************
+$ This DMAP routine will output the Mass matrix
+$ 
+$ Format   = op4 - sparse
+$ DOF set  = F-SET (Free DOFs Set) 
+$ Analysis = SOL101
+$
+$ Note: the solution sequence is interrepted after the mass is output
+$***************************************************************************
+
+
+COMPILE SEMRM  $
+ALTER 'CALL.*SEMR2' $
+OUTPUT4 MFF,,,,///-13//TRUE/   $
+EXIT  $

@@ -1,0 +1,250 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialMTXExtractor</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialMTXExtractor.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">TUTORIAL for the MTXExtractor object</a></li><li><a href="#2">Preparation of FE-analysis</a></li><li><a href="#3">Run FE-analysis and read stiffness matrix from file</a></li><li><a href="#4">Remove simulation files and close figures</a></li></ul></div><h2>TUTORIAL for the MTXExtractor object<a name="1"></a></h2><p>In this tutorial it is shown how to import matrices from an Abaqus output file (*.mtx-file) into Matlab</p><p>Prepared by BG</p><pre class="codeinput"><span class="comment">%**************************************************************************</span>
+<span class="comment">% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@MTXExtractor</span>
+<span class="comment">%</span>
+
+<span class="comment">%  Copyright 1993-2011, COSSAN Working Group</span>
+<span class="comment">%  University of Innsbruck, Austria</span>
+</pre><h2>Preparation of FE-analysis<a name="2"></a></h2><pre class="codeinput"><span class="comment">% copy FE-input file with COSSAN-identifiers to working directory</span>
+StutorialPath = fileparts(which(<span class="string">'TutorialMTXExtractor.m'</span>));
+copyfile([StutorialPath <span class="string">'/Connector/ABAQUS/antenna.cossan'</span>],<span class="keyword">...</span>
+    fullfile(CossanX.getCossanWorkingPath),<span class="string">'f'</span>);
+
+<span class="comment">% Define random variables and random variable set</span>
+mat1 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,3e+7,<span class="string">'std'</span>,3e+6);
+mat2 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,1e+7,<span class="string">'std'</span>,1e+6);
+mat3 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,1.59e+7,<span class="string">'std'</span>,1.59e+6);
+mat4 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,3e+7,<span class="string">'std'</span>,3e+6);
+mat5 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,1e+7,<span class="string">'std'</span>,1e+6);
+
+rvs = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'mat1'</span>, <span class="string">'mat2'</span>,<span class="string">'mat3'</span>,<span class="string">'mat4'</span>,<span class="string">'mat5'</span>});
+
+<span class="comment">% Define Input object and generate samples</span>
+Xin = Input;
+Xin = add(Xin,rvs);
+Xin = sample(Xin,<span class="string">'Nsamples'</span>,3);
+
+<span class="comment">% Define Injector</span>
+Xi=Injector(<span class="string">'SscanfilePath'</span>,CossanX.getCossanWorkingPath,<span class="keyword">...</span>
+    <span class="string">'Sscanfilename'</span>,<span class="string">'antenna.cossan'</span>,<span class="string">'Sfile'</span>,<span class="string">'antenna.inp'</span>);
+
+<span class="comment">% define the name of the file &amp; path of the file &amp; the variable name to be stored</span>
+XmtxEx = MTXExtractor(<span class="string">'Sfile'</span>,<span class="string">'antenna_STIF2.mtx'</span>,<span class="string">'Soutputname'</span>,<span class="string">'stiffness'</span>);
+
+<span class="comment">% Define Connector</span>
+Xc = Connector(<span class="string">'SpredefinedType'</span>,<span class="string">'Abaqus'</span>, <span class="keyword">...</span>
+               <span class="string">'Sworkingdirectory'</span>,<span class="string">'/tmp'</span>,<span class="keyword">...</span>
+               <span class="string">'Smaininputpath'</span>,CossanX.getCossanWorkingPath,<span class="keyword">...</span>
+               <span class="string">'Smaininputfile'</span>,<span class="string">'antenna.inp'</span>);
+
+<span class="comment">% Add injector and extractor to connector</span>
+Xc = add(Xc,Xi);
+Xc = add(Xc,XmtxEx);
+</pre><pre class="codeoutput">[COSSAN-X.Injector.createByScan] File to be scanned: /tmp/COSSAN/antenna.cossan
+[COSSAN-X.Injector.createByScan] Close File to be scanned: /tmp/COSSAN/antenna.cossan
+EOF found after 3168 lines
+Add Injector Object to Connector
+Add Extractor Object to Connector
+</pre><h2>Run FE-analysis and read stiffness matrix from file<a name="3"></a></h2><pre class="codeinput">Xout = run(Xc,Xin);
+
+<span class="comment">% show sparsity pattern of stiffness matrix</span>
+f1 = figure;
+spy(Xout.Tvalues(1).stiffness)
+</pre><pre class="codeoutput">[COSSAN-X.Connector.run] COSSAN-X:Connector:run  - START -18-May-2011 19:35:51
+[COSSAN-X.Connector.run] Matlab current directory: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/build
+Simulation #1 of 3
+Create folder: /tmp/20110518T193551_sim_1 mess: 
+[COSSAN-X:Connector:copyFiles] Copy main input file from: /tmp/COSSAN/antenna.inp to: /tmp/20110518T193551_sim_1/antenna.inp
+[COSSAN-X:Connector:copyFiles] Copy files of the injectors
+[COSSAN-X:Connector:copyFiles] main Input file already copied
+[COSSAN-X:Connector:copyFiles] MainInputFile: /tmp/COSSAN/antenna.inp
+[COSSAN-X:Connector:copyFiles] Injector File: /tmp/COSSAN/antenna.inp
+[COSSAN-X:Connector:copyFiles] Copy file from: /tmp/COSSAN/./antenna.inp to: /tmp/20110518T193551_sim_1./antenna.inp
+[COSSAN-X.Connector.inject] 1 injector(s) present into the connector
+[COSSAN-X.Connector.inject] Current working directory:/home/ep/workspace/COSSAN-X_SVN/COSSANXengine/build
+[COSSAN-X.Connector.inject] Injecting values in the file: ./antenna.inp
+[COSSAN-X.Injector.inject] Replacing value in the file: /tmp/20110518T193551_sim_1/./antenna.inp
+[COSSAN-X.Injector.inject] Open file (relative path): /tmp/20110518T193551_sim_1/./antenna.inp
+[COSSAN-X.Connector.inject] method: -END -18-May-2011 19:35:52
+[COSSAN-X.Connector.run]  Prepare execution command: 'cd /tmp/20110518T193551_sim_1; pwd;/usr/site/bin/abq673 interactive ask_delete=off job=antenna.inp 
+[COSSAN-X.Connector.run]  Excecution of the solver completed
+[COSSAN-X.Connector.extract] Current directory is: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/build
+[COSSAN-X.Connector.extract] Extracting values from file: antenna_STIF2.mtx
+Reading 14512 x 14512 matrix
+[COSSAN-X.Connector.run] Copy simulation files to: /tmp/COSSAN/20110518T193551_sim_1
+Simulation #2 of 3
+Create folder: /tmp/20110518T193551_sim_2 mess: 
+[COSSAN-X:Connector:copyFiles] Copy main input file from: /tmp/COSSAN/antenna.inp to: /tmp/20110518T193551_sim_2/antenna.inp
+[COSSAN-X:Connector:copyFiles] Copy files of the injectors
+[COSSAN-X:Connector:copyFiles] main Input file already copied
+[COSSAN-X:Connector:copyFiles] MainInputFile: /tmp/COSSAN/antenna.inp
+[COSSAN-X:Connector:copyFiles] Injector File: /tmp/COSSAN/antenna.inp
+[COSSAN-X:Connector:copyFiles] Copy file from: /tmp/COSSAN/./antenna.inp to: /tmp/20110518T193551_sim_2./antenna.inp
+[COSSAN-X.Connector.inject] 1 injector(s) present into the connector
+[COSSAN-X.Connector.inject] Current working directory:/home/ep/workspace/COSSAN-X_SVN/COSSANXengine/build
+[COSSAN-X.Connector.inject] Injecting values in the file: ./antenna.inp
+[COSSAN-X.Injector.inject] Replacing value in the file: /tmp/20110518T193551_sim_2/./antenna.inp
+[COSSAN-X.Injector.inject] Open file (relative path): /tmp/20110518T193551_sim_2/./antenna.inp
+[COSSAN-X.Connector.inject] method: -END -18-May-2011 19:36:23
+[COSSAN-X.Connector.run]  Prepare execution command: 'cd /tmp/20110518T193551_sim_2; pwd;/usr/site/bin/abq673 interactive ask_delete=off job=antenna.inp 
+[COSSAN-X.Connector.run]  Excecution of the solver completed
+[COSSAN-X.Connector.extract] Current directory is: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/build
+[COSSAN-X.Connector.extract] Extracting values from file: antenna_STIF2.mtx
+Reading 14512 x 14512 matrix
+[COSSAN-X.Connector.run] Copy simulation files to: /tmp/COSSAN/20110518T193551_sim_2
+Simulation #3 of 3
+Create folder: /tmp/20110518T193551_sim_3 mess: 
+[COSSAN-X:Connector:copyFiles] Copy main input file from: /tmp/COSSAN/antenna.inp to: /tmp/20110518T193551_sim_3/antenna.inp
+[COSSAN-X:Connector:copyFiles] Copy files of the injectors
+[COSSAN-X:Connector:copyFiles] main Input file already copied
+[COSSAN-X:Connector:copyFiles] MainInputFile: /tmp/COSSAN/antenna.inp
+[COSSAN-X:Connector:copyFiles] Injector File: /tmp/COSSAN/antenna.inp
+[COSSAN-X:Connector:copyFiles] Copy file from: /tmp/COSSAN/./antenna.inp to: /tmp/20110518T193551_sim_3./antenna.inp
+[COSSAN-X.Connector.inject] 1 injector(s) present into the connector
+[COSSAN-X.Connector.inject] Current working directory:/home/ep/workspace/COSSAN-X_SVN/COSSANXengine/build
+[COSSAN-X.Connector.inject] Injecting values in the file: ./antenna.inp
+[COSSAN-X.Injector.inject] Replacing value in the file: /tmp/20110518T193551_sim_3/./antenna.inp
+[COSSAN-X.Injector.inject] Open file (relative path): /tmp/20110518T193551_sim_3/./antenna.inp
+[COSSAN-X.Connector.inject] method: -END -18-May-2011 19:36:33
+[COSSAN-X.Connector.run]  Prepare execution command: 'cd /tmp/20110518T193551_sim_3; pwd;/usr/site/bin/abq673 interactive ask_delete=off job=antenna.inp 
+[COSSAN-X.Connector.run]  Excecution of the solver completed
+[COSSAN-X.Connector.extract] Current directory is: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/build
+[COSSAN-X.Connector.extract] Extracting values from file: antenna_STIF2.mtx
+Reading 14512 x 14512 matrix
+[COSSAN-X.Connector.run] Copy simulation files to: /tmp/COSSAN/20110518T193551_sim_3
+[COSSAN-X.Connector.run]  Creating SimulationData object
+[COSSAN-X.Connector.run]   - END -18-May-2011 19:36:43
+</pre><img vspace="5" hspace="5" src="TutorialMTXExtractor_01.png" alt=""> <h2>Remove simulation files and close figures<a name="4"></a></h2><pre class="codeinput">close(f1)
+assert(all(all(abs(size(Xout.Tvalues(1).stiffness)-[14512 14512])&lt;1e-4)),<span class="string">'CossanX:Tutorials:TutorialMTXExtractor'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution regarding size of matrix does not match.'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIAL for the MTXExtractor object 
+% In this tutorial it is shown how to import matrices from an Abaqus output 
+% file (*.mtx-file) into Matlab
+%
+% Prepared by BG
+%**************************************************************************
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@MTXExtractor
+%
+
+%  Copyright 1993-2011, COSSAN Working Group
+%  University of Innsbruck, Austria
+
+%% Preparation of FE-analysis
+
+% copy FE-input file with COSSAN-identifiers to working directory
+StutorialPath = fileparts(which('TutorialMTXExtractor.m'));
+copyfile([StutorialPath '/Connector/ABAQUS/antenna.cossan'],...
+    fullfile(CossanX.getCossanWorkingPath),'f');
+
+% Define random variables and random variable set
+mat1 = RandomVariable('Sdistribution','normal','mean',3e+7,'std',3e+6);
+mat2 = RandomVariable('Sdistribution','normal','mean',1e+7,'std',1e+6);
+mat3 = RandomVariable('Sdistribution','normal','mean',1.59e+7,'std',1.59e+6);
+mat4 = RandomVariable('Sdistribution','normal','mean',3e+7,'std',3e+6);
+mat5 = RandomVariable('Sdistribution','normal','mean',1e+7,'std',1e+6);
+
+rvs = RandomVariableSet('Cmembers',{'mat1', 'mat2','mat3','mat4','mat5'});
+
+% Define Input object and generate samples
+Xin = Input;
+Xin = add(Xin,rvs);
+Xin = sample(Xin,'Nsamples',3);
+
+% Define Injector
+Xi=Injector('SscanfilePath',CossanX.getCossanWorkingPath,...
+    'Sscanfilename','antenna.cossan','Sfile','antenna.inp');
+
+% define the name of the file & path of the file & the variable name to be stored
+XmtxEx = MTXExtractor('Sfile','antenna_STIF2.mtx','Soutputname','stiffness');
+
+% Define Connector
+Xc = Connector('SpredefinedType','Abaqus', ...
+               'Sworkingdirectory','/tmp',...
+               'Smaininputpath',CossanX.getCossanWorkingPath,...
+               'Smaininputfile','antenna.inp');
+
+% Add injector and extractor to connector
+Xc = add(Xc,Xi);
+Xc = add(Xc,XmtxEx);
+
+%% Run FE-analysis and read stiffness matrix from file
+Xout = run(Xc,Xin);
+
+% show sparsity pattern of stiffness matrix
+f1 = figure;
+spy(Xout.Tvalues(1).stiffness)
+
+%% Remove simulation files and close figures
+
+close(f1)
+assert(all(all(abs(size(Xout.Tvalues(1).stiffness)-[14512 14512])<1e-4)),'CossanX:Tutorials:TutorialMTXExtractor', ...
+       'Reference Solution regarding size of matrix does not match.')
+
+##### SOURCE END #####
+--></body></html>

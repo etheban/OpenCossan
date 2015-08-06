@@ -1,0 +1,262 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial: create a PerformanceFunction object</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialPerformanceFunction.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial: create a PerformanceFunction object</h1><!--introduction--><p>Create a user defined performance function A user defined PerformaceFunction can be defined passing a Function object to the constructor of the Performance Function</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@PerformanceFunction">http://mechanik.uibk.ac.at/wiki/index.php/@PerformanceFunction</a></p><p><img src="TutorialPerformanceFunction_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialPerformanceFunction_eq39615.png" alt="$Author: Edoardo-Patelli~and~Barbara-Goller$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create a performance function manipulating variable of the</a></li><li><a href="#2">Construct User Defined Performance Function</a></li><li><a href="#3">Using smooth indicator function</a></li></ul></div><h2>Create a performance function manipulating variable of the<a name="1"></a></h2><p>SimulationData object</p><pre class="codeinput"><span class="comment">% Create a fake SimulationData object</span>
+Toutput.variableA=5;
+Toutput.variableB=11;
+
+Xout=SimulationData(<span class="string">'Tvalues'</span>,Toutput);
+
+<span class="comment">% define performace function as variableA-variableB</span>
+Xpf=PerformanceFunction(<span class="string">'Sdescription'</span>,<span class="string">'variableA-variableB'</span>, <span class="keyword">...</span>
+                        <span class="string">'Sdemand'</span>,<span class="string">'variableB'</span>,<span class="string">'Scapacity'</span>,<span class="string">'variableA'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Vg1'</span>);
+
+<span class="comment">% Show summary of the PerformanceFunction</span>
+display(Xpf)
+
+<span class="comment">% Evaluate the PerformanceFunction</span>
+Xout2=Xpf.apply(Xout);
+
+<span class="comment">% Show values of the performance function</span>
+Vg=Xout2.getValues(<span class="string">'Sname'</span>,Xpf.Soutputname)
+
+
+<span class="comment">% Suppose now to have more samples (let say 2). The apply method returs two</span>
+<span class="comment">% values.</span>
+
+Toutput(2).variableA=10;
+Toutput(2).variableB=12;
+Xout=SimulationData(<span class="string">'Tvalues'</span>,Toutput);
+Xout2=Xpf.apply(Xout);
+
+<span class="comment">% Show results</span>
+Vg=Xout2.getValues(<span class="string">'Sname'</span>,Xpf.Soutputname);
+
+<span class="comment">% One more sample</span>
+Toutput(3).variableA=11;
+Toutput(3).variableB=11;
+Xout=SimulationData(<span class="string">'Tvalues'</span>,Toutput);
+Xout2=Xpf.apply(Xout);
+
+<span class="comment">% Show results</span>
+Vg=Xout2.getValues(<span class="string">'Sname'</span>,Xpf.Soutputname);
+</pre><pre class="codeoutput">PerformanceFunction Object  -  Description: variableA-variableB
+
+Vg =
+
+    -6
+
+</pre><h2>Construct User Defined Performance Function<a name="2"></a></h2><p>A Mio object is used to define a PerformanceFunction</p><pre class="codeinput">Xm=Mio(<span class="string">'Sscript'</span>,<span class="string">'Moutput=Minput(:,1)+Minput(:,2);'</span>, <span class="keyword">...</span>
+      <span class="string">'Cinputnames'</span>,{<span class="string">'variableA'</span>,<span class="string">'variableB'</span>},<span class="keyword">...</span>
+      <span class="string">'Coutputnames'</span>,{<span class="string">'Vg'</span>},<span class="string">'Liomatrix'</span>,true,<span class="string">'Lfunction'</span>,false,<span class="string">'Liostructure'</span>,false);
+
+<span class="comment">% Construct PerformanceFunction</span>
+XpfM1=PerformanceFunction(<span class="string">'Sdescription'</span>,<span class="string">'User defined PerformanceFunction'</span>, <span class="keyword">...</span>
+                        <span class="string">'Xmio'</span>,Xm);
+<span class="comment">% Show summary of the PerformanceFunction</span>
+display(XpfM1)
+
+<span class="comment">% Construct PerformanceFunction</span>
+XpfM2=PerformanceFunction(<span class="string">'Sdescription'</span>,<span class="string">'User defined PerformanceFunction'</span>, <span class="keyword">...</span>
+                        <span class="string">'CXmio'</span>,{Xm});
+
+<span class="comment">% Show summary of the PerformanceFunction</span>
+display(XpfM2)
+
+<span class="comment">% Evaluate the PerformanceFunction</span>
+Xout2=XpfM1.apply(Xout);
+display(Xout2)
+</pre><pre class="codeoutput">PerformanceFunction Object  -  Description: User defined PerformanceFunction
+Mio Object - Description: 
+ 
+ * Matlab script defined in the field Sscript
+PerformanceFunction Object  -  Description: User defined PerformanceFunction
+Mio Object - Description: 
+ 
+ * Matlab script defined in the field Sscript
+ SimulationData Object  -   Description: 
+</pre><h2>Using smooth indicator function<a name="3"></a></h2><p>This section shows an important feature of the object  "PerformanceFunction" that allows calculating the probability of failure using a smooth indicator function.</p><pre> The concept of smooth indicator function implies that the traditional
+ indicator function (which is a heaviside or step function) is replaced
+ by a smooth version. The smooth version is modeled using the CDF of a
+ Gaussian distribution. Details on the theoretical aspects of this
+ smooth indicator function can be found at:</pre><pre> Taflanidis, A. and J. Beck: 2008, `An efficient framework for optimal
+ robust stochastic system design using stochastic simulation'. Computer
+ Methods in Applied Mechanics and Engineering, 198(1), 88-101.</pre><pre class="codeinput"><span class="comment">% In order to use the smooth indicator function it is necessary to define the</span>
+<span class="comment">% field stdDeviationIndicatorFunction in the PerformanceFunction</span>
+
+XpfSmooth     = PerformanceFunction(<span class="string">'Scapacity'</span>,<span class="string">'Xthreshold'</span>,<span class="keyword">...</span><span class="comment">  %indicate threshold to be used</span>
+    <span class="string">'Sdemand'</span>,<span class="string">'out1'</span>,<span class="keyword">...</span><span class="comment">    %indicate parameter modeling the demand</span>
+    <span class="string">'Soutputname'</span>,<span class="string">'Vg'</span>,<span class="keyword">...</span><span class="comment">  %name of performance function</span>
+    <span class="string">'stdDeviationIndicatorFunction'</span>,0.05);  <span class="comment">%this parameter is used to define the standard</span>
+    <span class="comment">%deviation of the Gaussian CDF used to define the indicator function</span>
+
+display(XpfSmooth)
+</pre><pre class="codeoutput">PerformanceFunction Object  -  Description: 
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial: create a PerformanceFunction object
+% Create a user defined performance function 
+% A user defined PerformaceFunction can be defined passing a Function
+% object to the constructor of the Performance Function 
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@PerformanceFunction
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli~and~Barbara-Goller$ 
+
+%% Create a performance function manipulating variable of the
+% SimulationData object
+
+% Create a fake SimulationData object
+Toutput.variableA=5;
+Toutput.variableB=11;
+
+Xout=SimulationData('Tvalues',Toutput);
+
+% define performace function as variableA-variableB
+Xpf=PerformanceFunction('Sdescription','variableA-variableB', ...
+                        'Sdemand','variableB','Scapacity','variableA','Soutputname','Vg1');
+
+% Show summary of the PerformanceFunction
+display(Xpf)
+                
+% Evaluate the PerformanceFunction                    
+Xout2=Xpf.apply(Xout);
+
+% Show values of the performance function 
+Vg=Xout2.getValues('Sname',Xpf.Soutputname)
+
+
+% Suppose now to have more samples (let say 2). The apply method returs two
+% values.
+
+Toutput(2).variableA=10;
+Toutput(2).variableB=12;
+Xout=SimulationData('Tvalues',Toutput);
+Xout2=Xpf.apply(Xout);
+
+% Show results
+Vg=Xout2.getValues('Sname',Xpf.Soutputname);
+
+% One more sample
+Toutput(3).variableA=11;
+Toutput(3).variableB=11;
+Xout=SimulationData('Tvalues',Toutput);
+Xout2=Xpf.apply(Xout);
+
+% Show results
+Vg=Xout2.getValues('Sname',Xpf.Soutputname);
+
+%% Construct User Defined Performance Function
+% A Mio object is used to define a PerformanceFunction
+Xm=Mio('Sscript','Moutput=Minput(:,1)+Minput(:,2);', ...
+      'Cinputnames',{'variableA','variableB'},...
+      'Coutputnames',{'Vg'},'Liomatrix',true,'Lfunction',false,'Liostructure',false);
+  
+% Construct PerformanceFunction  
+XpfM1=PerformanceFunction('Sdescription','User defined PerformanceFunction', ...
+                        'Xmio',Xm);
+% Show summary of the PerformanceFunction
+display(XpfM1)   
+
+% Construct PerformanceFunction  
+XpfM2=PerformanceFunction('Sdescription','User defined PerformanceFunction', ...
+                        'CXmio',{Xm});                 
+
+% Show summary of the PerformanceFunction
+display(XpfM2)
+                
+% Evaluate the PerformanceFunction                    
+Xout2=XpfM1.apply(Xout);
+display(Xout2)
+
+%% Using smooth indicator function
+% This section shows an important feature of the object  "PerformanceFunction"
+% that allows calculating the probability of failure using a smooth indicator
+% function. 
+%
+%   The concept of smooth indicator function implies that the traditional
+%   indicator function (which is a heaviside or step function) is replaced
+%   by a smooth version. The smooth version is modeled using the CDF of a
+%   Gaussian distribution. Details on the theoretical aspects of this
+%   smooth indicator function can be found at:
+%   
+%   Taflanidis, A. and J. Beck: 2008, `An efficient framework for optimal 
+%   robust stochastic system design using stochastic simulation'. Computer 
+%   Methods in Applied Mechanics and Engineering, 198(1), 88-101.
+
+% In order to use the smooth indicator function it is necessary to define the
+% field stdDeviationIndicatorFunction in the PerformanceFunction
+
+XpfSmooth     = PerformanceFunction('Scapacity','Xthreshold',...  %indicate threshold to be used
+    'Sdemand','out1',...    %indicate parameter modeling the demand
+    'Soutputname','Vg',...  %name of performance function
+    'stdDeviationIndicatorFunction',0.05);  %this parameter is used to define the standard
+    %deviation of the Gaussian CDF used to define the indicator function
+
+display(XpfSmooth)
+
+##### SOURCE END #####
+--></body></html>

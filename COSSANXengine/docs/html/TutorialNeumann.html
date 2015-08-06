@@ -1,0 +1,188 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialNeumann</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialNeumann.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Create the input</a></li><li><a href="#3">Construct the Injector</a></li><li><a href="#4">Define Connector</a></li><li><a href="#5">Define Model</a></li><li><a href="#6">using Regular implementation (NASTRAN)</a></li><li><a href="#7">Validate the results</a></li></ul></div><pre class="codeinput"><span class="comment">% Tutorial for the Neumann Object</span>
+<span class="comment">% This tutorial shows how to create and use a Neumann object</span>
+<span class="comment">%</span>
+<span class="comment">% Copyright 1990-2011 Cossan Working Group</span>
+</pre><h2>Create the input<a name="2"></a></h2><pre class="codeinput"><span class="comment">% define the RVs</span>
+RV1 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e7,<span class="string">'std'</span>,7e6);
+RV2 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e7,<span class="string">'std'</span>,7e6);
+RV3 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e7,<span class="string">'std'</span>,7e6);
+
+Xrvs = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>,<span class="string">'RV3'</span>});
+Xinp = Input(<span class="string">'Sdescription'</span>,<span class="string">'Xinput object'</span>);
+Xinp = add(Xinp,Xrvs);
+</pre><h2>Construct the Injector<a name="3"></a></h2><pre class="codeinput">Sdirectory = fullfile(CossanX.getCossanRoot,<span class="string">'examples'</span>,<span class="string">'Tutorials'</span>,<span class="string">'TurbineBlade'</span>,<span class="string">'FEinputFiles'</span>);
+Xinj       = Injector(<span class="string">'Sscanfilepath'</span>,Sdirectory,<span class="keyword">...</span>
+                      <span class="string">'Sscanfilename'</span>,<span class="string">'Nastran.cossan'</span>,<span class="string">'Sfile'</span>,<span class="string">'Nastran.inp'</span>);
+</pre><h2>Define Connector<a name="4"></a></h2><pre class="codeinput">Xcon = Connector(<span class="string">'Spredefinedtype'</span>,<span class="string">'nastran_x86_64'</span>,<span class="keyword">...</span>
+                     <span class="string">'SmaininputPath'</span>,Sdirectory,<span class="keyword">...</span>
+                     <span class="string">'Smaininputfile'</span>,<span class="string">'Nastran.inp'</span>);
+Xcon = add(Xcon,Xinj);
+</pre><pre class="codeoutput">Add Injector Object to Connector
+</pre><h2>Define Model<a name="5"></a></h2><pre class="codeinput">Xeval  = Evaluator(<span class="string">'Xconnector'</span>,Xcon);
+Xmodel = Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xinp);
+</pre><h2>using Regular implementation (NASTRAN)<a name="6"></a></h2><pre class="codeinput">Xsfem = Neumann(<span class="string">'Xmodel'</span>,Xmodel,<span class="string">'CyoungsmodulusRVs'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>,<span class="string">'RV3'</span>},<span class="keyword">...</span>
+                <span class="string">'Nsimulations'</span>,30,<span class="string">'Norder'</span>,5);
+
+<span class="comment">% Fix the seed in order to generate same samples =&gt; to validate results</span>
+CossanX.resetRandomNumberGenerator(1);
+
+Xout  = Xsfem.performAnalysis;
+
+Xout  = getResponse(Xout,<span class="string">'Sresponse'</span>,<span class="string">'specific'</span>,<span class="string">'MresponseDOFs'</span>,[150 3]);
+display(Xout);
+</pre><pre class="codeoutput"> 
+-------------------------------------------------
+COSSAN starting SFEM analysis
+-------------------------------------------------
+ 
+ 
+[SFEM.prepareInputFilesNastranRegular] Preparation of the input files started
+</pre><pre class="codeoutput">Error using ==&gt; Injector.Injector&gt;Injector.Injector at 159
+The file to be scanned /tmp/COSSAN/nominal0.dat does not exist: 
+
+Error in ==&gt; Sfem.prepareInputFilesNASTRANRegular at 179
+inj1=Injector('Stype','scan','Sscanfilename','nominal0.dat','Sworkingdirectory',[COSSANX.SworkingPath ],...
+
+Error in ==&gt; Neumann.Neumann&gt;Neumann.performAnalysis at 75
+                Xobj=prepareInputFilesNASTRANRegular(Xobj);
+
+Error in ==&gt; TutorialNeumann at 44
+Xout  = Xsfem.performAnalysis;
+</pre><h2>Validate the results<a name="7"></a></h2><pre class="codeinput">referenceMean = 0.9043;
+referenceCoV  = 0.0942;
+
+assert(abs(Xout.Vresponsemean-referenceMean)&lt;1e-4,<span class="string">'CossanX:Tutorials:TutorialNeumann'</span>, <span class="keyword">...</span>
+      <span class="string">'Reference mean value does not match.'</span>)
+
+assert(abs(Xout.Vresponsecov-referenceCoV)&lt;1e-4,<span class="string">'CossanX:Tutorials:TutorialNeumann'</span>, <span class="keyword">...</span>
+      <span class="string">'Reference CoV value does not match.'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+% Tutorial for the Neumann Object
+% This tutorial shows how to create and use a Neumann object
+%
+% Copyright 1990-2011 Cossan Working Group
+% $Revision: 1 $  $Date: 2011/02/22 $
+
+%% Create the input
+
+% define the RVs
+RV1 = RandomVariable('Sdistribution','normal', 'mean',7e7,'std',7e6);    
+RV2 = RandomVariable('Sdistribution','normal', 'mean',7e7,'std',7e6); 
+RV3 = RandomVariable('Sdistribution','normal', 'mean',7e7,'std',7e6);       
+
+Xrvs = RandomVariableSet('Cmembers',{'RV1','RV2','RV3'}); 
+Xinp = Input('Sdescription','Xinput object');       
+Xinp = add(Xinp,Xrvs);
+
+%% Construct the Injector
+
+Sdirectory = fullfile(CossanX.getCossanRoot,'examples','Tutorials','TurbineBlade','FEinputFiles');
+Xinj       = Injector('Sscanfilepath',Sdirectory,...
+                      'Sscanfilename','Nastran.cossan','Sfile','Nastran.inp');
+
+%% Define Connector
+
+Xcon = Connector('Spredefinedtype','nastran_x86_64',...
+                     'SmaininputPath',Sdirectory,...
+                     'Smaininputfile','Nastran.inp');
+Xcon = add(Xcon,Xinj);
+
+%% Define Model
+
+Xeval  = Evaluator('Xconnector',Xcon);
+Xmodel = Model('Xevaluator',Xeval,'Xinput',Xinp);
+
+%% using Regular implementation (NASTRAN)
+                   
+Xsfem = Neumann('Xmodel',Xmodel,'CyoungsmodulusRVs',{'RV1','RV2','RV3'},...
+                'Nsimulations',30,'Norder',5);  
+
+% Fix the seed in order to generate same samples => to validate results
+CossanX.resetRandomNumberGenerator(1);  
+
+Xout  = Xsfem.performAnalysis;
+
+Xout  = getResponse(Xout,'Sresponse','specific','MresponseDOFs',[150 3]);
+display(Xout);
+
+%% Validate the results
+
+referenceMean = 0.9043;
+referenceCoV  = 0.0942;
+
+assert(abs(Xout.Vresponsemean-referenceMean)<1e-4,'CossanX:Tutorials:TutorialNeumann', ...
+      'Reference mean value does not match.')
+
+assert(abs(Xout.Vresponsecov-referenceCoV)<1e-4,'CossanX:Tutorials:TutorialNeumann', ...
+      'Reference CoV value does not match.')
+  
+  
+  
+##### SOURCE END #####
+--></body></html>

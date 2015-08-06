@@ -1,0 +1,256 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialCantileverBeamMatlabOptimization</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialCantileverBeamMatlabOptimization.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">TutorialCantileverBeam: Optimization</a></li><li><a href="#2">Define the problem</a></li><li><a href="#3">Create connector</a></li><li><a href="#4">Create object OptimizationProblem</a></li><li><a href="#5">Perform optimization</a></li></ul></div><h2>TutorialCantileverBeam: Optimization<a name="1"></a></h2><p>The documentation and the problem description of this example is available on the User Manual -&gt; Tutorials -&gt; Cantilever_Beam</p><p>See Also <a href="http://mechanik.uibk.ac.at/wiki/index.php/Cantilever_Beam">http://mechanik.uibk.ac.at/wiki/index.php/Cantilever_Beam</a></p><p><img src="TutorialCantileverBeamMatlabOptimization_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialCantileverBeamMatlabOptimization_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><pre class="codeinput"><span class="comment">% Define the Model</span>
+run(<span class="string">'TutorialCantileverBeamMatlab'</span>)
+</pre><pre class="codeoutput">Input Object  - Description: 
+* 1 Sets of RandomVariables
+** Names: "Xrvset" 
+* 3 Parameter object(s)
+** Names: "L" "b" "maxDiplacement" 
+* 1 Functions object(s)
+** Names: "I" 
+</pre><pre class="codeoutput">Error using ==&gt; Mio.runScript at 37
+ The user define function can not be evaluate! 
+ Please check your function 
+ Undefined function or method 'mtimes' for input arguments of type 'cell'.
+
+Error in ==&gt; Mio.run at 182
+        [XsimOut Poutput]=runScript(Xmio,Psamples);
+
+Error in ==&gt; Evaluator.apply at 124
+                XSimOutTmp=Xobj.CXsolvers{n}.run(PinputMio);
+
+Error in ==&gt; Evaluator.deterministicAnalysis at 21
+XSimOut=Xobj.apply(Tinput);
+
+Error in ==&gt; Model.deterministicAnalysis at 14
+Xout = Xobj.Xevaluator.deterministicAnalysis(Xobj.Xinput);
+
+Error in ==&gt; TutorialCantileverBeamMatlab at 56
+Xout=Xmodel.deterministicAnalysis;
+
+Error in ==&gt; run at 74
+    evalin('caller',[script ';']);
+
+Error in ==&gt; TutorialCantileverBeamMatlabOptimization at 14
+run('TutorialCantileverBeamMatlab')
+</pre><h2>Define the problem<a name="2"></a></h2><pre class="codeinput">H=DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'Beam Height'</span>,<span class="string">'lowerBound'</span>,10,<span class="string">'upperBound'</span>,50,<span class="string">'value'</span>,20);
+W=DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'Beam Width'</span>,<span class="string">'lowerBound'</span>,10,<span class="string">'upperBound'</span>,50,<span class="string">'value'</span>,20);
+XminStress=Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Minimum stress'</span>,<span class="string">'value'</span>,195);
+XmaxStress=Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Maximum stress'</span>,<span class="string">'value'</span>,200);
+
+Xinput=Input(<span class="string">'CXmembers'</span>,{H W XminStress XmaxStress},<span class="keyword">...</span>
+    <span class="string">'CSmembers'</span>,{<span class="string">'H'</span> <span class="string">'W'</span> <span class="string">'XminStress'</span> <span class="string">'XmaxStress'</span>});
+</pre><h2>Create connector<a name="3"></a></h2><pre class="codeinput">Xi=Injector(<span class="string">'Stype'</span>,<span class="string">'scan'</span>,<span class="string">'Sscanfilepath'</span>,<span class="string">'./beamAnsys'</span>,<span class="string">'Sscanfilename'</span>,<span class="string">'BeamAnsys.txt.cossan'</span>, <span class="keyword">...</span>
+    <span class="string">'Srelativepath'</span>,<span class="string">'./'</span>,<span class="string">'Sfile'</span>,<span class="string">'BeamAnsys.txt'</span>);
+
+XrespVolume = Response(    <span class="string">'Sname'</span>, <span class="string">'Volume'</span>, <span class="keyword">...</span>
+    <span class="string">'Sfieldformat'</span>, <span class="string">'%e'</span>, <span class="keyword">...</span>
+    <span class="string">'Ncolnum'</span>,1, <span class="keyword">...</span>
+    <span class="string">'Nrownum'</span>,1);
+
+XrespStress = Response(    <span class="string">'Sname'</span>, <span class="string">'MaximumStress'</span>, <span class="keyword">...</span>
+    <span class="string">'Sfieldformat'</span>, <span class="string">'%e'</span>, <span class="keyword">...</span>
+    <span class="string">'Ncolnum'</span>,2, <span class="keyword">...</span>
+    <span class="string">'Nrownum'</span>,1);
+
+Xe=Extractor(<span class="string">'Sdescription'</span>,<span class="string">'Extract Volume and maximum stress'</span>, <span class="keyword">...</span>
+    <span class="string">'Srelativepath'</span>,<span class="string">'./'</span>, <span class="keyword">...</span><span class="comment"> % this is the directory where the input and output are contained</span>
+    <span class="string">'Sfile'</span>,<span class="string">'OutputMatlab.txt'</span>, <span class="keyword">...</span>
+    <span class="string">'CXresponse'</span>,{XrespVolume XrespStress});
+
+Xc=Connector(<span class="string">'Stype'</span>,<span class="string">'ansys'</span>,<span class="string">'Sworkingdirectory'</span>,<span class="string">'/tmp'</span>,<span class="keyword">...</span>
+    <span class="string">'Smaininputfile'</span>,<span class="string">'BeamAnsys.txt'</span>,<span class="keyword">...</span>
+    <span class="string">'Smaininputpath'</span>,fullfile(CossanX.getCossanRoot,<span class="string">'examples'</span>,<span class="string">'Tutorials'</span>, <span class="keyword">...</span>
+    <span class="string">'OptimizationProblem'</span>,<span class="string">'beamAnsys'</span>),<span class="keyword">...</span>
+    <span class="string">'Soutputfile'</span>,<span class="string">'AnsysOptimizationOutput.out'</span>,<span class="string">'CXmembers'</span>,{Xe Xi}, <span class="keyword">...</span>
+    <span class="string">'LkeepSimulationFiles'</span>,false);
+
+
+Xeval=Evaluator(<span class="string">'CXmembers'</span>,{Xc},<span class="string">'CSmembers'</span>,{<span class="string">'Xc'</span>});
+
+Xmodel=Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xinput);
+
+Xobjfun   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).VolumeObj=Tinput(n).Volume;end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'VolumeObj'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'Volume'</span>});
+
+
+<span class="comment">% Create (inequality) constraints</span>
+XconMaxStress   = Constraint(<span class="string">'Sdescription'</span>,<span class="string">'constraint'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).MaxStress=Tinput(n).MaximumStress-Tinput(n).XmaxStress; end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'MaxStress'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'MaximumStress'</span> <span class="string">'XmaxStress'</span> },<span class="keyword">...</span>
+    <span class="string">'Linequality'</span>,true);
+</pre><h2>Create object OptimizationProblem<a name="4"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+    <span class="string">'VinitialSolution'</span>,[20 20], <span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>,Xobjfun,<span class="string">'CXconstraint'</span>,{XconMaxStress},<span class="string">'Xmodel'</span>,Xmodel);
+
+<span class="comment">% Define Optimizer</span>
+<span class="comment">%Xsqp=SequentialQuadraticProgramming('finitedifferenceperturbation',0.1);</span>
+</pre><h2>Perform optimization<a name="5"></a></h2><pre class="codeinput"><span class="comment">%Xoptimum1=Xop.optimize('Xoptimizer',Xsqp)</span>
+
+<span class="comment">%</span>
+tic,
+Xoptimum2=Xop.optimize(<span class="string">'Xoptimizer'</span>,Cobyla);
+toc
+display(Xoptimum2)
+<span class="comment">% Xga=GeneticAlgorithms;</span>
+<span class="comment">% [Xoptimum XsimData]=Xop.optimize('Xoptimizer',Xga)</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TutorialCantileverBeam: Optimization
+%
+% The documentation and the problem description of this example is available on
+% the User Manual -> Tutorials -> Cantilever_Beam
+%
+%
+% See Also http://mechanik.uibk.ac.at/wiki/index.php/Cantilever_Beam
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+
+% Define the Model
+run('TutorialCantileverBeamMatlab')
+
+
+%% Define the problem 
+H=DesignVariable('Sdescription','Beam Height','lowerBound',10,'upperBound',50,'value',20);
+W=DesignVariable('Sdescription','Beam Width','lowerBound',10,'upperBound',50,'value',20);
+XminStress=Parameter('Sdescription','Minimum stress','value',195);
+XmaxStress=Parameter('Sdescription','Maximum stress','value',200);
+
+Xinput=Input('CXmembers',{H W XminStress XmaxStress},...
+    'CSmembers',{'H' 'W' 'XminStress' 'XmaxStress'});
+
+
+%% Create connector
+Xi=Injector('Stype','scan','Sscanfilepath','./beamAnsys','Sscanfilename','BeamAnsys.txt.cossan', ...
+    'Srelativepath','./','Sfile','BeamAnsys.txt');
+
+XrespVolume = Response(    'Sname', 'Volume', ...
+    'Sfieldformat', '%e', ...
+    'Ncolnum',1, ...
+    'Nrownum',1);
+
+XrespStress = Response(    'Sname', 'MaximumStress', ...
+    'Sfieldformat', '%e', ...
+    'Ncolnum',2, ...
+    'Nrownum',1);
+
+Xe=Extractor('Sdescription','Extract Volume and maximum stress', ...
+    'Srelativepath','./', ... % this is the directory where the input and output are contained
+    'Sfile','OutputMatlab.txt', ...
+    'CXresponse',{XrespVolume XrespStress});
+
+Xc=Connector('Stype','ansys','Sworkingdirectory','/tmp',...
+    'Smaininputfile','BeamAnsys.txt',...
+    'Smaininputpath',fullfile(CossanX.getCossanRoot,'examples','Tutorials', ...
+    'OptimizationProblem','beamAnsys'),...
+    'Soutputfile','AnsysOptimizationOutput.out','CXmembers',{Xe Xi}, ...
+    'LkeepSimulationFiles',false);
+
+
+Xeval=Evaluator('CXmembers',{Xc},'CSmembers',{'Xc'});
+
+Xmodel=Model('Xevaluator',Xeval,'Xinput',Xinput);
+
+Xobjfun   = ObjectiveFunction('Sdescription','objective function', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).VolumeObj=Tinput(n).Volume;end',...
+    'CoutputNames',{'VolumeObj'},...
+    'CinputNames',{'Volume'});
+
+
+% Create (inequality) constraints
+XconMaxStress   = Constraint('Sdescription','constraint', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).MaxStress=Tinput(n).MaximumStress-Tinput(n).XmaxStress; end',...
+    'CoutputNames',{'MaxStress'},...
+    'CinputNames',{'MaximumStress' 'XmaxStress' },...
+    'Linequality',true);
+
+%% Create object OptimizationProblem
+Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+    'VinitialSolution',[20 20], ...
+    'XobjectiveFunction',Xobjfun,'CXconstraint',{XconMaxStress},'Xmodel',Xmodel);
+
+% Define Optimizer
+%Xsqp=SequentialQuadraticProgramming('finitedifferenceperturbation',0.1);
+
+%% Perform optimization
+%Xoptimum1=Xop.optimize('Xoptimizer',Xsqp)
+
+%
+tic, 
+Xoptimum2=Xop.optimize('Xoptimizer',Cobyla);
+toc
+display(Xoptimum2)
+% Xga=GeneticAlgorithms;
+% [Xoptimum XsimData]=Xop.optimize('Xoptimizer',Xga)
+
+##### SOURCE END #####
+--></body></html>

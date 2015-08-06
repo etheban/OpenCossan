@@ -1,0 +1,572 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialMarkovChain</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialMarkovChain.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Tutorial MarkovChain</a></li><li><a href="#2">Start</a></li><li><a href="#3">Construct the markov chain object</a></li><li><a href="#4">Construct a chain</a></li><li><a href="#5">Optional parameter</a></li><li><a href="#6">Modify the chains</a></li><li><a href="#7">Drop the last state for the first and second chain only</a></li><li><a href="#8">Validate Results</a></li></ul></div><h2>Tutorial MarkovChain<a name="1"></a></h2><p>A Markov chain, named after Andrey Markov, is a stochastic process with the Markov property. Having the Markov property means that future states depend only on the present state, and are independent of past states.</p><p>At each step the system may change its state from the current state to another state (or remain in the same state) according to a probability distribution.</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@MarkovChain">http://mechanik.uibk.ac.at/wiki/index.php/@MarkovChain</a></p><p><img src="TutorialMarkovChain_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialMarkovChain_eq82982.png" alt="$Author:~Edoardo~Patelli$"></p><pre class="codeinput"><span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(56236)
+</pre><h2>Start<a name="2"></a></h2><p>The MarkovChain requires two RandomVariableSet that play the role of the proposal distribution and the target distribution</p><p>The first ('xrvsetbase') contains the real distributions of the samples. The second ('Xrvsoff') define the distributions</p><pre class="codeinput">XrvN=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+Xrvsbase = RandomVariableSet(<span class="string">'Xrv'</span>,XrvN,<span class="string">'Nrviid'</span>,3);
+
+XrvU=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,-0.5,<span class="string">'upperbound'</span>,0.5);
+Xrvsoff = RandomVariableSet(<span class="string">'Xrv'</span>,XrvU,<span class="string">'Nrviid'</span>,3);
+
+<span class="comment">% Create an Input object (optional)</span>
+Xin=Input(<span class="string">'Xrvset'</span>,Xrvsbase);
+
+<span class="comment">% Create a Samples object to define the initial starting point of the</span>
+<span class="comment">% Markov chains and the number of chains.</span>
+
+Xin=sample(Xin,<span class="string">'Nsamples'</span>,10);
+Xs=Xin.Xsamples;
+</pre><h2>Construct the markov chain object<a name="3"></a></h2><p>The markovchain object can be initilized passing the 2 RandomVariableSets or passing an Input object (containing only 1 RandomVariableSet) and a RandomVariableSet for the proposal distribution</p><pre class="codeinput">Xmkv1=MarkovChain(<span class="string">'XtargetDistribution'</span>,Xrvsbase, <span class="keyword">...</span>
+                  <span class="string">'Xoffsprings'</span>,Xrvsoff, <span class="keyword">...</span>
+                  <span class="string">'Xsamples'</span>,Xs,<span class="string">'Npoints'</span>,5);
+
+<span class="comment">% Show object</span>
+display(Xmkv1)
+</pre><pre class="codeoutput">****************************************************************** 
+*     MarkovChain Object                                         * 
+****************************************************************** 
+RandomVariableSet of the base:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvN_1" "XrvN_2" "XrvN_3" 
+RandomVariableSet of the offsring:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvU_1" "XrvU_2" "XrvU_3" 
+Initial samples:
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 10
+-----------------------------------------------------------
+Samples in the Physical Space 
+XrvN_1: -8.092e-01-7.595e-01 7.832e-01-1.204e-01-9.342e-01 ...
+XrvN_2: -4.152e-01 2.309e+00-4.655e-01-3.209e-01-9.352e-01 ...
+XrvN_3: -1.350e-01-9.373e-01 4.325e-01-5.109e-01 2.829e-01 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+-----------------------------------------------------------
+10 Markov Chains defined
+Length of the chains: 6 (total points 6) 
+Burnin: 0 Thin: 1
+-----------------------------------------------------------
+</pre><h2>Construct a chain<a name="4"></a></h2><p>use the method buildChain to constract a Markov chain</p><pre class="codeinput">Xmkv1=Xmkv1.buildChain(5);
+<span class="comment">% Show object</span>
+display(Xmkv1)
+
+<span class="comment">% or using the Input object. The TargetDistribution and the Initial point</span>
+<span class="comment">% are extracted automatically from the Input object.</span>
+
+Xmkv2=MarkovChain(<span class="string">'Xinput'</span>,Xin,<span class="string">'Xoffsprings'</span>,Xrvsoff,<span class="string">'Npoints'</span>,8);
+
+<span class="comment">% Show the Object</span>
+display(Xmkv2)
+</pre><pre class="codeoutput">****************************************************************** 
+*     MarkovChain Object                                         * 
+****************************************************************** 
+RandomVariableSet of the base:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvN_1" "XrvN_2" "XrvN_3" 
+RandomVariableSet of the offsring:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvU_1" "XrvU_2" "XrvU_3" 
+Initial samples:
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 10
+-----------------------------------------------------------
+Samples in the Physical Space 
+XrvN_1: -8.092e-01-7.595e-01 7.832e-01-1.204e-01-9.342e-01 ...
+XrvN_2: -4.152e-01 2.309e+00-4.655e-01-3.209e-01-9.352e-01 ...
+XrvN_3: -1.350e-01-9.373e-01 4.325e-01-5.109e-01 2.829e-01 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+-----------------------------------------------------------
+10 Markov Chains defined
+Length of the chains: 11 (total points 11) 
+Burnin: 0 Thin: 1
+-----------------------------------------------------------
+****************************************************************** 
+*     MarkovChain Object                                         * 
+****************************************************************** 
+RandomVariableSet of the base:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvN_1" "XrvN_2" "XrvN_3" 
+RandomVariableSet of the offsring:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvU_1" "XrvU_2" "XrvU_3" 
+Initial samples:
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 10
+-----------------------------------------------------------
+Samples in the Physical Space 
+XrvN_1: -8.092e-01-7.595e-01 7.832e-01-1.204e-01-9.342e-01 ...
+XrvN_2: -4.152e-01 2.309e+00-4.655e-01-3.209e-01-9.352e-01 ...
+XrvN_3: -1.350e-01-9.373e-01 4.325e-01-5.109e-01 2.829e-01 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+-----------------------------------------------------------
+10 Markov Chains defined
+Length of the chains: 9 (total points 9) 
+Burnin: 0 Thin: 1
+-----------------------------------------------------------
+</pre><h2>Optional parameter<a name="5"></a></h2><p>burnin (k)    generates a Markov chain with values between the starting               point and the kth point omitted in the generated sequence.               Values beyond the kth point are kept.               k is a nonnegative integer with default value of 0.</p><p>thin (m)      generates a Markov chain with m-1 out of m values omitted               in the generated sequence.               m is a positive integer with default value of 1.</p><pre class="codeinput"><span class="comment">% Generate samples using optional parameters burnin and thin</span>
+Xmkv2.burnin=1;
+Xmkv2.thin=2;
+<span class="comment">%</span>
+<span class="comment">% %% Retrieve the chains</span>
+MX=getChain(Xmkv2,<span class="string">'Vchain'</span>,[1])
+<span class="comment">%</span>
+<span class="comment">% % Retrive 2 chains</span>
+MX=getChain(Xmkv2,<span class="string">'Vchain'</span>,[1 2])
+<span class="comment">%</span>
+<span class="comment">% % Retrive 2 chains</span>
+MX=getChain(Xmkv2,<span class="string">'Vchain'</span>,[1 10])
+<span class="comment">%</span>
+<span class="comment">% Retrive 3 chains</span>
+MX=getChain(Xmkv2,<span class="string">'Vchain'</span>,[1 2 10])
+<span class="comment">%</span>
+<span class="comment">% % Retrive samples only ever 3 Markov Chain states</span>
+Xmkv2.thin=3;
+MX=getChain(Xmkv2,<span class="string">'Vchain'</span>,[1 2 10])
+</pre><pre class="codeoutput">
+MX =
+
+    -1.824927459254609e-01    -3.499196590359148e-01     1.290565055272622e+00
+    -7.959343541250629e-01     1.734787879460887e-01     5.183057616652722e-01
+     3.395965520469954e-01     1.734787879460887e-01    -6.156558011172009e-01
+     2.360647275500865e+00     1.137386499517076e+00    -6.474377111746816e-01
+
+
+MX =
+
+    -1.824927459254609e-01    -3.499196590359148e-01     1.290565055272622e+00
+    -7.959343541250629e-01     1.734787879460887e-01     5.183057616652722e-01
+     3.395965520469954e-01     1.734787879460887e-01    -6.156558011172009e-01
+     2.360647275500865e+00     1.137386499517076e+00    -6.474377111746816e-01
+    -7.595250572281091e-01     2.099702382086188e+00    -2.105542488166792e-01
+    -1.503041637611334e+00     1.651663304973359e+00     4.407213777585910e-01
+    -1.556337035893296e+00     1.761270372892817e+00    -8.591144039108953e-01
+    -9.554782720737628e-01     9.776627714398418e-01    -1.189866306818801e+00
+
+
+MX =
+
+    -1.824927459254609e-01    -3.499196590359148e-01     1.290565055272622e+00
+    -7.959343541250629e-01     1.734787879460887e-01     5.183057616652722e-01
+     3.395965520469954e-01     1.734787879460887e-01    -6.156558011172009e-01
+     2.360647275500865e+00     1.137386499517076e+00    -6.474377111746816e-01
+     1.749638315789485e+00    -4.140135492914357e-01    -7.529606831445470e-01
+     3.553109345035144e-01    -1.078674042706853e-01     3.164449940155112e-01
+     7.934853054827814e-01    -1.304521912888731e+00     2.320011289201797e-01
+     7.934853054827814e-01    -1.304521912888731e+00    -7.207255611904935e-01
+
+
+MX =
+
+    -1.824927459254609e-01    -3.499196590359148e-01     1.290565055272622e+00
+    -7.959343541250629e-01     1.734787879460887e-01     5.183057616652722e-01
+     3.395965520469954e-01     1.734787879460887e-01    -6.156558011172009e-01
+     2.360647275500865e+00     1.137386499517076e+00    -6.474377111746816e-01
+    -7.595250572281091e-01     2.099702382086188e+00    -2.105542488166792e-01
+    -1.503041637611334e+00     1.651663304973359e+00     4.407213777585910e-01
+    -1.556337035893296e+00     1.761270372892817e+00    -8.591144039108953e-01
+    -9.554782720737628e-01     9.776627714398418e-01    -1.189866306818801e+00
+     1.749638315789485e+00    -4.140135492914357e-01    -7.529606831445470e-01
+     3.553109345035144e-01    -1.078674042706853e-01     3.164449940155112e-01
+     7.934853054827814e-01    -1.304521912888731e+00     2.320011289201797e-01
+     7.934853054827814e-01    -1.304521912888731e+00    -7.207255611904935e-01
+
+
+MX =
+
+    -1.824927459254609e-01    -3.499196590359148e-01     1.290565055272622e+00
+    -1.491161141145700e+00     1.734787879460887e-01    -6.156558011172009e-01
+     2.360647275500865e+00     1.137386499517076e+00    -6.474377111746816e-01
+    -7.640986998554642e-01     1.761270372892817e+00    -1.136190430698683e+00
+    -9.554782720737628e-01     9.776627714398418e-01    -1.189866306818801e+00
+     1.162797602882802e+00     8.352298766473130e-02     2.320011289201797e-01
+     7.934853054827814e-01    -1.304521912888731e+00    -7.207255611904935e-01
+
+</pre><h2>Modify the chains<a name="6"></a></h2><p>Add new states to the Markov Chains</p><pre class="codeinput"><span class="comment">% Add 2 samples (states)</span>
+Xmkv2=Xmkv2.add(<span class="string">'Npoints'</span>,2);
+
+display(Xmkv2)
+
+<span class="comment">% Remove the latest state</span>
+Xmkv2=Xmkv2.remove;
+<span class="comment">%</span>
+display(Xmkv2)
+</pre><pre class="codeoutput">****************************************************************** 
+*     MarkovChain Object                                         * 
+****************************************************************** 
+RandomVariableSet of the base:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvN_1" "XrvN_2" "XrvN_3" 
+RandomVariableSet of the offsring:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvU_1" "XrvU_2" "XrvU_3" 
+Initial samples:
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 10
+-----------------------------------------------------------
+Samples in the Physical Space 
+XrvN_1: -8.092e-01-7.595e-01 7.832e-01-1.204e-01-9.342e-01 ...
+XrvN_2: -4.152e-01 2.309e+00-4.655e-01-3.209e-01-9.352e-01 ...
+XrvN_3: -1.350e-01-9.373e-01 4.325e-01-5.109e-01 2.829e-01 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+-----------------------------------------------------------
+10 Markov Chains defined
+Length of the chains: 3 (total points 11) 
+Burnin: 1 Thin: 3
+-----------------------------------------------------------
+****************************************************************** 
+*     MarkovChain Object                                         * 
+****************************************************************** 
+RandomVariableSet of the base:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvN_1" "XrvN_2" "XrvN_3" 
+RandomVariableSet of the offsring:
+===================================================================
+ RandomVariableSet Description: 
+===================================================================
+ Set of 3 independent Random Variables
+ * Names: "XrvU_1" "XrvU_2" "XrvU_3" 
+Initial samples:
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 10
+-----------------------------------------------------------
+Samples in the Physical Space 
+XrvN_1: -8.092e-01-7.595e-01 7.832e-01-1.204e-01-9.342e-01 ...
+XrvN_2: -4.152e-01 2.309e+00-4.655e-01-3.209e-01-9.352e-01 ...
+XrvN_3: -1.350e-01-9.373e-01 4.325e-01-5.109e-01 2.829e-01 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+-----------------------------------------------------------
+10 Markov Chains defined
+Length of the chains: 3 (total points 10) 
+Burnin: 1 Thin: 3
+-----------------------------------------------------------
+</pre><h2>Drop the last state for the first and second chain only<a name="7"></a></h2><p>The length of the chains is restored automatically replacing the dropped states with the previous ones</p><pre class="codeinput">Xmkv2=Xmkv2.remove(<span class="string">'Vchain'</span>,[1 2]);
+Xmkv2.thin=1;
+
+MX=getChain(Xmkv2,<span class="string">'Vchain'</span>,[1 2 3])
+</pre><pre class="codeoutput">
+MX =
+
+    -1.824927459254609e-01    -3.499196590359148e-01     1.290565055272622e+00
+    -1.456746556698092e-01    -3.499196590359148e-01     2.169652571497212e+00
+    -7.959343541250629e-01     1.734787879460887e-01     5.183057616652722e-01
+    -1.491161141145700e+00     1.734787879460887e-01    -6.156558011172009e-01
+     3.395965520469954e-01     1.734787879460887e-01    -6.156558011172009e-01
+     1.950008768899607e+00     7.811059480956469e-01    -4.559525913311414e-01
+     2.360647275500865e+00     1.137386499517076e+00    -6.474377111746816e-01
+     2.360647275500865e+00     3.802170924133108e-01    -8.306080491883350e-01
+     2.360647275500865e+00     3.802170924133108e-01    -8.306080491883350e-01
+    -7.595250572281091e-01     2.099702382086188e+00    -2.105542488166792e-01
+    -1.050259152870634e+00     2.099702382086188e+00     4.407213777585910e-01
+    -1.503041637611334e+00     1.651663304973359e+00     4.407213777585910e-01
+    -7.640986998554642e-01     1.761270372892817e+00    -1.136190430698683e+00
+    -1.556337035893296e+00     1.761270372892817e+00    -8.591144039108953e-01
+    -1.693351069966612e+00     2.304344888688571e+00    -8.591144039108952e-01
+    -9.554782720737628e-01     9.776627714398418e-01    -1.189866306818801e+00
+     4.814748009335627e-01     3.787113244920665e-01    -1.189866306818801e+00
+     4.814748009335627e-01     3.787113244920665e-01    -1.189866306818801e+00
+     1.058057714921985e-01    -5.756912322579699e-01    -4.273335383313855e-01
+     2.911488016457205e-01     1.211585972717668e+00    -4.273335383313855e-01
+     2.911488016457205e-01     1.396869352993849e+00    -4.273335383313855e-01
+     1.000163036504084e+00     1.396869352993849e+00     1.178398411807117e-01
+     1.000163036504084e+00     2.218665633826557e+00    -2.652503820776197e-03
+     1.851577396167740e+00     2.218665633826557e+00     7.991171910692257e-01
+     4.345761732087304e-01     8.342556045708378e-01     1.020429798019601e+00
+     4.345761732087304e-01    -4.014382920300932e-01     2.243999587839387e+00
+    -1.168821347135370e+00    -1.081085046923253e+00     1.408520952678413e+00
+
+</pre><h2>Validate Results<a name="8"></a></h2><pre class="codeinput">Vreference=[-1.824927459254609e-01    -3.499196590359148e-01     1.290565055272622e+00;
+    -1.456746556698092e-01    -3.499196590359148e-01     2.169652571497212e+00;
+    -7.959343541250629e-01     1.734787879460887e-01     5.183057616652722e-01;
+    -1.491161141145700e+00     1.734787879460887e-01    -6.156558011172009e-01;
+     3.395965520469954e-01     1.734787879460887e-01    -6.156558011172009e-01;
+     1.950008768899607e+00     7.811059480956469e-01    -4.559525913311414e-01;
+     2.360647275500865e+00     1.137386499517076e+00    -6.474377111746816e-01;
+     2.360647275500865e+00     3.802170924133108e-01    -8.306080491883350e-01;
+     2.360647275500865e+00     3.802170924133108e-01    -8.306080491883350e-01;
+    -7.595250572281091e-01     2.099702382086188e+00    -2.105542488166792e-01;
+    -1.050259152870634e+00     2.099702382086188e+00     4.407213777585910e-01;
+    -1.503041637611334e+00     1.651663304973359e+00     4.407213777585910e-01;
+    -7.640986998554642e-01     1.761270372892817e+00    -1.136190430698683e+00;
+    -1.556337035893296e+00     1.761270372892817e+00    -8.591144039108953e-01;
+    -1.693351069966612e+00     2.304344888688571e+00    -8.591144039108952e-01;
+    -9.554782720737628e-01     9.776627714398418e-01    -1.189866306818801e+00;
+     4.814748009335627e-01     3.787113244920665e-01    -1.189866306818801e+00;
+     4.814748009335627e-01     3.787113244920665e-01    -1.189866306818801e+00;
+     1.058057714921985e-01    -5.756912322579699e-01    -4.273335383313855e-01;
+     2.911488016457205e-01     1.211585972717668e+00    -4.273335383313855e-01;
+     2.911488016457205e-01     1.396869352993849e+00    -4.273335383313855e-01;
+     1.000163036504084e+00     1.396869352993849e+00     1.178398411807117e-01;
+     1.000163036504084e+00     2.218665633826557e+00    -2.652503820776197e-03;
+     1.851577396167740e+00     2.218665633826557e+00     7.991171910692257e-01;
+     4.345761732087304e-01     8.342556045708378e-01     1.020429798019601e+00;
+     4.345761732087304e-01    -4.014382920300932e-01     2.243999587839387e+00;
+    -1.168821347135370e+00    -1.081085046923253e+00     1.408520952678413e+00];
+
+<span class="comment">% Check solutions</span>
+assert(max(max(Vreference-MX))&lt;1e-15,<span class="string">'COSSANX:Tutorial'</span>,<span class="string">'wrong results'</span>)
+
+disp(<span class="string">'Tutorial terminated successfully'</span>)
+</pre><pre class="codeoutput">Tutorial terminated successfully
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial MarkovChain
+%
+% A Markov chain, named after Andrey Markov, is a stochastic process with the Markov property. 
+% Having the Markov property means that future states depend only on the 
+% present state, and are independent of past states.
+%
+% At each step the system may change its state from the current state to 
+% another state (or remain in the same state) according to a 
+% probability distribution. 
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@MarkovChain
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Edoardo~Patelli$ 
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(56236)
+
+%% Start
+% The MarkovChain requires two RandomVariableSet that play the role of the
+% proposal distribution and the target distribution
+%
+%
+% The first ('xrvsetbase') contains the real distributions of the samples.
+% The second ('Xrvsoff') define the distributions
+
+XrvN=RandomVariable('Sdistribution','normal','mean',0,'std',1);
+Xrvsbase = RandomVariableSet('Xrv',XrvN,'Nrviid',3);
+
+XrvU=RandomVariable('Sdistribution','uniform','lowerbound',-0.5,'upperbound',0.5);
+Xrvsoff = RandomVariableSet('Xrv',XrvU,'Nrviid',3);
+
+% Create an Input object (optional)
+Xin=Input('Xrvset',Xrvsbase);
+
+% Create a Samples object to define the initial starting point of the
+% Markov chains and the number of chains.
+
+Xin=sample(Xin,'Nsamples',10);
+Xs=Xin.Xsamples;
+
+%% Construct the markov chain object
+% The markovchain object can be initilized passing the 2 RandomVariableSets
+% or passing an Input object (containing only 1 RandomVariableSet) and a
+% RandomVariableSet for the proposal distribution
+
+Xmkv1=MarkovChain('XtargetDistribution',Xrvsbase, ...
+                  'Xoffsprings',Xrvsoff, ...
+                  'Xsamples',Xs,'Npoints',5);
+
+% Show object
+display(Xmkv1)
+
+%% Construct a chain
+% use the method buildChain to constract a Markov chain
+Xmkv1=Xmkv1.buildChain(5); 
+% Show object
+display(Xmkv1)
+
+% or using the Input object. The TargetDistribution and the Initial point
+% are extracted automatically from the Input object. 
+
+Xmkv2=MarkovChain('Xinput',Xin,'Xoffsprings',Xrvsoff,'Npoints',8);          
+
+% Show the Object            
+display(Xmkv2)
+
+
+%% Optional parameter
+% burnin (k)    generates a Markov chain with values between the starting
+%               point and the kth point omitted in the generated sequence.
+%               Values beyond the kth point are kept. 
+%               k is a nonnegative integer with default value of 0.
+%
+% thin (m)      generates a Markov chain with m-1 out of m values omitted 
+%               in the generated sequence. 
+%               m is a positive integer with default value of 1.
+
+% Generate samples using optional parameters burnin and thin
+Xmkv2.burnin=1;
+Xmkv2.thin=2;
+% 
+% %% Retrieve the chains
+MX=getChain(Xmkv2,'Vchain',[1])
+% 
+% % Retrive 2 chains 
+MX=getChain(Xmkv2,'Vchain',[1 2])
+% 
+% % Retrive 2 chains 
+MX=getChain(Xmkv2,'Vchain',[1 10])
+% 
+% Retrive 3 chains 
+MX=getChain(Xmkv2,'Vchain',[1 2 10])
+% 
+% % Retrive samples only ever 3 Markov Chain states
+Xmkv2.thin=3;
+MX=getChain(Xmkv2,'Vchain',[1 2 10])
+
+%% Modify the chains
+% Add new states to the Markov Chains
+
+% Add 2 samples (states)
+Xmkv2=Xmkv2.add('Npoints',2);
+
+display(Xmkv2)
+
+% Remove the latest state
+Xmkv2=Xmkv2.remove;
+% 
+display(Xmkv2)
+
+%% Drop the last state for the first and second chain only
+% The length of the chains is restored automatically replacing the dropped
+% states with the previous ones
+Xmkv2=Xmkv2.remove('Vchain',[1 2]);
+Xmkv2.thin=1;
+
+MX=getChain(Xmkv2,'Vchain',[1 2 3])
+
+%% Validate Results
+Vreference=[-1.824927459254609e-01    -3.499196590359148e-01     1.290565055272622e+00;
+    -1.456746556698092e-01    -3.499196590359148e-01     2.169652571497212e+00;
+    -7.959343541250629e-01     1.734787879460887e-01     5.183057616652722e-01;
+    -1.491161141145700e+00     1.734787879460887e-01    -6.156558011172009e-01;
+     3.395965520469954e-01     1.734787879460887e-01    -6.156558011172009e-01;
+     1.950008768899607e+00     7.811059480956469e-01    -4.559525913311414e-01;
+     2.360647275500865e+00     1.137386499517076e+00    -6.474377111746816e-01;
+     2.360647275500865e+00     3.802170924133108e-01    -8.306080491883350e-01;
+     2.360647275500865e+00     3.802170924133108e-01    -8.306080491883350e-01;
+    -7.595250572281091e-01     2.099702382086188e+00    -2.105542488166792e-01;
+    -1.050259152870634e+00     2.099702382086188e+00     4.407213777585910e-01;
+    -1.503041637611334e+00     1.651663304973359e+00     4.407213777585910e-01;
+    -7.640986998554642e-01     1.761270372892817e+00    -1.136190430698683e+00;
+    -1.556337035893296e+00     1.761270372892817e+00    -8.591144039108953e-01;
+    -1.693351069966612e+00     2.304344888688571e+00    -8.591144039108952e-01;
+    -9.554782720737628e-01     9.776627714398418e-01    -1.189866306818801e+00;
+     4.814748009335627e-01     3.787113244920665e-01    -1.189866306818801e+00;
+     4.814748009335627e-01     3.787113244920665e-01    -1.189866306818801e+00;
+     1.058057714921985e-01    -5.756912322579699e-01    -4.273335383313855e-01;
+     2.911488016457205e-01     1.211585972717668e+00    -4.273335383313855e-01;
+     2.911488016457205e-01     1.396869352993849e+00    -4.273335383313855e-01;
+     1.000163036504084e+00     1.396869352993849e+00     1.178398411807117e-01;
+     1.000163036504084e+00     2.218665633826557e+00    -2.652503820776197e-03;
+     1.851577396167740e+00     2.218665633826557e+00     7.991171910692257e-01;
+     4.345761732087304e-01     8.342556045708378e-01     1.020429798019601e+00;
+     4.345761732087304e-01    -4.014382920300932e-01     2.243999587839387e+00;
+    -1.168821347135370e+00    -1.081085046923253e+00     1.408520952678413e+00];
+
+% Check solutions
+assert(max(max(Vreference-MX))<1e-15,'COSSANX:Tutorial','wrong results')
+
+disp('Tutorial terminated successfully')
+
+##### SOURCE END #####
+--></body></html>

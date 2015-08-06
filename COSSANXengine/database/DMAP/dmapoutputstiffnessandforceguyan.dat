@@ -1,0 +1,31 @@
+
+
+$***************************************************************************
+$ This DMAP routine will output the Stiffness matrix after Guyan Reduction
+$ 
+$ Format   = op4 - sparse
+$ DOF set  = T-SET (Reduced DOF set) 
+$ Analysis = SOL101
+$
+$ Note: the solution sequence is interrupted after the stiffness is output
+$***************************************************************************
+
+COMPILE SEKR $
+ALTER 118 $
+OUTPUT4 KTT,,,,///-13//TRUE/16
+
+
+$***************************************************************************
+$ This DMAP routine will output the Force Vector
+$ 
+$ Format   = op4
+$ DOF set  = A-SET (Analysis set) 
+$ Analysis = SOL101
+$
+$ Note: the solution sequence is interrupted after the stiffness is output
+$***************************************************************************
+
+COMPILE SELR $
+ALTER 99 $
+OUTPUT4 PA,,,,///61//TRUE/16
+EXIT  $

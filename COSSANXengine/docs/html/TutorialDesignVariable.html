@@ -1,0 +1,237 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial DesignVariable</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialDesignVariable.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial DesignVariable</h1><!--introduction--><p>This is a demonstration of the use of DesingVariable object.</p><p>The demo starts with the definition of two DesignVariable, then proceeds to include these DesignVariable in a Input Object. After that, the demo shows how to generate Samples from the Input object containing DesignVariable.</p><pre>Copyright 1993-2011, COSSAN Working Group
+University of Innsbruck, Austria</pre><p>See Also:  <a href="http://mechanik.uibk.ac.at/wiki/index.php/@DesignVariable">http://mechanik.uibk.ac.at/wiki/index.php/@DesignVariable</a></p><p><img src="TutorialDesignVariable_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialDesignVariable_eq82982.png" alt="$Author:~Edoardo~Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Define a Continuos Design Variable</a></li><li><a href="#2">Define a Discrete Design Variable</a></li><li><a href="#3">Adding Design Variables to Input</a></li><li><a href="#4">Sampling values</a></li><li><a href="#5">Sampling from DesignVariable with infinite support</a></li></ul></div><h2>Define a Continuos Design Variable<a name="1"></a></h2><p>This example shows how to define a continuos DesignVariable. The minValue and maxValue property names are used to defined the bounds of the DesignVariable</p><pre class="codeinput">DV1 = DesignVariable(<span class="string">'value'</span>,30,<span class="string">'minvalue'</span>,10,<span class="string">'maxvalue'</span>,50);
+
+<span class="comment">% The content of the object can be see using the dispay method</span>
+display(DV1)
+</pre><pre class="codeoutput">DesignVariable Object - Description: 
+ Current Value          : 30
+ Lower Bound : 10
+ Upper Bound : 50
+</pre><h2>Define a Discrete Design Variable<a name="2"></a></h2><p>Discrete Desing Variable are define using the PropertyName Vsupport. It is not necessary to specify the bounds of discrete DesignVariable</p><pre class="codeinput">DV2 = DesignVariable(<span class="string">'value'</span>,3,<span class="string">'Vsupport'</span>,1:2:13);
+<span class="comment">% The content of the object can be see using the dispay method</span>
+display(DV2)
+</pre><pre class="codeoutput">DesignVariable Object - Description: 
+ Current Value          : 3
+ Support points : 1   3   5   7   9  11  13
+ Lower Bound : 1
+ Upper Bound : 13
+</pre><h2>Adding Design Variables to Input<a name="3"></a></h2><pre class="codeinput">Xin   = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input Object of our model'</span>,<span class="keyword">...</span>
+    <span class="string">'CXmembers'</span>,{DV1 DV2},<span class="string">'CSmembers'</span>,{<span class="string">'DV1'</span> <span class="string">'DV2'</span>});
+<span class="comment">% It is possible to retrieve the name of the DesignVariable using the method</span>
+<span class="comment">% CnamesDesignVariabl@Input</span>
+Xin.CnamesDesignVariable <span class="comment">% Names of DVs</span>
+
+<span class="comment">% The number of designVariable are shown by the method NdesignVariables@Input</span>
+Xin.NdesignVariables     <span class="comment">% Number of DVs</span>
+</pre><pre class="codeoutput">
+ans = 
+
+    'DV1'    'DV2'
+
+
+ans =
+
+     2
+
+</pre><h2>Sampling values<a name="4"></a></h2><p>The method sample is used to genarate samples of the object DesignVariable</p><pre class="codeinput">Vout1=DV1.sample(<span class="string">'Nsamples'</span>,10)
+
+Vout2=DV2.sample(<span class="string">'Nsamples'</span>,10)
+
+<span class="comment">% The samples method can be applied directly to the Input object</span>
+Xin=Xin.sample(<span class="string">'Nsamples'</span>,10);
+<span class="comment">% The matrix of sampled values is stored in the field MdoeDesignVariables of the</span>
+<span class="comment">% Samples object.</span>
+disp(Xin.Xsamples.MdoeDesignVariables)
+</pre><pre class="codeoutput">
+Vout1 =
+
+     1.687694362900427e+01
+     3.370805170336790e+01
+     1.796897187684313e+01
+     1.092900624962351e+01
+     4.035510807331175e+01
+     2.551498356933281e+01
+     4.221847999036790e+01
+     2.468687475263356e+01
+     1.661396183498413e+01
+     1.943675093442042e+01
+
+
+Vout2 =
+
+     3    11     5     7     3    11     3    11     9     3
+
+     2.466042385579289e+01     5.000000000000000e+00
+     4.973169849688646e+01     1.000000000000000e+00
+     2.743997844956465e+01     3.000000000000000e+00
+     2.038451113486359e+01     5.000000000000000e+00
+     3.453059863727222e+01     1.100000000000000e+01
+     2.117241197786469e+01     9.000000000000000e+00
+     2.275877997336639e+01     3.000000000000000e+00
+     4.778660997025794e+01     3.000000000000000e+00
+     2.417929492066189e+01     5.000000000000000e+00
+     4.151029111740243e+01     3.000000000000000e+00
+
+</pre><h2>Sampling from DesignVariable with infinite support<a name="5"></a></h2><p>Create a design variable with infinite support</p><pre class="codeinput">DV3 = DesignVariable(<span class="string">'value'</span>,3);
+<span class="comment">% Show Design Variable</span>
+display(DV3)
+
+<span class="comment">% Generate sample for DV3</span>
+<span class="comment">% It is necessary to define a parturbation around the actual value.</span>
+Vout3=DV3.sample(<span class="string">'Nsamples'</span>,10,<span class="string">'perturbation'</span>,3)
+</pre><pre class="codeoutput">DesignVariable Object - Description: 
+ Current Value          : 3
+ Lower Bound : -Inf
+ Upper Bound : Inf
+
+Vout3 =
+
+     2.428050043928587e-01
+     1.043907570017929e+01
+     1.016549401573039e+01
+     9.470332936952133e+00
+     3.501741757016648e+00
+     9.473773728210041e+00
+     3.399044425567195e+00
+    -2.660928614999389e-01
+     5.334452583532362e+00
+     1.497707461781963e+00
+
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial DesignVariable 
+%
+% This is a demonstration of the use of DesingVariable object.
+%   
+%
+% The demo starts with the definition of two DesignVariable, then proceeds to
+% include these DesignVariable in a Input Object. After that, the 
+% demo shows how to generate Samples from the Input object containing
+% DesignVariable.  
+%
+%
+%  Copyright 1993-2011, COSSAN Working Group
+%  University of Innsbruck, Austria
+%
+% See Also:  http://mechanik.uibk.ac.at/wiki/index.php/@DesignVariable
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Edoardo~Patelli$ 
+
+%% Define a Continuos Design Variable
+% This example shows how to define a continuos DesignVariable. The minValue and
+% maxValue property names are used to defined the bounds of the DesignVariable
+DV1 = DesignVariable('value',30,'minvalue',10,'maxvalue',50);
+
+% The content of the object can be see using the dispay method
+display(DV1)
+
+%%  Define a Discrete Design Variable
+% Discrete Desing Variable are define using the PropertyName Vsupport. It is not
+% necessary to specify the bounds of discrete DesignVariable
+DV2 = DesignVariable('value',3,'Vsupport',1:2:13);
+% The content of the object can be see using the dispay method
+display(DV2)
+
+%% Adding Design Variables to Input
+Xin   = Input('Sdescription','Input Object of our model',...
+    'CXmembers',{DV1 DV2},'CSmembers',{'DV1' 'DV2'});
+% It is possible to retrieve the name of the DesignVariable using the method
+% CnamesDesignVariabl@Input 
+Xin.CnamesDesignVariable % Names of DVs
+
+% The number of designVariable are shown by the method NdesignVariables@Input
+Xin.NdesignVariables     % Number of DVs
+
+%% Sampling values
+% The method sample is used to genarate samples of the object DesignVariable
+Vout1=DV1.sample('Nsamples',10)
+
+Vout2=DV2.sample('Nsamples',10)
+
+% The samples method can be applied directly to the Input object
+Xin=Xin.sample('Nsamples',10);
+% The matrix of sampled values is stored in the field MdoeDesignVariables of the
+% Samples object.
+disp(Xin.Xsamples.MdoeDesignVariables)
+
+%% Sampling from DesignVariable with infinite support
+% Create a design variable with infinite support
+
+DV3 = DesignVariable('value',3);
+% Show Design Variable
+display(DV3)
+
+% Generate sample for DV3
+% It is necessary to define a parturbation around the actual value.
+Vout3=DV3.sample('Nsamples',10,'perturbation',3)
+
+
+
+##### SOURCE END #####
+--></body></html>

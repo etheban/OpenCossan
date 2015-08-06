@@ -1,0 +1,60 @@
+
+
+SOL 101
+
+
+CEND
+
+SUBCASE 1
+
+SPC = 1
+LOAD = 2
+DISPLACEMENT(SORT1,REAL)=ALL
+
+BEGIN BULK
+
+MAT1  ,  1   , 1.0000e+00    ,   ,    .3 ,   2500.
+MAT1  ,  2   , 1.8+6    ,   ,    .3 ,   2500.
+MAT1  ,  3   , 1.8+6    ,   ,    .3 ,   2500.
+
+
+PBAR,   1  ,    1 , 4.-4  , 1.33-8 ,  1.33-8 
+PBAR,   2  ,    2 , 4.-4  , 1.33-8 ,  1.33-8 
+PBAR,   3  ,    3 , 4.-4  , 1.33-8 ,  1.33-8
+
+
+CBAR     1       1       1       2       0.     1.       0.
+CBAR     2       1       2       3       0.     1.       0.
+CBAR     3       1       3       4       0.     1.       0.
+CBAR     4       2       4       5       0.     1.       0.
+CBAR     5       2       5       6       0.     1.       0.
+CBAR     6       2       6       7       0.     1.       0.
+CBAR     7       3       7       8       0.     1.       0.
+CBAR     8       3       8       9       0.     1.       0.
+CBAR     9       3       9       10      0.     1.       0.
+
+
+
+GRID     1               0.      0.      0.
+GRID     2              .111111  0.      0.
+GRID     3              .222222  0.      0.
+GRID     4              .333333  0.      0.
+GRID     5              .444444  0.      0.
+GRID     6              .555556  0.      0.
+GRID     7              .666667  0.      0.
+GRID     8              .777778  0.      0.
+GRID     9              .888889  0.      0.
+GRID     10             1.       0.      0.
+
+
+SPCADD   2       1
+LOAD     2      1.      1.       1      1.       3
+SPC1     1       123456  1
+$
+FORCE    1       10      0      100.     0.     1.       0.
+
+$ Gravity Loading of Load Set : gravity
+GRAV     3       0      10.      0.      0.     -1.
+
+
+ENDDATA

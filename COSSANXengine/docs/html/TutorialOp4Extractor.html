@@ -1,0 +1,151 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialOp4Extractor</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialOp4Extractor.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Tutorial for Op4Extractor.</a></li><li><a href="#2">Create op4Extractor object</a></li></ul></div><h2>Tutorial for Op4Extractor.<a name="1"></a></h2><p>tutorial on the use of op4 extractor example on how to transfer the data from op4 format files</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Op4Extractor">http://mechanik.uibk.ac.at/wiki/index.php/@Op4Extractor</a></p><pre class="codeinput"><span class="comment">%  Copyright 1993-2011, COSSAN Working Group</span>
+<span class="comment">%  University of Innsbruck, Austria</span>
+</pre><h2>Create op4Extractor object<a name="2"></a></h2><pre class="codeinput">SpathName=fullfile(CossanX.getCossanRoot,<span class="string">'examples'</span>,<span class="string">'Tutorials'</span>,<span class="string">'Extractor'</span>,<span class="string">'NASTRAN'</span>);
+<span class="comment">% define the name of the file &amp; path of the file &amp; the variable name to be stored</span>
+Xextractor = Op4Extractor(<span class="string">'Sfile'</span>,<span class="string">'BEAM1_K_0.OP4'</span>,<span class="string">'Sworkingdirectory'</span>,SpathName,<span class="keyword">...</span>
+        <span class="string">'Srelativepath'</span>,<span class="string">'./'</span>,<span class="string">'Soutputname'</span>,<span class="string">'stiffness'</span>);
+display(Xextractor)
+<span class="comment">% Test extract method of the Op4Extractor object</span>
+Tout  = extract(Xextractor);
+
+<span class="comment">% Validate output</span>
+
+Vreference= -4.5247e+02;
+assert(abs(Tout.stiffness(42,45)-Vreference)&lt;1e-4,<span class="keyword">...</span>
+    <span class="string">'CossanX:Tutorials:TutorialEvaluator'</span>,<span class="string">'Reference Solution does not match.'</span>)
+
+
+
+Xextractor = Op4Extractor(<span class="string">'Sfile'</span>,<span class="string">'BEAM1_U_0.OP4'</span>,<span class="string">'Sworkingdirectory'</span>,SpathName, <span class="keyword">...</span>
+    <span class="string">'Srelativepath'</span>,<span class="string">'./'</span>,<span class="string">'Soutputname'</span>,<span class="string">'displacements'</span>);
+Tout  = extract(Xextractor);
+
+<span class="comment">% Validate output</span>
+
+Vreference= 1.1272e+01;
+assert(abs(Tout.displacements(5)-Vreference)&lt;1e-4,<span class="keyword">...</span>
+    <span class="string">'CossanX:Tutorials:TutorialEvaluator'</span>,<span class="string">'Reference Solution does not match.'</span>)
+</pre><pre class="codeoutput"> 
+===================================================================
+ Extractor Object  -  Name: Xextractor
+ Description: 
+===================================================================
+ 
+ Number of responses: 0
+ ASCII file: ./BEAM1_K_0.OP4
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+ Response #1
+ Output Name: stiffness
+</pre><pre class="codeoutput">Error using ==&gt; Op4Extractor.extract at 20
+Please make sure that the input file /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Tutorials/Extractor/NASTRAN/./BEAM1_K_0.OP4 exists
+
+Error in ==&gt; TutorialOp4Extractor at 19
+Tout  = extract(Xextractor);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for Op4Extractor.
+%
+% tutorial on the use of op4 extractor
+% example on how to transfer the data from op4 format files
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@Op4Extractor
+%
+
+%  Copyright 1993-2011, COSSAN Working Group
+%  University of Innsbruck, Austria
+
+%% Create op4Extractor object
+SpathName=fullfile(CossanX.getCossanRoot,'examples','Tutorials','Extractor','NASTRAN');
+% define the name of the file & path of the file & the variable name to be stored
+Xextractor = Op4Extractor('Sfile','BEAM1_K_0.OP4','Sworkingdirectory',SpathName,...
+        'Srelativepath','./','Soutputname','stiffness');
+display(Xextractor)
+% Test extract method of the Op4Extractor object
+Tout  = extract(Xextractor);
+
+% Validate output
+
+Vreference= -4.5247e+02;
+assert(abs(Tout.stiffness(42,45)-Vreference)<1e-4,...
+    'CossanX:Tutorials:TutorialEvaluator','Reference Solution does not match.')
+
+
+
+Xextractor = Op4Extractor('Sfile','BEAM1_U_0.OP4','Sworkingdirectory',SpathName, ...
+    'Srelativepath','./','Soutputname','displacements');
+Tout  = extract(Xextractor);
+
+% Validate output
+
+Vreference= 1.1272e+01;
+assert(abs(Tout.displacements(5)-Vreference)<1e-4,...
+    'CossanX:Tutorials:TutorialEvaluator','Reference Solution does not match.')
+
+
+##### SOURCE END #####
+--></body></html>

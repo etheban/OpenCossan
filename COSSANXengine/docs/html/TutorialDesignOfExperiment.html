@@ -1,0 +1,1189 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for the DesignOfExperiments class</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialDesignOfExperiment.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for the DesignOfExperiments class</h1><!--introduction--><p>DesignOfExperiments tutorial Please refer to the specific tutorials for the other objects available in [COSSANEngine/examples/Tutorials]</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@DesignOfExperiment">http://mechanik.uibk.ac.at/wiki/index.php/@DesignOfExperiment</a></p><p><img src="TutorialDesignOfExperiment_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialDesignOfExperiment_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Example #1 - using only RandomVariables in Input</a></li><li><a href="#2">BOX-BEHNKEN</a></li><li><a href="#3">2LEVEL-FACTORIAL</a></li><li><a href="#4">FULL-FACTORIAL</a></li><li><a href="#5">Central-Composite with Faced</a></li><li><a href="#6">Central-Composite with inscribed</a></li><li><a href="#7">Example #2 - using only DesignVariables (continous &amp; discrete) in Input</a></li><li><a href="#8">BOX-BEHNKEN</a></li><li><a href="#9">2LEVEL-FACTORIAL</a></li><li><a href="#10">FULL-FACTORIAL</a></li><li><a href="#11">Central-Composite with Faced</a></li><li><a href="#12">Central-Composite with inscribed</a></li><li><a href="#13">User defined</a></li><li><a href="#14">Example #3 - using both DesignVariables &amp; RandomVariables in Input</a></li><li><a href="#15">Define the Model</a></li><li><a href="#16">BOX-BEHNKEN</a></li><li><a href="#17">2LEVEL-FACTORIAL</a></li><li><a href="#18">Use apply method</a></li></ul></div><h2>Example #1 - using only RandomVariables in Input<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Define RandomVariablesSet</span>
+RV1   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,5, <span class="string">'std'</span>,1);
+RV2   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,15,<span class="string">'std'</span>,2);
+RV3   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,1,<span class="string">'std'</span>,0.2);
+Xrvs1 = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>,<span class="string">'RV3'</span>},<span class="string">'CXmembers'</span>,{RV1,RV2,RV3});
+<span class="comment">% Create an Input object</span>
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input Object of our model'</span>);
+Xin   = add(Xin,Xrvs1);
+</pre><h2>BOX-BEHNKEN<a name="2"></a></h2><pre class="codeinput"><span class="comment">% here we use the Box-Behnken type of DOE in order to generate the samples</span>
+Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'BoxBehnken'</span>);
+
+<span class="comment">% if you provide also the Xdoe as output, the MdoeFactors will be stored in</span>
+<span class="comment">% the object (this object is created in sample method, since it requires</span>
+<span class="comment">% the Xinput, i.e. you need to know the no Nrv +Ndv)</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin); <span class="comment">%#ok&lt;*NASGU&gt;</span>
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+<span class="comment">% validate the results: second row of samples is selected for this purpose</span>
+Vreference=[4.00 17.00 1.00];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(2,:)-Vreference))&lt;1e-6,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'BOX-BEHNKEN (ex#1) Reference Solution does not match.'</span>)
+
+<span class="comment">% change the perturbance parameter and observe the changes in the samples</span>
+<span class="comment">% now the samples are perturbed +-2 std dev</span>
+Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'BoxBehnken'</span>,<span class="string">'perturbanceparameter'</span>,2);
+
+<span class="comment">% generate the samples</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+<span class="comment">% validate the results: fifth row of samples is selected for this purpose</span>
+Vreference=[3.0000   15.0000    0.6000];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(5,:)-Vreference))&lt;1e-6,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'BOX-BEHNKEN (ex#1) Reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+    -1    -1     0
+    -1     1     0
+     1    -1     0
+     1     1     0
+    -1     0    -1
+    -1     0     1
+     1     0    -1
+     1     0     1
+     0    -1    -1
+     0    -1     1
+     0     1    -1
+     0     1     1
+     0     0     0
+
+
+ans =
+
+     4.000000000000000e+00     1.300000000000000e+01     1.000000000000000e+00
+     4.000000000000000e+00     1.700000000000000e+01     1.000000000000000e+00
+     6.000000000000000e+00     1.300000000000000e+01     1.000000000000000e+00
+     6.000000000000000e+00     1.700000000000000e+01     1.000000000000000e+00
+     4.000000000000000e+00     1.500000000000000e+01     8.000000000000000e-01
+     4.000000000000000e+00     1.500000000000000e+01     1.200000000000000e+00
+     6.000000000000000e+00     1.500000000000000e+01     8.000000000000000e-01
+     6.000000000000000e+00     1.500000000000000e+01     1.200000000000000e+00
+     5.000000000000000e+00     1.300000000000000e+01     8.000000000000000e-01
+     5.000000000000000e+00     1.300000000000000e+01     1.200000000000000e+00
+     5.000000000000000e+00     1.700000000000000e+01     8.000000000000000e-01
+     5.000000000000000e+00     1.700000000000000e+01     1.200000000000000e+00
+     5.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+
+
+ans =
+
+    -1    -1     0
+    -1     1     0
+     1    -1     0
+     1     1     0
+    -1     0    -1
+    -1     0     1
+     1     0    -1
+     1     0     1
+     0    -1    -1
+     0    -1     1
+     0     1    -1
+     0     1     1
+     0     0     0
+
+
+ans =
+
+     3.000000000000000e+00     1.100000000000000e+01     1.000000000000000e+00
+     3.000000000000000e+00     1.900000000000000e+01     1.000000000000000e+00
+     7.000000000000000e+00     1.100000000000000e+01     1.000000000000000e+00
+     7.000000000000000e+00     1.900000000000000e+01     1.000000000000000e+00
+     3.000000000000000e+00     1.500000000000000e+01     6.000000000000000e-01
+     3.000000000000000e+00     1.500000000000000e+01     1.400000000000000e+00
+     7.000000000000000e+00     1.500000000000000e+01     6.000000000000000e-01
+     7.000000000000000e+00     1.500000000000000e+01     1.400000000000000e+00
+     5.000000000000000e+00     1.100000000000000e+01     6.000000000000000e-01
+     5.000000000000000e+00     1.100000000000000e+01     1.400000000000000e+00
+     5.000000000000000e+00     1.900000000000000e+01     6.000000000000000e-01
+     5.000000000000000e+00     1.900000000000000e+01     1.400000000000000e+00
+     5.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+
+</pre><h2>2LEVEL-FACTORIAL<a name="3"></a></h2><pre class="codeinput"><span class="comment">% using the 2LEVEL-FACTORIAL type of DOE in order to generate the samples</span>
+Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'2LevelFactorial'</span>);
+
+<span class="comment">% generate the samples according to the provided input</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+<span class="comment">% validate the results: last row of samples is selected for this purpose</span>
+Vreference=[6.0000   17.0000    1.2000];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(8,:)-Vreference))&lt;1e-6,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'2LEVEL-FACTORIAL (ex#1) Reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+     0     0     0
+     0     0     1
+     0     1     0
+     0     1     1
+     1     0     0
+     1     0     1
+     1     1     0
+     1     1     1
+
+
+ans =
+
+     5.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.500000000000000e+01     1.200000000000000e+00
+     5.000000000000000e+00     1.700000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.700000000000000e+01     1.200000000000000e+00
+     6.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+     6.000000000000000e+00     1.500000000000000e+01     1.200000000000000e+00
+     6.000000000000000e+00     1.700000000000000e+01     1.000000000000000e+00
+     6.000000000000000e+00     1.700000000000000e+01     1.200000000000000e+00
+
+</pre><h2>FULL-FACTORIAL<a name="4"></a></h2><pre class="codeinput"><span class="comment">% using the full factorial DOE</span>
+Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'FullFactorial'</span>);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+<span class="comment">% validate the results: last row of samples is selected for this purpose</span>
+Vreference=[6.0000   17.0000    1.2000];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(8,:)-Vreference))&lt;1e-6,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'2LEVEL-FACTORIAL (ex#1) Reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+     0     0     0
+     1     0     0
+     0     1     0
+     1     1     0
+     0     0     1
+     1     0     1
+     0     1     1
+     1     1     1
+
+
+ans =
+
+     5.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+     6.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.700000000000000e+01     1.000000000000000e+00
+     6.000000000000000e+00     1.700000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.500000000000000e+01     1.200000000000000e+00
+     6.000000000000000e+00     1.500000000000000e+01     1.200000000000000e+00
+     5.000000000000000e+00     1.700000000000000e+01     1.200000000000000e+00
+     6.000000000000000e+00     1.700000000000000e+01     1.200000000000000e+00
+
+</pre><h2>Central-Composite with Faced<a name="5"></a></h2><pre class="codeinput"><span class="comment">% using the Central-Composite DOE with "Faced" option</span>
+Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'CentralComposite'</span>,<span class="string">'ScentralCompositeType'</span>,<span class="string">'faced'</span>);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+<span class="comment">% validate the results:</span>
+Vreference=[4.0000   15.0000    1.0000];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(9,:)-Vreference))&lt;1e-6,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'Central-Composite with Faced (ex#1) Reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+    -1    -1    -1
+    -1    -1     1
+    -1     1    -1
+    -1     1     1
+     1    -1    -1
+     1    -1     1
+     1     1    -1
+     1     1     1
+    -1     0     0
+     1     0     0
+     0    -1     0
+     0     1     0
+     0     0    -1
+     0     0     1
+     0     0     0
+
+
+ans =
+
+     4.000000000000000e+00     1.300000000000000e+01     8.000000000000000e-01
+     4.000000000000000e+00     1.300000000000000e+01     1.200000000000000e+00
+     4.000000000000000e+00     1.700000000000000e+01     8.000000000000000e-01
+     4.000000000000000e+00     1.700000000000000e+01     1.200000000000000e+00
+     6.000000000000000e+00     1.300000000000000e+01     8.000000000000000e-01
+     6.000000000000000e+00     1.300000000000000e+01     1.200000000000000e+00
+     6.000000000000000e+00     1.700000000000000e+01     8.000000000000000e-01
+     6.000000000000000e+00     1.700000000000000e+01     1.200000000000000e+00
+     4.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+     6.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.300000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.700000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.500000000000000e+01     8.000000000000000e-01
+     5.000000000000000e+00     1.500000000000000e+01     1.200000000000000e+00
+     5.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+
+</pre><h2>Central-Composite with inscribed<a name="6"></a></h2><pre class="codeinput">Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'CentralComposite'</span>,<span class="string">'ScentralCompositeType'</span>,<span class="string">'inscribed'</span>);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+<span class="comment">% validate the results:</span>
+Vreference=[4.4054   13.8108    0.8811];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(1,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'Central-Composite with inscribed (ex#1) Reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+    -5.946035575013605e-01    -5.946035575013605e-01    -5.946035575013605e-01
+    -5.946035575013605e-01    -5.946035575013605e-01     5.946035575013605e-01
+    -5.946035575013605e-01     5.946035575013605e-01    -5.946035575013605e-01
+    -5.946035575013605e-01     5.946035575013605e-01     5.946035575013605e-01
+     5.946035575013605e-01    -5.946035575013605e-01    -5.946035575013605e-01
+     5.946035575013605e-01    -5.946035575013605e-01     5.946035575013605e-01
+     5.946035575013605e-01     5.946035575013605e-01    -5.946035575013605e-01
+     5.946035575013605e-01     5.946035575013605e-01     5.946035575013605e-01
+    -1.000000000000000e+00                         0                         0
+     1.000000000000000e+00                         0                         0
+                         0    -1.000000000000000e+00                         0
+                         0     1.000000000000000e+00                         0
+                         0                         0    -1.000000000000000e+00
+                         0                         0     1.000000000000000e+00
+                         0                         0                         0
+
+
+ans =
+
+     4.405396442498639e+00     1.381079288499728e+01     8.810792884997278e-01
+     4.405396442498639e+00     1.381079288499728e+01     1.118920711500272e+00
+     4.405396442498639e+00     1.618920711500272e+01     8.810792884997278e-01
+     4.405396442498639e+00     1.618920711500272e+01     1.118920711500272e+00
+     5.594603557501361e+00     1.381079288499728e+01     8.810792884997278e-01
+     5.594603557501361e+00     1.381079288499728e+01     1.118920711500272e+00
+     5.594603557501361e+00     1.618920711500272e+01     8.810792884997278e-01
+     5.594603557501361e+00     1.618920711500272e+01     1.118920711500272e+00
+     4.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+     6.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.300000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.700000000000000e+01     1.000000000000000e+00
+     5.000000000000000e+00     1.500000000000000e+01     8.000000000000000e-01
+     5.000000000000000e+00     1.500000000000000e+01     1.200000000000000e+00
+     5.000000000000000e+00     1.500000000000000e+01     1.000000000000000e+00
+
+</pre><h2>Example #2 - using only DesignVariables (continous &amp; discrete) in Input<a name="7"></a></h2><pre class="codeinput">Xin2 = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input Object of our model'</span>);
+
+DV1 = DesignVariable(<span class="string">'value'</span>,3,<span class="string">'Vsupport'</span>,1:2:9);
+DV2 = DesignVariable(<span class="string">'value'</span>,17,<span class="string">'lowerbound'</span>,10,<span class="string">'upperbound'</span>,20);
+DV3 = DesignVariable(<span class="string">'value'</span>,42,<span class="string">'lowerbound'</span>,40,<span class="string">'upperbound'</span>,60);
+Xin2 = add(Xin2,DV1);
+Xin2 = add(Xin2,DV2);
+Xin2 = add(Xin2,DV3);
+</pre><h2>BOX-BEHNKEN<a name="8"></a></h2><pre class="codeinput">Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'BoxBehnken'</span>,<span class="string">'Lusecurrentvalues'</span>,false);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin2); <span class="comment">%#ok&lt;*NASGU&gt;</span>
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+<span class="comment">% validate the results:</span>
+Vreference=[ 9    10    50];
+assert(max(abs(Xsmp.MdoeDesignVariables(3,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'BOX-BEHNKEN (ex#2) reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+    -1    -1     0
+    -1     1     0
+     1    -1     0
+     1     1     0
+    -1     0    -1
+    -1     0     1
+     1     0    -1
+     1     0     1
+     0    -1    -1
+     0    -1     1
+     0     1    -1
+     0     1     1
+     0     0     0
+
+
+ans =
+
+     1    10    50
+     1    20    50
+     9    10    50
+     9    20    50
+     1    15    40
+     1    15    60
+     9    15    40
+     9    15    60
+     5    10    40
+     5    10    60
+     5    20    40
+     5    20    60
+     5    15    50
+
+</pre><h2>2LEVEL-FACTORIAL<a name="9"></a></h2><pre class="codeinput">Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'2LevelFactorial'</span>);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin2);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+<span class="comment">% validate the results:</span>
+Vreference=[3    17    42];
+assert(max(abs(Xsmp.MdoeDesignVariables(1,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'2LEVEL-FACTORIAL (ex#2) reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+     0     0     0
+     0     0     1
+     0     1     0
+     0     1     1
+     1     0     0
+     1     0     1
+     1     1     0
+     1     1     1
+
+
+ans =
+
+     3    17    42
+     3    17    60
+     3    20    42
+     3    20    60
+     9    17    42
+     9    17    60
+     9    20    42
+     9    20    60
+
+</pre><h2>FULL-FACTORIAL<a name="10"></a></h2><pre class="codeinput">Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'FullFactorial'</span>,<span class="string">'Vlevelvalues'</span>,[2 3],<span class="string">'Clevelnames'</span>,{<span class="string">'DV2'</span>,<span class="string">'DV3'</span>});
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin2);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+<span class="comment">% validate the results:</span>
+Vreference=[3    10    40];
+assert(max(abs(Xsmp.MdoeDesignVariables(2,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'FULL-FACTORIAL (ex#2) reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+     1     1     1
+     2     1     1
+     3     1     1
+     4     1     1
+     5     1     1
+     1     2     1
+     2     2     1
+     3     2     1
+     4     2     1
+     5     2     1
+     1     1     2
+     2     1     2
+     3     1     2
+     4     1     2
+     5     1     2
+     1     2     2
+     2     2     2
+     3     2     2
+     4     2     2
+     5     2     2
+     1     1     3
+     2     1     3
+     3     1     3
+     4     1     3
+     5     1     3
+     1     2     3
+     2     2     3
+     3     2     3
+     4     2     3
+     5     2     3
+
+
+ans =
+
+     1    10    40
+     3    10    40
+     5    10    40
+     7    10    40
+     9    10    40
+     1    20    40
+     3    20    40
+     5    20    40
+     7    20    40
+     9    20    40
+     1    10    50
+     3    10    50
+     5    10    50
+     7    10    50
+     9    10    50
+     1    20    50
+     3    20    50
+     5    20    50
+     7    20    50
+     9    20    50
+     1    10    60
+     3    10    60
+     5    10    60
+     7    10    60
+     9    10    60
+     1    20    60
+     3    20    60
+     5    20    60
+     7    20    60
+     9    20    60
+
+</pre><h2>Central-Composite with Faced<a name="11"></a></h2><pre class="codeinput">Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'CentralComposite'</span>,<span class="string">'ScentralCompositeType'</span>,<span class="string">'faced'</span>);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin2);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+<span class="comment">% validate the results:</span>
+Vreference=[3    17    42];
+assert(max(abs(Xsmp.MdoeDesignVariables(end,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'Central-Composite with Faced (ex#2) reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+    -1    -1    -1
+    -1    -1     1
+    -1     1    -1
+    -1     1     1
+     1    -1    -1
+     1    -1     1
+     1     1    -1
+     1     1     1
+    -1     0     0
+     1     0     0
+     0    -1     0
+     0     1     0
+     0     0    -1
+     0     0     1
+     0     0     0
+
+
+ans =
+
+     1    10    40
+     1    10    60
+     1    20    40
+     1    20    60
+     9    10    40
+     9    10    60
+     9    20    40
+     9    20    60
+     1    17    42
+     9    17    42
+     3    10    42
+     3    20    42
+     3    17    40
+     3    17    60
+     3    17    42
+
+</pre><h2>Central-Composite with inscribed<a name="12"></a></h2><pre class="codeinput">Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'CentralComposite'</span>,<span class="string">'ScentralCompositeType'</span>,<span class="string">'inscribed'</span>);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin2);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+<span class="comment">% validate the results:</span>
+Vreference=[3.0000   12.0270   44.0540];
+assert(max(abs(Xsmp.MdoeDesignVariables(1,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'Central-Composite with inscribed (ex#2) reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+    -5.946035575013605e-01    -5.946035575013605e-01    -5.946035575013605e-01
+    -5.946035575013605e-01    -5.946035575013605e-01     5.946035575013605e-01
+    -5.946035575013605e-01     5.946035575013605e-01    -5.946035575013605e-01
+    -5.946035575013605e-01     5.946035575013605e-01     5.946035575013605e-01
+     5.946035575013605e-01    -5.946035575013605e-01    -5.946035575013605e-01
+     5.946035575013605e-01    -5.946035575013605e-01     5.946035575013605e-01
+     5.946035575013605e-01     5.946035575013605e-01    -5.946035575013605e-01
+     5.946035575013605e-01     5.946035575013605e-01     5.946035575013605e-01
+    -1.000000000000000e+00                         0                         0
+     1.000000000000000e+00                         0                         0
+                         0    -1.000000000000000e+00                         0
+                         0     1.000000000000000e+00                         0
+                         0                         0    -1.000000000000000e+00
+                         0                         0     1.000000000000000e+00
+                         0                         0                         0
+
+
+ans =
+
+     3.000000000000000e+00     1.202698221249320e+01     4.405396442498640e+01
+     3.000000000000000e+00     1.202698221249320e+01     5.594603557501360e+01
+     3.000000000000000e+00     1.797301778750680e+01     4.405396442498640e+01
+     3.000000000000000e+00     1.797301778750680e+01     5.594603557501360e+01
+     7.000000000000000e+00     1.202698221249320e+01     4.405396442498640e+01
+     7.000000000000000e+00     1.202698221249320e+01     5.594603557501360e+01
+     7.000000000000000e+00     1.797301778750680e+01     4.405396442498640e+01
+     7.000000000000000e+00     1.797301778750680e+01     5.594603557501360e+01
+     1.000000000000000e+00     1.700000000000000e+01     4.200000000000000e+01
+     9.000000000000000e+00     1.700000000000000e+01     4.200000000000000e+01
+     3.000000000000000e+00     1.000000000000000e+01     4.200000000000000e+01
+     3.000000000000000e+00     2.000000000000000e+01     4.200000000000000e+01
+     3.000000000000000e+00     1.700000000000000e+01     4.000000000000000e+01
+     3.000000000000000e+00     1.700000000000000e+01     6.000000000000000e+01
+     3.000000000000000e+00     1.700000000000000e+01     4.200000000000000e+01
+
+</pre><h2>User defined<a name="13"></a></h2><pre class="codeinput">Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'UserDefined'</span>,<span class="string">'MdoeFactors'</span>,[0 0.5 1; -1 -1 -0.5]);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin2);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+<span class="comment">% validate the results:</span>
+Vreference=[3.0000   17.5000   60.0000];
+assert(max(abs(Xsmp.MdoeDesignVariables(1,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'User defined (ex#2) reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+                         0     5.000000000000000e-01     1.000000000000000e+00
+    -1.000000000000000e+00    -1.000000000000000e+00    -5.000000000000000e-01
+
+
+ans =
+
+     3.000000000000000e+00     1.750000000000000e+01     6.000000000000000e+01
+     1.000000000000000e+00     1.000000000000000e+01     4.500000000000000e+01
+
+</pre><h2>Example #3 - using both DesignVariables &amp; RandomVariables in Input<a name="14"></a></h2><pre class="codeinput">Xin3 = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input Object of our model'</span>);
+
+<span class="comment">% Define RandomVariablesSet</span>
+RV1   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,5, <span class="string">'std'</span>,1); <span class="comment">%#ok&lt;SNASGU&gt;</span>
+RV2   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,15,<span class="string">'std'</span>,2);
+Xrvs1 = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>, <span class="string">'RV2'</span>});
+Xin3   = add(Xin3,Xrvs1);
+
+<span class="comment">% Define the DesignVariables</span>
+DV1 = DesignVariable(<span class="string">'value'</span>,2,<span class="string">'minvalue'</span>,1,<span class="string">'maxvalue'</span>,6);
+DV2 = DesignVariable(<span class="string">'value'</span>,3,<span class="string">'Vsupport'</span>,1:2:9);
+Xin3 = add(Xin3,DV1);
+Xin3 = add(Xin3,DV2);
+</pre><h2>Define the Model<a name="15"></a></h2><pre class="codeinput">Xm=Mio(<span class="string">'Sdescription'</span>, <span class="string">'This is our Model'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput),Toutput(j).out=2*Tinput(j).RV1-Tinput(j).RV2+3*Tinput(j).DV1+3*Tinput(j).DV2; end'</span>, <span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'out'</span>},<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>,<span class="string">'DV1'</span>,<span class="string">'DV2'</span>},<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false);
+<span class="comment">% Construct the Evaluator</span>
+Xeval = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'Evaluator for the DOE tutorial'</span>);
+Xmdl  = Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xin3);
+</pre><h2>BOX-BEHNKEN<a name="16"></a></h2><pre class="codeinput">Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'BoxBehnken'</span>);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin3); <span class="comment">%#ok&lt;*NASGU&gt;</span>
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);   <span class="comment">% samples of DVs</span>
+display(Xsmp.MsamplesPhysicalSpace); <span class="comment">% samples of RVs</span>
+
+<span class="comment">% validate the results:</span>
+Vreference=[2 3];
+assert(max(abs(Xsmp.MdoeDesignVariables(1,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'BOX-BEHNKEN (ex#3) reference Solution does not match.'</span>)
+
+<span class="comment">% validate the results:</span>
+Vreference=[4 13];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(1,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'BOX-BEHNKEN (ex#3) reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+    -1    -1     0     0
+    -1     1     0     0
+     1    -1     0     0
+     1     1     0     0
+     0     0    -1    -1
+     0     0    -1     1
+     0     0     1    -1
+     0     0     1     1
+    -1     0     0    -1
+    -1     0     0     1
+     1     0     0    -1
+     1     0     0     1
+     0    -1    -1     0
+     0    -1     1     0
+     0     1    -1     0
+     0     1     1     0
+    -1     0    -1     0
+    -1     0     1     0
+     1     0    -1     0
+     1     0     1     0
+     0    -1     0    -1
+     0    -1     0     1
+     0     1     0    -1
+     0     1     0     1
+     0     0     0     0
+
+
+ans =
+
+     2     3
+     2     3
+     2     3
+     2     3
+     1     1
+     1     9
+     6     1
+     6     9
+     2     1
+     2     9
+     2     1
+     2     9
+     1     3
+     6     3
+     1     3
+     6     3
+     1     3
+     6     3
+     1     3
+     6     3
+     2     1
+     2     9
+     2     1
+     2     9
+     2     3
+
+
+ans =
+
+     4    13
+     4    17
+     6    13
+     6    17
+     5    15
+     5    15
+     5    15
+     5    15
+     4    15
+     4    15
+     6    15
+     6    15
+     5    13
+     5    13
+     5    17
+     5    17
+     4    15
+     4    15
+     6    15
+     6    15
+     5    13
+     5    13
+     5    17
+     5    17
+     5    15
+
+</pre><h2>2LEVEL-FACTORIAL<a name="17"></a></h2><pre class="codeinput">Xdoe = DesignOfExperiments(<span class="string">'SdesignType'</span>,<span class="string">'2LevelFactorial'</span>);
+
+<span class="comment">% generate the samples accordingly</span>
+[Xsmp Xdoe] = Xdoe.sample(<span class="string">'Xinput'</span>,Xin3);
+
+<span class="comment">% display the coordinates of the DOE and the generated samples</span>
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);   <span class="comment">% samples of DVs</span>
+display(Xsmp.MsamplesPhysicalSpace); <span class="comment">% samples of RVs</span>
+
+<span class="comment">% validate the results:</span>
+Vreference=[6 9];
+assert(max(abs(Xsmp.MdoeDesignVariables(end,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'BOX-BEHNKEN (ex#3) reference Solution does not match.'</span>)
+
+<span class="comment">% validate the results:</span>
+Vreference=[5 15];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(1,:)-Vreference))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'BOX-BEHNKEN (ex#3) reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+     0     0     0     0
+     0     0     0     1
+     0     0     1     0
+     0     0     1     1
+     0     1     0     0
+     0     1     0     1
+     0     1     1     0
+     0     1     1     1
+     1     0     0     0
+     1     0     0     1
+     1     0     1     0
+     1     0     1     1
+     1     1     0     0
+     1     1     0     1
+     1     1     1     0
+     1     1     1     1
+
+
+ans =
+
+     2     3
+     2     9
+     6     3
+     6     9
+     2     3
+     2     9
+     6     3
+     6     9
+     2     3
+     2     9
+     6     3
+     6     9
+     2     3
+     2     9
+     6     3
+     6     9
+
+
+ans =
+
+     5    15
+     5    15
+     5    15
+     5    15
+     5    17
+     5    17
+     5    17
+     5    17
+     6    15
+     6    15
+     6    15
+     6    15
+     6    17
+     6    17
+     6    17
+     6    17
+
+</pre><h2>Use apply method<a name="18"></a></h2><pre class="codeinput">Xo = Xdoe.apply(Xmdl);
+
+<span class="comment">% validate the results:</span>
+Vreference=[28 22 40 8];
+assert(max(abs(Xo.Tvalues(2).out-Vreference(1)))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'BOX-BEHNKEN (ex#3) reference Solution does not match.'</span>)
+
+assert(max(abs(Xo.Tvalues(5).out-Vreference(4)))&lt;1e-4,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialDesignOfExperiments'</span>,<span class="string">'BOX-BEHNKEN (ex#3) reference Solution does not match.'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the DesignOfExperiments class
+%
+% DesignOfExperiments tutorial
+% Please refer to the specific tutorials for the other objects available in
+% [COSSANEngine/examples/Tutorials]
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@DesignOfExperiment
+%
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+%% Example #1 - using only RandomVariables in Input
+
+% Define RandomVariablesSet
+RV1   = RandomVariable('Sdistribution','normal', 'mean',5, 'std',1); 
+RV2   = RandomVariable('Sdistribution','normal', 'mean',15,'std',2); 
+RV3   = RandomVariable('Sdistribution','normal', 'mean',1,'std',0.2);
+Xrvs1 = RandomVariableSet('Cmembers',{'RV1','RV2','RV3'},'CXmembers',{RV1,RV2,RV3});
+% Create an Input object
+Xin = Input('Sdescription','Input Object of our model');
+Xin   = add(Xin,Xrvs1);
+
+%% BOX-BEHNKEN
+
+% here we use the Box-Behnken type of DOE in order to generate the samples
+Xdoe = DesignOfExperiments('SdesignType','BoxBehnken');
+
+% if you provide also the Xdoe as output, the MdoeFactors will be stored in
+% the object (this object is created in sample method, since it requires 
+% the Xinput, i.e. you need to know the no Nrv +Ndv)
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin); %#ok<*NASGU>
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+% validate the results: second row of samples is selected for this purpose
+Vreference=[4.00 17.00 1.00];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(2,:)-Vreference))<1e-6,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','BOX-BEHNKEN (ex#1) Reference Solution does not match.')
+
+% change the perturbance parameter and observe the changes in the samples
+% now the samples are perturbed +-2 std dev
+Xdoe = DesignOfExperiments('SdesignType','BoxBehnken','perturbanceparameter',2);
+
+% generate the samples
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin); 
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+% validate the results: fifth row of samples is selected for this purpose
+Vreference=[3.0000   15.0000    0.6000];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(5,:)-Vreference))<1e-6,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','BOX-BEHNKEN (ex#1) Reference Solution does not match.')
+
+%% 2LEVEL-FACTORIAL
+
+% using the 2LEVEL-FACTORIAL type of DOE in order to generate the samples
+Xdoe = DesignOfExperiments('SdesignType','2LevelFactorial');
+
+% generate the samples according to the provided input
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+% validate the results: last row of samples is selected for this purpose
+Vreference=[6.0000   17.0000    1.2000];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(8,:)-Vreference))<1e-6,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','2LEVEL-FACTORIAL (ex#1) Reference Solution does not match.')
+
+%% FULL-FACTORIAL
+
+% using the full factorial DOE 
+Xdoe = DesignOfExperiments('SdesignType','FullFactorial');
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+% validate the results: last row of samples is selected for this purpose
+Vreference=[6.0000   17.0000    1.2000];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(8,:)-Vreference))<1e-6,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','2LEVEL-FACTORIAL (ex#1) Reference Solution does not match.')
+
+%% Central-Composite with Faced
+
+% using the Central-Composite DOE with "Faced" option
+Xdoe = DesignOfExperiments('SdesignType','CentralComposite','ScentralCompositeType','faced');
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+% validate the results: 
+Vreference=[4.0000   15.0000    1.0000];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(9,:)-Vreference))<1e-6,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','Central-Composite with Faced (ex#1) Reference Solution does not match.')
+
+%% Central-Composite with inscribed
+
+Xdoe = DesignOfExperiments('SdesignType','CentralComposite','ScentralCompositeType','inscribed');
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MsamplesPhysicalSpace);
+
+% validate the results: 
+Vreference=[4.4054   13.8108    0.8811];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(1,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','Central-Composite with inscribed (ex#1) Reference Solution does not match.')
+
+%% Example #2 - using only DesignVariables (continous & discrete) in Input
+
+Xin2 = Input('Sdescription','Input Object of our model');
+
+DV1 = DesignVariable('value',3,'Vsupport',1:2:9);
+DV2 = DesignVariable('value',17,'lowerbound',10,'upperbound',20);
+DV3 = DesignVariable('value',42,'lowerbound',40,'upperbound',60);
+Xin2 = add(Xin2,DV1);
+Xin2 = add(Xin2,DV2);
+Xin2 = add(Xin2,DV3);
+
+%% BOX-BEHNKEN
+
+Xdoe = DesignOfExperiments('SdesignType','BoxBehnken','Lusecurrentvalues',false);
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin2); %#ok<*NASGU>
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+% validate the results: 
+Vreference=[ 9    10    50];
+assert(max(abs(Xsmp.MdoeDesignVariables(3,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','BOX-BEHNKEN (ex#2) reference Solution does not match.')
+
+%%  2LEVEL-FACTORIAL
+
+Xdoe = DesignOfExperiments('SdesignType','2LevelFactorial');
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin2);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+% validate the results: 
+Vreference=[3    17    42];
+assert(max(abs(Xsmp.MdoeDesignVariables(1,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','2LEVEL-FACTORIAL (ex#2) reference Solution does not match.')
+
+%%  FULL-FACTORIAL
+
+Xdoe = DesignOfExperiments('SdesignType','FullFactorial','Vlevelvalues',[2 3],'Clevelnames',{'DV2','DV3'});
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin2);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+% validate the results: 
+Vreference=[3    10    40];
+assert(max(abs(Xsmp.MdoeDesignVariables(2,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','FULL-FACTORIAL (ex#2) reference Solution does not match.')
+
+%% Central-Composite with Faced
+
+Xdoe = DesignOfExperiments('SdesignType','CentralComposite','ScentralCompositeType','faced');
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin2);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+% validate the results: 
+Vreference=[3    17    42];
+assert(max(abs(Xsmp.MdoeDesignVariables(end,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','Central-Composite with Faced (ex#2) reference Solution does not match.')
+
+%% Central-Composite with inscribed
+
+Xdoe = DesignOfExperiments('SdesignType','CentralComposite','ScentralCompositeType','inscribed');
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin2);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+% validate the results: 
+Vreference=[3.0000   12.0270   44.0540];
+assert(max(abs(Xsmp.MdoeDesignVariables(1,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','Central-Composite with inscribed (ex#2) reference Solution does not match.')
+
+%% User defined 
+
+Xdoe = DesignOfExperiments('SdesignType','UserDefined','MdoeFactors',[0 0.5 1; -1 -1 -0.5]);
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin2);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);
+
+% validate the results: 
+Vreference=[3.0000   17.5000   60.0000];
+assert(max(abs(Xsmp.MdoeDesignVariables(1,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','User defined (ex#2) reference Solution does not match.')
+
+%% Example #3 - using both DesignVariables & RandomVariables in Input
+
+Xin3 = Input('Sdescription','Input Object of our model');
+
+% Define RandomVariablesSet
+RV1   = RandomVariable('Sdistribution','normal', 'mean',5, 'std',1); %#ok<SNASGU>
+RV2   = RandomVariable('Sdistribution','normal', 'mean',15,'std',2); 
+Xrvs1 = RandomVariableSet('Cmembers',{'RV1', 'RV2'});
+Xin3   = add(Xin3,Xrvs1);
+
+% Define the DesignVariables
+DV1 = DesignVariable('value',2,'minvalue',1,'maxvalue',6);
+DV2 = DesignVariable('value',3,'Vsupport',1:2:9);
+Xin3 = add(Xin3,DV1);
+Xin3 = add(Xin3,DV2);
+
+%% Define the Model
+
+Xm=Mio('Sdescription', 'This is our Model', ...
+    'Sscript','for j=1:length(Tinput),Toutput(j).out=2*Tinput(j).RV1-Tinput(j).RV2+3*Tinput(j).DV1+3*Tinput(j).DV2; end', ...
+    'Liostructure',true,...
+    'Coutputnames',{'out'},...
+    'Cinputnames',{'RV1','RV2','DV1','DV2'},...
+    'Lfunction',false); 
+% Construct the Evaluator
+Xeval = Evaluator('Xmio',Xm,'Sdescription','Evaluator for the DOE tutorial');
+Xmdl  = Model('Xevaluator',Xeval,'Xinput',Xin3);
+
+%% BOX-BEHNKEN
+
+Xdoe = DesignOfExperiments('SdesignType','BoxBehnken');
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin3); %#ok<*NASGU>
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);   % samples of DVs
+display(Xsmp.MsamplesPhysicalSpace); % samples of RVs
+
+% validate the results: 
+Vreference=[2 3];
+assert(max(abs(Xsmp.MdoeDesignVariables(1,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','BOX-BEHNKEN (ex#3) reference Solution does not match.')
+
+% validate the results: 
+Vreference=[4 13];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(1,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','BOX-BEHNKEN (ex#3) reference Solution does not match.')
+
+%%  2LEVEL-FACTORIAL
+
+Xdoe = DesignOfExperiments('SdesignType','2LevelFactorial');
+
+% generate the samples accordingly
+[Xsmp Xdoe] = Xdoe.sample('Xinput',Xin3);
+
+% display the coordinates of the DOE and the generated samples
+display(Xdoe.MdoeFactors);
+display(Xsmp.MdoeDesignVariables);   % samples of DVs
+display(Xsmp.MsamplesPhysicalSpace); % samples of RVs
+
+% validate the results: 
+Vreference=[6 9];
+assert(max(abs(Xsmp.MdoeDesignVariables(end,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','BOX-BEHNKEN (ex#3) reference Solution does not match.')
+
+% validate the results: 
+Vreference=[5 15];
+assert(max(abs(Xsmp.MsamplesPhysicalSpace(1,:)-Vreference))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','BOX-BEHNKEN (ex#3) reference Solution does not match.')
+
+%% Use apply method
+
+Xo = Xdoe.apply(Xmdl);
+
+% validate the results: 
+Vreference=[28 22 40 8];
+assert(max(abs(Xo.Tvalues(2).out-Vreference(1)))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','BOX-BEHNKEN (ex#3) reference Solution does not match.')
+
+assert(max(abs(Xo.Tvalues(5).out-Vreference(4)))<1e-4,...
+   'CossanX:Tutorials:TutorialDesignOfExperiments','BOX-BEHNKEN (ex#3) reference Solution does not match.')
+
+
+##### SOURCE END #####
+--></body></html>

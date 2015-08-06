@@ -1,0 +1,372 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for the CossanX object</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialCossanX.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for the CossanX object</h1><!--introduction--><p>The CossanX object is use to store all the settings required by the toolbox.</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@CossanX">http://mechanik.uibk.ac.at/wiki/index.php/@CossanX</a></p><p><img src="TutorialCossanX_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialCossanX_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">ATTENTION</a></li><li><a href="#2">CossanX object</a></li><li><a href="#3">Using static Method</a></li><li><a href="#4">Change verbosity level</a></li><li><a href="#5">Change Analysis Name</a></li><li><a href="#6">Change Working Path</a></li><li><a href="#7">Random Number Generator</a></li><li><a href="#8">Set the RandomNumberGenerator</a></li><li><a href="#9">Create matlab start up file</a></li><li><a href="#10">Remove CossanX toolbox</a></li></ul></div><h2>ATTENTION<a name="1"></a></h2><p>the command CossanX does not call the display of the object CossanX but the constructor. This mean that calling CossanX without argument the CossanX object is reinitialized</p><pre class="codeinput"><span class="comment">% Please refer to the Reference Manual to see all the possible input arguments</span>
+<span class="comment">% of the constructor CossanX.</span>
+</pre><h2>CossanX object<a name="2"></a></h2><p>The object CossanX is a handle object stored in a global variable named COSSANX. It is usually initalizated automatically at the matlab start up. In order to verify that Cossan-X has been initializad correcly declare the global variable COSSANX and the display it:</p><pre class="codeinput"><span class="keyword">global</span> COSSANX
+assert(~isempty(COSSANX),<span class="string">'COSSANX:TutorialCossanX'</span>,<span class="string">'COSSAN-X toolbox not initialized'</span>)
+
+display(COSSANX)
+
+<span class="comment">% Now the field name and the property of the object are accessible. For instance</span>
+<span class="comment">% the field name are:</span>
+Sfieldnames=fieldnames(COSSANX)
+<span class="comment">% The constrains object requires the fieds Linequality to define the type</span>
+<span class="comment">% of constaints.</span>
+
+<span class="comment">% We can now see the content of each field, for instance</span>
+SmatlabPath=COSSANX.SmatlabPath
+</pre><pre class="codeoutput">----------------------------------------------------------------------------------------------------------
+
+   .oooooo.     .oooooo.    .oooooo..o  .oooooo..o       .o.       ooooo      ooo         ooooooo  ooooo 
+  d8P   `Y8b   d8P   `Y8b  d8P     `Y8 d8P     `Y8      .888.      `888b.     `8           `8888    d8   
+ 888          888      888 Y88bo.      Y88bo.          .8"888.      8 `88b.    8             Y888..8P    
+ 888          888      888  `"Y8888o.   `"Y8888o.     .8  `888.     8   `88b.  8              `8888      
+ 888          888      888      `"Y88b      `"Y88b   .88ooo8888.    8     `88b.8  8888888    .8PY888.   
+ `88b    ooo  `88b    d88  oo     .d8P oo     .d8P  .8      `888.   8       `888            d8   `888b   
+  `Y8bood8P    `Y8bood8P   8""88888P   8""88888P   o88o     o8888o o8o        `8          o888o  o88888o 
+
+----------------------------------------------------------------------------------------------------------
+The next generation of the computational stochastic analysis
+University of Innsbruck, Austria
+url: http://mechanik.uibk.ac.at/cossan email: mechanik@uibk.ac.at
+Copyright 1993-2011
+----------------------------------------------------------------------------------------------------------
+
+* Project Name: CossanX
+* Analysis Name: 
+* The COSSAN working path has been set to: /tmp/COSSAN
+* No Diary Log file used
+* Verbose level set to VERY VERBOSE
+-------------------------------------------------------------
+* Random Number Generator: 
+
+mt19937ar random stream (current default)
+             Seed: 213994
+         RandnAlg: Ziggurat
+-------------------------------------------------------------
+
+Sfieldnames = 
+
+    'ScossanRoot'
+    'Xtimer'
+    'XdatabaseDriver'
+    'SworkingPath'
+    'SexternalPath'
+    'SanalysisName'
+    'SmatlabDatabasePath'
+    'SmcrPath'
+    'SmatlabPath'
+    'NverboseLevel'
+    'SdiaryFileName'
+    'SprojectName'
+    'SrandomNumberAlgorithm'
+    'Nseed'
+    'SbinPath'
+    'SlibPath'
+    'SincludePath'
+
+
+SmatlabPath =
+
+/usr/site/matlab/R2010b
+
+</pre><h2>Using static Method<a name="3"></a></h2><p>The CossanX object provides a number of different static methods can be used directly without accessing to the global variable.</p><pre class="codeinput"><span class="comment">% the installation path of the Cossan toolbox can be retrieve using the</span>
+<span class="comment">% following method CossanX.getCossanRoot while</span>
+display(CossanX.getCossanRoot)
+</pre><pre class="codeoutput">/home/ep/workspace/COSSAN-X_SVN/COSSANXengine
+</pre><h2>Change verbosity level<a name="4"></a></h2><p>store old verbosity level</p><pre class="codeinput">NoldLevel=CossanX.getVerbosityLevel;
+CossanX.setVerbosityLevel(1);
+<span class="comment">% The verbosity level is setted to 1, minimal output are shown in the</span>
+<span class="comment">% console. For instance we can see the output of the object CossanX</span>
+display(COSSANX)
+<span class="comment">% Reset verbisity level to 3 (very verbose)</span>
+<span class="comment">% Change verbosity level</span>
+CossanX.setVerbosityLevel(3)
+display(COSSANX)
+
+<span class="comment">% Restore original Analysis Name</span>
+CossanX.setVerbosityLevel(NoldLevel);
+</pre><pre class="codeoutput">----------------------------------------------------------------------------------------------------------
+
+   .oooooo.     .oooooo.    .oooooo..o  .oooooo..o       .o.       ooooo      ooo         ooooooo  ooooo 
+  d8P   `Y8b   d8P   `Y8b  d8P     `Y8 d8P     `Y8      .888.      `888b.     `8           `8888    d8   
+ 888          888      888 Y88bo.      Y88bo.          .8"888.      8 `88b.    8             Y888..8P    
+ 888          888      888  `"Y8888o.   `"Y8888o.     .8  `888.     8   `88b.  8              `8888      
+ 888          888      888      `"Y88b      `"Y88b   .88ooo8888.    8     `88b.8  8888888    .8PY888.   
+ `88b    ooo  `88b    d88  oo     .d8P oo     .d8P  .8      `888.   8       `888            d8   `888b   
+  `Y8bood8P    `Y8bood8P   8""88888P   8""88888P   o88o     o8888o o8o        `8          o888o  o88888o 
+
+----------------------------------------------------------------------------------------------------------
+The next generation of the computational stochastic analysis
+University of Innsbruck, Austria
+url: http://mechanik.uibk.ac.at/cossan email: mechanik@uibk.ac.at
+Copyright 1993-2011
+----------------------------------------------------------------------------------------------------------
+
+* No Diary Log file used
+* Verbose level set to INFO
+
+mt19937ar random stream (current default)
+             Seed: 213994
+         RandnAlg: Ziggurat
+----------------------------------------------------------------------------------------------------------
+
+   .oooooo.     .oooooo.    .oooooo..o  .oooooo..o       .o.       ooooo      ooo         ooooooo  ooooo 
+  d8P   `Y8b   d8P   `Y8b  d8P     `Y8 d8P     `Y8      .888.      `888b.     `8           `8888    d8   
+ 888          888      888 Y88bo.      Y88bo.          .8"888.      8 `88b.    8             Y888..8P    
+ 888          888      888  `"Y8888o.   `"Y8888o.     .8  `888.     8   `88b.  8              `8888      
+ 888          888      888      `"Y88b      `"Y88b   .88ooo8888.    8     `88b.8  8888888    .8PY888.   
+ `88b    ooo  `88b    d88  oo     .d8P oo     .d8P  .8      `888.   8       `888            d8   `888b   
+  `Y8bood8P    `Y8bood8P   8""88888P   8""88888P   o88o     o8888o o8o        `8          o888o  o88888o 
+
+----------------------------------------------------------------------------------------------------------
+The next generation of the computational stochastic analysis
+University of Innsbruck, Austria
+url: http://mechanik.uibk.ac.at/cossan email: mechanik@uibk.ac.at
+Copyright 1993-2011
+----------------------------------------------------------------------------------------------------------
+
+* Project Name: CossanX
+* Analysis Name: 
+* The COSSAN working path has been set to: /tmp/COSSAN
+* No Diary Log file used
+* Verbose level set to VERY VERBOSE
+-------------------------------------------------------------
+* Random Number Generator: 
+
+mt19937ar random stream (current default)
+             Seed: 213994
+         RandnAlg: Ziggurat
+-------------------------------------------------------------
+</pre><h2>Change Analysis Name<a name="5"></a></h2><p>store old analysis name</p><pre class="codeinput">Sanalysis=CossanX.getAnalysisName;
+CossanX.setAnalysisName(<span class="string">'New Analysis Name'</span>);
+<span class="comment">% Show analysis name</span>
+disp(CossanX.getAnalysisName)
+<span class="comment">% Restore original Analysis Name</span>
+CossanX.setAnalysisName(Sanalysis);
+</pre><pre class="codeoutput">New Analysis Name
+</pre><h2>Change Working Path<a name="6"></a></h2><p>the working path (i.e. the path where all the outputs are stored) using the method CossanX.getCossanWorkingPath</p><pre class="codeinput"><span class="comment">% store old working path</span>
+SoldPath=CossanX.getCossanWorkingPath;
+CossanX.setWorkingPath([filesep <span class="string">'tmp'</span>]);
+<span class="comment">% Show working path</span>
+disp(CossanX.getCossanWorkingPath)
+<span class="comment">% Restore original Path</span>
+CossanX.setWorkingPath(SoldPath);
+</pre><pre class="codeoutput">/tmp
+</pre><h2>Random Number Generator<a name="7"></a></h2><p>CossanX used as default random number generator the Mersenne Twister algorithm (mt19937ar) it is possible to reinitialize the random number generator using the static method CossanX.resetRandomNumberGenerator</p><pre class="codeinput">CossanX.resetRandomNumberGenerator(13314)
+<span class="comment">% Now we sample using the matlab function rand</span>
+Vsamples1=rand(4,1)
+<span class="comment">% if we reset the random number generator and then we sample again we obtain the</span>
+<span class="comment">% same sample values</span>
+CossanX.resetRandomNumberGenerator(13314)
+
+Vsamples2=rand(4,1)
+
+assert(all(Vsamples1==Vsamples2),<span class="string">'Tutotiral:CossanX'</span>,<span class="string">'RandomNumber Generator not reinitialized'</span>)
+
+<span class="comment">% To change the random number generator it is necessary first to create a new</span>
+<span class="comment">% stream (see matlab documentation for randstream)</span>
+</pre><pre class="codeoutput">
+Vsamples1 =
+
+     7.966076049624990e-01
+     8.125816715808279e-01
+     9.656726558193522e-01
+     3.595084982941822e-01
+
+
+Vsamples2 =
+
+     7.966076049624990e-01
+     8.125816715808279e-01
+     9.656726558193522e-01
+     3.595084982941822e-01
+
+</pre><h2>Set the RandomNumberGenerator<a name="8"></a></h2><pre class="codeinput">newStream = RandStream(<span class="string">'swb2712'</span>,<span class="string">'Seed'</span>,2515);
+RandStream.setDefaultStream(newStream);
+</pre><h2>Create matlab start up file<a name="9"></a></h2><p>CossanX provides a static method to create the matlab startup file the automatically initialize the Cossan Engine Toolbox at matlab start up. The static method CossanX.createStartupFile will generate the file for you. A backup copy of old startup file is create automatically.</p><h2>Remove CossanX toolbox<a name="10"></a></h2><p>The CossanX toolbox can be removed from the matlab path using the static method CossanX.removePath</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the CossanX object
+% The CossanX object is use to store all the settings required by the toolbox. 
+% 
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@CossanX
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+%% ATTENTION
+% the command CossanX does not call the display of the object CossanX but the
+% constructor. This mean that calling CossanX without argument the CossanX
+% object is reinitialized
+
+% Please refer to the Reference Manual to see all the possible input arguments
+% of the constructor CossanX. 
+
+%% CossanX object 
+% The object CossanX is a handle object stored in a global variable named
+% COSSANX. It is usually initalizated automatically at the matlab start
+% up. In order to verify that Cossan-X has been initializad correcly declare the
+% global variable COSSANX and the display it:
+
+global COSSANX
+assert(~isempty(COSSANX),'COSSANX:TutorialCossanX','COSSAN-X toolbox not initialized')
+
+display(COSSANX)
+
+% Now the field name and the property of the object are accessible. For instance
+% the field name are:
+Sfieldnames=fieldnames(COSSANX)
+% The constrains object requires the fieds Linequality to define the type
+% of constaints.
+
+% We can now see the content of each field, for instance
+SmatlabPath=COSSANX.SmatlabPath
+
+
+%% Using static Method
+% The CossanX object provides a number of different static methods can be used
+% directly without accessing to the global variable. 
+
+% the installation path of the Cossan toolbox can be retrieve using the
+% following method CossanX.getCossanRoot while 
+display(CossanX.getCossanRoot)
+
+%% Change verbosity level
+% store old verbosity level
+NoldLevel=CossanX.getVerbosityLevel;
+CossanX.setVerbosityLevel(1);
+% The verbosity level is setted to 1, minimal output are shown in the
+% console. For instance we can see the output of the object CossanX
+display(COSSANX)
+% Reset verbisity level to 3 (very verbose)
+% Change verbosity level
+CossanX.setVerbosityLevel(3)
+display(COSSANX)
+
+% Restore original Analysis Name
+CossanX.setVerbosityLevel(NoldLevel);
+
+
+%% Change Analysis Name
+% store old analysis name
+Sanalysis=CossanX.getAnalysisName;
+CossanX.setAnalysisName('New Analysis Name');
+% Show analysis name
+disp(CossanX.getAnalysisName)
+% Restore original Analysis Name
+CossanX.setAnalysisName(Sanalysis);
+
+%% Change Working Path
+% the working path (i.e. the path where all the outputs are stored) using the
+% method CossanX.getCossanWorkingPath  
+
+% store old working path
+SoldPath=CossanX.getCossanWorkingPath;
+CossanX.setWorkingPath([filesep 'tmp']);
+% Show working path
+disp(CossanX.getCossanWorkingPath)
+% Restore original Path
+CossanX.setWorkingPath(SoldPath);
+
+
+%% Random Number Generator
+% CossanX used as default random number generator the Mersenne Twister
+% algorithm (mt19937ar)
+% it is possible to reinitialize the random number generator using the static
+% method CossanX.resetRandomNumberGenerator
+
+CossanX.resetRandomNumberGenerator(13314)
+% Now we sample using the matlab function rand
+Vsamples1=rand(4,1)
+% if we reset the random number generator and then we sample again we obtain the
+% same sample values
+CossanX.resetRandomNumberGenerator(13314)
+
+Vsamples2=rand(4,1)
+
+assert(all(Vsamples1==Vsamples2),'Tutotiral:CossanX','RandomNumber Generator not reinitialized')
+
+% To change the random number generator it is necessary first to create a new
+% stream (see matlab documentation for randstream)
+
+%% Set the RandomNumberGenerator
+newStream = RandStream('swb2712','Seed',2515);
+RandStream.setDefaultStream(newStream);
+           
+%% Create matlab start up file
+% CossanX provides a static method to create the matlab startup file the
+% automatically initialize the Cossan Engine Toolbox at matlab start up.
+% The static method CossanX.createStartupFile will generate the file for you.
+% A backup copy of old startup file is create automatically.
+
+
+%% Remove CossanX toolbox
+% The CossanX toolbox can be removed from the matlab path using the static
+% method CossanX.removePath
+
+
+##### SOURCE END #####
+--></body></html>

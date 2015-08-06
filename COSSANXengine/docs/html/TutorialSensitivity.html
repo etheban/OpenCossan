@@ -1,0 +1,257 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for the Sensitivity analysis</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialSensitivity.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for the Sensitivity analysis</h1><!--introduction--><p>The tutorial InfectionDynamicModel expains in very details how to use the Sensitivity Toolbox. For this reason the uses is invited to check the tutorial InfectionDynamicModel.</p><p>In this tutorial a very simplified model is considered.</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/Infection_Dynamic_Model">http://mechanik.uibk.ac.at/wiki/index.php/Infection_Dynamic_Model</a></p><p><img src="TutorialSensitivity_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialSensitivity_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Problem setup</a></li><li><a href="#2">Local Sensitivity Analysis</a></li><li><a href="#3">Global Sensitivity Analysis</a></li><li><a href="#4">Saltelli Exercise 3 pag 177</a></li></ul></div><h2>Problem setup<a name="1"></a></h2><p>In this examples we consider only 3 uniform random variables</p><pre class="codeinput">Xrv1   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,-1,<span class="string">'upperbound'</span>,1);
+Xrv2   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,-1,<span class="string">'upperbound'</span>,1);
+Xrv3   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,-1,<span class="string">'upperbound'</span>,1);
+Xrvset = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xrv1'</span>,<span class="string">'Xrv2'</span>,<span class="string">'Xrv3'</span>},<span class="string">'CXrandomvariables'</span>,{Xrv1,Xrv2,Xrv3});
+Xin    = Input(<span class="string">'XrandomVariableSet'</span>,Xrvset);
+
+<span class="comment">% The model is defined using a Mio object</span>
+Xm = Mio(<span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out1=Tinput(j).Xrv1^2+2*Tinput(j).Xrv2-Tinput(j).Xrv3; end'</span>, <span class="keyword">...</span>
+         <span class="string">'Coutputnames'</span>,{<span class="string">'out1'</span>},<span class="keyword">...</span>
+         <span class="string">'Cinputnames'</span>,{<span class="string">'Xrv1'</span> <span class="string">'Xrv2'</span> <span class="string">'Xrv3'</span>},<span class="keyword">...</span>
+         <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+	     <span class="string">'Lfunction'</span>,false);
+
+Xev    = Evaluator(<span class="string">'Xmio'</span>,Xm);
+Xmdl   = Model(<span class="string">'Xinput'</span>,Xin,<span class="string">'Xevaluator'</span>,Xev);
+
+<span class="comment">% Here we go!!!</span>
+</pre><h2>Local Sensitivity Analysis<a name="2"></a></h2><p>To start with, we compute the local sensitivity analysis based on Finite Differnce Methos</p><pre class="codeinput">XgMC = Sensitivity.gradientMonteCarlo(<span class="string">'Xtarget'</span>,Xmdl);
+display(XgMC)
+
+XgFD = Sensitivity.gradientFiniteDifferences(<span class="string">'Xtarget'</span>,Xmdl);
+display(XgFD)
+
+<span class="comment">% Plese notice that the Gradient method based on MonteCarlo simulation produces</span>
+<span class="comment">% an approximate value of the gradient. It should be used only in high space</span>
+<span class="comment">% (i.e. number of input &gt; 50) since it allows to reduce significantly the</span>
+<span class="comment">% conputational efforts</span>
+
+<span class="comment">% The localFiniteDifference and the localMonteCarlo methods returns a</span>
+<span class="comment">% LocalSensitivityMeasure and not a Gradient object.</span>
+
+Xls=Sensitivity.localFiniteDifferences(<span class="string">'Xtarget'</span>,Xmdl);
+display(Xls)
+
+Xls1=Sensitivity.localFiniteDifferences(<span class="string">'Xtarget'</span>,Xmdl,<span class="string">'VreferencePoint'</span>,[0.5 0.4 0.2],<span class="string">'CnamesRandomVariable'</span>,{<span class="string">'Xrv1'</span>,<span class="string">'Xrv2'</span>,<span class="string">'Xrv3'</span>});
+display(Xls1)
+</pre><pre class="codeoutput"> Gradient Object  -  Name: XgMC
+* Function Name: out1
+ Gradient Object  -  Name: XgFD
+* Function Name: out1
+LocalSensitivityMeasures -  Description: Finite Difference estimation the local sensitivity analysis of out1
+* Function Name: out1
+LocalSensitivityMeasures -  Description: Finite Difference estimation the local sensitivity analysis of out1
+* Function Name: out1
+</pre><h2>Global Sensitivity Analysis<a name="3"></a></h2><p>The global sensitivity analysis is independent of the reference points. There are different methods to estimate the global sensitivity analysis.</p><pre class="codeinput"><span class="comment">% The method randomBalanceDesign is a very rubust method to compute the first</span>
+<span class="comment">% order sensitivity indicies.</span>
+Xsm = Sensitivity.randomBalanceDesign(<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'Nbootstrap'</span>,1,<span class="string">'Nsamples'</span>,5);
+display(Xsm)
+
+<span class="comment">% To compute the Total indices the Saltelli's method must be used. This method</span>
+<span class="comment">% requires a Simulations object.</span>
+
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,1000);
+Xsm = Sensitivity.sobolIndices(<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'Xsimulation'</span>,Xmc,<span class="string">'Nbootstrap'</span>,100);
+display(Xsm)
+
+<span class="comment">% The method upperBounds allows to estimate the upper bounds of teh total</span>
+<span class="comment">% sensitivity indices</span>
+Xsm = Sensitivity.upperBounds(<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'Nbootstrap'</span>,3,<span class="string">'Nsamples'</span>,4);
+ display(Xsm)
+</pre><pre class="codeoutput">SensitivityMeasures -  Description: 
+SensitivityMeasures -  Description: 
+SensitivityMeasures -  Description: 
+</pre><h2>Saltelli Exercise 3 pag 177<a name="4"></a></h2><p>In this examples we consider only 3 uniform random variables</p><pre class="codeinput">X1   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,1,<span class="string">'std'</span>,3);
+X2   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,2,<span class="string">'std'</span>,2);
+Xrvset = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'X1'</span>,<span class="string">'X2'</span>},<span class="string">'CXrandomvariables'</span>,{X1,X2});
+Xin    = Input(<span class="string">'XrandomVariableSet'</span>,Xrvset);
+
+<span class="comment">% The model is defined using a Mio object</span>
+Xm = Mio(<span class="string">'Sscript'</span>,<span class="string">'Moutput=Minput(:,1).*Minput(:,2);'</span>, <span class="keyword">...</span>
+         <span class="string">'Coutputnames'</span>,{<span class="string">'Y'</span>},<span class="keyword">...</span>
+         <span class="string">'Cinputnames'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>},<span class="keyword">...</span>
+         <span class="string">'Liostructure'</span>,false,<span class="keyword">...</span>
+	     <span class="string">'Lfunction'</span>,false);
+
+Xev    = Evaluator(<span class="string">'Xmio'</span>,Xm);
+Xmdl   = Model(<span class="string">'Xinput'</span>,Xin,<span class="string">'Xevaluator'</span>,Xev);
+
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,1000);
+Xsm = Sensitivity.sobolIndices(<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'Xsimulation'</span>,Xmc);
+
+<span class="comment">% Show the results</span>
+disply(Xsm)
+</pre><pre class="codeoutput">Undefined function or method 'disply' for input arguments of type 'SensitivityMeasures'.
+
+Error in ==&gt; TutorialSensitivity at 100
+disply(Xsm)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the Sensitivity analysis
+% The tutorial InfectionDynamicModel expains in very details how to use the
+% Sensitivity Toolbox. For this reason the uses is invited to check the
+% tutorial InfectionDynamicModel. 
+%
+% In this tutorial a very simplified model is considered.  
+% 
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/Infection_Dynamic_Model
+% 
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+
+%% Problem setup
+% In this examples we consider only 3 uniform random variables
+Xrv1   = RandomVariable('Sdistribution','uniform','lowerbound',-1,'upperbound',1);
+Xrv2   = RandomVariable('Sdistribution','uniform','lowerbound',-1,'upperbound',1);
+Xrv3   = RandomVariable('Sdistribution','uniform','lowerbound',-1,'upperbound',1);
+Xrvset = RandomVariableSet('Cmembers',{'Xrv1','Xrv2','Xrv3'},'CXrandomvariables',{Xrv1,Xrv2,Xrv3});
+Xin    = Input('XrandomVariableSet',Xrvset);
+
+% The model is defined using a Mio object
+Xm = Mio('Sscript','for j=1:length(Tinput), Toutput(j).out1=Tinput(j).Xrv1^2+2*Tinput(j).Xrv2-Tinput(j).Xrv3; end', ...
+         'Coutputnames',{'out1'},...
+         'Cinputnames',{'Xrv1' 'Xrv2' 'Xrv3'},...
+         'Liostructure',true,...
+	     'Lfunction',false); 
+     
+Xev    = Evaluator('Xmio',Xm);
+Xmdl   = Model('Xinput',Xin,'Xevaluator',Xev);
+
+% Here we go!!!
+%% Local Sensitivity Analysis
+% To start with, we compute the local sensitivity analysis based on Finite
+% Differnce Methos
+XgMC = Sensitivity.gradientMonteCarlo('Xtarget',Xmdl);
+display(XgMC)
+
+XgFD = Sensitivity.gradientFiniteDifferences('Xtarget',Xmdl);
+display(XgFD)
+
+% Plese notice that the Gradient method based on MonteCarlo simulation produces
+% an approximate value of the gradient. It should be used only in high space
+% (i.e. number of input > 50) since it allows to reduce significantly the
+% conputational efforts
+
+% The localFiniteDifference and the localMonteCarlo methods returns a
+% LocalSensitivityMeasure and not a Gradient object. 
+
+Xls=Sensitivity.localFiniteDifferences('Xtarget',Xmdl);
+display(Xls)
+
+Xls1=Sensitivity.localFiniteDifferences('Xtarget',Xmdl,'VreferencePoint',[0.5 0.4 0.2],'CnamesRandomVariable',{'Xrv1','Xrv2','Xrv3'});
+display(Xls1)
+       
+%% Global Sensitivity Analysis
+% The global sensitivity analysis is independent of the reference points.
+% There are different methods to estimate the global sensitivity analysis.
+
+% The method randomBalanceDesign is a very rubust method to compute the first
+% order sensitivity indicies. 
+Xsm = Sensitivity.randomBalanceDesign('Xmodel',Xmdl,'Nbootstrap',1,'Nsamples',5);
+display(Xsm)
+   
+% To compute the Total indices the Saltelli's method must be used. This method
+% requires a Simulations object.
+
+Xmc=MonteCarlo('Nsamples',1000);
+Xsm = Sensitivity.sobolIndices('Xmodel',Xmdl,'Xsimulation',Xmc,'Nbootstrap',100);
+display(Xsm)
+
+% The method upperBounds allows to estimate the upper bounds of teh total
+% sensitivity indices
+Xsm = Sensitivity.upperBounds('Xmodel',Xmdl,'Nbootstrap',3,'Nsamples',4);
+ display(Xsm)
+
+   
+%% Saltelli Exercise 3 pag 177 
+% In this examples we consider only 3 uniform random variables
+X1   = RandomVariable('Sdistribution','normal','mean',1,'std',3);
+X2   = RandomVariable('Sdistribution','normal','mean',2,'std',2);
+Xrvset = RandomVariableSet('Cmembers',{'X1','X2'},'CXrandomvariables',{X1,X2});
+Xin    = Input('XrandomVariableSet',Xrvset);
+
+% The model is defined using a Mio object
+Xm = Mio('Sscript','Moutput=Minput(:,1).*Minput(:,2);', ...
+         'Coutputnames',{'Y'},...
+         'Cinputnames',{'X1' 'X2'},...
+         'Liostructure',false,...
+	     'Lfunction',false); 
+     
+Xev    = Evaluator('Xmio',Xm);
+Xmdl   = Model('Xinput',Xin,'Xevaluator',Xev);
+
+Xmc=MonteCarlo('Nsamples',1000);
+Xsm = Sensitivity.sobolIndices('Xmodel',Xmdl,'Xsimulation',Xmc);
+
+% Show the results
+disply(Xsm)
+
+##### SOURCE END #####
+--></body></html>

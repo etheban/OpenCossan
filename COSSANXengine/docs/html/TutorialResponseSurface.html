@@ -1,0 +1,1541 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialResponseSurface</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialResponseSurface.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Definition of random variables</a></li><li><a href="#3">Create Injector</a></li><li><a href="#4">Create Response &amp; Extractor</a></li><li><a href="#5">Create Connector</a></li><li><a href="#6">Construct the Evaluator and Model object</a></li><li><a href="#7">Construction and Calibration of Response surface</a></li><li><a href="#8">Apply response surface</a></li><li><a href="#9">Validate solution, close figures and delete simulation files</a></li></ul></div><pre class="codeinput"><span class="comment">%**************************************************************************</span>
+<span class="comment">% In this tutorial it is shown how to construct a ResponseSurface object and</span>
+<span class="comment">% how to use it for approximating the response computed by a FE-analysis</span>
+<span class="comment">%</span>
+<span class="comment">% Prepared by MB &amp; BG</span>
+<span class="comment">%</span>
+<span class="comment">%  Copyright 1993-2011, COSSAN Working Group</span>
+<span class="comment">%  University of Innsbruck, Austria</span>
+<span class="comment">%</span>
+<span class="comment">% See Also:</span>
+<span class="comment">% http://mechanik.uibk.ac.at/wiki/index.php/@StochasticProcess</span>
+
+<span class="comment">% Reset the random number generator in order to always obtain the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(51125)
+
+<span class="comment">% copy FE-input file with COSSAN-identifiers to working directory</span>
+StutorialPath = fileparts(which(<span class="string">'TutorialResponseSurface.m'</span>));
+copyfile([StutorialPath <span class="string">'/Connector/FEAP/Ibeam.cossan'</span>],<span class="keyword">...</span>
+    fullfile(CossanX.getCossanWorkingPath),<span class="string">'f'</span>);
+</pre><h2>Definition of random variables<a name="2"></a></h2><pre class="codeinput">Xh          = RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'height of cross section of beam'</span>,<span class="keyword">...</span>
+    <span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'par1'</span>,0.2,<span class="string">'par2'</span>,0.3);
+XP          = RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'load at tip of beam'</span>,<span class="keyword">...</span>
+    <span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'par1'</span>,0.5e6,<span class="string">'par2'</span>,1.5e6);
+
+Xrvset      = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xh'</span>,<span class="string">'XP'</span>});
+Xin         = Input;            <span class="comment">%Create empty Input object</span>
+Xin         = add(Xin,Xrvset);  <span class="comment">%add RandomVariableSet to Input object</span>
+
+<span class="comment">% this parameters are used in the test computation of pf</span>
+Xthreshold = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Define threshold'</span>,<span class="string">'value'</span>,0.022);
+Xin = add(Xin,Xthreshold);
+</pre><h2>Create Injector<a name="3"></a></h2><pre class="codeinput">Xi  = Injector(<span class="string">'Sscanfilepath'</span>, CossanX.getCossanWorkingPath, <span class="keyword">...</span>
+               <span class="string">'Sscanfilename'</span>,<span class="string">'Ibeam.cossan'</span>, <span class="keyword">...</span>
+               <span class="string">'Sfile'</span>,<span class="string">'Ibeam'</span>);
+</pre><h2>Create Response &amp; Extractor<a name="4"></a></h2><p>Response related with displacement at tip of the beam</p><pre class="codeinput">Xresp1  = Response(<span class="string">'Sdescription'</span>,<span class="string">'displacement at tip of the beam'</span>,<span class="keyword">...</span>
+    <span class="string">'Sname'</span>, <span class="string">'disp'</span>, <span class="keyword">...</span>
+    <span class="string">'Sfieldformat'</span>, <span class="string">'%e'</span>, <span class="keyword">...</span>
+    <span class="string">'Clookoutfor'</span>,{<span class="string">'N o d a l   D i s p l a c e m e n t s'</span>}, <span class="keyword">...</span>
+    <span class="string">'Ncolnum'</span>,46, <span class="keyword">...</span>
+    <span class="string">'Nrownum'</span>,5);
+
+<span class="comment">% Extractor object</span>
+Xe      = Extractor(<span class="string">'Sdescription'</span>,<span class="string">'object for extracting response of cantilever beam'</span>, <span class="keyword">...</span>
+    <span class="string">'Srelativepath'</span>,<span class="string">'./'</span>, <span class="keyword">...</span>
+    <span class="string">'Lverbose'</span>,true, <span class="keyword">...</span>
+    <span class="string">'Sfile'</span>,<span class="string">'Obeam'</span>, <span class="keyword">...</span>
+    <span class="string">'Xresponse'</span>,Xresp1);
+</pre><pre class="codeoutput">Warning: PropertyName Sdescription has been ignored 
+</pre><h2>Create Connector<a name="5"></a></h2><p>Basic set up</p><pre class="codeinput">Xc  = Connector(<span class="string">'SpredefinedType'</span>,<span class="string">'feap'</span>,<span class="string">'Lkeepsimulationfiles'</span>,false,<span class="keyword">...</span>
+    <span class="string">'Sworkingdirectory'</span>,<span class="string">'/tmp'</span>,<span class="keyword">...</span>
+    <span class="string">'Smaininputpath'</span>,CossanX.getCossanWorkingPath, <span class="keyword">...</span>
+    <span class="string">'Smaininputfile'</span>,<span class="string">'Ibeam'</span>);
+
+<span class="comment">% Add injector</span>
+Xc      = add(Xc,Xi);
+<span class="comment">% Add extractor to the connector</span>
+Xc      = add(Xc,Xe);
+</pre><pre class="codeoutput">Add Injector Object to Connector
+Add Extractor Object to Connector
+</pre><h2>Construct the Evaluator and Model object<a name="6"></a></h2><pre class="codeinput">Xev     = Evaluator(<span class="string">'Xconnector'</span>,Xc);
+Xmod    = Model(<span class="string">'Xevaluator'</span>,Xev,<span class="string">'Xinput'</span>,Xin);
+</pre><h2>Construction and Calibration of Response surface<a name="7"></a></h2><p>In this step, the response surface model is created</p><pre class="codeinput">Xrs     = ResponseSurface(<span class="string">'Sdescription'</span>,<span class="keyword">...</span>
+    <span class="string">'response surface of tip displacement of cantilever beam'</span>,<span class="keyword">...</span>
+    <span class="string">'XfullModel'</span>,Xmod,<span class="keyword">...</span><span class="comment">   %full model</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'Xh'</span> <span class="string">'XP'</span>},<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'disp'</span>},<span class="keyword">...</span><span class="comment">  %response to be extracted from full model</span>
+    <span class="string">'Stype'</span>,<span class="string">'quadratic'</span>);   <span class="comment">%type of response surface</span>
+
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,100); <span class="comment">% simulation obecjt for calibration samples</span>
+Xrs = Xrs.calibrate(<span class="string">'XSimulator'</span>,Xmc); <span class="comment">% calibrate response surface</span>
+
+<span class="comment">% alternatively it is possible to pass the SimulationData to the calibrate</span>
+<span class="comment">% method</span>
+XsimData=Xmc.apply(Xmod);
+Xrs = Xrs.calibrate(<span class="string">'XsimulationData'</span>,XsimData); <span class="comment">% calibrate response surface</span>
+
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,20); <span class="comment">% simulation object for validation samples</span>
+Xrs = Xrs.validate(<span class="string">'XSimulator'</span>,Xmc); <span class="comment">% validate response surface</span>
+
+<span class="comment">% regression plots for calibration and validation</span>
+f1 = figure;
+Xrs.plotregression(<span class="string">'Stype'</span>,<span class="string">'calibration'</span>,<span class="string">'Soutputname'</span>,<span class="string">'disp'</span>);
+
+f2 = figure;
+Xrs.plotregression(<span class="string">'Stype'</span>,<span class="string">'validation'</span>,<span class="string">'Soutputname'</span>,<span class="string">'disp'</span>);
+</pre><pre class="codeoutput">Simulation #1 of 100
+Simulation #2 of 100
+Simulation #3 of 100
+Simulation #4 of 100
+Simulation #5 of 100
+Simulation #6 of 100
+Simulation #7 of 100
+Simulation #8 of 100
+Simulation #9 of 100
+Simulation #10 of 100
+Simulation #11 of 100
+Simulation #12 of 100
+Simulation #13 of 100
+Simulation #14 of 100
+Simulation #15 of 100
+Simulation #16 of 100
+Simulation #17 of 100
+Simulation #18 of 100
+Simulation #19 of 100
+Simulation #20 of 100
+Simulation #21 of 100
+Simulation #22 of 100
+Simulation #23 of 100
+Simulation #24 of 100
+Simulation #25 of 100
+Simulation #26 of 100
+Simulation #27 of 100
+Simulation #28 of 100
+Simulation #29 of 100
+Simulation #30 of 100
+Simulation #31 of 100
+Simulation #32 of 100
+Simulation #33 of 100
+Simulation #34 of 100
+Simulation #35 of 100
+Simulation #36 of 100
+Simulation #37 of 100
+Simulation #38 of 100
+Simulation #39 of 100
+Simulation #40 of 100
+Simulation #41 of 100
+Simulation #42 of 100
+Simulation #43 of 100
+Simulation #44 of 100
+Simulation #45 of 100
+Simulation #46 of 100
+Simulation #47 of 100
+Simulation #48 of 100
+Simulation #49 of 100
+Simulation #50 of 100
+Simulation #51 of 100
+Simulation #52 of 100
+Simulation #53 of 100
+Simulation #54 of 100
+Simulation #55 of 100
+Simulation #56 of 100
+Simulation #57 of 100
+Simulation #58 of 100
+Simulation #59 of 100
+Simulation #60 of 100
+Simulation #61 of 100
+Simulation #62 of 100
+Simulation #63 of 100
+Simulation #64 of 100
+Simulation #65 of 100
+Simulation #66 of 100
+Simulation #67 of 100
+Simulation #68 of 100
+Simulation #69 of 100
+Simulation #70 of 100
+Simulation #71 of 100
+Simulation #72 of 100
+Simulation #73 of 100
+Simulation #74 of 100
+Simulation #75 of 100
+Simulation #76 of 100
+Simulation #77 of 100
+Simulation #78 of 100
+Simulation #79 of 100
+Simulation #80 of 100
+Simulation #81 of 100
+Simulation #82 of 100
+Simulation #83 of 100
+Simulation #84 of 100
+Simulation #85 of 100
+Simulation #86 of 100
+Simulation #87 of 100
+Simulation #88 of 100
+Simulation #89 of 100
+Simulation #90 of 100
+Simulation #91 of 100
+Simulation #92 of 100
+Simulation #93 of 100
+Simulation #94 of 100
+Simulation #95 of 100
+Simulation #96 of 100
+Simulation #97 of 100
+Simulation #98 of 100
+Simulation #99 of 100
+Simulation #100 of 100
+Simulation #1 of 100
+Simulation #2 of 100
+Simulation #3 of 100
+Simulation #4 of 100
+Simulation #5 of 100
+Simulation #6 of 100
+Simulation #7 of 100
+Simulation #8 of 100
+Simulation #9 of 100
+Simulation #10 of 100
+Simulation #11 of 100
+Simulation #12 of 100
+Simulation #13 of 100
+Simulation #14 of 100
+Simulation #15 of 100
+Simulation #16 of 100
+Simulation #17 of 100
+Simulation #18 of 100
+Simulation #19 of 100
+Simulation #20 of 100
+Simulation #21 of 100
+Simulation #22 of 100
+Simulation #23 of 100
+Simulation #24 of 100
+Simulation #25 of 100
+Simulation #26 of 100
+Simulation #27 of 100
+Simulation #28 of 100
+Simulation #29 of 100
+Simulation #30 of 100
+Simulation #31 of 100
+Simulation #32 of 100
+Simulation #33 of 100
+Simulation #34 of 100
+Simulation #35 of 100
+Simulation #36 of 100
+Simulation #37 of 100
+Simulation #38 of 100
+Simulation #39 of 100
+Simulation #40 of 100
+Simulation #41 of 100
+Simulation #42 of 100
+Simulation #43 of 100
+Simulation #44 of 100
+Simulation #45 of 100
+Simulation #46 of 100
+Simulation #47 of 100
+Simulation #48 of 100
+Simulation #49 of 100
+Simulation #50 of 100
+Simulation #51 of 100
+Simulation #52 of 100
+Simulation #53 of 100
+Simulation #54 of 100
+Simulation #55 of 100
+Simulation #56 of 100
+Simulation #57 of 100
+Simulation #58 of 100
+Simulation #59 of 100
+Simulation #60 of 100
+Simulation #61 of 100
+Simulation #62 of 100
+Simulation #63 of 100
+Simulation #64 of 100
+Simulation #65 of 100
+Simulation #66 of 100
+Simulation #67 of 100
+Simulation #68 of 100
+Simulation #69 of 100
+Simulation #70 of 100
+Simulation #71 of 100
+Simulation #72 of 100
+Simulation #73 of 100
+Simulation #74 of 100
+Simulation #75 of 100
+Simulation #76 of 100
+Simulation #77 of 100
+Simulation #78 of 100
+Simulation #79 of 100
+Simulation #80 of 100
+Simulation #81 of 100
+Simulation #82 of 100
+Simulation #83 of 100
+Simulation #84 of 100
+Simulation #85 of 100
+Simulation #86 of 100
+Simulation #87 of 100
+Simulation #88 of 100
+Simulation #89 of 100
+Simulation #90 of 100
+Simulation #91 of 100
+Simulation #92 of 100
+Simulation #93 of 100
+Simulation #94 of 100
+Simulation #95 of 100
+Simulation #96 of 100
+Simulation #97 of 100
+Simulation #98 of 100
+Simulation #99 of 100
+Simulation #100 of 100
+Simulation #1 of 20
+Simulation #2 of 20
+Simulation #3 of 20
+Simulation #4 of 20
+Simulation #5 of 20
+Simulation #6 of 20
+Simulation #7 of 20
+Simulation #8 of 20
+Simulation #9 of 20
+Simulation #10 of 20
+Simulation #11 of 20
+Simulation #12 of 20
+Simulation #13 of 20
+Simulation #14 of 20
+Simulation #15 of 20
+Simulation #16 of 20
+Simulation #17 of 20
+Simulation #18 of 20
+Simulation #19 of 20
+Simulation #20 of 20
+</pre><img vspace="5" hspace="5" src="TutorialResponseSurface_01.png" alt=""> <img vspace="5" hspace="5" src="TutorialResponseSurface_02.png" alt=""> <img vspace="5" hspace="5" src="TutorialResponseSurface_03.png" alt=""> <img vspace="5" hspace="5" src="TutorialResponseSurface_04.png" alt=""> <h2>Apply response surface<a name="8"></a></h2><p>the accuracy of the neural network is tested by computing the failure probability of the tip-loaded beam. This result is compared with the real model</p><pre class="codeinput"><span class="comment">% performance function (threshold value defined above as maximum displacement)</span>
+Xpf = PerformanceFunction(<span class="string">'Sdemand'</span>,<span class="string">'disp'</span>,<span class="string">'Scapacity'</span>,<span class="string">'Xthreshold'</span>,<span class="string">'SoutputName'</span>,<span class="string">'Vg'</span>);
+
+<span class="comment">% probabilistic model using full model</span>
+Xpm_real = ProbabilisticModel(<span class="string">'XModel'</span>,Xmod,<span class="string">'XPerformanceFunction'</span>,Xpf);
+
+<span class="comment">% probabilistic model using response surface</span>
+Xpm_metamodel = ProbabilisticModel(<span class="string">'XModel'</span>,Xrs,<span class="string">'XPerformanceFunction'</span>,Xpf);
+
+<span class="comment">% simulation object (failure probability is computed by using direct MCS)</span>
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,1000,<span class="string">'Nbatches'</span>,1);
+
+Xpf_real = pf(Xpm_real,Xmc); <span class="comment">% compute failure probability of full model</span>
+Xpf_metamodel = pf(Xpm_metamodel,Xmc); <span class="comment">% compute failure probability using response surface</span>
+
+display(Xpf_real)
+display(Xpf_metamodel)
+</pre><pre class="codeoutput">Simulation #1 of 1000
+Simulation #2 of 1000
+Simulation #3 of 1000
+Simulation #4 of 1000
+Simulation #5 of 1000
+Simulation #6 of 1000
+Simulation #7 of 1000
+Simulation #8 of 1000
+Simulation #9 of 1000
+Simulation #10 of 1000
+Simulation #11 of 1000
+Simulation #12 of 1000
+Simulation #13 of 1000
+Simulation #14 of 1000
+Simulation #15 of 1000
+Simulation #16 of 1000
+Simulation #17 of 1000
+Simulation #18 of 1000
+Simulation #19 of 1000
+Simulation #20 of 1000
+Simulation #21 of 1000
+Simulation #22 of 1000
+Simulation #23 of 1000
+Simulation #24 of 1000
+Simulation #25 of 1000
+Simulation #26 of 1000
+Simulation #27 of 1000
+Simulation #28 of 1000
+Simulation #29 of 1000
+Simulation #30 of 1000
+Simulation #31 of 1000
+Simulation #32 of 1000
+Simulation #33 of 1000
+Simulation #34 of 1000
+Simulation #35 of 1000
+Simulation #36 of 1000
+Simulation #37 of 1000
+Simulation #38 of 1000
+Simulation #39 of 1000
+Simulation #40 of 1000
+Simulation #41 of 1000
+Simulation #42 of 1000
+Simulation #43 of 1000
+Simulation #44 of 1000
+Simulation #45 of 1000
+Simulation #46 of 1000
+Simulation #47 of 1000
+Simulation #48 of 1000
+Simulation #49 of 1000
+Simulation #50 of 1000
+Simulation #51 of 1000
+Simulation #52 of 1000
+Simulation #53 of 1000
+Simulation #54 of 1000
+Simulation #55 of 1000
+Simulation #56 of 1000
+Simulation #57 of 1000
+Simulation #58 of 1000
+Simulation #59 of 1000
+Simulation #60 of 1000
+Simulation #61 of 1000
+Simulation #62 of 1000
+Simulation #63 of 1000
+Simulation #64 of 1000
+Simulation #65 of 1000
+Simulation #66 of 1000
+Simulation #67 of 1000
+Simulation #68 of 1000
+Simulation #69 of 1000
+Simulation #70 of 1000
+Simulation #71 of 1000
+Simulation #72 of 1000
+Simulation #73 of 1000
+Simulation #74 of 1000
+Simulation #75 of 1000
+Simulation #76 of 1000
+Simulation #77 of 1000
+Simulation #78 of 1000
+Simulation #79 of 1000
+Simulation #80 of 1000
+Simulation #81 of 1000
+Simulation #82 of 1000
+Simulation #83 of 1000
+Simulation #84 of 1000
+Simulation #85 of 1000
+Simulation #86 of 1000
+Simulation #87 of 1000
+Simulation #88 of 1000
+Simulation #89 of 1000
+Simulation #90 of 1000
+Simulation #91 of 1000
+Simulation #92 of 1000
+Simulation #93 of 1000
+Simulation #94 of 1000
+Simulation #95 of 1000
+Simulation #96 of 1000
+Simulation #97 of 1000
+Simulation #98 of 1000
+Simulation #99 of 1000
+Simulation #100 of 1000
+Simulation #101 of 1000
+Simulation #102 of 1000
+Simulation #103 of 1000
+Simulation #104 of 1000
+Simulation #105 of 1000
+Simulation #106 of 1000
+Simulation #107 of 1000
+Simulation #108 of 1000
+Simulation #109 of 1000
+Simulation #110 of 1000
+Simulation #111 of 1000
+Simulation #112 of 1000
+Simulation #113 of 1000
+Simulation #114 of 1000
+Simulation #115 of 1000
+Simulation #116 of 1000
+Simulation #117 of 1000
+Simulation #118 of 1000
+Simulation #119 of 1000
+Simulation #120 of 1000
+Simulation #121 of 1000
+Simulation #122 of 1000
+Simulation #123 of 1000
+Simulation #124 of 1000
+Simulation #125 of 1000
+Simulation #126 of 1000
+Simulation #127 of 1000
+Simulation #128 of 1000
+Simulation #129 of 1000
+Simulation #130 of 1000
+Simulation #131 of 1000
+Simulation #132 of 1000
+Simulation #133 of 1000
+Simulation #134 of 1000
+Simulation #135 of 1000
+Simulation #136 of 1000
+Simulation #137 of 1000
+Simulation #138 of 1000
+Simulation #139 of 1000
+Simulation #140 of 1000
+Simulation #141 of 1000
+Simulation #142 of 1000
+Simulation #143 of 1000
+Simulation #144 of 1000
+Simulation #145 of 1000
+Simulation #146 of 1000
+Simulation #147 of 1000
+Simulation #148 of 1000
+Simulation #149 of 1000
+Simulation #150 of 1000
+Simulation #151 of 1000
+Simulation #152 of 1000
+Simulation #153 of 1000
+Simulation #154 of 1000
+Simulation #155 of 1000
+Simulation #156 of 1000
+Simulation #157 of 1000
+Simulation #158 of 1000
+Simulation #159 of 1000
+Simulation #160 of 1000
+Simulation #161 of 1000
+Simulation #162 of 1000
+Simulation #163 of 1000
+Simulation #164 of 1000
+Simulation #165 of 1000
+Simulation #166 of 1000
+Simulation #167 of 1000
+Simulation #168 of 1000
+Simulation #169 of 1000
+Simulation #170 of 1000
+Simulation #171 of 1000
+Simulation #172 of 1000
+Simulation #173 of 1000
+Simulation #174 of 1000
+Simulation #175 of 1000
+Simulation #176 of 1000
+Simulation #177 of 1000
+Simulation #178 of 1000
+Simulation #179 of 1000
+Simulation #180 of 1000
+Simulation #181 of 1000
+Simulation #182 of 1000
+Simulation #183 of 1000
+Simulation #184 of 1000
+Simulation #185 of 1000
+Simulation #186 of 1000
+Simulation #187 of 1000
+Simulation #188 of 1000
+Simulation #189 of 1000
+Simulation #190 of 1000
+Simulation #191 of 1000
+Simulation #192 of 1000
+Simulation #193 of 1000
+Simulation #194 of 1000
+Simulation #195 of 1000
+Simulation #196 of 1000
+Simulation #197 of 1000
+Simulation #198 of 1000
+Simulation #199 of 1000
+Simulation #200 of 1000
+Simulation #201 of 1000
+Simulation #202 of 1000
+Simulation #203 of 1000
+Simulation #204 of 1000
+Simulation #205 of 1000
+Simulation #206 of 1000
+Simulation #207 of 1000
+Simulation #208 of 1000
+Simulation #209 of 1000
+Simulation #210 of 1000
+Simulation #211 of 1000
+Simulation #212 of 1000
+Simulation #213 of 1000
+Simulation #214 of 1000
+Simulation #215 of 1000
+Simulation #216 of 1000
+Simulation #217 of 1000
+Simulation #218 of 1000
+Simulation #219 of 1000
+Simulation #220 of 1000
+Simulation #221 of 1000
+Simulation #222 of 1000
+Simulation #223 of 1000
+Simulation #224 of 1000
+Simulation #225 of 1000
+Simulation #226 of 1000
+Simulation #227 of 1000
+Simulation #228 of 1000
+Simulation #229 of 1000
+Simulation #230 of 1000
+Simulation #231 of 1000
+Simulation #232 of 1000
+Simulation #233 of 1000
+Simulation #234 of 1000
+Simulation #235 of 1000
+Simulation #236 of 1000
+Simulation #237 of 1000
+Simulation #238 of 1000
+Simulation #239 of 1000
+Simulation #240 of 1000
+Simulation #241 of 1000
+Simulation #242 of 1000
+Simulation #243 of 1000
+Simulation #244 of 1000
+Simulation #245 of 1000
+Simulation #246 of 1000
+Simulation #247 of 1000
+Simulation #248 of 1000
+Simulation #249 of 1000
+Simulation #250 of 1000
+Simulation #251 of 1000
+Simulation #252 of 1000
+Simulation #253 of 1000
+Simulation #254 of 1000
+Simulation #255 of 1000
+Simulation #256 of 1000
+Simulation #257 of 1000
+Simulation #258 of 1000
+Simulation #259 of 1000
+Simulation #260 of 1000
+Simulation #261 of 1000
+Simulation #262 of 1000
+Simulation #263 of 1000
+Simulation #264 of 1000
+Simulation #265 of 1000
+Simulation #266 of 1000
+Simulation #267 of 1000
+Simulation #268 of 1000
+Simulation #269 of 1000
+Simulation #270 of 1000
+Simulation #271 of 1000
+Simulation #272 of 1000
+Simulation #273 of 1000
+Simulation #274 of 1000
+Simulation #275 of 1000
+Simulation #276 of 1000
+Simulation #277 of 1000
+Simulation #278 of 1000
+Simulation #279 of 1000
+Simulation #280 of 1000
+Simulation #281 of 1000
+Simulation #282 of 1000
+Simulation #283 of 1000
+Simulation #284 of 1000
+Simulation #285 of 1000
+Simulation #286 of 1000
+Simulation #287 of 1000
+Simulation #288 of 1000
+Simulation #289 of 1000
+Simulation #290 of 1000
+Simulation #291 of 1000
+Simulation #292 of 1000
+Simulation #293 of 1000
+Simulation #294 of 1000
+Simulation #295 of 1000
+Simulation #296 of 1000
+Simulation #297 of 1000
+Simulation #298 of 1000
+Simulation #299 of 1000
+Simulation #300 of 1000
+Simulation #301 of 1000
+Simulation #302 of 1000
+Simulation #303 of 1000
+Simulation #304 of 1000
+Simulation #305 of 1000
+Simulation #306 of 1000
+Simulation #307 of 1000
+Simulation #308 of 1000
+Simulation #309 of 1000
+Simulation #310 of 1000
+Simulation #311 of 1000
+Simulation #312 of 1000
+Simulation #313 of 1000
+Simulation #314 of 1000
+Simulation #315 of 1000
+Simulation #316 of 1000
+Simulation #317 of 1000
+Simulation #318 of 1000
+Simulation #319 of 1000
+Simulation #320 of 1000
+Simulation #321 of 1000
+Simulation #322 of 1000
+Simulation #323 of 1000
+Simulation #324 of 1000
+Simulation #325 of 1000
+Simulation #326 of 1000
+Simulation #327 of 1000
+Simulation #328 of 1000
+Simulation #329 of 1000
+Simulation #330 of 1000
+Simulation #331 of 1000
+Simulation #332 of 1000
+Simulation #333 of 1000
+Simulation #334 of 1000
+Simulation #335 of 1000
+Simulation #336 of 1000
+Simulation #337 of 1000
+Simulation #338 of 1000
+Simulation #339 of 1000
+Simulation #340 of 1000
+Simulation #341 of 1000
+Simulation #342 of 1000
+Simulation #343 of 1000
+Simulation #344 of 1000
+Simulation #345 of 1000
+Simulation #346 of 1000
+Simulation #347 of 1000
+Simulation #348 of 1000
+Simulation #349 of 1000
+Simulation #350 of 1000
+Simulation #351 of 1000
+Simulation #352 of 1000
+Simulation #353 of 1000
+Simulation #354 of 1000
+Simulation #355 of 1000
+Simulation #356 of 1000
+Simulation #357 of 1000
+Simulation #358 of 1000
+Simulation #359 of 1000
+Simulation #360 of 1000
+Simulation #361 of 1000
+Simulation #362 of 1000
+Simulation #363 of 1000
+Simulation #364 of 1000
+Simulation #365 of 1000
+Simulation #366 of 1000
+Simulation #367 of 1000
+Simulation #368 of 1000
+Simulation #369 of 1000
+Simulation #370 of 1000
+Simulation #371 of 1000
+Simulation #372 of 1000
+Simulation #373 of 1000
+Simulation #374 of 1000
+Simulation #375 of 1000
+Simulation #376 of 1000
+Simulation #377 of 1000
+Simulation #378 of 1000
+Simulation #379 of 1000
+Simulation #380 of 1000
+Simulation #381 of 1000
+Simulation #382 of 1000
+Simulation #383 of 1000
+Simulation #384 of 1000
+Simulation #385 of 1000
+Simulation #386 of 1000
+Simulation #387 of 1000
+Simulation #388 of 1000
+Simulation #389 of 1000
+Simulation #390 of 1000
+Simulation #391 of 1000
+Simulation #392 of 1000
+Simulation #393 of 1000
+Simulation #394 of 1000
+Simulation #395 of 1000
+Simulation #396 of 1000
+Simulation #397 of 1000
+Simulation #398 of 1000
+Simulation #399 of 1000
+Simulation #400 of 1000
+Simulation #401 of 1000
+Simulation #402 of 1000
+Simulation #403 of 1000
+Simulation #404 of 1000
+Simulation #405 of 1000
+Simulation #406 of 1000
+Simulation #407 of 1000
+Simulation #408 of 1000
+Simulation #409 of 1000
+Simulation #410 of 1000
+Simulation #411 of 1000
+Simulation #412 of 1000
+Simulation #413 of 1000
+Simulation #414 of 1000
+Simulation #415 of 1000
+Simulation #416 of 1000
+Simulation #417 of 1000
+Simulation #418 of 1000
+Simulation #419 of 1000
+Simulation #420 of 1000
+Simulation #421 of 1000
+Simulation #422 of 1000
+Simulation #423 of 1000
+Simulation #424 of 1000
+Simulation #425 of 1000
+Simulation #426 of 1000
+Simulation #427 of 1000
+Simulation #428 of 1000
+Simulation #429 of 1000
+Simulation #430 of 1000
+Simulation #431 of 1000
+Simulation #432 of 1000
+Simulation #433 of 1000
+Simulation #434 of 1000
+Simulation #435 of 1000
+Simulation #436 of 1000
+Simulation #437 of 1000
+Simulation #438 of 1000
+Simulation #439 of 1000
+Simulation #440 of 1000
+Simulation #441 of 1000
+Simulation #442 of 1000
+Simulation #443 of 1000
+Simulation #444 of 1000
+Simulation #445 of 1000
+Simulation #446 of 1000
+Simulation #447 of 1000
+Simulation #448 of 1000
+Simulation #449 of 1000
+Simulation #450 of 1000
+Simulation #451 of 1000
+Simulation #452 of 1000
+Simulation #453 of 1000
+Simulation #454 of 1000
+Simulation #455 of 1000
+Simulation #456 of 1000
+Simulation #457 of 1000
+Simulation #458 of 1000
+Simulation #459 of 1000
+Simulation #460 of 1000
+Simulation #461 of 1000
+Simulation #462 of 1000
+Simulation #463 of 1000
+Simulation #464 of 1000
+Simulation #465 of 1000
+Simulation #466 of 1000
+Simulation #467 of 1000
+Simulation #468 of 1000
+Simulation #469 of 1000
+Simulation #470 of 1000
+Simulation #471 of 1000
+Simulation #472 of 1000
+Simulation #473 of 1000
+Simulation #474 of 1000
+Simulation #475 of 1000
+Simulation #476 of 1000
+Simulation #477 of 1000
+Simulation #478 of 1000
+Simulation #479 of 1000
+Simulation #480 of 1000
+Simulation #481 of 1000
+Simulation #482 of 1000
+Simulation #483 of 1000
+Simulation #484 of 1000
+Simulation #485 of 1000
+Simulation #486 of 1000
+Simulation #487 of 1000
+Simulation #488 of 1000
+Simulation #489 of 1000
+Simulation #490 of 1000
+Simulation #491 of 1000
+Simulation #492 of 1000
+Simulation #493 of 1000
+Simulation #494 of 1000
+Simulation #495 of 1000
+Simulation #496 of 1000
+Simulation #497 of 1000
+Simulation #498 of 1000
+Simulation #499 of 1000
+Simulation #500 of 1000
+Simulation #501 of 1000
+Simulation #502 of 1000
+Simulation #503 of 1000
+Simulation #504 of 1000
+Simulation #505 of 1000
+Simulation #506 of 1000
+Simulation #507 of 1000
+Simulation #508 of 1000
+Simulation #509 of 1000
+Simulation #510 of 1000
+Simulation #511 of 1000
+Simulation #512 of 1000
+Simulation #513 of 1000
+Simulation #514 of 1000
+Simulation #515 of 1000
+Simulation #516 of 1000
+Simulation #517 of 1000
+Simulation #518 of 1000
+Simulation #519 of 1000
+Simulation #520 of 1000
+Simulation #521 of 1000
+Simulation #522 of 1000
+Simulation #523 of 1000
+Simulation #524 of 1000
+Simulation #525 of 1000
+Simulation #526 of 1000
+Simulation #527 of 1000
+Simulation #528 of 1000
+Simulation #529 of 1000
+Simulation #530 of 1000
+Simulation #531 of 1000
+Simulation #532 of 1000
+Simulation #533 of 1000
+Simulation #534 of 1000
+Simulation #535 of 1000
+Simulation #536 of 1000
+Simulation #537 of 1000
+Simulation #538 of 1000
+Simulation #539 of 1000
+Simulation #540 of 1000
+Simulation #541 of 1000
+Simulation #542 of 1000
+Simulation #543 of 1000
+Simulation #544 of 1000
+Simulation #545 of 1000
+Simulation #546 of 1000
+Simulation #547 of 1000
+Simulation #548 of 1000
+Simulation #549 of 1000
+Simulation #550 of 1000
+Simulation #551 of 1000
+Simulation #552 of 1000
+Simulation #553 of 1000
+Simulation #554 of 1000
+Simulation #555 of 1000
+Simulation #556 of 1000
+Simulation #557 of 1000
+Simulation #558 of 1000
+Simulation #559 of 1000
+Simulation #560 of 1000
+Simulation #561 of 1000
+Simulation #562 of 1000
+Simulation #563 of 1000
+Simulation #564 of 1000
+Simulation #565 of 1000
+Simulation #566 of 1000
+Simulation #567 of 1000
+Simulation #568 of 1000
+Simulation #569 of 1000
+Simulation #570 of 1000
+Simulation #571 of 1000
+Simulation #572 of 1000
+Simulation #573 of 1000
+Simulation #574 of 1000
+Simulation #575 of 1000
+Simulation #576 of 1000
+Simulation #577 of 1000
+Simulation #578 of 1000
+Simulation #579 of 1000
+Simulation #580 of 1000
+Simulation #581 of 1000
+Simulation #582 of 1000
+Simulation #583 of 1000
+Simulation #584 of 1000
+Simulation #585 of 1000
+Simulation #586 of 1000
+Simulation #587 of 1000
+Simulation #588 of 1000
+Simulation #589 of 1000
+Simulation #590 of 1000
+Simulation #591 of 1000
+Simulation #592 of 1000
+Simulation #593 of 1000
+Simulation #594 of 1000
+Simulation #595 of 1000
+Simulation #596 of 1000
+Simulation #597 of 1000
+Simulation #598 of 1000
+Simulation #599 of 1000
+Simulation #600 of 1000
+Simulation #601 of 1000
+Simulation #602 of 1000
+Simulation #603 of 1000
+Simulation #604 of 1000
+Simulation #605 of 1000
+Simulation #606 of 1000
+Simulation #607 of 1000
+Simulation #608 of 1000
+Simulation #609 of 1000
+Simulation #610 of 1000
+Simulation #611 of 1000
+Simulation #612 of 1000
+Simulation #613 of 1000
+Simulation #614 of 1000
+Simulation #615 of 1000
+Simulation #616 of 1000
+Simulation #617 of 1000
+Simulation #618 of 1000
+Simulation #619 of 1000
+Simulation #620 of 1000
+Simulation #621 of 1000
+Simulation #622 of 1000
+Simulation #623 of 1000
+Simulation #624 of 1000
+Simulation #625 of 1000
+Simulation #626 of 1000
+Simulation #627 of 1000
+Simulation #628 of 1000
+Simulation #629 of 1000
+Simulation #630 of 1000
+Simulation #631 of 1000
+Simulation #632 of 1000
+Simulation #633 of 1000
+Simulation #634 of 1000
+Simulation #635 of 1000
+Simulation #636 of 1000
+Simulation #637 of 1000
+Simulation #638 of 1000
+Simulation #639 of 1000
+Simulation #640 of 1000
+Simulation #641 of 1000
+Simulation #642 of 1000
+Simulation #643 of 1000
+Simulation #644 of 1000
+Simulation #645 of 1000
+Simulation #646 of 1000
+Simulation #647 of 1000
+Simulation #648 of 1000
+Simulation #649 of 1000
+Simulation #650 of 1000
+Simulation #651 of 1000
+Simulation #652 of 1000
+Simulation #653 of 1000
+Simulation #654 of 1000
+Simulation #655 of 1000
+Simulation #656 of 1000
+Simulation #657 of 1000
+Simulation #658 of 1000
+Simulation #659 of 1000
+Simulation #660 of 1000
+Simulation #661 of 1000
+Simulation #662 of 1000
+Simulation #663 of 1000
+Simulation #664 of 1000
+Simulation #665 of 1000
+Simulation #666 of 1000
+Simulation #667 of 1000
+Simulation #668 of 1000
+Simulation #669 of 1000
+Simulation #670 of 1000
+Simulation #671 of 1000
+Simulation #672 of 1000
+Simulation #673 of 1000
+Simulation #674 of 1000
+Simulation #675 of 1000
+Simulation #676 of 1000
+Simulation #677 of 1000
+Simulation #678 of 1000
+Simulation #679 of 1000
+Simulation #680 of 1000
+Simulation #681 of 1000
+Simulation #682 of 1000
+Simulation #683 of 1000
+Simulation #684 of 1000
+Simulation #685 of 1000
+Simulation #686 of 1000
+Simulation #687 of 1000
+Simulation #688 of 1000
+Simulation #689 of 1000
+Simulation #690 of 1000
+Simulation #691 of 1000
+Simulation #692 of 1000
+Simulation #693 of 1000
+Simulation #694 of 1000
+Simulation #695 of 1000
+Simulation #696 of 1000
+Simulation #697 of 1000
+Simulation #698 of 1000
+Simulation #699 of 1000
+Simulation #700 of 1000
+Simulation #701 of 1000
+Simulation #702 of 1000
+Simulation #703 of 1000
+Simulation #704 of 1000
+Simulation #705 of 1000
+Simulation #706 of 1000
+Simulation #707 of 1000
+Simulation #708 of 1000
+Simulation #709 of 1000
+Simulation #710 of 1000
+Simulation #711 of 1000
+Simulation #712 of 1000
+Simulation #713 of 1000
+Simulation #714 of 1000
+Simulation #715 of 1000
+Simulation #716 of 1000
+Simulation #717 of 1000
+Simulation #718 of 1000
+Simulation #719 of 1000
+Simulation #720 of 1000
+Simulation #721 of 1000
+Simulation #722 of 1000
+Simulation #723 of 1000
+Simulation #724 of 1000
+Simulation #725 of 1000
+Simulation #726 of 1000
+Simulation #727 of 1000
+Simulation #728 of 1000
+Simulation #729 of 1000
+Simulation #730 of 1000
+Simulation #731 of 1000
+Simulation #732 of 1000
+Simulation #733 of 1000
+Simulation #734 of 1000
+Simulation #735 of 1000
+Simulation #736 of 1000
+Simulation #737 of 1000
+Simulation #738 of 1000
+Simulation #739 of 1000
+Simulation #740 of 1000
+Simulation #741 of 1000
+Simulation #742 of 1000
+Simulation #743 of 1000
+Simulation #744 of 1000
+Simulation #745 of 1000
+Simulation #746 of 1000
+Simulation #747 of 1000
+Simulation #748 of 1000
+Simulation #749 of 1000
+Simulation #750 of 1000
+Simulation #751 of 1000
+Simulation #752 of 1000
+Simulation #753 of 1000
+Simulation #754 of 1000
+Simulation #755 of 1000
+Simulation #756 of 1000
+Simulation #757 of 1000
+Simulation #758 of 1000
+Simulation #759 of 1000
+Simulation #760 of 1000
+Simulation #761 of 1000
+Simulation #762 of 1000
+Simulation #763 of 1000
+Simulation #764 of 1000
+Simulation #765 of 1000
+Simulation #766 of 1000
+Simulation #767 of 1000
+Simulation #768 of 1000
+Simulation #769 of 1000
+Simulation #770 of 1000
+Simulation #771 of 1000
+Simulation #772 of 1000
+Simulation #773 of 1000
+Simulation #774 of 1000
+Simulation #775 of 1000
+Simulation #776 of 1000
+Simulation #777 of 1000
+Simulation #778 of 1000
+Simulation #779 of 1000
+Simulation #780 of 1000
+Simulation #781 of 1000
+Simulation #782 of 1000
+Simulation #783 of 1000
+Simulation #784 of 1000
+Simulation #785 of 1000
+Simulation #786 of 1000
+Simulation #787 of 1000
+Simulation #788 of 1000
+Simulation #789 of 1000
+Simulation #790 of 1000
+Simulation #791 of 1000
+Simulation #792 of 1000
+Simulation #793 of 1000
+Simulation #794 of 1000
+Simulation #795 of 1000
+Simulation #796 of 1000
+Simulation #797 of 1000
+Simulation #798 of 1000
+Simulation #799 of 1000
+Simulation #800 of 1000
+Simulation #801 of 1000
+Simulation #802 of 1000
+Simulation #803 of 1000
+Simulation #804 of 1000
+Simulation #805 of 1000
+Simulation #806 of 1000
+Simulation #807 of 1000
+Simulation #808 of 1000
+Simulation #809 of 1000
+Simulation #810 of 1000
+Simulation #811 of 1000
+Simulation #812 of 1000
+Simulation #813 of 1000
+Simulation #814 of 1000
+Simulation #815 of 1000
+Simulation #816 of 1000
+Simulation #817 of 1000
+Simulation #818 of 1000
+Simulation #819 of 1000
+Simulation #820 of 1000
+Simulation #821 of 1000
+Simulation #822 of 1000
+Simulation #823 of 1000
+Simulation #824 of 1000
+Simulation #825 of 1000
+Simulation #826 of 1000
+Simulation #827 of 1000
+Simulation #828 of 1000
+Simulation #829 of 1000
+Simulation #830 of 1000
+Simulation #831 of 1000
+Simulation #832 of 1000
+Simulation #833 of 1000
+Simulation #834 of 1000
+Simulation #835 of 1000
+Simulation #836 of 1000
+Simulation #837 of 1000
+Simulation #838 of 1000
+Simulation #839 of 1000
+Simulation #840 of 1000
+Simulation #841 of 1000
+Simulation #842 of 1000
+Simulation #843 of 1000
+Simulation #844 of 1000
+Simulation #845 of 1000
+Simulation #846 of 1000
+Simulation #847 of 1000
+Simulation #848 of 1000
+Simulation #849 of 1000
+Simulation #850 of 1000
+Simulation #851 of 1000
+Simulation #852 of 1000
+Simulation #853 of 1000
+Simulation #854 of 1000
+Simulation #855 of 1000
+Simulation #856 of 1000
+Simulation #857 of 1000
+Simulation #858 of 1000
+Simulation #859 of 1000
+Simulation #860 of 1000
+Simulation #861 of 1000
+Simulation #862 of 1000
+Simulation #863 of 1000
+Simulation #864 of 1000
+Simulation #865 of 1000
+Simulation #866 of 1000
+Simulation #867 of 1000
+Simulation #868 of 1000
+Simulation #869 of 1000
+Simulation #870 of 1000
+Simulation #871 of 1000
+Simulation #872 of 1000
+Simulation #873 of 1000
+Simulation #874 of 1000
+Simulation #875 of 1000
+Simulation #876 of 1000
+Simulation #877 of 1000
+Simulation #878 of 1000
+Simulation #879 of 1000
+Simulation #880 of 1000
+Simulation #881 of 1000
+Simulation #882 of 1000
+Simulation #883 of 1000
+Simulation #884 of 1000
+Simulation #885 of 1000
+Simulation #886 of 1000
+Simulation #887 of 1000
+Simulation #888 of 1000
+Simulation #889 of 1000
+Simulation #890 of 1000
+Simulation #891 of 1000
+Simulation #892 of 1000
+Simulation #893 of 1000
+Simulation #894 of 1000
+Simulation #895 of 1000
+Simulation #896 of 1000
+Simulation #897 of 1000
+Simulation #898 of 1000
+Simulation #899 of 1000
+Simulation #900 of 1000
+Simulation #901 of 1000
+Simulation #902 of 1000
+Simulation #903 of 1000
+Simulation #904 of 1000
+Simulation #905 of 1000
+Simulation #906 of 1000
+Simulation #907 of 1000
+Simulation #908 of 1000
+Simulation #909 of 1000
+Simulation #910 of 1000
+Simulation #911 of 1000
+Simulation #912 of 1000
+Simulation #913 of 1000
+Simulation #914 of 1000
+Simulation #915 of 1000
+Simulation #916 of 1000
+Simulation #917 of 1000
+Simulation #918 of 1000
+Simulation #919 of 1000
+Simulation #920 of 1000
+Simulation #921 of 1000
+Simulation #922 of 1000
+Simulation #923 of 1000
+Simulation #924 of 1000
+Simulation #925 of 1000
+Simulation #926 of 1000
+Simulation #927 of 1000
+Simulation #928 of 1000
+Simulation #929 of 1000
+Simulation #930 of 1000
+Simulation #931 of 1000
+Simulation #932 of 1000
+Simulation #933 of 1000
+Simulation #934 of 1000
+Simulation #935 of 1000
+Simulation #936 of 1000
+Simulation #937 of 1000
+Simulation #938 of 1000
+Simulation #939 of 1000
+Simulation #940 of 1000
+Simulation #941 of 1000
+Simulation #942 of 1000
+Simulation #943 of 1000
+Simulation #944 of 1000
+Simulation #945 of 1000
+Simulation #946 of 1000
+Simulation #947 of 1000
+Simulation #948 of 1000
+Simulation #949 of 1000
+Simulation #950 of 1000
+Simulation #951 of 1000
+Simulation #952 of 1000
+Simulation #953 of 1000
+Simulation #954 of 1000
+Simulation #955 of 1000
+Simulation #956 of 1000
+Simulation #957 of 1000
+Simulation #958 of 1000
+Simulation #959 of 1000
+Simulation #960 of 1000
+Simulation #961 of 1000
+Simulation #962 of 1000
+Simulation #963 of 1000
+Simulation #964 of 1000
+Simulation #965 of 1000
+Simulation #966 of 1000
+Simulation #967 of 1000
+Simulation #968 of 1000
+Simulation #969 of 1000
+Simulation #970 of 1000
+Simulation #971 of 1000
+Simulation #972 of 1000
+Simulation #973 of 1000
+Simulation #974 of 1000
+Simulation #975 of 1000
+Simulation #976 of 1000
+Simulation #977 of 1000
+Simulation #978 of 1000
+Simulation #979 of 1000
+Simulation #980 of 1000
+Simulation #981 of 1000
+Simulation #982 of 1000
+Simulation #983 of 1000
+Simulation #984 of 1000
+Simulation #985 of 1000
+Simulation #986 of 1000
+Simulation #987 of 1000
+Simulation #988 of 1000
+Simulation #989 of 1000
+Simulation #990 of 1000
+Simulation #991 of 1000
+Simulation #992 of 1000
+Simulation #993 of 1000
+Simulation #994 of 1000
+Simulation #995 of 1000
+Simulation #996 of 1000
+Simulation #997 of 1000
+Simulation #998 of 1000
+Simulation #999 of 1000
+Simulation #1000 of 1000
+FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+</pre><h2>Validate solution, close figures and delete simulation files<a name="9"></a></h2><pre class="codeinput">close(f1)
+close(f2)
+
+delete([CossanX.getCossanWorkingPath <span class="string">'/Ibeam.*'</span>]);
+
+assert(abs(Xpf_real.pfhat-Xpf_metamodel.pfhat)&lt;5.e-3, <span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+       <span class="string">'Accuracy of output of metamodel too low'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%**************************************************************************
+% In this tutorial it is shown how to construct a ResponseSurface object and
+% how to use it for approximating the response computed by a FE-analysis
+%
+% Prepared by MB & BG
+%
+%  Copyright 1993-2011, COSSAN Working Group
+%  University of Innsbruck, Austria
+%
+% See Also: 
+% http://mechanik.uibk.ac.at/wiki/index.php/@StochasticProcess
+
+% Reset the random number generator in order to always obtain the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(51125)
+
+% copy FE-input file with COSSAN-identifiers to working directory
+StutorialPath = fileparts(which('TutorialResponseSurface.m'));
+copyfile([StutorialPath '/Connector/FEAP/Ibeam.cossan'],...
+    fullfile(CossanX.getCossanWorkingPath),'f');
+
+
+%%  Definition of random variables
+
+Xh          = RandomVariable('Sdescription','height of cross section of beam',...
+    'Sdistribution','uniform','par1',0.2,'par2',0.3);
+XP          = RandomVariable('Sdescription','load at tip of beam',...
+    'Sdistribution','uniform','par1',0.5e6,'par2',1.5e6);
+
+Xrvset      = RandomVariableSet('Cmembers',{'Xh','XP'});
+Xin         = Input;            %Create empty Input object
+Xin         = add(Xin,Xrvset);  %add RandomVariableSet to Input object
+
+% this parameters are used in the test computation of pf
+Xthreshold = Parameter('Sdescription','Define threshold','value',0.022);
+Xin = add(Xin,Xthreshold);
+
+%%  Create Injector
+Xi  = Injector('Sscanfilepath', CossanX.getCossanWorkingPath, ...
+               'Sscanfilename','Ibeam.cossan', ...
+               'Sfile','Ibeam');
+
+%%  Create Response & Extractor
+% Response related with displacement at tip of the beam
+Xresp1  = Response('Sdescription','displacement at tip of the beam',...
+    'Sname', 'disp', ...
+    'Sfieldformat', '%e', ...
+    'Clookoutfor',{'N o d a l   D i s p l a c e m e n t s'}, ...
+    'Ncolnum',46, ...
+    'Nrownum',5);
+
+% Extractor object
+Xe      = Extractor('Sdescription','object for extracting response of cantilever beam', ...
+    'Srelativepath','./', ...
+    'Lverbose',true, ...
+    'Sfile','Obeam', ...
+    'Xresponse',Xresp1);
+
+%%  Create Connector
+% Basic set up
+Xc  = Connector('SpredefinedType','feap','Lkeepsimulationfiles',false,...
+    'Sworkingdirectory','/tmp',...
+    'Smaininputpath',CossanX.getCossanWorkingPath, ...
+    'Smaininputfile','Ibeam');
+
+% Add injector
+Xc      = add(Xc,Xi);
+% Add extractor to the connector
+Xc      = add(Xc,Xe);
+
+%% Construct the Evaluator and Model object
+Xev     = Evaluator('Xconnector',Xc);
+Xmod    = Model('Xevaluator',Xev,'Xinput',Xin);
+
+
+%% Construction and Calibration of Response surface
+% In this step, the response surface model is created
+Xrs     = ResponseSurface('Sdescription',...
+    'response surface of tip displacement of cantilever beam',...
+    'XfullModel',Xmod,...   %full model
+    'Cinputnames',{'Xh' 'XP'},... 
+    'Coutputnames',{'disp'},...  %response to be extracted from full model
+    'Stype','quadratic');   %type of response surface
+
+Xmc=MonteCarlo('Nsamples',100); % simulation obecjt for calibration samples
+Xrs = Xrs.calibrate('XSimulator',Xmc); % calibrate response surface
+
+% alternatively it is possible to pass the SimulationData to the calibrate
+% method
+XsimData=Xmc.apply(Xmod);
+Xrs = Xrs.calibrate('XsimulationData',XsimData); % calibrate response surface
+
+Xmc=MonteCarlo('Nsamples',20); % simulation object for validation samples
+Xrs = Xrs.validate('XSimulator',Xmc); % validate response surface
+
+% regression plots for calibration and validation
+f1 = figure;
+Xrs.plotregression('Stype','calibration','Soutputname','disp');
+
+f2 = figure;
+Xrs.plotregression('Stype','validation','Soutputname','disp');
+
+
+%% Apply response surface
+% the accuracy of the neural network is tested by computing the failure
+% probability of the tip-loaded beam. This result is compared with the
+% real model
+
+% performance function (threshold value defined above as maximum displacement)
+Xpf = PerformanceFunction('Sdemand','disp','Scapacity','Xthreshold','SoutputName','Vg');
+
+% probabilistic model using full model
+Xpm_real = ProbabilisticModel('XModel',Xmod,'XPerformanceFunction',Xpf);
+
+% probabilistic model using response surface
+Xpm_metamodel = ProbabilisticModel('XModel',Xrs,'XPerformanceFunction',Xpf);
+
+% simulation object (failure probability is computed by using direct MCS)
+Xmc=MonteCarlo('Nsamples',1000,'Nbatches',1);
+
+Xpf_real = pf(Xpm_real,Xmc); % compute failure probability of full model
+Xpf_metamodel = pf(Xpm_metamodel,Xmc); % compute failure probability using response surface
+
+display(Xpf_real)
+display(Xpf_metamodel)
+
+%% Validate solution, close figures and delete simulation files
+
+close(f1)
+close(f2)
+
+delete([CossanX.getCossanWorkingPath '/Ibeam.*']);
+
+assert(abs(Xpf_real.pfhat-Xpf_metamodel.pfhat)<5.e-3, ...
+       'CossanX:Tutorials:TutorialDataseries', ...
+       'Accuracy of output of metamodel too low')
+   
+   
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,305 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALFaultTree</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialFaultTree.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALFaultTree</h1><!--introduction--><p>the FaultTree object define the logic of the SystemReliability model</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@FaultTree">http://mechanik.uibk.ac.at/wiki/index.php/@FaultTree</a></p><p><img src="TutorialFaultTree_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialFaultTree_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create FaultTree</a></li></ul></div><h2>Create FaultTree<a name="1"></a></h2><p>To create a FaultTree object it is necessary to define 3 different components: nodeTypes nodeNames and nodeConnection. These components are defined by means of Cell arrays and a vector of connection</p><pre class="codeinput">CnodeTypes={<span class="string">'Output'</span>,<span class="string">'AND'</span>,<span class="string">'Input'</span>,<span class="string">'OR'</span>,<span class="string">'Input'</span>,<span class="string">'AND'</span>,<span class="string">'Input'</span>,<span class="string">'AND'</span>,<span class="string">'Input'</span>,<span class="string">'Input'</span>};
+CnodeNames={<span class="string">'TopEvent'</span>,<span class="string">'AND gate 1'</span>,<span class="string">'C'</span>,<span class="string">'OR gate 1'</span>,<span class="string">'A'</span>,<span class="string">'AND gate 2'</span>,<span class="string">'B'</span>,<span class="string">'AND gate 3'</span>,<span class="string">'B'</span>,<span class="string">'D'</span>};
+VnodeConnections=[0 1 2 2 4 4 6 6 8 8];
+
+
+Xft=FaultTree(<span class="string">'CnodeTypes'</span>,CnodeTypes,<span class="string">'CnodeNames'</span>,CnodeNames,<span class="keyword">...</span>
+               <span class="string">'VnodeConnections'</span>,VnodeConnections,<span class="string">'Sdescription'</span>,<span class="string">'FaultTree object'</span>);
+
+<span class="comment">% Show FaultTree in the console</span>
+display(Xft)
+
+<span class="comment">% Graphical representation of the FaultTree</span>
+Xft.plotTree(<span class="string">'Stitle'</span>,<span class="string">'test plot'</span>)
+
+<span class="comment">% Find cut-sets</span>
+Xft=Xft.findCutSets;
+display(Xft)
+
+<span class="comment">% Find minimal cut-sets</span>
+Xft=Xft.findMinimalCutSets;
+display(Xft)
+
+<span class="comment">% The method findMinimalCutSets can be also used to reduce arbitrary</span>
+<span class="comment">% cut-sets</span>
+
+Mcutsets=Xft.McutSets;
+<span class="comment">% add 2 cutsets</span>
+Mcutsets(:,3)=Mcutsets(:,1);
+Mcutsets(:,4)=Mcutsets(:,2);
+Mcutsets(1,4)=1;
+
+[~, CminimalCutSet]=Xft.findMinimalCutSets(<span class="string">'mcutsets'</span>,Mcutsets);
+<span class="comment">% Show cut-sets</span>
+disp(CminimalCutSet)
+
+<span class="comment">% Remove nodes</span>
+<span class="comment">% Be carefull when you use this function. You can destroy completely the</span>
+<span class="comment">% structure of the FaultTree</span>
+
+Xft=Xft.removeNodes(<span class="string">'VnodeIndex'</span>,[8 9 10]);
+
+Xft.plotTree(<span class="string">'Stitle'</span>,<span class="string">'test plot'</span>)
+
+<span class="comment">% Add nodes</span>
+Xft=Xft.addNodes(<span class="string">'CnodeTypes'</span>,CnodeTypes([8 9 10]),<span class="keyword">...</span>
+                 <span class="string">'CnodeNames'</span>,CnodeNames([8 9 10]),<span class="keyword">...</span>
+                 <span class="string">'VnodeConnections'</span>,VnodeConnections([8 9 10]));
+
+<span class="comment">% Now the FaultTree should be exactly as the origianal but without the</span>
+<span class="comment">% cutsets.</span>
+display(Xft)
+
+Xft=Xft.findMinimalCutSets;
+
+display(Xft)
+</pre><pre class="codeoutput"> 
+===================================================================
+ FaultTree Object  -  Name: Xft
+ Description: FaultTree object
+===================================================================
+The FaultTree contains 10 nodes
+Node #1 (TopEvent) Node Type: Output Connection: 0
+Node #2 (AND gate 1) Node Type: AND Connection: 1
+Node #3 (C) Node Type: Input Connection: 2
+Node #4 (OR gate 1) Node Type: OR Connection: 2
+Node #5 (A) Node Type: Input Connection: 4
+Node #6 (AND gate 2) Node Type: AND Connection: 4
+Node #7 (B) Node Type: Input Connection: 6
+Node #8 (AND gate 3) Node Type: AND Connection: 6
+Node #9 (B) Node Type: Input Connection: 8
+Node #10 (D) Node Type: Input Connection: 8
+-------------------------------------------------------------------
+Cut-Set of the Fault Tree not identified
+-------------------------------------------------------------------
+ 
+===================================================================
+ FaultTree Object  -  Name: Xft
+ Description: FaultTree object
+===================================================================
+The FaultTree contains 10 nodes
+Node #1 (TopEvent) Node Type: Output Connection: 0
+Node #2 (AND gate 1) Node Type: AND Connection: 1
+Node #3 (C) Node Type: Input Connection: 2
+Node #4 (OR gate 1) Node Type: OR Connection: 2
+Node #5 (A) Node Type: Input Connection: 4
+Node #6 (AND gate 2) Node Type: AND Connection: 4
+Node #7 (B) Node Type: Input Connection: 6
+Node #8 (AND gate 3) Node Type: AND Connection: 6
+Node #9 (B) Node Type: Input Connection: 8
+Node #10 (D) Node Type: Input Connection: 8
+-------------------------------------------------------------------
+2 cut-sets identified
+Minimal Cut-Sets not identified
+-------------------------------------------------------------------
+ 
+===================================================================
+ FaultTree Object  -  Name: Xft
+ Description: FaultTree object
+===================================================================
+The FaultTree contains 10 nodes
+Node #1 (TopEvent) Node Type: Output Connection: 0
+Node #2 (AND gate 1) Node Type: AND Connection: 1
+Node #3 (C) Node Type: Input Connection: 2
+Node #4 (OR gate 1) Node Type: OR Connection: 2
+Node #5 (A) Node Type: Input Connection: 4
+Node #6 (AND gate 2) Node Type: AND Connection: 4
+Node #7 (B) Node Type: Input Connection: 6
+Node #8 (AND gate 3) Node Type: AND Connection: 6
+Node #9 (B) Node Type: Input Connection: 8
+Node #10 (D) Node Type: Input Connection: 8
+-------------------------------------------------------------------
+2 cut-sets identified
+Minimal Cut-Set #1: 
+C
+A
+Minimal Cut-Set #2: 
+C
+B
+D
+-------------------------------------------------------------------
+    {1x2 cell}    {1x3 cell}
+
+ 
+===================================================================
+ FaultTree Object  -  Name: Xft
+ Description: FaultTree object
+===================================================================
+The FaultTree contains 10 nodes
+Node #1 (TopEvent) Node Type: Output Connection: 0
+Node #2 (AND gate 1) Node Type: AND Connection: 1
+Node #3 (C) Node Type: Input Connection: 2
+Node #4 (OR gate 1) Node Type: OR Connection: 2
+Node #5 (A) Node Type: Input Connection: 4
+Node #6 (AND gate 2) Node Type: AND Connection: 4
+Node #7 (B) Node Type: Input Connection: 6
+Node #8 (AND gate 3) Node Type: AND Connection: 6
+Node #9 (B) Node Type: Input Connection: 8
+Node #10 (D) Node Type: Input Connection: 8
+-------------------------------------------------------------------
+Cut-Set of the Fault Tree not identified
+-------------------------------------------------------------------
+ 
+===================================================================
+ FaultTree Object  -  Name: Xft
+ Description: FaultTree object
+===================================================================
+The FaultTree contains 10 nodes
+Node #1 (TopEvent) Node Type: Output Connection: 0
+Node #2 (AND gate 1) Node Type: AND Connection: 1
+Node #3 (C) Node Type: Input Connection: 2
+Node #4 (OR gate 1) Node Type: OR Connection: 2
+Node #5 (A) Node Type: Input Connection: 4
+Node #6 (AND gate 2) Node Type: AND Connection: 4
+Node #7 (B) Node Type: Input Connection: 6
+Node #8 (AND gate 3) Node Type: AND Connection: 6
+Node #9 (B) Node Type: Input Connection: 8
+Node #10 (D) Node Type: Input Connection: 8
+-------------------------------------------------------------------
+2 cut-sets identified
+Minimal Cut-Set #1: 
+C
+A
+Minimal Cut-Set #2: 
+C
+B
+D
+-------------------------------------------------------------------
+</pre><img vspace="5" hspace="5" src="TutorialFaultTree_01.png" alt=""> <img vspace="5" hspace="5" src="TutorialFaultTree_02.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALFaultTree
+% the FaultTree object define the logic of the SystemReliability model
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@FaultTree
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+%% Create FaultTree
+% To create a FaultTree object it is necessary to define 3 different
+% components: nodeTypes nodeNames and nodeConnection. These
+% components are defined by means of Cell arrays and a vector of connection
+%
+CnodeTypes={'Output','AND','Input','OR','Input','AND','Input','AND','Input','Input'};
+CnodeNames={'TopEvent','AND gate 1','C','OR gate 1','A','AND gate 2','B','AND gate 3','B','D'};
+VnodeConnections=[0 1 2 2 4 4 6 6 8 8];
+
+
+Xft=FaultTree('CnodeTypes',CnodeTypes,'CnodeNames',CnodeNames,...
+               'VnodeConnections',VnodeConnections,'Sdescription','FaultTree object');
+           
+% Show FaultTree in the console
+display(Xft)
+
+% Graphical representation of the FaultTree
+Xft.plotTree('Stitle','test plot')
+
+% Find cut-sets
+Xft=Xft.findCutSets;
+display(Xft)
+
+% Find minimal cut-sets
+Xft=Xft.findMinimalCutSets;
+display(Xft)
+
+% The method findMinimalCutSets can be also used to reduce arbitrary
+% cut-sets 
+
+Mcutsets=Xft.McutSets;
+% add 2 cutsets
+Mcutsets(:,3)=Mcutsets(:,1);
+Mcutsets(:,4)=Mcutsets(:,2);
+Mcutsets(1,4)=1;
+
+[~, CminimalCutSet]=Xft.findMinimalCutSets('mcutsets',Mcutsets);
+% Show cut-sets
+disp(CminimalCutSet)
+
+% Remove nodes
+% Be carefull when you use this function. You can destroy completely the
+% structure of the FaultTree
+
+Xft=Xft.removeNodes('VnodeIndex',[8 9 10]);
+
+Xft.plotTree('Stitle','test plot')
+
+% Add nodes
+Xft=Xft.addNodes('CnodeTypes',CnodeTypes([8 9 10]),...
+                 'CnodeNames',CnodeNames([8 9 10]),...
+                 'VnodeConnections',VnodeConnections([8 9 10]));
+             
+% Now the FaultTree should be exactly as the origianal but without the
+% cutsets.
+display(Xft)
+
+Xft=Xft.findMinimalCutSets;
+
+display(Xft)
+
+##### SOURCE END #####
+--></body></html>

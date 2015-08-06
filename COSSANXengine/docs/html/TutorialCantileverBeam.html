@@ -1,0 +1,113 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialCantileverBeam: Model Definition and Uncertainty Quantification</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialCantileverBeam.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TutorialCantileverBeam: Model Definition and Uncertainty Quantification</h1><!--introduction--><p>This script run the Cantilever Beam Tutorial in the COSSAN-X Engine The documentation and the problem description of this example is available here: <a href="http://mechanik.uibk.ac.at/wiki/index.php/Cantilever_Beam">http://mechanik.uibk.ac.at/wiki/index.php/Cantilever_Beam</a></p><p><img src="TutorialCantileverBeam_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialCantileverBeam_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Run Tutorial</a></li></ul></div><h2>Run Tutorial<a name="1"></a></h2><pre class="codeinput">run(<span class="string">'TutorialCantileverBeamMatlab'</span>)
+</pre><pre class="codeoutput">Input Object  - Description: 
+* 1 Sets of RandomVariables
+** Names: "Xrvset" 
+* 3 Parameter object(s)
+** Names: "L" "b" "maxDiplacement" 
+* 1 Functions object(s)
+** Names: "I" 
+</pre><pre class="codeoutput">Error using ==&gt; Mio.runScript at 37
+ The user define function can not be evaluate! 
+ Please check your function 
+ Undefined function or method 'mtimes' for input arguments of type 'cell'.
+
+Error in ==&gt; Mio.run at 182
+        [XsimOut Poutput]=runScript(Xmio,Psamples);
+
+Error in ==&gt; Evaluator.apply at 124
+                XSimOutTmp=Xobj.CXsolvers{n}.run(PinputMio);
+
+Error in ==&gt; Evaluator.deterministicAnalysis at 21
+XSimOut=Xobj.apply(Tinput);
+
+Error in ==&gt; Model.deterministicAnalysis at 14
+Xout = Xobj.Xevaluator.deterministicAnalysis(Xobj.Xinput);
+
+Error in ==&gt; TutorialCantileverBeamMatlab at 56
+Xout=Xmodel.deterministicAnalysis;
+
+Error in ==&gt; run at 74
+    evalin('caller',[script ';']);
+
+Error in ==&gt; TutorialCantileverBeam at 10
+run('TutorialCantileverBeamMatlab')
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TutorialCantileverBeam: Model Definition and Uncertainty Quantification
+% This script run the Cantilever Beam Tutorial in the COSSAN-X Engine
+% The documentation and the problem description of this example is available
+% here: http://mechanik.uibk.ac.at/wiki/index.php/Cantilever_Beam
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+%% Run Tutorial
+run('TutorialCantileverBeamMatlab')
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,69 @@
+assign PUNCH=Nastran_DOFS.pch,unit=52,formatted,delete 
+ASSIGN OUTPUT4='U_primes.op4',unit=13,formatted 
+
+SOL 101
+INCLUDE dmap_perturbation.dat  
+CEND
+
+
+
+SUBCASE 1
+
+   SET 1=158
+   SPC = 2
+   LOAD = 2
+   DISPLACEMENT(SORT1,REAL)=ALL
+   STRESS(SORT1,REAL,VONMISES,BILIN)=1
+
+
+BEGIN BULK
+include residual.dat
+sebulk,1,primary,,manual
+seconct,1,0,,
+,1777,1777,
+616,616,
+1779,1779,
+4120,4120,
+4276,4276,
+4286,4286,
+
+sebulk,2,primary,,manual
+seconct,2,0,,
+,1777,1777,
+616,616,
+1779,1779,
+4120,4120,
+4276,4276,
+4286,4286,
+
+sebulk,3,primary,,manual
+seconct,3,0,,
+,1777,1777,
+616,616,
+1779,1779,
+4120,4120,
+4276,4276,
+4286,4286,
+
+sebulk,4,primary,,manual
+seconct,4,0,,
+,1777,1777,
+616,616,
+1779,1779,
+4120,4120,
+4276,4276,
+4286,4286,
+
+begin super=1  $
+include se1.dat
+
+begin super=2  $
+include se2.dat
+
+begin super=3  $
+include se3.dat
+
+begin super=4  $
+include se4.dat
+
+ENDDATA

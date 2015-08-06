@@ -1,0 +1,1678 @@
+********************************************************************************
+ REPORT OF UNIT TEST (22-May-2013 18:44:08)
+ 
+ Matlab version : 7.13.0.564 (R2011b) Architecture: glnxa64
+ Host Machine OS: Fedora (18)
+ 
+ Successful: 89.2819%
+********************************************************************************
+
+
+********************************************************************************
+ REPORT FOR EP
+                       UnitTestEvaluator Successful:  86.67% of 15 tests TODO/FIXME:  0 
+                     UnitTestMarkovChain Successful: 100.00% of 13 tests TODO/FIXME:  0 
+                           UnitTestModel Successful: 100.00% of  8 tests TODO/FIXME:  0 
+                         UnitTestSamples Successful:   0.00% of  1 tests TODO/FIXME:  0 
+                UnitTestSolutionSequence Successful:  81.82% of 11 tests TODO/FIXME:  0 
+                           UnitTestTimer Successful: 100.00% of  8 tests TODO/FIXME:  0 
+             UnitTestJobManagerInterface Successful:  50.00% of 12 tests TODO/FIXME:  0 
+                           UnitTestInput Successful: 100.00% of 30 tests TODO/FIXME:  1 
+                          UnitTestCobyla Successful: 100.00% of  5 tests TODO/FIXME:  0 
+                      UnitTestConstraint Successful: 100.00% of  9 tests TODO/FIXME:  0 
+                    UnitTestCrossEntropy Successful: 100.00% of  5 tests TODO/FIXME:  0 
+               UnitTestEvolutionStrategy Successful:  85.71% of  7 tests TODO/FIXME:  1 
+               UnitTestGeneticAlgorithms Successful: 100.00% of 10 tests TODO/FIXME:  0 
+               UnitTestObjectiveFunction Successful: 100.00% of  5 tests TODO/FIXME:  0 
+                    UnitTestOptimization Successful: 100.00% of  2 tests TODO/FIXME:  0 
+             UnitTestOptimizationProblem Successful: 100.00% of 13 tests TODO/FIXME:  2 
+  UnitTestSequentialQuadraticProgramming Successful: 100.00% of 12 tests TODO/FIXME:  0 
+              UnitTestSimulatedAnnealing Successful: 100.00% of  6 tests TODO/FIXME:  0 
+                      UnitTestRBOproblem Successful:   0.00% of  1 tests TODO/FIXME:  0 
+                         UnitTestMiniMax Successful:  71.43% of  7 tests TODO/FIXME:  0 
+                         UnitTestSimplex Successful:  66.67% of  6 tests TODO/FIXME:  0 
+                            UnitTestBFGS Successful:  62.50% of  8 tests TODO/FIXME:  0 
+                          UnitTestCutSet Successful: 100.00% of 10 tests TODO/FIXME:  0 
+                     UnitTestDesignPoint Successful: 100.00% of  7 tests TODO/FIXME:  0 
+              UnitTestFailureProbability Successful:   0.00% of  1 tests TODO/FIXME:  0 
+                        UnitTestGradient Successful: 100.00% of 11 tests TODO/FIXME:  0 
+        UnitTestLocalSensitivityMeasures Successful: 100.00% of 12 tests TODO/FIXME:  0 
+             UnitTestSensitivityMeasures Successful: 100.00% of 39 tests TODO/FIXME:  0 
+                       UnitTestFaultTree Successful: 100.00% of 15 tests TODO/FIXME:  0 
+             UnitTestPerformanceFunction Successful: 100.00% of 11 tests TODO/FIXME:  0 
+              UnitTestProbabilisticModel Successful:  91.67% of 12 tests TODO/FIXME:  0 
+                     UnitTestSensitivity Successful:  96.88% of 32 tests TODO/FIXME:  0 
+                  UnitTestHaltonSampling Successful: 100.00% of 14 tests TODO/FIXME:  0 
+              UnitTestImportanceSampling Successful:  92.31% of 13 tests TODO/FIXME:  0 
+          UnitTestLatinHypercubeSampling Successful: 100.00% of 14 tests TODO/FIXME:  0 
+                    UnitTestLineSampling Successful:  79.17% of 24 tests TODO/FIXME:  1 
+                      UnitTestMonteCarlo Successful: 100.00% of 13 tests TODO/FIXME:  0 
+                   UnitTestSobolSampling Successful: 100.00% of 12 tests TODO/FIXME:  0 
+********************************************************************************
+
+
+********************************************************************************
+ REPORT FOR HMP
+********************************************************************************
+
+
+********************************************************************************
+ REPORT FOR BG
+                      UnitTestDataseries Successful: 100.00% of 24 tests TODO/FIXME:  0 
+                    UnitTestMTXExtractor Successful:  75.00% of  4 tests TODO/FIXME:  0 
+                  UnitTestTableExtractor Successful:  77.78% of  9 tests TODO/FIXME:  0 
+              UnitTestCovarianceFunction Successful: 100.00% of  6 tests TODO/FIXME:  0 
+               UnitTestStochasticProcess Successful:  47.06% of 17 tests TODO/FIXME:  0 
+                       UnitTestModeBased Successful: 100.00% of 12 tests TODO/FIXME:  0 
+                UnitTestPolynomicalChaos Successful:   0.00% of  1 tests TODO/FIXME:  0 
+                           UnitTestModes Successful: 100.00% of  7 tests TODO/FIXME:  0 
+                         UnitTestOptimum Successful:  63.16% of 19 tests TODO/FIXME:  1 
+                      UnitTestSFEMoutput Successful: 100.00% of  8 tests TODO/FIXME:  0 
+                  UnitTestSimulationData Successful:  89.47% of 19 tests TODO/FIXME:  0 
+                         UnitTestNastsem Successful:  75.00% of  8 tests TODO/FIXME:  0 
+                         UnitTestNeumann Successful:  62.50% of  8 tests TODO/FIXME:  0 
+                    UnitTestPerturbation Successful:  37.50% of  8 tests TODO/FIXME:  0 
+             UnitTestSfemPolynomialChaos Successful:  23.08% of 13 tests TODO/FIXME:  0 
+********************************************************************************
+
+
+********************************************************************************
+ REPORT FOR MB
+                       unitTestExtractor Successful:  72.73% of 11 tests TODO/FIXME:  0 
+                     UnitTestHBExtractor Successful:  80.00% of  5 tests TODO/FIXME:  0 
+                      unitTestIdentifier Successful: 100.00% of  1 tests TODO/FIXME:  0 
+                        unitTestInjector Successful:   0.00% of  1 tests TODO/FIXME:  0 
+                unitTestMappingExtractor Successful:   0.00% of  1 tests TODO/FIXME:  0 
+                    UnitTestOP4Extractor Successful: 100.00% of  4 tests TODO/FIXME:  0 
+                  UnitTestPunchExtractor Successful: 100.00% of  4 tests TODO/FIXME:  0 
+                        unitTestResponse Successful: 100.00% of  8 tests TODO/FIXME:  0 
+                       unitTestConnector Successful:  91.67% of 12 tests TODO/FIXME:  0 
+                             unitTestMio Successful:  92.98% of 57 tests TODO/FIXME:  0 
+                      UnitTestJobManager Successful:   0.00% of  1 tests TODO/FIXME:  0 
+                   UnitTestNeuralNetwork Successful:   0.00% of  1 tests TODO/FIXME:  0 
+                 UnitTestResponseSurface Successful: 100.00% of 30 tests TODO/FIXME:  0 
+                    UnitTestRobustDesign Successful:  66.67% of  6 tests TODO/FIXME:  0 
+********************************************************************************
+
+
+********************************************************************************
+ REPORT FOR PB
+                        UnitTestFunction Successful: 100.00% of 12 tests TODO/FIXME:  0 
+UnitTestGaussianMixtureRandomVariableSet Successful: 100.00% of 13 tests TODO/FIXME:  0 
+                       UnitTestParameter Successful:  83.33% of  6 tests TODO/FIXME:  0 
+                 UnitTestRandomVariables Successful: 100.00% of 61 tests TODO/FIXME:  0 
+               UnitTestRandomVariableSet Successful: 100.00% of 19 tests TODO/FIXME:  0 
+       UnitTestUserDefinedRandomVariable Successful: 100.00% of 25 tests TODO/FIXME:  0 
+                  UnitTestDesignVariable Successful:  88.89% of  9 tests TODO/FIXME:  0 
+              UnitTestLineSamplingOutput Successful:  84.62% of 13 tests TODO/FIXME:  0 
+                    UnitTestSubSetOutput Successful:  83.33% of  6 tests TODO/FIXME:  0 
+             UnitTestDesignOfExperiments Successful:  47.06% of 17 tests TODO/FIXME:  0 
+                UnitTestSubsetSimulation Successful: 100.00% of 13 tests TODO/FIXME:  0 
+********************************************************************************
+
+
+********************************************************************************
+*  MISSING UNIT-TESTS 
+********************************************************************************
+1)    BG - UnitTestSystemReliability
+
+
+--------------------------------------------------------------------
+ Unit Test of Dataseries
+ Unit Test executed in  7.1827 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Successfull Test Constructor #1)
+Test #  2: passed  (Successfull Test Constructor #1)
+Test #  3: passed  (Test Display)
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: passed  (openCOSSAN:Dataseries:subsasgn -- Dimension of assigned Vdata is not consistent with that of the column where it is inserted.)
+Test #  9: passed  ()
+Test # 10: passed  (openCOSSAN:Dataseries:subsasgn -- Dimension of assigned Mcoord is not consistent with that of Vdata of the column where it is inserted.)
+Test # 11: passed  ()
+Test # 12: passed  (openCOSSAN:Dataseries:addData -- The no. of columns of Mcoord and of Mdata to be added are not compatible.
+ no. of columns of Mcoord: 9
+ no. of columns of Vdata : 10)
+Test # 13: passed  (openCOSSAN:Dataseries:addData -- Duplicated coordinate entry in Mcoord)
+Test # 14: passed  (openCOSSAN:Dataseries:addData -- The no. of columns of Mcoord and of Mdata to be added are not compatible.
+ no. of columns of Mcoord: 10
+ no. of columns of Vdata : 1)
+Test # 15: passed  ()
+Test # 16: passed  (openCOSSAN:Dataseries:addData -- The no. of columns of Mcoord and of Mdata to be added are not compatible.
+ no. of columns of Mcoord: 10
+ no. of columns of Vdata : 1)
+Test # 17: passed  (openCOSSAN:Dataseries:Dataseries -- PropertyName: Sdhdfdhfn not a valid input argument)
+Test # 18: passed  ()
+Test # 19: passed  (openCOSSAN:Dataseries:horzcat -- CAT arguments dimensions are not consistent)
+Test # 20: passed  ()
+Test # 21: passed  (openCOSSAN:Dataseries:vertcat -- All the Dataseries array must have the same Mcoord)
+Test # 22: passed  ()
+Test # 23: passed  (openCOSSAN:Dataseries:vertcat -- All the Dataseries array must have the same Mcoord)
+Test # 24: passed  (openCOSSAN:Dataseries:vertcat -- CAT arguments dimensions are not consistent)
+
+
+--------------------------------------------------------------------
+ Unit Test of Evaluator
+ Unit Test executed in  9.5611 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Create Object with only description)
+Test #  3: passed  (openCOSSAN:validateCOSSANInputs -- The object after the PropertyName Xmio is not a COSSAN object. It is a logical object )
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  (openCOSSAN:Evaluator -- Length of CSnames (1) must be equal to the length of CXsolvers (2))
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  ()
+Test # 12: failed  (openCOSSAN:mio:checkPinput -- Not all the necessary inputs are contained in the structure.
+Missing inputs: dummy
+)
+Test # 13: failed  (openCOSSAN:mio:checkPinput -- Not all the necessary inputs are contained in the structure.
+Missing inputs: dummy
+)
+Test # 14: passed  ()
+Test # 15: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of MarkovChain
+ Unit Test executed in  2.4785 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Prepre preliminary objects)
+Test #  2: passed  (Create an empty object)
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  (This should fail)
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  ()
+Test # 12: passed  ()
+Test # 13: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Model
+ Unit Test executed in  4.596 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Create a full model object)
+Test #  3: passed  (Create a model object with CXmembers)
+Test #  4: passed  (openCOSSAN:Model -- The Model must contain an Evaluator)
+Test #  5: passed  (openCOSSAN:Model -- An object of kind Input is required by the Model)
+Test #  6: passed  ()
+Test #  7: passed  (openCOSSAN:Mio -- The names of the Input variables should be defined in the field Cinputnames)
+Test #  8: passed  (openCOSSAN:Model -- An input object containing the following inputs is required: 
+Xrv Xrv2 
+Provided inputs: 
+Xpar1)
+
+
+--------------------------------------------------------------------
+ Unit Test of UnitTestSamples
+ Unit Test executed in  156.0768 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (Diagnostic level opts.disp must be an integer.)
+
+
+--------------------------------------------------------------------
+ Unit Test of SolutionSequence
+ Unit Test executed in  10.7002 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Create a SolutionSequence object)
+Test #  3: passed  (Create a SolutionSequence object)
+Test #  4: passed  (openCOSSAN:SolutionSequence -- Mandatory input Coutputnames cannot be empty.)
+Test #  5: passed  (Apply object using a file)
+Test #  6: passed  (Apply object using a script)
+Test #  7: passed  (openCOSSAN:SolutionSequence:runScript -- Output at position (1) is of type RandomVariable, expected type Input)
+Test #  8: passed  (This test returns the valus of the fiels of RandomVariable)
+Test #  9: passed  (Apply object without defining the types of the involved objects)
+Test # 10: failed  (openCOSSAN:JobManager -- Error retrieving grid configuration from the job manager)
+Test # 11: failed  (openCOSSAN:JobManager -- Error retrieving grid configuration from the job manager)
+
+
+--------------------------------------------------------------------
+ Unit Test of Timer
+ Unit Test executed in  0.39513 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Extractor
+ Unit Test executed in  4.498 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  (openCOSSAN:Extractor:Extractor -- Duplicated output names defined in Extractor:
+ -  OUT1 is present in response 1 and 2
+)
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: failed  (MATLAB:UndefinedFunction -- Undefined function 'eq' for input arguments of type 'Dataseries'.)
+Test #  7: failed  (MATLAB:UndefinedFunction -- Undefined function 'eq' for input arguments of type 'Dataseries'.)
+Test #  8: failed  (MATLAB:UndefinedFunction -- Undefined function 'eq' for input arguments of type 'Dataseries'.)
+Test #  9: passed  ()
+Test # 10: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName CCXresponse must be an cell of cell array
+ * Value provided is of type cell)
+Test # 11: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of HBExtractor
+ Unit Test executed in  1.0505 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Creating HBExtractor object)
+Test #  2: failed  (MATLAB:load:couldNotReadFile -- Unable to read file Mstiffness: No such file or directory.)
+Test #  3: passed  ( -- COSSAN:HBExtractor: Please make sure that the input file dummy exists)
+Test #  4: passed  (openCOSSAN:HBExtractor -- Soutputname not defined)
+Test #  5: passed  (openCOSSAN:HBExtractor -- No file name specified)
+
+
+--------------------------------------------------------------------
+ Unit Test of Identifier
+ Unit Test executed in  0.049715 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (No unit test exists for class Identifier)
+
+
+--------------------------------------------------------------------
+ Unit Test of unitTestInjector
+ Unit Test executed in  10.7772 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (Diagnostic level opts.disp must be an integer.)
+
+
+--------------------------------------------------------------------
+ Unit Test of unitTestMappingExtractor
+ Unit Test executed in  0.089919 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (Cannot find an exact (case-sensitive) match for 'unitTestMappingExtractor'.
+Do you want: UnitTestMappingExtractor
+(in /home/ep/workspace/OpenCossan/trunk/COSSANXengine/examples/Unit_test/Connectors/MappingExtractor/UnitTestMappingExtractor.m)?
+)
+
+
+--------------------------------------------------------------------
+ Unit Test of MTXExtractor
+ Unit Test executed in  1.2398 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: failed  (MATLAB:class:InvalidStaticProperty -- The property 'ScossanRoot' in class 'OpenCossan' must be accessed from a class instance because it is not a Constant property.)
+
+
+--------------------------------------------------------------------
+ Unit Test of OP4Extractor
+ Unit Test executed in  2.8083 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of PunchExtractor
+ Unit Test executed in  0.46849 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Response
+ Unit Test executed in  0.35341 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  (openCOSSAN:Response:Response -- Mandatory property Sname (name of the output) must be passed to the Response constructor.)
+Test #  5: passed  ()
+Test #  6: passed  (openCOSSAN:validateCOSSANInputs -- each PropertyName field must be followed by its corresponding VALUE 
+ * Length of arguments: 3)
+Test #  7: passed  ()
+Test #  8: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of TableExtractor
+ Unit Test executed in  4.6419 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  (openCOSSAN:TableExtractor -- either a Response object or a table format (Nheaderlines,Sdelimiter,Soutputname) must be passed)
+Test #  6: passed  (openCOSSAN:TableExtractor -- either a Response object or a table format (Nheaderlines,Sdelimiter,Soutputname) must be passed)
+Test #  7: failed  (openCOSSAN:Dataseries:Dataseries -- The no. of columns of Mcoord and of Vdata are not compatible.
+ no. of columns of Mcoord: 3
+ no. of columns of Vdata : 18)
+Test #  8: passed  (openCOSSAN:Extractor:Extractor -- Duplicated output names defined in Extractor:
+ -  displacement2 is present in response 1 and 2
+)
+Test #  9: failed  ( -- No appropriate method, property, or field Mdata for class Dataseries.)
+
+
+--------------------------------------------------------------------
+ Unit Test of Connector
+ Unit Test executed in  1.8432 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: failed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  ()
+Test # 12: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Mio
+ Unit Test executed in  3.0547 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Check display method)
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  ()
+Test # 12: passed  ()
+Test # 13: passed  ()
+Test # 14: passed  ()
+Test # 15: failed  (The user define function can not be evaluate.! 
+Please check your function or script!!!
+* Error msg: Not enough input arguments.
+* Filename : differenceStructure
+* Line num : 3)
+Test # 16: passed  ()
+Test # 17: passed  ()
+Test # 18: passed  ()
+Test # 19: passed  ()
+Test # 20: passed  ()
+Test # 21: passed  ()
+Test # 22: passed  ()
+Test # 23: passed  ()
+Test # 24: passed  ()
+Test # 25: passed  ()
+Test # 26: passed  ()
+Test # 27: passed  ()
+Test # 28: passed  ()
+Test # 29: passed  ()
+Test # 30: passed  ()
+Test # 31: passed  ()
+Test # 32: passed  ()
+Test # 33: passed  ()
+Test # 34: passed  ()
+Test # 35: failed  (The user define function can not be evaluate.! 
+Please check your function or script!!!
+* Error msg: Not enough input arguments.
+* Filename : differenceStructure
+* Line num : 3)
+Test # 36: passed  ()
+Test # 37: passed  ()
+Test # 38: passed  ()
+Test # 39: passed  ()
+Test # 40: passed  ()
+Test # 41: passed  ()
+Test # 42: passed  ()
+Test # 43: passed  (Field name (Sunexistingproperty) not allowed)
+Test # 44: passed  (The input value after the PropertyName Lfunction must be a logical value. 
+ * Value provided is of type char)
+Test # 45: passed  (The Script or Function specified in the field 'Spath/Sname', '/home/ep/workspace/OpenCossan/trunk/COSSANXengine/examples/Unit_test/Connectors/Mio/thisfiledoesntexist', does not exist
+)
+Test # 46: failed  (This test should fail)
+Test # 47: failed  (This test should fail)
+Test # 48: passed  (The flags Liomatrix and Liostructure can not be set both to true)
+Test # 49: passed  (It is not possible to run a Mio object with an Input object with no samples)
+Test # 50: passed  (Not all the necessary inputs are contained in the Input.
+Missing inputs: missinginput
+)
+Test # 51: passed  (Index exceeds matrix dimensions.)
+Test # 52: passed  (Not all the necessary inputs are contained in the structure.
+Missing inputs: missinginput
+)
+Test # 53: passed  (Not all the necessary inputs are contained in the structure.
+Missing inputs: missinginput
+)
+Test # 54: passed  (Wrong number of columns in provided samples matrix!
+Nr. of columns:3
+Nr. of inputs:2
+)
+Test # 55: passed  (Wrong number of outputs returned by script/function.
+Nr. of required outputs: 3
+Nr. of columns of output matrix: 2)
+Test # 56: passed  (Not all the necessary outputs are contained in the output structure.
+Missing outputs: thisoutputdoesnotexists
+)
+Test # 57: passed  (Output of name diff2 returned an empty quantity for samples 2,.
+Please ensure that your script or function alway return non-empty quantities.)
+
+
+--------------------------------------------------------------------
+ Unit Test of UnitTestJobManager
+ Unit Test executed in  0.002153 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (Cannot find an exact (case-sensitive) match for 'UnitTestJobManager'.
+Do you want: unitTestJobManager
+(in /home/ep/workspace/OpenCossan/trunk/COSSANXengine/examples/Unit_test/HighPerformanceComputing/unitTestJobManager.m)?
+)
+
+
+--------------------------------------------------------------------
+ Unit Test of JobManagerInterface
+ Unit Test executed in  0.17802 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  (Pre-defined jobManagerInterface configuration (GGridEngine_matlab) not available)
+Test #  3: passed  ()
+Test #  4: failed  (Error retrieving grid configuration from the job manager)
+Test #  5: failed  (Error retrieving grid configuration from the job manager)
+Test #  6: failed  (Error retrieving grid configuration from the job manager)
+Test #  7: failed  (Error retrieving grid configuration from the job manager This is failing when no Squeuname is spcified)
+Test #  8: failed  (Error retrieving grid configuration from the job manager This is failing when no Squeuname is spcified)
+Test #  9: passed  (Error retrieving grid configuration from the job manager)
+Test # 10: failed  (Error retrieving grid configuration from the job manager)
+Test # 11: passed  (It is mandatory to specify SqueueName)
+Test # 12: passed  (Error retrieving grid configuration from the job manager)
+
+
+--------------------------------------------------------------------
+ Unit Test of CovarianceFunction
+ Unit Test executed in  0.26248 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  ()
+Test #  3: passed  (openCOSSAN:CovarianceFunction -- A single output (Coutputnames) must be defined)
+Test #  4: passed  (openCOSSAN:CovarianceFunction -- Two input names (Cinputnames) must be defined)
+Test #  5: passed  ()
+Test #  6: passed  (openCOSSAN:Input:CovarianceFunction -- The number of rows of the passed matrix MX must be a multiple of 2, where this multiple is equal to the dimension of the input variables)
+
+
+--------------------------------------------------------------------
+ Unit Test of Unit Test of FUNCTIONS
+ Unit Test executed in  0.32548 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Cexpression must be a cell
+ * Value provided is of type char)
+Test #  4: passed  (openCOSSAN:Function -- Property name Snonsense is not allowed)
+Test #  5: passed  (openCOSSAN:Function:evaluate -- The function require an Input object to be evaluated.)
+Test #  6: passed  (openCOSSAN:Function:evaluate -- The function require an Input object to be evaluated.)
+Test #  7: passed  (MATLAB:maxlhs -- Too many output arguments.)
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  (openCOSSAN:Function:evaluate -- the second argument must be an object of type Input )
+Test # 12: passed  (Function named Xfun requires an input named Xrv1)
+
+
+--------------------------------------------------------------------
+ Unit Test of GaussianMixtureRandomVariableSet
+ Unit Test executed in  2.9917 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Checking display)
+Test #  3: passed  (openCOSSAN:GaussianMixtureRandomVariableSet -- MdataSet is required to construct an object GaussianMixtureRandomVariableSet)
+Test #  4: passed  (Creating object with the input parameters)
+Test #  5: passed  (Checking map2stdnorm method)
+Test #  6: passed  (Checking map2physical method)
+Test #  7: passed  (Checking physical2cdf method)
+Test #  8: passed  (Checking stdnorm2cdf method)
+Test #  9: passed  (Checking cdf2physical method)
+Test # 10: passed  (Checking cdf2stdnorm method)
+Test # 11: passed  (openCOSSAN:GaussianMixtureRandomVariableSet -- VstandardDeviation is required to construct anobject GaussianMixtureRandomVariableSet using the correlation matrix)
+Test # 12: passed  (openCOSSAN:GaussianRandomVariableSet -- The covariance matrix must be square (for each component))
+Test # 13: passed  (openCOSSAN:GaussianMixtureRandomVariableSet -- Lenght of Vweight (3) must be equal to the number of components (20))
+
+
+--------------------------------------------------------------------
+ Unit Test of Unit Test of INPUT (22-May-2013 18:39:59)
+ Unit Test executed in  2.638 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  (openCOSSAN:Inputs:merge -- It is not possible to add the object Xrvs1 (of type RandomVariableSet) to the Input objects!
+Receiver object contains the following variables: "Xrv1" "Xrv2" 
+The applied object contains the following variables: "Xrv1" "Xrv2" )
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  (Returns only the last requested value)
+Test # 12: passed  ( Interaction w/ DesignVariable )
+Test # 13: passed  ()
+Test # 14: passed  ()
+Test # 15: passed  ()
+Test # 16: passed  ()
+Test # 17: passed  ()
+Test # 18: passed  ()
+Test # 19: passed  ()
+Test # 20: passed  ()
+Test # 21: passed  ()
+Test # 22: passed  ()
+Test # 23: passed  ()
+Test # 24: passed  ()
+Test # 25: passed  ()
+Test # 26: passed  ()
+Test # 27: passed  ()
+Test # 28: passed  (openCOSSAN:Inputs:merge -- It is not possible to merge the Input objects!
+Receiver object contains the following variables: "Xrv1" "Xrv2" 
+The applied object contains the following variables: "Xrv1" "Xrv2" "Xfun1" "Xpar" "DV" )
+Test # 29: passed  ()
+Test # 30: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Unit Test of PARAMETERS (22-May-2013 18:39:59)
+ Unit Test executed in  0.065443 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  (openCOSSAN:Input:checkFunction -- Function named Xfun1 requires an input named Xpar)
+Test #  6: failed  (MATLAB:unassignedOutputs -- Output argument "Cmembers" (and maybe others) not assigned during call to "/home/ep/workspace/OpenCossan/trunk/COSSANXengine/src/Inputs/@RandomVariableSet/private/addall.m>addall".)
+
+
+--------------------------------------------------------------------
+ Unit Test of Unit Test of RANDOM VARIABLES (22-May-2013 18:40:04)
+ Unit Test executed in  5.3182 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  (openCOSSAN:RandomVariable:RandomVariable -- The standard deviation has to be greater than zero)
+Test #  3: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName CoV must be a cell
+ * Value provided is of type double)
+Test #  4: passed  (openCOSSAN:RandomVariable:RandomVariable -- The standard deviation has to be greater than zero)
+Test #  5: passed  (openCOSSAN:RandomVariable:RandomVariable -- The coefficient of variation (cov) of a RandomVariable must be strictly greater than zero)
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: passed  ()
+Test #  9: passed  (openCOSSAN:rv:uniform -- Upper bound (2nd argument) must be greater than lower bound (1st argument).)
+Test # 10: passed  (openCOSSAN:rv:normal -- Not enough parameters defined to identify the distribution)
+Test # 11: passed  ()
+Test # 12: passed  (openCOSSAN:rv:rayleigh -- It is not possible to set the mean and standard deviation in a Rayleigh distribution)
+Test # 13: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName mean must be a numeric value
+ * Value provided is of type char)
+Test # 14: passed  ()
+Test # 15: passed  ()
+Test # 16: passed  ()
+Test # 17: passed  (openCOSSAN:RandomVariable:weibull -- Weibull has to be defined only via parameter1 and parameter2)
+Test # 18: passed  ()
+Test # 19: passed  ()
+Test # 20: passed  ()
+Test # 21: passed  ()
+Test # 22: passed  ()
+Test # 23: passed  ()
+Test # 24: passed  (openCOSSAN:RandomVariable:logistic -- the distribution could not be created because of missing or invalid parameters)
+Test # 25: passed  (openCOSSAN:RandomVariable:RandomVariable -- PropertyName meanstd not allowed)
+Test # 26: passed  (openCOSSAN:RandomVariable:checkDistribution -- distribution type: normalzz not available)
+Test # 27: passed  ()
+Test # 28: passed  (openCOSSAN:rv:uniformdiscrete -- Upper bound (2nd argument) must be greater than lower bound (1st argument).)
+Test # 29: passed  (openCOSSAN:rv:uniformdiscrete -- Invalid input arguments, uniformdiscrete distributions must be created using lowerBound and upperBound )
+Test # 30: passed  (openCOSSAN:RandomVariable:checkDistribution -- Distribution name must be defined)
+Test # 31: passed  (openCOSSAN:rv:uniformdiscrete -- Invalid input arguments, uniformdiscrete distributions must be created using lowerBound and upperBound )
+Test # 32: passed  ()
+Test # 33: passed  (openCOSSAN:RandomVariable:poisson -- poisson can be defined only via parameter1)
+Test # 34: passed  (openCOSSAN:RandomVariable:poisson -- the parameter defining poisson distribution must be greater than zero)
+Test # 35: passed  (openCOSSAN:RandomVariable:poisson -- the parameter defining poisson distribution must be greater than zero)
+Test # 36: passed  (openCOSSAN:rv:uniformdiscrete -- Upper bound (2nd argument) must be greater than lower bound (1st argument).)
+Test # 37: passed  ()
+Test # 38: passed  (weibull test getPDF)
+Test # 39: passed  (chi2 test getPDF)
+Test # 40: passed  (betaDistribution test getPDF)
+Test # 41: passed  (Gamma Distribution test getPDF)
+Test # 42: passed  (exponential Distribution test getPDF)
+Test # 43: passed  (generalizedPareto Distribution test getPDF)
+Test # 44: passed  (large_I Distribution test getPDF)
+Test # 45: passed  (lognormal Distribution test getPDF)
+Test # 46: passed  (logistic Distribution test getPDF)
+Test # 47: passed  (normal Distribution test getPDF)
+Test # 48: passed  (uniform Distribution test getPDF)
+Test # 49: passed  (rayleigh Distribution test getPDF)
+Test # 50: passed  (small-i Distribution test getPDF)
+Test # 51: passed  (uniformdiscrete Distribution test getPDF)
+Test # 52: passed  (student Distribution test getPDF)
+Test # 53: passed  (poisson Distribution test getPDF)
+Test # 54: passed  (truncnormal Distribution test getPDF)
+Test # 55: passed  (f Distribution test getPDF)
+Test # 56: passed  (binomial Distribution test getPDF)
+Test # 57: passed  (geometric Distribution test getPDF)
+Test # 58: passed  (hypergeometric Distribution test getPDF)
+Test # 59: passed  (negativebinomial Distribution test getPDF)
+Test # 60: passed  ()
+Test # 61: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Unit Test of Random Variable Set
+ Unit Test executed in  1.4298 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  (openCOSSAN:RandomVariableSet -- the RandomVariableSet can not be build because not all the random variable are present in the workspace)
+Test #  3: passed  ()
+Test #  4: passed  (openCOSSAN:Inputs:RandomVariableSet -- The diagonal terms of the correlation matrix must be equal to one)
+Test #  5: passed  (openCOSSAN:Inputs:RandomVariableSet -- The diagonal terms of the correlation matrix must be equal to one)
+Test #  6: passed  ()
+Test #  7: passed  (openCOSSAN:Inputs:RandomVariableSet -- The correlation matrix must be square)
+Test #  8: passed  (openCOSSAN:Inputs:RandomVariableSet -- The diagonal terms of the correlation matrix must be equal to one)
+Test #  9: passed  (openCOSSAN:Inputs:RandomVariableSet -- The diagonal terms of the correlation matrix must be equal to one)
+Test # 10: passed  ()
+Test # 11: passed  (MATLAB:UndefinedFunction -- Undefined function or variable 'Xrv5'.)
+Test # 12: passed  ()
+Test # 13: passed  ()
+Test # 14: passed  ()
+Test # 15: passed  ()
+Test # 16: passed  ()
+Test # 17: passed  ()
+Test # 18: passed  ()
+Test # 19: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of StochasticProcess
+ Unit Test executed in  0.3807 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: failed  (MATLAB:eigs:NonIntegerDiagnosticLevel -- Diagnostic level opts.disp must be an integer.)
+Test #  4: failed  (MATLAB:eigs:NonIntegerDiagnosticLevel -- Diagnostic level opts.disp must be an integer.)
+Test #  5: passed  (openCOSSAN:StochasticProcess:KL_terms -- The number of KL-terms (30) must be <= length of Mcoord (9))
+Test #  6: failed  (openCOSSAN:StochasticProcess:sample -- No KL-terms determined)
+Test #  7: passed  (openCOSSAN:CovarianceFunction -- Two input names (Cinputnames) must be defined)
+Test #  8: passed  (openCOSSAN:CovarianceFunction -- Two input names (Cinputnames) must be defined)
+Test #  9: passed  (openCOSSAN:Mio -- The Script or Function specified in the field 'Spath/Sname', '/home/ep/workspace/OpenCossan/trunk/COSSANXengine/examples/Unit_test/Inputs/fleubleubleu', does not exist
+)
+Test # 10: failed  (MATLAB:eigs:NonIntegerDiagnosticLevel -- Diagnostic level opts.disp must be an integer.)
+Test # 11: passed  (MATLAB:eigs:NonIntegerDiagnosticLevel -- Diagnostic level opts.disp must be an integer.)
+Test # 12: passed  (openCOSSAN:StochasticProcess:StochasticProcess -- Size of covariance matrix not correct)
+Test # 13: failed  (MATLAB:eigs:NonIntegerDiagnosticLevel -- Diagnostic level opts.disp must be an integer.)
+Test # 14: failed  (MATLAB:eigs:NonIntegerDiagnosticLevel -- Diagnostic level opts.disp must be an integer.)
+Test # 15: failed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xmodel".)
+Test # 16: failed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test # 17: failed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+
+
+--------------------------------------------------------------------
+ Unit Test of Unit Test of Userdef RANDOM VARIABLES (22-May-2013 18:40:09)
+ Unit Test executed in  2.6421 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Empty object)
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  ()
+Test # 12: passed  ()
+Test # 13: passed  ()
+Test # 14: passed  ()
+Test # 15: passed  ()
+Test # 16: passed  ()
+Test # 17: passed  ()
+Test # 18: passed  ()
+Test # 19: passed  ()
+Test # 20: passed  ()
+Test # 21: passed  ()
+Test # 22: passed  ()
+Test # 23: passed  ()
+Test # 24: passed  ()
+Test # 25: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Unit Test of DESIGNVARIABLE (22-May-2013 18:40:09)
+ Unit Test executed in  0.033182 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create a continous design variable without bounds)
+Test #  2: passed  (Create a continous design variable with bounds)
+Test #  3: passed  (Create a discrete design variable)
+Test #  4: passed  (Add Design Variables to Xinput)
+Test #  5: passed  (Remove Design Variables from Xinput)
+Test #  6: passed  (openCOSSAN:DesignOfExperiments:DesignOfExperiments -- Lower Bound cannot be higher than Upper Bound)
+Test #  7: failed  ()
+Test #  8: passed  (Discrete DV defined without specifiying its current value)
+Test #  9: passed  (Discrete DV defined with its value outside of Vsupport)
+
+
+--------------------------------------------------------------------
+ Unit Test of ModeBased
+ Unit Test executed in  14.9654 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Prerequisite created correctly)
+Test #  2: passed  ()
+Test #  3: passed  (openCOSSAN:ModeBased -- The nominal mass matrix has to be specified)
+Test #  4: passed  (openCOSSAN:ModeBased -- The names of the eigenvalues and eigenvectors in the output of XFullmodel have to be specified)
+Test #  5: passed  (MATLAB:UndefinedFunction -- Undefined function or variable 'cossanRoot'.)
+Test #  6: passed  (openCOSSAN:ModeBased -- The names of the eigenvalues and/or eigenvectors are not in the output of XFullmodel)
+Test #  7: passed  (openCOSSAN:ModeBased -- The names of the eigenvalues and/or eigenvectors are not in the output of XFullmodel)
+Test #  8: passed  (openCOSSAN:ModeBased -- The names of the eigenvalues and eigenvectors in the output of XFullmodel have to be specified)
+Test #  9: passed  (openCOSSAN:ModeBased -- The names of the eigenvalues and/or eigenvectors are not in the output of XFullmodel)
+Test # 10: passed  (openCOSSAN:ModeBased -- The names of the eigenvalues and/or eigenvectors are not in the output of XFullmodel)
+Test # 11: passed  ()
+Test # 12: passed  (openCOSSAN:ModeBased -- The nominal mass matrix has to be specified)
+
+
+--------------------------------------------------------------------
+ Unit Test of UnitTestNeuralNetwork
+ Unit Test executed in  1.2404 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (
+
+Fann Libraries or Mex file not installed correctly
+The Unit Test can not be performed
+Invalid MEX-file '/home/ep/workspace/OpenCossan/trunk/COSSANXengine/mex/bin/testFann.mexa64': libfann.so.2: cannot open shared object file: No such file or directory)
+
+
+--------------------------------------------------------------------
+ Unit Test of UnitTestPolynomicalChaos
+ Unit Test executed in  11.4183 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (No appropriate method, property, or field Xtimer for class OpenCossan.)
+
+
+--------------------------------------------------------------------
+ Unit Test of ResponseSurface
+ Unit Test executed in  32.1364 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  (openCOSSAN:ResponseSurface -- Either the maximum exponent or the matrix of expoents is required to define a custom model.)
+Test #  5: passed  ()
+Test #  6: passed  (openCOSSAN:ResponseSurface -- Not all members of Coutputnames are present in the Model
+ Model outputs: "out" 
+ Required outputs: "notexisting" 
+)
+Test #  7: passed  (openCOSSAN:ResponseSurface -- PropertyName Snonsense not allowed for a ResponseSurface object)
+Test #  8: passed  (openCOSSAN:MetaModel:calibrate -- The CalibrationInput does not contain samples)
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  ()
+Test # 12: passed  (openCOSSAN:ResponseSurface:ResponseSurface -- Either the full model or XcalibrationInput and XcalibrationOutput have to be defined)
+Test # 13: passed  (openCOSSAN:ResponseSurface -- Either the maximum exponent or the matrix of expoents is required to define a custom model.)
+Test # 14: passed  (openCOSSAN:ResponseSurface -- The model matrix must contain only integers)
+Test # 15: passed  ()
+Test # 16: passed  ()
+Test # 17: passed  (openCOSSAN:ResponseSurface:calibrate -- Object not calibrated: too few calibration samples.
+ 5 samples are available, while at least 66 samples are needed.)
+Test # 18: passed  (MATLAB:assert:LogicalScalar -- The condition input argument must be a scalar logical.)
+Test # 19: passed  ()
+Test # 20: passed  ()
+Test # 21: passed  (openCOSSAN:MetaModel:validate -- Field name XcalibrationInput not allowed for the method validate of ResponseSurface)
+Test # 22: passed  (openCOSSAN:MetaModel:apply -- MetaModel has not been calibrated)
+Test # 23: passed  ()
+Test # 24: passed  ()
+Test # 25: passed  ()
+Test # 26: passed  (openCOSSAN:ResponseSurface -- Stype of type ;-) is not supported)
+Test # 27: passed  ()
+Test # 28: passed  (openCOSSAN:MetaModel:validate -- Either Simulation object or the XvalidationOutput has to be provided)
+Test # 29: passed  ()
+Test # 30: passed  (openCOSSAN:metamodel:plotregression -- Requested output(s) is not present in the output of the model.
+)
+
+
+--------------------------------------------------------------------
+ Unit Test of Cobyla
+ Unit Test executed in  4.7143 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initilized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: passed  (Checking display)
+Test #  4: passed  (openCOSSAN:Cobyla -- the size of the final trust region rho_end (0.001) should be smaller than the initial trust region rho_ini (-2 ))
+Test #  5: passed  (Checking apply method)
+
+
+--------------------------------------------------------------------
+ Unit Test of Constraints
+ Unit Test executed in  0.25976 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Checking display)
+Test #  3: passed  (openCOSSAN:Mio -- The names of the Output variables must be defined in the field Coutputnames)
+Test #  4: passed  (openCOSSAN:Mio -- The names of the Input variables should be defined in the field Cinputnames)
+Test #  5: passed  (openCOSSAN:optimization:Constraint -- A single output (Coutputnames) must be defined)
+Test #  6: passed  (Creating object with input parameters)
+Test #  7: passed  (openCOSSAN:optimization:constraint:evaluate -- An OptimizationProblem must be passed using the PropertyName XoptimizationProblem)
+Test #  8: passed  (Creating object with input parameters)
+Test #  9: passed  (Creating object with input parameters)
+
+
+--------------------------------------------------------------------
+ Unit Test of CrossEntropy
+ Unit Test executed in  0.90797 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initilized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: passed  (Checking display)
+Test #  4: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName NUpdate must be positive
+ * Value provided is of type double)
+Test #  5: passed  (Checking apply method)
+
+
+--------------------------------------------------------------------
+ Unit Test of EvolutionStrategy
+ Unit Test executed in  1.4333 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initilized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: passed  (Checking display)
+Test #  4: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Nrho must be positive
+ * Value provided is of type double)
+Test #  5: passed  (openCOSSAN:EvolutionStrategy -- Available options for Srecombination are 'discrete' or 'intermediate')
+Test #  6: passed  (openCOSSAN:EvolutionStrategy -- Available options for Sselection are '+' or ',')
+Test #  7: failed  (MATLAB:badsubscript -- Attempted to access Mdata(1,0); index must be a positive integer or logical.)
+
+
+--------------------------------------------------------------------
+ Unit Test of GeneticAlgorithms
+ Unit Test executed in  6.2924 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initilized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: passed  (Checking display)
+Test #  4: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName NGenerations must be positive
+ * Value provided is of type double)
+Test #  5: passed  (openCOSSAN:GeneticAlgorithms -- Available options for sfitnessscalingfcn are:
+* fitscalingshiftlinear
+* fitscalingprop
+* fitscalingtop
+* fitscalingrank)
+Test #  6: passed  (openCOSSAN:GeneticAlgorithms -- Available options for sselectionfcn are:
+* selectionremainder
+* selectionuniform
+* selectionstochunif
+* selectionroulette
+* selectiontournament)
+Test #  7: passed  (openCOSSAN:GeneticAlgorithms -- Available options for scrossoverfcn are:
+*  crossoverheuristic
+*  crossoverscattered
+*  crossoverintermediate
+*  crossoversinglepoint
+*  crossovertwopoint
+*  crossoverarithmetic)
+Test #  8: passed  (openCOSSAN:GeneticAlgorithms -- Available options for scrossoverfcn are:
+*  crossoverheuristic
+*  crossoverscattered
+*  crossoverintermediate
+*  crossoversinglepoint
+*  crossovertwopoint
+*  crossoverarithmetic)
+Test #  9: passed  (openCOSSAN:GeneticAlgorithms -- Available options for smutationfcn are:
+*  mutationuniform
+*  mutationadaptfeasible
+*  mutationgaussian)
+Test # 10: passed  (Checking apply method)
+
+
+--------------------------------------------------------------------
+ Unit Test of ObjectiveFunction
+ Unit Test executed in  0.02074 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Create an object with input parameters)
+Test #  3: passed  (Checking display)
+Test #  4: passed  (openCOSSAN:Mio -- The names of the Output variables must be defined in the field Coutputnames)
+Test #  5: passed  (openCOSSAN:Mio -- A file name must be supplied.)
+
+
+--------------------------------------------------------------------
+ Unit Test of Optimization
+ Unit Test executed in  0.10462 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Checking display)
+
+
+--------------------------------------------------------------------
+ Unit Test of OptimizationProblem
+ Unit Test executed in  9.163 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initilized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: passed  (Checking display)
+Test #  4: passed  (openCOSSAN:OptimizationProblem -- A Model or an Input object is required to define an OptimizationProblem)
+Test #  5: passed  (openCOSSAN:OptimizationProblem -- The input object must contains at least 1 design variable)
+Test #  6: passed  (According to the Ref. Manual it should not be possible to create the object without defining constraints)
+Test #  7: passed  ()
+Test #  8: passed  (Create an Optimization Problem Object)
+Test #  9: passed  (testing method optimize)
+Test # 10: passed  (testing method optimize)
+Test # 11: passed  (testing method optimize)
+Test # 12: passed  (testing method optimize)
+Test # 13: passed  (testing method optimize)
+
+
+--------------------------------------------------------------------
+ Unit Test of SequentialQuadraticProgramming
+ Unit Test executed in  0.36494 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initilized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: passed  (Checking display)
+Test #  4: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Sdescription must be a string
+ * Value provided is of type double)
+Test #  5: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Nmax must be an integer
+ * Value provided is of type double)
+Test #  6: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Nmax must be positive
+ * Value provided is of type double)
+Test #  7: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName NEvaluationsPerBatch must be positive
+ * Value provided is of type double)
+Test #  8: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName LKeepFiles must be a logical value. 
+ * Value provided is of type double)
+Test #  9: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName FiniteDifferencePerturbation must be a numeric value
+ * Value provided is of type char)
+Test # 10: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName NMaximumIterations must be positive
+ * Value provided is of type double)
+Test # 11: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName ToleranceObjectiveFunction must be a structure 
+ * Value provided is of type char)
+Test # 12: passed  (Checking apply method)
+
+
+--------------------------------------------------------------------
+ Unit Test of SimulatedAnnealing
+ Unit Test executed in  1.4434 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initilized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: passed  (Checking display)
+Test #  4: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Ng must be positive
+ * Value provided is of type double)
+Test #  5: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName verbose must be a numeric value
+ * Value provided is of type char)
+Test #  6: passed  (Checking apply method)
+
+
+--------------------------------------------------------------------
+ Unit Test of UnitTestRBOproblem
+ Unit Test executed in  0.13722 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (Cannot find an exact (case-sensitive) match for 'UnitTestRBOproblem'.
+Do you want: UnitTestRBOProblem
+(in /home/ep/workspace/OpenCossan/trunk/COSSANXengine/examples/Unit_test/Optimization/UnitTestRBOProblem.m)?
+)
+
+
+--------------------------------------------------------------------
+ Unit Test of RobustDesign
+ Unit Test executed in  6.6404 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object created and display test passed)
+Test #  2: passed  (Object created and display test passed)
+Test #  3: passed  (openCOSSAN:RobustDesign -- An ObjectiveFunction is required to define an RobustDesign)
+Test #  4: passed  (openCOSSAN:OptimizationProblem -- The input object does not contain all the required inputs to evaluate objective function and constraints. 
+Required inputs: 
+* Xdv1;
+* Xdv2;
+* out1;
+Defined inputs: 
+* Xdv1;
+* Xdv2;
+* out11;)
+Test #  5: failed  ( -- No appropriate method, property, or field Mdata for class Dataseries.)
+Test #  6: failed  ( -- No appropriate method, property, or field Mdata for class Dataseries.)
+
+
+--------------------------------------------------------------------
+ Unit Test of MiniMax
+ Unit Test executed in  6.5694 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initialized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: failed  ( -- No appropriate method, property, or field Mdata for class Dataseries.)
+Test #  4: passed  (Check apply method using NmaxModelEvaluations )
+Test #  5: passed  (Check apply method using NmaxIterations)
+Test #  6: passed  (Check apply method using toleranceDesignVariables)
+Test #  7: failed  (MATLAB:unassignedOutputs -- Output argument "varargout" (and maybe others) not assigned during call to "/home/ep/workspace/OpenCossan/trunk/COSSANXengine/src/common/@Dataseries/subsref.m>subsref".)
+
+
+--------------------------------------------------------------------
+ Unit Test of Simplex
+ Unit Test executed in  4.3838 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initialized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: failed  ( -- No appropriate method, property, or field Mdata for class Dataseries.)
+Test #  4: passed  (Check apply method using NmaxModelEvaluations )
+Test #  5: passed  (Check apply method using NmaxIterations)
+Test #  6: failed  ( -- Option toleranceDesignVariables ignored)
+
+
+--------------------------------------------------------------------
+ Unit Test of BFGS
+ Unit Test executed in  8.5846 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object initialized correctly)
+Test #  2: passed  (Create an empty object)
+Test #  3: failed  ( -- No appropriate method, property, or field Mdata for class Dataseries.)
+Test #  4: passed  (Check apply method using NmaxModelEvaluations )
+Test #  5: passed  (Check apply method using NmaxIterations)
+Test #  6: failed  ( -- Option toleranceDesignVariables ignored)
+Test #  7: failed  ( -- No appropriate method, property, or field Mdata for class Dataseries.)
+Test #  8: passed  (openCOSSAN:BFGS:apply -- BFGS is an UNconstrained Nonlinear Optimization.)
+
+
+--------------------------------------------------------------------
+ Unit Test of CutSet
+ Unit Test executed in  0.28526 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Empty Object created)
+Test #  2: passed  (Object created)
+Test #  3: passed  (Object created)
+Test #  4: passed  (Object created)
+Test #  5: passed  (Object created)
+Test #  6: passed  (openCOSSAN:output:CutSet -- It is necessary to define the VcutsetIndex to construct a CutSet object)
+Test #  7: passed  (openCOSSAN:output:CutSet --  The object passed after the PropertyName  XDesignPoint must be a DesignPoint object)
+Test #  8: passed  (openCOSSAN:output:CutSet --  The object passed after the PropertyName  XFaultTree must be a FaultTree object)
+Test #  9: passed  (openCOSSAN:CutSet --  The object passed after the PropertyName  XFailureProbability must be a FailureProbability object)
+Test # 10: passed  (Object created)
+
+
+--------------------------------------------------------------------
+ Unit Test of DesignPoint
+ Unit Test executed in  0.1439 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  (openCOSSAN:outputs:DesignPoint -- no Input object has been passed)
+Test #  3: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName PM must be a numeric value
+ * Value provided is of type ProbabilisticModel)
+Test #  4: passed  (test create correctly)
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  (openCOSSAN:outputs:DesignPoint -- length of defined design point and number of random variables in associated performance function do not match)
+
+
+--------------------------------------------------------------------
+ Unit Test of UnitTestFailureProbability
+ Unit Test executed in  0.002804 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (Attempt to execute SCRIPT UnitTestFailureProbability as a function:
+/home/ep/workspace/OpenCossan/trunk/COSSANXengine/examples/Unit_test/outputs/UnitTestFailureProbability.m)
+
+
+--------------------------------------------------------------------
+ Unit Test of Gradient
+ Unit Test executed in  10.4022 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  (openCOSSAN:outputs:Gradient -- The length of the field name Vgradient (4) must be equal to length of the field Cnames 0)
+Test #  5: passed  (openCOSSAN:outputs:Gradient -- The length of the field name Vgradient (5) must be equal to length of the field Cnames 4)
+Test #  6: passed  (openCOSSAN:outputs:Gradient -- The length of the field name Vgradient (3) must be equal to length of the field Cnames 4)
+Test #  7: passed  (openCOSSAN:outputs:Gradient -- The length of the field name Vgradient (3) must be equal to length of the field Cnames 4)
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of LineSamplingOutput
+ Unit Test executed in  0.57986 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: passed  (openCOSSAN:LineSamplingOutput -- Number of points in VdistanceOrthogonalPlane is 5 and it should be 9!)
+Test #  9: passed  (openCOSSAN:LineSamplingOutput -- Number of points in VdistanceOrigin is 8 and it should be 9!)
+Test # 10: failed  (MATLAB:badsubscript -- Index exceeds matrix dimensions.)
+Test # 11: passed  (openCOSSAN:LineSamplingOutput:plotLines -- No data available in the object)
+Test # 12: passed  (openCOSSAN:LineSamplingOutput:plotLines -- No data available in the object)
+Test # 13: failed  (MATLAB:load:couldNotReadFile -- Unable to read file LineSamplingOutput.mat: No such file or directory.)
+
+
+--------------------------------------------------------------------
+ Unit Test of LocalSensitivityMeasures
+ Unit Test executed in  0.97154 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  (openCOSSAN:outputs:LocalSensitivityMeasures -- The names after the PropertyName Cnames must be unique)
+Test #  5: passed  (openCOSSAN:outputs:LocalSensitivityMeasures -- The length of the field name Vmeasures (4) must be equal to length of the field Cnames 0)
+Test #  6: passed  (openCOSSAN:outputs:LocalSensitivityMeasures -- The names after the PropertyName Cnames must be unique)
+Test #  7: passed  (test total variance)
+Test #  8: passed  (openCOSSAN:outputs:LocalSensitivityMeasures -- Field name (Vgradient) not allowed)
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  ()
+Test # 12: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Modes
+ Unit Test executed in  0.27647 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  (openCOSSAN:outputs:Xo_modes -- No eigenvectors defined)
+Test #  5: passed  (openCOSSAN:outputs:Xo_modes -- number of eingenvalues and number of eigenvectors are not the same)
+Test #  6: passed  (openCOSSAN:outputs:Xo_modes -- number of eingenvalues and number of eigenvectors are not the same)
+Test #  7: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Optimum
+ Unit Test executed in  1.6228 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Object created and display test passed)
+Test #  2: failed  (MATLAB:badsubscript -- Attempted to access Mdata(1,0); index must be a positive integer or logical.)
+Test #  3: failed  (MATLAB:badsubscript -- Attempted to access Mdata(1,0); index must be a positive integer or logical.)
+Test #  4: passed  (Object created and display test passed)
+Test #  5: passed  (Object created and display test passed)
+Test #  6: passed  (openCOSSAN:Optimum:Optimum -- The PropertyName NEvaluationsObjectiveFunction is not valid)
+Test #  7: passed  (Object created and display test passed)
+Test #  8: passed  (openCOSSAN:Optimum:Optimum -- A OptimizarionProblem is expected after the PropertyName Xoptimizer)
+Test #  9: passed  (Object created and display test passed)
+Test # 10: passed  (Check number of fields)
+Test # 11: failed  (openCOSSAN:Dataseries:Dataseries -- The no. of columns of Mcoord and of Vdata are not compatible.
+ no. of columns of Mcoord: 1
+ no. of columns of Vdata : 100)
+Test # 12: failed  (openCOSSAN:Dataseries:Dataseries -- The no. of columns of Mcoord and of Vdata are not compatible.
+ no. of columns of Mcoord: 1
+ no. of columns of Vdata : 10)
+Test # 13: failed  (openCOSSAN:Dataseries:Dataseries -- The no. of columns of Mcoord and of Vdata are not compatible.
+ no. of columns of Mcoord: 1
+ no. of columns of Vdata : 10)
+Test # 14: failed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xout13".)
+Test # 15: failed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xin".)
+Test # 16: passed  (openCOSSAN:Dataseries:Dataseries -- The no. of columns of Mcoord and of Vdata are not compatible.
+ no. of columns of Mcoord: 1
+ no. of columns of Vdata : 10)
+Test # 17: passed  (openCOSSAN:Dataseries:Dataseries -- The no. of columns of Mcoord and of Vdata are not compatible.
+ no. of columns of Mcoord: 1
+ no. of columns of Vdata : 10)
+Test # 18: passed  (Object created and display test passed)
+Test # 19: passed  (openCOSSAN:Optimum:Optimum -- The PropertyName TConstraintEvaluations is not valid)
+
+
+--------------------------------------------------------------------
+ Unit Test of SensitivityMeasures
+ Unit Test executed in  11.2268 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create Empty Object)
+Test #  2: passed  (Create Object with only description)
+Test #  3: passed  (Create Object with Total indices)
+Test #  4: passed  (openCOSSAN:output:SensitivityMeasures -- The length of total sensitivity indices (3) must be equal to the number of input factors (2))
+Test #  5: passed  (Create Object with Total indices and CoV)
+Test #  6: passed  (Create Object with Object evaluated name)
+Test #  7: passed  (Create Object with evaluated object)
+Test #  8: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName CsobolComponentsIndices must be a cell
+ * Value provided is of type double)
+Test #  9: passed  (Create Object with Sobol indices (First order))
+Test # 10: passed  (openCOSSAN:output:SensitivityMeasures -- The length of total sensitivity indices (2) must be equal to the number of input factors (3))
+Test # 11: passed  (Create Object with Sobol indices)
+Test # 12: passed  (Create Object with Sobol indices and CoV)
+Test # 13: passed  (Create full SensitivityMeasures object)
+Test # 14: passed  (Test addSobolIndices)
+Test # 15: passed  (openCOSSAN:output:SensitivityMeasures -- Number of indices defined (2) do not correspond to the number of estimation error of  the Sobol' indices (0))
+Test # 16: passed  (openCOSSAN:output:SensitivityMeasures -- The length of Sobol' sensitivity indices (VsobolIndices) must be equal to the length of CsobolComponentsIndices )
+Test # 17: passed  (openCOSSAN:output:SensitivityMeasures -- Numer of indices defined (2) do not correspond to the number of Sobol' indices (3))
+Test # 18: passed  (Depent field created correctly)
+Test # 19: passed  ()
+Test # 20: passed  ()
+Test # 21: passed  ()
+Test # 22: passed  (The Object does not contains any Sobol' index)
+Test # 23: passed  (The Object does not contains any Sobol' index)
+Test # 24: passed  ()
+Test # 25: passed  ()
+Test # 26: passed  ()
+Test # 27: passed  ()
+Test # 28: passed  ()
+Test # 29: passed  ()
+Test # 30: passed  (Figure plot)
+Test # 31: passed  (The Object does not contains upper bounds)
+Test # 32: passed  (The Object does not contains upper bounds)
+Test # 33: passed  ()
+Test # 34: passed  (openCOSSAN:output:SensitivityMeasures -- Number of rows of MtotalIndicesCI (3) must be 2)
+Test # 35: passed  (openCOSSAN:output:SensitivityMeasures -- Number of rows of MtotalIndicesCI (3) must be 2)
+Test # 36: passed  (openCOSSAN:output:SensitivityMeasures -- Number of rows of MupperBoundsCI (3) must be 2)
+Test # 37: passed  (openCOSSAN:output:SensitivityMeasures -- Number of rows of MsobolFirstIndicesCI (3) must be 2)
+Test # 38: passed  (openCOSSAN:output:SensitivityMeasures -- Number of rows of MsobolIndicesCI (3) must be 2)
+Test # 39: passed  (The Object does not contains upper bounds)
+
+
+--------------------------------------------------------------------
+ Unit Test of SFEMoutput
+ Unit Test executed in  23.2344 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (empty SFEM output object created successfully)
+Test #  2: passed  (Object created successfully)
+Test #  3: passed  (Using getResponse method with max option)
+Test #  4: passed  (Using getResponse method with specific option)
+Test #  5: passed  (testing prepareReport method)
+Test #  6: passed  (Using getResponse method with all option)
+Test #  7: passed  (openCOSSAN:SfemOutput -- MresponseDOFs should be with size n x 2)
+Test #  8: passed  (openCOSSAN:SfemOutput -- Please select one of the following response types: specific, max or all)
+
+
+--------------------------------------------------------------------
+ Unit Test of SimulationData
+ Unit Test executed in  6.1751 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  (openCOSSAN:SimulationData -- It is mandatory to pass Mvalue field if the Cnames are defined)
+Test #  3: passed  ()
+Test #  4: passed  (openCOSSAN:SimulationData -- The number of variable defined in Cvariablenames (2) does not match with the number of columns of Mvalues (3))
+Test #  5: passed  (openCOSSAN:SimulationData -- The number of variable defined in Cvariablenames (4) does not match with the number of columns of Mvalues (3))
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  (openCOSSAN:SimulationData:merge -- I can not merge these 2 objects. Obj1 contains 50 samples Obj2 contains 5 samples)
+Test # 11: passed  ()
+Test # 12: passed  ()
+Test # 13: passed  ()
+Test # 14: passed  ()
+Test # 15: passed  ()
+Test # 16: passed  (Test SimulationData with Dataseries)
+Test # 17: failed  (MATLAB:badsubscript -- Index exceeds matrix dimensions.)
+Test # 18: failed  (MATLAB:badsubscript -- Index exceeds matrix dimensions.)
+Test # 19: passed  (Test get parameter from simulation output)
+
+
+--------------------------------------------------------------------
+ Unit Test of SubSetOutput
+ Unit Test executed in  0.41573 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (MATLAB:dispatcher:InexactCaseMatch -- Cannot find an exact (case-sensitive) match for 'SubSetOutput'.
+Do you want: SubsetOutput
+(in /home/ep/workspace/OpenCossan/trunk/COSSANXengine/src/outputs/@SubsetOutput/SubsetOutput.m)?
+)
+Test #  2: passed  (MATLAB:dispatcher:InexactCaseMatch -- Cannot find an exact (case-sensitive) match for 'SubSetOutput'.
+Do you want: SubsetOutput
+(in /home/ep/workspace/OpenCossan/trunk/COSSANXengine/src/outputs/@SubsetOutput/SubsetOutput.m)?
+)
+Test #  3: passed  ()
+Test #  4: passed  (openCOSSAN:validateCOSSANInputs -- The valus after the PropertyName vrejectionrates must be a scalar value )
+Test #  5: passed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xobj2".)
+Test #  6: passed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xobj2".)
+
+
+--------------------------------------------------------------------
+ Unit Test of FaultTree
+ Unit Test executed in  13.924 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Create a fault tree object)
+Test #  3: passed  (openCOSSAN:reliability:FaultTree -- Length of Cnodetype Cnodenames and Vnodeout must be the same 
+ Cnodetype: 10 
+ Cnodenames: 10 
+ Vnodeout: 9)
+Test #  4: passed  (openCOSSAN:reliability:FaultTree -- Length of Cnodetype Cnodenames and Vnodeout must be the same 
+ Cnodetype: 10 
+ Cnodenames: 9 
+ Vnodeout: 10)
+Test #  5: passed  (openCOSSAN:reliability:FaultTree -- Length of Cnodetype Cnodenames and Vnodeout must be the same 
+ Cnodetype: 9 
+ Cnodenames: 10 
+ Vnodeout: 10)
+Test #  6: passed  (openCOSSAN:FaultTree -- The output node can not be attached to 0)
+Test #  7: passed  (openCOSSAN:FaultTree -- The node type Pippo at position 3 is not allowed)
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  (openCOSSAN:reliability:FaultTree:removeNodes -- It is not possible to remove the node 13. The FaultTree contains 12 nodes)
+Test # 12: passed  ()
+Test # 13: passed  ()
+Test # 14: passed  (openCOSSAN:FaultTree -- The Fault tree must contain more the 1 basic event)
+Test # 15: passed  (All reference manual examples are successfull)
+
+
+--------------------------------------------------------------------
+ Unit Test of PerformanceFunction
+ Unit Test executed in  0.25597 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Create an object using capacity - demand)
+Test #  3: passed  (openCOSSAN:reliability:PerformanceFunction -- It is not possible to define the Soutputname when the performance function is defined by means of a Mio object)
+Test #  4: passed  ()
+Test #  5: passed  (Create an object usign a mio)
+Test #  6: passed  (openCOSSAN:reliability:PerformanceFunction -- user defined PerformanceFunction can only be defined by means of a Mio object)
+Test #  7: passed  (openCOSSAN:reliability:PerformanceFunction -- Field name  (Spippo) not allowed)
+Test #  8: passed  (apply of pf defined using capacity and demand)
+Test #  9: passed  (apply of pf defined using mio)
+Test # 10: passed  (The field names of the SimulationData objects must be unique
+Field Names:
+Xvar1; Xvar2;  out1;  out1;)
+Test # 11: passed  (The request variable pinco is not present in the SimulationData object
+Available variables are:  Xvar1; Xvar2; out1;)
+
+
+--------------------------------------------------------------------
+ Unit Test of ProbabilisticModel
+ Unit Test executed in  1.0096 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create an empty object)
+Test #  2: passed  (Create an object)
+Test #  3: passed  (Create an object - GUI style)
+Test #  4: passed  (openCOSSAN:reliability:ProbabilisticModel -- Wrong type of PerformanceFunction ( Mio))
+Test #  5: passed  (openCOSSAN:reliability:ProbabilisticModel -- Only Model and MetaModel can be used to define a ProbabilisticModel)
+Test #  6: passed  (apply method)
+Test #  7: passed  (openCOSSAN:reliability:ProbabilisticModel:apply -- The 2nd argument must be: 
+ 1) Input object 
+ 2) Samples object 
+ 3) a structure of input data)
+Test #  8: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field pf for class MonteCarlo.)
+Test #  9: passed  (openCOSSAN:ProbabilisticModel:pf -- The object Xinp must be a sub-class of Simulation)
+Test # 10: passed  (designPointIdentification method)
+Test # 11: passed  (MATLAB:nonExistentCellElement -- Reference to non-existent element of a cell array.)
+Test # 12: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Sensitivity
+ Unit Test executed in  8.0842 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (MATLAB:class:undefinedMethod -- Method 'display' is not defined for class 'Sensitivity' or is removed from MATLAB's search path.)
+Test #  2: passed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xtarget".)
+Test #  3: passed  (openCOSSAN:sensitivity:sobolIndices -- It is mandatory to pass a valid Simulation object zo the Sobol' indices)
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  (openCOSSAN:sensitivity:sobolIndices -- Cinputnames (Xrv4) not defined in the model)
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Nsamples must be an integer
+ * Value provided is of type double)
+Test # 11: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Nsamples must be positive
+ * Value provided is of type double)
+Test # 12: passed  ()
+Test # 13: passed  (openCOSSAN:sensitivity:sobolIndices -- Cinputnames (Xrv4) not defined in the model)
+Test # 14: passed  ()
+Test # 15: passed  ()
+Test # 16: passed  ()
+Test # 17: passed  ()
+Test # 18: passed  ()
+Test # 19: passed  ()
+Test # 20: passed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xtarget".)
+Test # 21: passed  (openCOSSAN:sensitivity:coreMonteCarlo -- The length of reference point (2) must be equal to the number of random variables (3))
+Test # 22: passed  (openCOSSAN:sensitivity:coreMonteCarlo -- The Sample object must containts only 1 sample in order to define the reference point)
+Test # 23: passed  ()
+Test # 24: passed  ()
+Test # 25: passed  ()
+Test # 26: passed  ()
+Test # 27: passed  ()
+Test # 28: passed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xtarget".)
+Test # 29: passed  (openCOSSAN:sensitivity:coreMonteCarlo -- The length of reference point (2) must be equal to the number of random variables (3))
+Test # 30: passed  (openCOSSAN:sensitivity:coreMonteCarlo -- The Sample object must containts only 1 sample in order to define the reference point)
+Test # 31: passed  ()
+Test # 32: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of Nastsem
+ Unit Test executed in  0.59055 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  2: failed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xsfem".)
+Test #  3: passed  (openCOSSAN:SFEM:checkInput -- A physical model must be defined)
+Test #  4: passed  ( -- COSSAN:sfem: Define the corresponding structural properties of RVs)
+Test #  5: passed  ( -- COSSAN:sfem: Please make sure that assigned RVs exist in the RVSET)
+Test #  6: passed  ( -- COSSAN:sfem: Please select either the Neumann or Perturbation methods)
+Test #  7: passed  ( -- COSSAN:sfem: Please define the constrained nodes in the FE model)
+Test #  8: passed  ( -- COSSAN:sfem: NASTSEM is implemented for the case, where ONLY Youngs modulud is modeled as random)
+
+
+--------------------------------------------------------------------
+ Unit Test of Neumann
+ Unit Test executed in  0.20252 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  2: failed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xsfem".)
+Test #  3: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  4: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Nsimulations must be positive
+ * Value provided is of type double)
+Test #  5: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Norder must be positive
+ * Value provided is of type double)
+Test #  6: passed  (openCOSSAN:SFEM:checkInput -- A physical model must be defined)
+Test #  7: passed  ( -- COSSAN:sfem: Define the corresponding structural properties of RVs)
+Test #  8: passed  ( -- COSSAN:sfem: Please make sure that assigned RVs exist in the RVSET)
+
+
+--------------------------------------------------------------------
+ Unit Test of Perturbation
+ Unit Test executed in  0.2606 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  2: failed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xpert01".)
+Test #  3: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  4: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  5: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  6: passed  ( -- COSSAN:sfem: Please enter a valid analysis type)
+Test #  7: passed  ( -- COSSAN:sfem: Please enter a valid implementation type)
+Test #  8: passed  ( -- COSSAN:sfem: Define the corresponding structural properties of RVs)
+
+
+--------------------------------------------------------------------
+ Unit Test of SfemPolynomialChaos
+ Unit Test executed in  0.56692 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  2: failed  (MATLAB:UndefinedFunction -- Undefined function or variable "Xsfem".)
+Test #  3: passed  (openCOSSAN:validateCOSSANInputs -- The input value after the PropertyName Norder must be positive
+ * Value provided is of type double)
+Test #  4: passed  (openCOSSAN:SFEM:PolynomialChaos -- Please define the master DOFs)
+Test #  5: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  6: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  7: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  8: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test #  9: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test # 10: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test # 11: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+Test # 12: passed  (openCOSSAN:SFEM:PolynomialChaos -- Collocation P-C is not available for componentwise implementation)
+Test # 13: failed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field SworkingPath for class OpenCossan.)
+
+
+--------------------------------------------------------------------
+ Unit Test of DesignOfExperiments
+ Unit Test executed in  0.050401 seconds
+--------------------------------------------------------------------
+Test #  1: failed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test #  2: failed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test #  3: failed  (MATLAB:undefinedVariable -- Undefined variable Xdoe.)
+Test #  4: failed  (MATLAB:undefinedVariable -- Undefined variable Xdoe.)
+Test #  5: failed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test #  6: failed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test #  7: failed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test #  8: failed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test #  9: passed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test # 10: passed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test # 11: passed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test # 12: passed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test # 13: passed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test # 14: passed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test # 15: passed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test # 16: failed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+Test # 17: passed  (MATLAB:class:abstract -- Creating an instance of the Abstract class 'DesignOfExperiments' is not allowed.)
+
+
+--------------------------------------------------------------------
+ Unit Test of HaltonSampling
+ Unit Test executed in  10.106 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  (Elapsed time counted with tic-toc is 2.101s.)
+Test #  7: passed  ()
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  (Field name (RandomNumberGenerator) not allowed)
+Test # 11: passed  ()
+Test # 12: passed  (MATLAB:nonExistentCellElement -- Reference to non-existent element of a cell array.)
+Test # 13: passed  (Obtained CoV: 0.19825)
+Test # 14: passed  (Obtained CoV: 0.072764)
+
+
+--------------------------------------------------------------------
+ Unit Test of ImportanceSampling
+ Unit Test executed in  2.7885 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: failed  (MATLAB:UndefinedFunction -- Undefined function or variable "CrvnamesUD".)
+Test #  4: passed  (openCOSSAN:InportanceSampling -- The Cmapping cell array must contains 2 columns)
+Test #  5: passed  (openCOSSAN:InportanceSampling -- The variable RV2 defined in the Cmapping is not present in the Importance sampling density)
+Test #  6: passed  (openCOSSAN:InportanceSampling -- A RandomVariableSet object is required after to defined the proposal distribution. 
+  at position 1 of the field XrandomVariableSet)
+Test #  7: passed  ()
+Test #  8: passed  ()
+Test #  9: passed  (Timeout=2 s; Used time=)
+Test # 10: passed  (Obtained CoV: 0.077194)
+Test # 11: passed  ()
+Test # 12: passed  ()
+Test # 13: passed  ()
+
+
+--------------------------------------------------------------------
+ Unit Test of LatinHypercubeSampling
+ Unit Test executed in  3.1726 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  (Check Nsamples)
+Test #  6: passed  ()
+Test #  7: passed  (Elapsed time counted with tic-toc is 2.0355s.)
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  ()
+Test # 11: passed  (openCOSSAN:simulations:Xlatinhypercubesampling -- Property Name (RandomNumberGenerator) not allowed)
+Test # 12: passed  ()
+Test # 13: passed  (MATLAB:nonExistentCellElement -- Reference to non-existent element of a cell array.)
+Test # 14: passed  (Obtained CoV: 0.34768)
+
+
+--------------------------------------------------------------------
+ Unit Test of LineSampling
+ Unit Test executed in  2.851 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create empty object)
+Test #  2: passed  ()
+Test #  3: passed  (openCOSSAN:simulations:LineSampling -- Field name (LexportSamples) not allowed)
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  (openCOSSAN:LineSampling:sample -- An Input object is require to generate samples for LineSampling)
+Test #  8: passed  (openCOSSAN:LineSampling:sample -- The Gradient object define in the Linesampling can not be used with the Input defiened in the target object 
+* Variable Names defined for important direction : "RV1" "RV2"  
+* Variable Names present in the Input object     : "RV3" "RV4" "RV5" "RV6" )
+Test #  9: passed  ()
+Test # 10: passed  (openCOSSAN:Simulations:checkInputs -- Input parameter of class Input not allowed)
+Test # 11: passed  ()
+Test # 12: passed  (MATLAB:noSuchMethodOrField -- No appropriate method, property, or field XperformanceFunction for class Model.)
+Test # 13: failed  (MATLAB:innerdim -- Inner matrix dimensions must agree.)
+Test # 14: failed  (MATLAB:innerdim -- Inner matrix dimensions must agree.)
+Test # 15: passed  ()
+Test # 16: passed  ()
+Test # 17: passed  ()
+Test # 18: passed  ()
+Test # 19: passed  ()
+Test # 20: passed  (openCOSSAN:LineSampling -- Please provide a LocalSensitivityMeasures of the PerformanceFunction only! 
+Length of the provided object: 2)
+Test # 21: failed  (MATLAB:innerdim -- Inner matrix dimensions must agree.)
+Test # 22: failed  (MATLAB:nonExistentField -- Reference to non-existent field 'Xpar_near'.)
+Test # 23: failed  (MATLAB:nonExistentField -- Reference to non-existent field 'Xpar_far'.)
+Test # 24: passed  (MATLAB:innerdim -- Inner matrix dimensions must agree.)
+
+
+--------------------------------------------------------------------
+ Unit Test of MonteCarlo
+ Unit Test executed in  9.3693 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  (Elapsed time counted with tic-toc is 2.4945s.)
+Test #  7: passed  ()
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  (openCOSSAN:simulations:MonteCarlo -- Field name (RandomNumberGenerator) not allowed)
+Test # 11: passed  ()
+Test # 12: passed  (MATLAB:UndefinedFunction -- Undefined function or variable 'Xpf'.)
+Test # 13: passed  (Obtained CoV: 0.39736)
+
+
+--------------------------------------------------------------------
+ Unit Test of SobolSampling
+ Unit Test executed in  2.5262 seconds
+--------------------------------------------------------------------
+Test #  1: passed  ()
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  (Elapsed time counted with tic-toc is 2.0756s.)
+Test #  6: passed  ()
+Test #  7: passed  ()
+Test #  8: passed  ()
+Test #  9: passed  (openCOSSAN:simulations:SobolSampling:SobolSampling -- Field name (RandomNumberGenerator) not allowed)
+Test # 10: passed  ()
+Test # 11: passed  (Reference to non-existent element of a cell array.)
+Test # 12: passed  (Obtained CoV: 0.42366)
+
+
+--------------------------------------------------------------------
+ Unit Test of SubSet
+ Unit Test executed in  2.8289 seconds
+--------------------------------------------------------------------
+Test #  1: passed  (Create empty object)
+Test #  2: passed  ()
+Test #  3: passed  ()
+Test #  4: passed  ()
+Test #  5: passed  ()
+Test #  6: passed  ()
+Test #  7: passed  (openCOSSAN:simulations:subset -- method apply not available for the SubSet object 
+use pf to estimate the failure probability)
+Test #  8: passed  ()
+Test #  9: passed  ()
+Test # 10: passed  (Subset simulation can not be performed with a target CoV)
+Test # 11: passed  ()
+Test # 12: passed  ()
+Test # 13: passed  ()

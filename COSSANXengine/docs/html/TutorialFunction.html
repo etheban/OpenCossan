@@ -1,0 +1,307 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for FUNCTION object</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialFunction.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for FUNCTION object</h1><!--introduction--><pre> This tutorial shows the basics on how to define an object of the class
+ Function and how to evaluate it</pre><p>See Also:  <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Function">http://mechanik.uibk.ac.at/wiki/index.php/@Function</a></p><p><img src="TutorialFunction_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialFunction_eq30863.png" alt="$Author:~Pierre~Beaurepaire$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">First Example</a></li><li><a href="#2">Create Parameter object</a></li><li><a href="#3">Create Random Variable  and Random Variable Set objects</a></li><li><a href="#4">Create Function object</a></li><li><a href="#5">Evaluate the Function</a></li><li><a href="#6">Evaluate Function</a></li><li><a href="#7">Validate Solutions</a></li><li><a href="#8">getMembers</a></li><li><a href="#9">Second example</a></li><li><a href="#10">Create Input</a></li><li><a href="#11">Third example: Dependent function</a></li><li><a href="#12">Forth example: Multidimensional Function object</a></li><li><a href="#13">Fifth exmple</a></li><li><a href="#14">Function operation elements of multidimensional Parameters</a></li></ul></div><h2>First Example<a name="1"></a></h2><pre class="codeinput">    <span class="comment">% Create an input object</span>
+    Xin     = Input;
+</pre><h2>Create Parameter object<a name="2"></a></h2><pre class="codeinput">    Xpar1   = Parameter(<span class="string">'value'</span>,2);
+    <span class="comment">% Add parameter to the input</span>
+    Xin     = add(Xin,Xpar1);
+</pre><h2>Create Random Variable  and Random Variable Set objects<a name="3"></a></h2><pre class="codeinput">    Xrv1    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+    Xrvs1   = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xrv1'</span>});
+    Xin     = add(Xin,Xrvs1);
+</pre><h2>Create Function object<a name="4"></a></h2><p>This function returns the sum of the random variable 1 plus the values of the paramter</p><pre class="codeinput">    Xfun1   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #1'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;Xrv1&amp;&gt;+&lt;&amp;Xpar1&amp;&gt;'</span>);
+    Xin     = add(Xin,Xfun1);
+</pre><h2>Evaluate the Function<a name="5"></a></h2><p>the Input object must be sampled before function evaluation</p><pre class="codeinput">Xin     = sample(Xin,<span class="string">'Nsamples'</span>,3);
+</pre><h2>Evaluate Function<a name="6"></a></h2><pre class="codeinput">values  =  evaluate(Xfun1,Xin);
+disp(values)
+</pre><pre class="codeoutput">     2.308013551957802e+00
+     9.820750503234363e-01
+     1.499693160345477e-01
+
+</pre><h2>Validate Solutions<a name="7"></a></h2><pre class="codeinput">    VvaluesRV=Xin.getValues(<span class="string">'Sname'</span>,<span class="string">'Xrv1'</span>);
+    Vreference=VvaluesRV+2;
+    assert(max(Vreference-values)&lt;1e-10,<span class="string">'COSSAN:Tutorial'</span>,<span class="string">'wrong results'</span>)
+</pre><h2>getMembers<a name="8"></a></h2><pre class="codeinput"><span class="comment">%retrieve the names of all objects that are associated with the Function</span>
+<span class="comment">%object and their type</span>
+
+[Cmembers Ctypes] = getMembers(Xfun1);
+disp(Cmembers)
+disp(Ctypes)
+</pre><pre class="codeoutput">    'Xrv1'
+    'Xpar1'
+
+    'RandomVariable'
+    'Parameter'
+
+</pre><h2>Second example<a name="9"></a></h2><p>This second example involves functions that make use of parameters that contain array of values</p><h2>Create Input<a name="10"></a></h2><pre class="codeinput">    Xin     = Input;
+
+    <span class="comment">% Create Parameter objects</span>
+    Xpar1   = Parameter(<span class="string">'value'</span>,2);
+    Xpar2   = Parameter(<span class="string">'Vvalues'</span>,[1 2 3 4]);
+
+    <span class="comment">% Create Function objects</span>
+    Xfunction1 = Function(<span class="string">'Sdescription'</span>,<span class="string">'Target function #1'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'2 * &lt;&amp;Xpar1&amp;&gt;'</span>);
+
+    <span class="comment">% The function can access to a specific value of the parameter object or it</span>
+    <span class="comment">% can use the entire values of the parameter. Hence, the function returs</span>
+    <span class="comment">% (when evaluated) a vector that contains the same number of samples present</span>
+    <span class="comment">% in the input.</span>
+
+    Xfunction2 = Function(<span class="string">'Sdescription'</span>,<span class="string">'Target function #2'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'2 * &lt;&amp;Xpar2&amp;&gt;'</span>);
+
+    <span class="comment">% Add objects to input</span>
+    Xin     = add(Xin,Xpar1);
+    Xin     = add(Xin,Xpar2);
+    Xin     = add(Xin,Xfunction1);
+    Xin     = add(Xin,Xfunction2);
+
+    values1  =  Xfunction1.evaluate(Xin);
+    values2  =  Xfunction2.evaluate(Xin);
+</pre><h2>Third example: Dependent function<a name="11"></a></h2><p>Create Function object that depends on other function.</p><pre class="codeinput">Xfunction3   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #3'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'.2 .* &lt;&amp;Xfunction1&amp;&gt;'</span>);
+
+<span class="comment">% Evaluate the function</span>
+values3  =  Xfunction3.evaluate(Xin);
+disp(values3)
+</pre><pre class="codeoutput">     8.000000000000000e-01
+
+</pre><h2>Forth example: Multidimensional Function object<a name="12"></a></h2><p>The function can also access a specific value of a multidimensional function.</p><pre class="codeinput">Xfunction4   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #2'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'.5 .* &lt;&amp;Xfunction2&amp;&gt;(3)'</span>);
+
+<span class="comment">% Evaluate the function</span>
+values4  =  Xfunction4.evaluate(Xin);
+disp(values4)
+</pre><pre class="codeoutput">     3
+
+</pre><h2>Fifth exmple<a name="13"></a></h2><pre class="codeinput">    <span class="comment">%   Create Input</span>
+    Xin     = Input;
+
+    <span class="comment">%   Create Parameter object</span>
+    Xpar1   = Parameter(<span class="string">'Vvalues'</span>,[2;3]);
+    Xpar2   = Parameter(<span class="string">'Mvalues'</span>,[1 2 ; 3 4]);
+    Xin     = add(Xin,Xpar1);
+    Xin     = add(Xin,Xpar2);
+
+    <span class="comment">%Create Function object</span>
+    Xfun1   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #1'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'2 .* &lt;&amp;Xpar1&amp;&gt;(2)'</span>);
+
+    <span class="comment">% Input object needn't to be sampled before function evaluation because it</span>
+    <span class="comment">% does not contains random variables</span>
+    values1  =  evaluate(Xfun1,Xin);
+    <span class="comment">% show the results</span>
+    disp(values1)
+</pre><pre class="codeoutput">     6
+
+</pre><h2>Function operation elements of multidimensional Parameters<a name="14"></a></h2><pre class="codeinput">    Xfun3   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #3'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;Xpar2&amp;&gt;(2) .*&lt;&amp;Xpar1&amp;&gt;(1)'</span>);
+    values3  =  evaluate(Xfun3,Xin);
+
+    <span class="comment">% show the results</span>
+    disp(values3)
+</pre><pre class="codeoutput">     6
+
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for FUNCTION object
+%   This tutorial shows the basics on how to define an object of the class
+%   Function and how to evaluate it
+%
+%
+%
+% See Also:  http://mechanik.uibk.ac.at/wiki/index.php/@Function
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Pierre~Beaurepaire$ 
+
+%% First Example
+    % Create an input object
+    Xin     = Input;
+    
+    %% Create Parameter object
+    Xpar1   = Parameter('value',2);
+    % Add parameter to the input
+    Xin     = add(Xin,Xpar1);
+
+    %%  Create Random Variable  and Random Variable Set objects
+    Xrv1    = RandomVariable('Sdistribution','normal','mean',0,'std',1);
+    Xrvs1   = RandomVariableSet('Cmembers',{'Xrv1'});
+    Xin     = add(Xin,Xrvs1);
+
+    %% Create Function object
+    % This function returns the sum of the random variable 1 plus the values of
+    % the paramter
+    Xfun1   = Function('Sdescription','function #1', ...
+    'Sexpression','<&Xrv1&>+<&Xpar1&>');
+    Xin     = add(Xin,Xfun1);
+    
+%% Evaluate the Function
+% the Input object must be sampled before function evaluation
+Xin     = sample(Xin,'Nsamples',3);
+
+%% Evaluate Function 
+values  =  evaluate(Xfun1,Xin);
+disp(values)
+
+    %% Validate Solutions
+    VvaluesRV=Xin.getValues('Sname','Xrv1');
+    Vreference=VvaluesRV+2;
+    assert(max(Vreference-values)<1e-10,'COSSAN:Tutorial','wrong results')
+
+%%  getMembers
+%retrieve the names of all objects that are associated with the Function
+%object and their type
+
+[Cmembers Ctypes] = getMembers(Xfun1);
+disp(Cmembers)
+disp(Ctypes)
+
+%% Second example 
+% This second example involves functions that make use of parameters that
+% contain array of values 
+% 
+    %% Create Input
+    Xin     = Input;
+    
+    % Create Parameter objects
+    Xpar1   = Parameter('value',2);
+    Xpar2   = Parameter('Vvalues',[1 2 3 4]);
+    
+    % Create Function objects
+    Xfunction1 = Function('Sdescription','Target function #1', ...
+    'Sexpression','2 * <&Xpar1&>');
+    
+    % The function can access to a specific value of the parameter object or it
+    % can use the entire values of the parameter. Hence, the function returs
+    % (when evaluated) a vector that contains the same number of samples present
+    % in the input.
+    
+    Xfunction2 = Function('Sdescription','Target function #2', ...
+    'Sexpression','2 * <&Xpar2&>');
+    
+    % Add objects to input
+    Xin     = add(Xin,Xpar1);
+    Xin     = add(Xin,Xpar2);
+    Xin     = add(Xin,Xfunction1);
+    Xin     = add(Xin,Xfunction2);
+    
+    values1  =  Xfunction1.evaluate(Xin);   
+    values2  =  Xfunction2.evaluate(Xin);  
+
+%% Third example: Dependent function
+% Create Function object that depends on other function.
+Xfunction3   = Function('Sdescription','function #3', ...
+    'Sexpression','.2 .* <&Xfunction1&>');
+
+% Evaluate the function
+values3  =  Xfunction3.evaluate(Xin);   
+disp(values3)
+
+%% Forth example: Multidimensional Function object
+% The function can also access a specific value of a multidimensional function.
+Xfunction4   = Function('Sdescription','function #2', ...
+    'Sexpression','.5 .* <&Xfunction2&>(3)');
+
+% Evaluate the function
+values4  =  Xfunction4.evaluate(Xin);   
+disp(values4)
+
+%% Fifth exmple
+    %   Create Input
+    Xin     = Input;
+    
+    %   Create Parameter object
+    Xpar1   = Parameter('Vvalues',[2;3]);
+    Xpar2   = Parameter('Mvalues',[1 2 ; 3 4]);
+    Xin     = add(Xin,Xpar1);
+    Xin     = add(Xin,Xpar2);
+    
+    %Create Function object
+    Xfun1   = Function('Sdescription','function #1', ...
+    'Sexpression','2 .* <&Xpar1&>(2)');
+    
+    % Input object needn't to be sampled before function evaluation because it
+    % does not contains random variables
+    values1  =  evaluate(Xfun1,Xin);
+    % show the results
+    disp(values1)
+
+
+    %%  Function operation elements of multidimensional Parameters
+    Xfun3   = Function('Sdescription','function #3', ...
+    'Sexpression','<&Xpar2&>(2) .*<&Xpar1&>(1)');
+    values3  =  evaluate(Xfun3,Xin);
+    
+    % show the results
+    disp(values3)
+
+
+
+##### SOURCE END #####
+--></body></html>

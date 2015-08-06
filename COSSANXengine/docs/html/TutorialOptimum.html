@@ -1,0 +1,194 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialOptimum</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialOptimum.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">TutorialOPTIMUM</a></li><li><a href="#2">Problem Definition</a></li><li><a href="#3">Define Probabilistic Model</a></li><li><a href="#4">Identify design point</a></li><li><a href="#5">Plot resutls</a></li><li><a href="#6">Close figures</a></li></ul></div><h2>TutorialOPTIMUM<a name="1"></a></h2><p>This Tutorial shows how to use the object Optimim</p><p>See Also:  <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Optimum">http://mechanik.uibk.ac.at/wiki/index.php/@Optimum</a></p><p><img src="TutorialOptimum_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialOptimum_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><pre class="codeinput"><span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(56236)
+</pre><h2>Problem Definition<a name="2"></a></h2><p>Define Input parameters Random Variables</p><pre class="codeinput">Xrv1    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,1,<span class="string">'std'</span>,0.5);
+Xrv2    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,-1,<span class="string">'std'</span>,2);
+Xrv3    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,10,<span class="string">'std'</span>,0.5);
+Xrv4    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,10,<span class="string">'std'</span>,2);
+C       = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Capacity'</span>,<span class="string">'value'</span>,3);
+
+<span class="comment">%  RandomVariableSets</span>
+Xrvs1   = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xrv1'</span>,<span class="string">'Xrv3'</span>,<span class="string">'Xrv4'</span>},<span class="string">'Cxrandomvariables'</span>,{Xrv1 Xrv3 Xrv4});
+Xrvs2   = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xrv2'</span>},<span class="string">'Cxrandomvariables'</span>,{Xrv2});
+
+<span class="comment">% Define Input</span>
+Xin     = Input(<span class="string">'CXmembers'</span>,{Xrvs1 Xrvs2 C},<span class="string">'CSmembers'</span>,{<span class="string">'Xrvs1'</span> <span class="string">'Xrvs2'</span> <span class="string">'C'</span>});
+
+<span class="comment">%  Construct Mio object</span>
+Xm      = Mio(<span class="string">'Sdescription'</span>,<span class="string">'normalized demand'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for i=1:length(Tinput),Toutput(i,1).D = 1/sqrt(2)*((Tinput(i).Xrv1-1)/0.5+(Tinput(i).Xrv2+1)/2);end'</span>,<span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false,<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'Xrv1'</span>,<span class="string">'Xrv2'</span>},<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'D'</span>});
+
+<span class="comment">%  Construct evaluator</span>
+Xeval   = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'Evaluator xmio'</span>);
+<span class="comment">%   Define Physical Model</span>
+Xmdl    = Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xin);
+</pre><h2>Define Probabilistic Model<a name="3"></a></h2><p>Define Performance Function</p><pre class="codeinput">Xperf   = PerformanceFunction(<span class="string">'Scapacity'</span>,<span class="string">'C'</span>,<span class="string">'Sdemand'</span>,<span class="string">'D'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Vg'</span>);
+<span class="comment">% Construct a probmodel</span>
+Xpm     = ProbabilisticModel(<span class="string">'XModel'</span>,Xmdl,<span class="string">'XPerformanceFunction'</span>,Xperf);
+</pre><h2>Identify design point<a name="4"></a></h2><p>The design point is identified using a HLRF like algorithms, as default method. It identify the design point by means of linear approximation, that means that the method is very efficient when the limit state function is linear or slightly non-linear.</p><pre class="codeinput">[XdesignPoint  Xoptimum] = Xpm.designPointIdentification;
+</pre><h2>Plot resutls<a name="5"></a></h2><p>Plot objective function</p><pre class="codeinput">f1=Xoptimum.plotObjectiveFunction;
+<span class="comment">% Plot contraints</span>
+f2=Xoptimum.plotConstraint;
+<span class="comment">% Plot design variables</span>
+f3=Xoptimum.plotDesignVariable;
+</pre><img vspace="5" hspace="5" src="TutorialOptimum_01.png" alt=""> <img vspace="5" hspace="5" src="TutorialOptimum_02.png" alt=""> <img vspace="5" hspace="5" src="TutorialOptimum_03.png" alt=""> <h2>Close figures<a name="6"></a></h2><pre class="codeinput">close(f1), close(f2),close(f3)
+
+<span class="comment">% Validate Solution</span>
+Vreference=3.481519e+00;
+assert(abs(XdesignPoint.ReliabilityIndex-Vreference)&lt;1e-4,<span class="keyword">...</span>
+    <span class="string">'CossanX:Tutorials:TutorialDesignPointIdentification'</span>,<span class="string">'Reference Solution does not match.'</span>)
+
+<span class="comment">% Show summary</span>
+display(Xoptimum)
+</pre><pre class="codeoutput">Error using ==&gt; TutorialOptimum at 71
+Reference Solution does not match.
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TutorialOPTIMUM
+%
+% This Tutorial shows how to use the object Optimim
+% 
+% See Also:  http://mechanik.uibk.ac.at/wiki/index.php/@Optimum
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(56236)
+
+
+%%  Problem Definition 
+% Define Input parameters
+% Random Variables
+Xrv1    = RandomVariable('Sdistribution','normal', 'mean',1,'std',0.5); 
+Xrv2    = RandomVariable('Sdistribution','normal', 'mean',-1,'std',2);
+Xrv3    = RandomVariable('Sdistribution','normal', 'mean',10,'std',0.5); 
+Xrv4    = RandomVariable('Sdistribution','normal', 'mean',10,'std',2);
+C       = Parameter('Sdescription','Capacity','value',3);
+
+%  RandomVariableSets 
+Xrvs1   = RandomVariableSet('Cmembers',{'Xrv1','Xrv3','Xrv4'},'Cxrandomvariables',{Xrv1 Xrv3 Xrv4}); 
+Xrvs2   = RandomVariableSet('Cmembers',{'Xrv2'},'Cxrandomvariables',{Xrv2}); 
+
+% Define Input
+Xin     = Input('CXmembers',{Xrvs1 Xrvs2 C},'CSmembers',{'Xrvs1' 'Xrvs2' 'C'});
+
+%  Construct Mio object
+Xm      = Mio('Sdescription','normalized demand', ...
+    'Sscript','for i=1:length(Tinput),Toutput(i,1).D = 1/sqrt(2)*((Tinput(i).Xrv1-1)/0.5+(Tinput(i).Xrv2+1)/2);end',...
+    'Liostructure',true,...
+    'Lfunction',false,...
+    'Cinputnames',{'Xrv1','Xrv2'},...
+    'Coutputnames',{'D'});            
+
+%  Construct evaluator
+Xeval   = Evaluator('Xmio',Xm,'Sdescription','Evaluator xmio');
+%   Define Physical Model
+Xmdl    = Model('Xevaluator',Xeval,'Xinput',Xin);
+
+%% Define Probabilistic Model
+% Define Performance Function
+Xperf   = PerformanceFunction('Scapacity','C','Sdemand','D','Soutputname','Vg');
+% Construct a probmodel
+Xpm     = ProbabilisticModel('XModel',Xmdl,'XPerformanceFunction',Xperf);
+
+%% Identify design point 
+% The design point is identified using a HLRF like algorithms, as default
+% method. It identify the design point by means of linear approximation, that
+% means that the method is very efficient when the limit state function is
+% linear or slightly non-linear. 
+
+[XdesignPoint  Xoptimum] = Xpm.designPointIdentification;
+
+%% Plot resutls
+% Plot objective function 
+f1=Xoptimum.plotObjectiveFunction;
+% Plot contraints
+f2=Xoptimum.plotConstraint;
+% Plot design variables
+f3=Xoptimum.plotDesignVariable;
+
+%% Close figures
+close(f1), close(f2),close(f3)
+
+% Validate Solution
+Vreference=3.481519e+00;
+assert(abs(XdesignPoint.ReliabilityIndex-Vreference)<1e-4,...
+    'CossanX:Tutorials:TutorialDesignPointIdentification','Reference Solution does not match.')
+
+% Show summary
+display(Xoptimum)
+
+
+##### SOURCE END #####
+--></body></html>

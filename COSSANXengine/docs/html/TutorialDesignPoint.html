@@ -1,0 +1,398 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialDesignPoint</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialDesignPoint.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TutorialDesignPoint</h1><!--introduction--><p>This tutorial shows how to create and use an object of type DesignPoint. The tutorial uses two very simple probabilistic models. The first model considers only standar normal distribution, while the second model contains random variable with different means and standard deviations. The aim here is not to define a realisic model but to show how to compute and use a DesignPoint object.</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@DesignPoint">http://mechanik.uibk.ac.at/wiki/index.php/@DesignPoint</a></p><p><img src="TutorialDesignPoint_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialDesignPoint_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">CASE A</a></li><li><a href="#2">Preparation of the Input</a></li><li><a href="#3">Prepare Input Object</a></li><li><a href="#4">Preparation of the Evaluator</a></li><li><a href="#5">Preparation of the Physical Model</a></li><li><a href="#6">Define a Probabilistic Model</a></li><li><a href="#7">Compute a DesingPoint</a></li><li><a href="#8">Show results</a></li><li><a href="#9">Validate resutls</a></li><li><a href="#10">Desing Point identified using a Optimization method (Optimizer object)</a></li><li><a href="#11">Close figures</a></li><li><a href="#12">CASE B</a></li><li><a href="#13">Preparation of the Input</a></li><li><a href="#14">Prepare Input Object</a></li><li><a href="#15">Preparation of the Evaluator</a></li><li><a href="#16">Preparation of the Physical Model</a></li><li><a href="#17">Define a Probabilistic Model</a></li><li><a href="#18">Compute Reference solutions</a></li><li><a href="#19">Compute a DesingPoint</a></li><li><a href="#20">Show results</a></li><li><a href="#21">Validate resutls</a></li><li><a href="#22">Desing Point identified usinf a Optimization method (Optimizer object)</a></li><li><a href="#23">Close figures</a></li></ul></div><h2>CASE A<a name="1"></a></h2><p>This first example considers standard normal distributions only. This means that the samples (realizations) in the physical space and in the standard normal space are exatly the same.</p><h2>Preparation of the Input<a name="2"></a></h2><p>Definition of the Parameters</p><pre class="codeinput">XmaxSum=Parameter(<span class="string">'value'</span>,2,<span class="string">'Sdescription'</span>,<span class="string">'Maximum allowed sum of random variable'</span>);
+
+<span class="comment">% Definition of the Random Varibles</span>
+X1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1,<span class="string">'Sdescription'</span>,<span class="string">'First random variable'</span>);
+X2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1,<span class="string">'Sdescription'</span>,<span class="string">'Second random variable'</span>);
+
+Xrvset=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>});
+<span class="comment">% Definition of the Function</span>
+Xsum=Function(<span class="string">'Sdescription'</span>,<span class="string">'Sum of RandomVariable'</span>,<span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;X1&amp;&gt;+&lt;&amp;X2&amp;&gt;'</span>);
+</pre><h2>Prepare Input Object<a name="3"></a></h2><p>The above prepared object can be added to an Input Object</p><pre class="codeinput">Xinput=Input(<span class="string">'CXmembers'</span>,{Xrvset Xsum XmaxSum},<span class="string">'CSmembers'</span>,{<span class="string">'Xrvset'</span> <span class="string">'Xsum'</span> <span class="string">'XmaxSum'</span>});
+<span class="comment">% Show summary of the Input Object</span>
+display(Xinput)
+</pre><pre class="codeoutput">* 1 Sets of RandomVariables
+* 1 Parameter object(s)
+* 1 Functions object(s)
+</pre><h2>Preparation of the Evaluator<a name="4"></a></h2><p>This example used and empty Evaluator since there is nothing to be computed.</p><pre class="codeinput">Xevaluator=Evaluator;
+</pre><h2>Preparation of the Physical Model<a name="5"></a></h2><p>Define the Physical Model</p><pre class="codeinput">Xmodel=Model(<span class="string">'Xinput'</span>,Xinput,<span class="string">'Xevaluator'</span>,Xevaluator);
+</pre><h2>Define a Probabilistic Model<a name="6"></a></h2><p>Performance Function</p><pre class="codeinput">Xperfun = PerformanceFunction(<span class="string">'Sdemand'</span>,<span class="string">'Xsum'</span>,<span class="string">'Scapacity'</span>,<span class="string">'XmaxSum'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Vg'</span>);
+<span class="comment">% Define a Probabilistic Model</span>
+XprobModel=ProbabilisticModel(<span class="string">'Xmodel'</span>,Xmodel,<span class="string">'XperformanceFunction'</span>,Xperfun);
+</pre><h2>Compute a DesingPoint<a name="7"></a></h2><p>The design point can be compute calling the method designPointIdentification of the ProbabilisticModel. If this method is called without arguments the DesignPoint is identified by means linear approximation of the performance function using the so called  method HLRF</p><pre class="codeinput">Xdp=XprobModel.designPointIdentification;
+</pre><pre class="codeoutput">Undefined function or method 'minus' for input arguments of type 'cell'.
+
+Error in ==&gt; SimulationData.compute at 68
+                Cout{i}=C1{i}-C2{i};
+
+Error in ==&gt; PerformanceFunction.apply at 37
+    Vg=XSimulationData.compute('Cnames',{Xpf.Scapacity;Xpf.Sdemand},'Soperation','-');
+
+Error in ==&gt; ProbabilisticModel.apply at 27
+    Xout = apply(Xpm.XperformanceFunction,Xout);
+
+Error in ==&gt; Sensitivity.localFiniteDifferences at 126
+    Xout0=Xtarget.apply(Xsamples0);
+
+Error in ==&gt; ProbabilisticModel.HLRF at 77
+        [Xgradient Xout]=Sensitivity.localFiniteDifferences('Xtarget',Xobj, ...
+
+Error in ==&gt; ProbabilisticModel.designPointIdentification at 52
+    [Xdp,Xopt] = HLRF(Xpm,varargin{:});
+
+Error in ==&gt; TutorialDesignPoint at 56
+Xdp=XprobModel.designPointIdentification;
+</pre><h2>Show results<a name="8"></a></h2><pre class="codeinput">display(Xdp)
+</pre><h2>Validate resutls<a name="9"></a></h2><pre class="codeinput">assert(max(Xdp.VDesignPointPhysical-[1 1]&lt;0.001),<span class="string">'COSSANX:TutorialDesignPoint'</span>,<span class="keyword">...</span>
+    <span class="string">'DesignPoint not identified correctly'</span>)
+</pre><h2>Desing Point identified using a Optimization method (Optimizer object)<a name="10"></a></h2><p>The design point can be identified using an Optimization object. Please refer to the TutorialOptimizer for more details about the Optimizer objects.</p><pre class="codeinput">[Xdp2 Xopt2]=XprobModel.designPointIdentification(<span class="string">'Xoptimizer'</span>,Cobyla);
+display(Xdp2)
+<span class="comment">% Show results</span>
+h1=Xopt2.plotObjectiveFunction;
+h2=Xopt2.plotConstraint;
+
+Xga=GeneticAlgorithms(<span class="string">'Npopulationsize'</span>,5,<span class="string">'NmaxIterations'</span>,10,<span class="string">'Smutationfcn'</span>,<span class="string">'mutationadaptfeasible'</span>);
+[Xdp3 Xopt3]=XprobModel.designPointIdentification(<span class="string">'Xoptimizer'</span>,Xga);
+display(Xdp3)
+h3=Xopt3.plotObjectiveFunction;
+h4=Xopt3.plotConstraint;
+</pre><h2>Close figures<a name="11"></a></h2><pre class="codeinput">close(h1),close(h2),close(h3),close(h4)
+</pre><h2>CASE B<a name="12"></a></h2><p>This second example considers normal distributions but with different means and standard deviations.</p><h2>Preparation of the Input<a name="13"></a></h2><pre class="codeinput"><span class="comment">% Definition of the Parameters</span>
+Xmax=Parameter(<span class="string">'value'</span>,4);
+
+<span class="comment">% Definition of the Random Varibles</span>
+X1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,6,<span class="string">'std'</span>,2,<span class="string">'Sdescription'</span>,<span class="string">'First random variable'</span>);
+X2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,5,<span class="string">'std'</span>,3,<span class="string">'Sdescription'</span>,<span class="string">'Second random variable'</span>);
+
+Xrvset=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>});
+
+Xsamples = sample(Xrvset,1000);
+
+<span class="comment">% Plot realizations of the inputs</span>
+f1=figure;
+scatter(gca(f1),Xsamples.MsamplesPhysicalSpace(:,1),Xsamples.MsamplesPhysicalSpace(:,2))
+hold(gca(f1),<span class="string">'on'</span>);
+x1 = -2:0.01:8;
+x2 = 3*x1+4;
+plot(gca(f1),x1,x2);
+grid(gca(f1),<span class="string">'on'</span>);
+axis(gca(f1),<span class="string">'equal'</span>);
+title(gca(f1),<span class="string">'Physical space'</span>)
+
+f2=figure;
+scatter(gca(f2),Xsamples.MsamplesStandardNormalSpace(:,1),Xsamples.MsamplesStandardNormalSpace(:,2))
+hold(gca(f2),<span class="string">'on'</span>);
+x1 = Xrvset.map2stdnorm(Xsamples.MsamplesPhysicalSpace);
+plot(gca(f2),x1,2*x1+17/3);
+<span class="comment">%plot(gca(f2),x1,-1/2*x1,'y');</span>
+grid(gca(f2),<span class="string">'on'</span>);
+axis(gca(f2),[-4 4 -4 4]);
+title(gca(f2),<span class="string">'Standard normal space'</span>)
+
+
+<span class="comment">% Definition of the Function</span>
+Xsum=Function(<span class="string">'Sexpression'</span>,<span class="string">'-3*&lt;&amp;X1&amp;&gt;+&lt;&amp;X2&amp;&gt;'</span>);
+</pre><h2>Prepare Input Object<a name="14"></a></h2><p>The above prepared object can be added to an Input Object</p><pre class="codeinput">Xinput=Input(<span class="string">'CXmembers'</span>,{Xrvset Xsum Xmax},<span class="string">'CSmembers'</span>,{<span class="string">'Xrvset'</span> <span class="string">'Xsum'</span> <span class="string">'Xmax'</span>});
+<span class="comment">% Show summary of the Input Object</span>
+display(Xinput)
+</pre><h2>Preparation of the Evaluator<a name="15"></a></h2><p>This example used and empty Evaluator since there is nothing to be computed.</p><pre class="codeinput">Xevaluator=Evaluator;
+</pre><h2>Preparation of the Physical Model<a name="16"></a></h2><p>Define the Physical Model</p><pre class="codeinput">Xmodel=Model(<span class="string">'Xinput'</span>,Xinput,<span class="string">'Xevaluator'</span>,Xevaluator);
+</pre><h2>Define a Probabilistic Model<a name="17"></a></h2><p>Performance Function</p><pre class="codeinput">Xperfun = PerformanceFunction(<span class="string">'Sdemand'</span>,<span class="string">'Xsum'</span>,<span class="string">'Scapacity'</span>,<span class="string">'Xmax'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Vg'</span>);
+<span class="comment">% Define a Probabilistic Model</span>
+XprobModel=ProbabilisticModel(<span class="string">'Xmodel'</span>,Xmodel,<span class="string">'XperformanceFunction'</span>,Xperfun);
+</pre><h2>Compute Reference solutions<a name="18"></a></h2><pre class="codeinput">Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,1e4);
+Xpf=XprobModel.pf(Xmc);
+
+<span class="comment">% The estimated failure probability is around 5.1e-3.</span>
+display(Xpf)
+</pre><h2>Compute a DesingPoint<a name="19"></a></h2><p>The design point can be compute calling the method designPointIdentification of the ProbabilisticModel. If this method is called without arguments the DesignPoint is identified by means linear approximation of the performance function using the so called  method HLRF</p><pre class="codeinput">Xdp=XprobModel.designPointIdentification;
+</pre><h2>Show results<a name="20"></a></h2><pre class="codeinput">display(Xdp)
+
+<span class="comment">% Plot identified DesignPoint in a red color</span>
+<span class="comment">% Add design point to the figures</span>
+scatter(gca(f1),Xdp.VDesignPointPhysical(1),Xdp.VDesignPointPhysical(2),<span class="string">'rp'</span>,<span class="string">'SizeData'</span>,90)
+scatter(gca(f2),Xdp.VDesignPointStdNormal(1),Xdp.VDesignPointStdNormal(2),<span class="string">'rp'</span>,<span class="string">'SizeData'</span>,90)
+</pre><h2>Validate resutls<a name="21"></a></h2><pre class="codeinput">assert(all(max(Xdp.VDesignPointStdNormal-[-34/15 17/15])&lt;0.001),<span class="string">'COSSANX:TutorialDesignPoint'</span>,<span class="keyword">...</span>
+    <span class="string">'DesignPoint not identified correctly'</span>)
+</pre><h2>Desing Point identified usinf a Optimization method (Optimizer object)<a name="22"></a></h2><p>The design point can be identified using an Optimization object. Please refer to the TutorialOptimizer for more details about the Optimizer objects.</p><pre class="codeinput">Xdp2=XprobModel.designPointIdentification(<span class="string">'Xoptimizer'</span>,Cobyla);
+display(Xdp2)
+
+<span class="comment">% Plot identified DesignPoint in a magenta color</span>
+scatter(gca(f1),Xdp2.VDesignPointPhysical(1),Xdp2.VDesignPointPhysical(2),<span class="string">'mp'</span>,<span class="string">'SizeData'</span>,90)
+scatter(gca(f2),Xdp2.VDesignPointStdNormal(1),Xdp2.VDesignPointStdNormal(2),<span class="string">'mp'</span>,<span class="string">'SizeData'</span>,90)
+
+Xga=GeneticAlgorithms(<span class="string">'Npopulationsize'</span>,5,<span class="string">'NmaxIterations'</span>,10,<span class="string">'Smutationfcn'</span>,<span class="string">'mutationadaptfeasible'</span>);
+[Xdp3 Xopt]=XprobModel.designPointIdentification(<span class="string">'Xoptimizer'</span>,Xga);
+display(Xdp3)
+
+<span class="comment">% Plot identified DesignPoint in a black color</span>
+scatter(gca(f1),Xdp3.VDesignPointPhysical(1),Xdp2.VDesignPointPhysical(2),<span class="string">'kp'</span>,<span class="string">'SizeData'</span>,90)
+scatter(gca(f2),Xdp3.VDesignPointStdNormal(1),Xdp2.VDesignPointStdNormal(2),<span class="string">'kp'</span>,<span class="string">'SizeData'</span>,90)
+
+f3=Xopt.plotObjectiveFunction;
+f4=Xopt.plotConstraint;
+</pre><h2>Close figures<a name="23"></a></h2><pre class="codeinput">close(f1),close(f2),close(f3),close(f4)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TutorialDesignPoint
+% This tutorial shows how to create and use an object of type DesignPoint.
+% The tutorial uses two very simple probabilistic models. The first model
+% considers only standar normal distribution, while the second model contains
+% random variable with different means and standard deviations.
+% The aim here is not to define a realisic model but to show how to compute and
+% use a DesignPoint object.
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@DesignPoint
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+%% CASE A
+% This first example considers standard normal distributions only. 
+% This means that the samples (realizations) in the physical space and in the
+% standard normal space are exatly the same.
+
+%% Preparation of the Input
+% Definition of the Parameters
+XmaxSum=Parameter('value',2,'Sdescription','Maximum allowed sum of random variable');
+
+% Definition of the Random Varibles
+X1=RandomVariable('Sdistribution','normal','mean',0,'std',1,'Sdescription','First random variable');
+X2=RandomVariable('Sdistribution','normal','mean',0,'std',1,'Sdescription','Second random variable');
+
+Xrvset=RandomVariableSet('Cmembers',{'X1' 'X2'});
+% Definition of the Function
+Xsum=Function('Sdescription','Sum of RandomVariable','Sexpression','<&X1&>+<&X2&>');
+
+%% Prepare Input Object
+% The above prepared object can be added to an Input Object
+Xinput=Input('CXmembers',{Xrvset Xsum XmaxSum},'CSmembers',{'Xrvset' 'Xsum' 'XmaxSum'});
+% Show summary of the Input Object
+display(Xinput)
+%% Preparation of the Evaluator
+% This example used and empty Evaluator since there is nothing to be computed.
+Xevaluator=Evaluator;
+
+%% Preparation of the Physical Model
+% Define the Physical Model
+Xmodel=Model('Xinput',Xinput,'Xevaluator',Xevaluator);
+
+
+%% Define a Probabilistic Model
+% Performance Function
+Xperfun = PerformanceFunction('Sdemand','Xsum','Scapacity','XmaxSum','Soutputname','Vg');
+% Define a Probabilistic Model
+XprobModel=ProbabilisticModel('Xmodel',Xmodel,'XperformanceFunction',Xperfun);
+
+%% Compute a DesingPoint
+% The design point can be compute calling the method designPointIdentification
+% of the ProbabilisticModel. If this method is called without arguments the
+% DesignPoint is identified by means linear approximation of the performance
+% function using the so called  method HLRF
+Xdp=XprobModel.designPointIdentification;
+
+%% Show results
+display(Xdp)
+
+%% Validate resutls
+assert(max(Xdp.VDesignPointPhysical-[1 1]<0.001),'COSSANX:TutorialDesignPoint',...
+    'DesignPoint not identified correctly')
+
+%% Desing Point identified using a Optimization method (Optimizer object)
+% The design point can be identified using an Optimization object. Please refer
+% to the TutorialOptimizer for more details about the Optimizer objects. 
+[Xdp2 Xopt2]=XprobModel.designPointIdentification('Xoptimizer',Cobyla);
+display(Xdp2)
+% Show results
+h1=Xopt2.plotObjectiveFunction;
+h2=Xopt2.plotConstraint;
+
+Xga=GeneticAlgorithms('Npopulationsize',5,'NmaxIterations',10,'Smutationfcn','mutationadaptfeasible');
+[Xdp3 Xopt3]=XprobModel.designPointIdentification('Xoptimizer',Xga);
+display(Xdp3)
+h3=Xopt3.plotObjectiveFunction;
+h4=Xopt3.plotConstraint;
+
+%% Close figures
+close(h1),close(h2),close(h3),close(h4)
+
+%% CASE B
+% This second example considers normal distributions but with different means
+% and standard deviations.
+
+
+%% Preparation of the Input
+
+% Definition of the Parameters
+Xmax=Parameter('value',4);
+
+% Definition of the Random Varibles
+X1=RandomVariable('Sdistribution','normal','mean',6,'std',2,'Sdescription','First random variable');
+X2=RandomVariable('Sdistribution','normal','mean',5,'std',3,'Sdescription','Second random variable');
+
+Xrvset=RandomVariableSet('Cmembers',{'X1' 'X2'});
+
+Xsamples = sample(Xrvset,1000);
+
+% Plot realizations of the inputs
+f1=figure;
+scatter(gca(f1),Xsamples.MsamplesPhysicalSpace(:,1),Xsamples.MsamplesPhysicalSpace(:,2))
+hold(gca(f1),'on');
+x1 = -2:0.01:8;
+x2 = 3*x1+4;
+plot(gca(f1),x1,x2); 
+grid(gca(f1),'on');
+axis(gca(f1),'equal');
+title(gca(f1),'Physical space')
+
+f2=figure;
+scatter(gca(f2),Xsamples.MsamplesStandardNormalSpace(:,1),Xsamples.MsamplesStandardNormalSpace(:,2))
+hold(gca(f2),'on');
+x1 = Xrvset.map2stdnorm(Xsamples.MsamplesPhysicalSpace);
+plot(gca(f2),x1,2*x1+17/3);  
+%plot(gca(f2),x1,-1/2*x1,'y'); 
+grid(gca(f2),'on');
+axis(gca(f2),[-4 4 -4 4]);
+title(gca(f2),'Standard normal space')
+
+
+% Definition of the Function
+Xsum=Function('Sexpression','-3*<&X1&>+<&X2&>');
+
+%% Prepare Input Object
+% The above prepared object can be added to an Input Object
+Xinput=Input('CXmembers',{Xrvset Xsum Xmax},'CSmembers',{'Xrvset' 'Xsum' 'Xmax'});
+% Show summary of the Input Object
+display(Xinput)
+
+%% Preparation of the Evaluator
+% This example used and empty Evaluator since there is nothing to be computed.
+Xevaluator=Evaluator;
+
+%% Preparation of the Physical Model
+% Define the Physical Model
+Xmodel=Model('Xinput',Xinput,'Xevaluator',Xevaluator);
+
+
+%% Define a Probabilistic Model
+% Performance Function
+Xperfun = PerformanceFunction('Sdemand','Xsum','Scapacity','Xmax','Soutputname','Vg');
+% Define a Probabilistic Model
+XprobModel=ProbabilisticModel('Xmodel',Xmodel,'XperformanceFunction',Xperfun);
+
+%% Compute Reference solutions 
+Xmc=MonteCarlo('Nsamples',1e4);
+Xpf=XprobModel.pf(Xmc);
+
+% The estimated failure probability is around 5.1e-3.
+display(Xpf)
+
+%% Compute a DesingPoint
+% The design point can be compute calling the method designPointIdentification
+% of the ProbabilisticModel. If this method is called without arguments the
+% DesignPoint is identified by means linear approximation of the performance
+% function using the so called  method HLRF
+Xdp=XprobModel.designPointIdentification;
+
+%% Show results
+display(Xdp)
+
+% Plot identified DesignPoint in a red color
+% Add design point to the figures
+scatter(gca(f1),Xdp.VDesignPointPhysical(1),Xdp.VDesignPointPhysical(2),'rp','SizeData',90)
+scatter(gca(f2),Xdp.VDesignPointStdNormal(1),Xdp.VDesignPointStdNormal(2),'rp','SizeData',90)
+
+%% Validate resutls
+assert(all(max(Xdp.VDesignPointStdNormal-[-34/15 17/15])<0.001),'COSSANX:TutorialDesignPoint',...
+    'DesignPoint not identified correctly')
+
+%% Desing Point identified usinf a Optimization method (Optimizer object)
+% The design point can be identified using an Optimization object. Please refer
+% to the TutorialOptimizer for more details about the Optimizer objects. 
+Xdp2=XprobModel.designPointIdentification('Xoptimizer',Cobyla);
+display(Xdp2)
+
+% Plot identified DesignPoint in a magenta color
+scatter(gca(f1),Xdp2.VDesignPointPhysical(1),Xdp2.VDesignPointPhysical(2),'mp','SizeData',90)
+scatter(gca(f2),Xdp2.VDesignPointStdNormal(1),Xdp2.VDesignPointStdNormal(2),'mp','SizeData',90)
+
+Xga=GeneticAlgorithms('Npopulationsize',5,'NmaxIterations',10,'Smutationfcn','mutationadaptfeasible');
+[Xdp3 Xopt]=XprobModel.designPointIdentification('Xoptimizer',Xga);
+display(Xdp3)
+
+% Plot identified DesignPoint in a black color
+scatter(gca(f1),Xdp3.VDesignPointPhysical(1),Xdp2.VDesignPointPhysical(2),'kp','SizeData',90)
+scatter(gca(f2),Xdp3.VDesignPointStdNormal(1),Xdp2.VDesignPointStdNormal(2),'kp','SizeData',90)
+
+f3=Xopt.plotObjectiveFunction;
+f4=Xopt.plotConstraint;
+
+%% Close figures
+close(f1),close(f2),close(f3),close(f4)
+
+##### SOURCE END #####
+--></body></html>

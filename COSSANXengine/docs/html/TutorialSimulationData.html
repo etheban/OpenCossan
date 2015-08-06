@@ -1,0 +1,490 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialSimulationData</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialSimulationData.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">TUTORIALSIMULATIONDATA</a></li><li><a href="#2">Create output object by using Mio</a></li><li><a href="#3">Define models (using Mio)</a></li><li><a href="#4">Apply model and hence generate an output -&gt; SimulationData</a></li><li><a href="#5">Methods available for SimulationData</a></li><li><a href="#6">Create SimulationData by direclty passing the values</a></li><li><a href="#7">Save and load SimulationData</a></li><li><a href="#8">Validate results</a></li></ul></div><h2>TUTORIALSIMULATIONDATA<a name="1"></a></h2><p>In this tutorial it is shown how to construct a SimulationData object and how to use it</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@SimulationData">http://mechanik.uibk.ac.at/wiki/index.php/@SimulationData</a></p><p><img src="TutorialSimulationData_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialSimulationData_eq39615.png" alt="$Author: Edoardo-Patelli~and~Barbara-Goller$"></p><pre class="codeinput"><span class="comment">% Reset the random number generator in order to always obtain the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(51125)
+</pre><h2>Create output object by using Mio<a name="2"></a></h2><pre class="codeinput"><span class="comment">% Define an input object containing random variables and parameters</span>
+
+Xrv1    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'par1'</span>,1,<span class="string">'par2'</span>,2);
+Xrv2    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+Xrvs1    = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xrv1'</span>,<span class="string">'Xrv2'</span>});
+
+Xrv3    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'par1'</span>,3,<span class="string">'par2'</span>,5);
+Xrv4    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,2,<span class="string">'std'</span>,0.5);
+Xrvs2    = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xrv3'</span>,<span class="string">'Xrv4'</span>});
+
+Xpar1   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Parameter 1'</span>,<span class="string">'value'</span>,1.5);
+Xpar2   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Parameter 2'</span>,<span class="string">'value'</span>,2.5);
+Xpar3   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Parameter 1'</span>,<span class="string">'value'</span>,3.5);
+Xpar4   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Parameter 2'</span>,<span class="string">'value'</span>,4.5);
+
+Xin1     = Input;             <span class="comment">% create input object</span>
+Xin1     = add(Xin1,Xrvs1);     <span class="comment">% add random variable set 1 to Input object</span>
+Xin1     = add(Xin1,Xpar1);    <span class="comment">% add parameter 1 to Input object</span>
+Xin1     = add(Xin1,Xpar2);    <span class="comment">% add parameter 2 to Input object</span>
+
+Xin2     = Input;
+Xin2     = add(Xin2,Xrvs2);     <span class="comment">% add random variable set 2 to Input object</span>
+Xin2     = add(Xin2,Xpar3);    <span class="comment">% add parameter 3 to Input object</span>
+Xin2     = add(Xin2,Xpar4);    <span class="comment">% add parameter 4 to Input object</span>
+
+<span class="comment">% Generate some samples</span>
+Xin1     = sample(Xin1,<span class="string">'Nsamples'</span>,5);
+Xin2     = sample(Xin2,<span class="string">'Nsamples'</span>,5);
+</pre><h2>Define models (using Mio)<a name="3"></a></h2><pre class="codeinput"><span class="comment">% Define model 1</span>
+
+Xm1  = Mio(<span class="string">'Sscript'</span>,[<span class="string">'for i=1:length(Tinput), Toutput(i).add1=Tinput(i).Xrv1+Tinput(i).Xpar1;'</span> <span class="keyword">...</span>
+                                             <span class="string">'Toutput(i).sub1=Tinput(i).Xrv2-Tinput(i).Xpar2;'</span> <span class="keyword">...</span>
+                                             <span class="string">'Toutput(i).linfunc1=Tinput(i).Xrv1*Tinput(i).Xpar1; end'</span>], <span class="keyword">...</span>
+          <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'Xrv1'</span>,<span class="string">'Xrv2'</span>,<span class="string">'Xpar1'</span>,<span class="string">'Xpar2'</span>},<span class="keyword">...</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'add1'</span>,<span class="string">'sub1'</span>,<span class="string">'linfunc1'</span>},<span class="keyword">...</span>
+		  <span class="string">'Lfunction'</span>,false);
+Xev1 = Evaluator(<span class="string">'Xmio'</span>,Xm1);
+Xmdl1 = Model(<span class="string">'Xevaluator'</span>,Xev1,<span class="string">'Xinput'</span>,Xin1);
+
+
+<span class="comment">% Define model 2</span>
+
+Xm2  = Mio(<span class="string">'Sscript'</span>,[<span class="string">'for i=1:length(Tinput), Toutput(i).add2=Tinput(i).Xrv3+Tinput(i).Xpar3;'</span> <span class="keyword">...</span>
+                                              <span class="string">'Toutput(i).sub2=Tinput(i).Xrv4-Tinput(i).Xpar4;'</span> <span class="keyword">...</span>
+                                              <span class="string">'Toutput(i).linfunc2=Tinput(i).Xrv3*Tinput(i).Xpar3; end'</span>], <span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'Xrv3'</span>,<span class="string">'Xrv4'</span>,<span class="string">'Xpar3'</span>,<span class="string">'Xpar4'</span>},<span class="keyword">...</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'add2'</span>,<span class="string">'sub2'</span>,<span class="string">'linfunc2'</span>},<span class="keyword">...</span>
+          <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+		  <span class="string">'Lfunction'</span>,false);
+Xev2 = Evaluator(<span class="string">'Xmio'</span>,Xm2);
+Xmdl2 = Model(<span class="string">'Xevaluator'</span>,Xev2,<span class="string">'Xinput'</span>,Xin2);
+</pre><h2>Apply model and hence generate an output -&gt; SimulationData<a name="4"></a></h2><pre class="codeinput"><span class="comment">% Generate output with five samples of Xin1</span>
+Xout1 = apply(Xmdl1,Xin1);
+
+<span class="comment">% Generate output with other five samples of Xin1</span>
+Xin1   = sample(Xin1,<span class="string">'Nsamples'</span>,5);
+Xout2  =  apply(Xmdl1,Xin1);
+</pre><h2>Methods available for SimulationData<a name="5"></a></h2><pre class="codeinput"><span class="comment">% Sum up the results of two output objects (with same fields &amp; no. of</span>
+<span class="comment">% simulations)</span>
+Xout3 = plus(Xout1,Xout2);
+
+<span class="comment">% Subtract Xout2 from Xout1 (must have the same fields and no. of sims)</span>
+Xout4 = minus(Xout1,Xout2);
+
+<span class="comment">% Add new field with values to SimulationData object Xout3</span>
+Xout3 = addVariable(Xout3,<span class="string">'Cnames'</span>,{<span class="string">'sequence'</span>},<span class="string">'Mvalues'</span>,[1:5]');
+
+<span class="comment">% Get values of field "add1"</span>
+Vsamples_add1 = Xout1.getValues(<span class="string">'Sname'</span>,<span class="string">'add1'</span>);
+Vsamples_add2 = Xout2.getValues(<span class="string">'Sname'</span>,<span class="string">'add1'</span>);
+Vsamples_add3 = Xout3.getValues(<span class="string">'Sname'</span>,<span class="string">'add1'</span>);
+Vsamples_add4 = Xout4.getValues(<span class="string">'Sname'</span>,<span class="string">'add1'</span>);
+
+<span class="comment">% Get names of output and input variables and numerb of samples</span>
+Xout3.Cnames   <span class="comment">% number of variables</span>
+Xout3.Nsamples <span class="comment">% number of simulations</span>
+
+<span class="comment">% Create new SimulationData object and merge with Xout1 (the number</span>
+<span class="comment">% of sims must be the same, but the two objects can have different fields</span>
+Xout5  = apply(Xmdl2,Xin2);
+Xout6 = merge(Xout1,Xout5);
+</pre><pre class="codeoutput">
+ans = 
+
+    'Xrv1'
+    'Xrv2'
+    'Xpar1'
+    'Xpar2'
+    'add1'
+    'sub1'
+    'linfunc1'
+    'sequence'
+
+
+ans =
+
+     5
+
+</pre><h2>Create SimulationData by direclty passing the values<a name="6"></a></h2><pre class="codeinput"><span class="comment">% Create SimulationData by passing a matrix</span>
+Xout7 = SimulationData(<span class="string">'Sdescription'</span>,<span class="string">'new output'</span>, <span class="keyword">...</span>
+        <span class="string">'Cnames'</span>,{<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>},<span class="string">'Mvalues'</span>,randn(5,3));
+
+<span class="comment">% Create SimulationData by passing a structure</span>
+T(1).a = randn;
+T(1).b = randn;
+T(1).c = randn;
+T(2).a = randn;
+T(2).b = randn;
+T(2).c = randn;
+Xout8 = SimulationData(<span class="string">'Sdescription'</span>,<span class="string">'new output'</span>,<span class="string">'Tvalues'</span>,T);
+</pre><h2>Save and load SimulationData<a name="7"></a></h2><pre class="codeinput"><span class="comment">% Save files</span>
+Xout5.save(<span class="string">'SfileName'</span>,[CossanX.getCossanWorkingPath <span class="string">'/SimulationData5'</span>]);
+Xout7.save(<span class="string">'SfileName'</span>,[CossanX.getCossanWorkingPath <span class="string">'/SimulationData7'</span>]);
+Xout8.save(<span class="string">'SfileName'</span>,[CossanX.getCossanWorkingPath <span class="string">'/SimulationData8'</span>]);
+
+<span class="comment">% Load files</span>
+Xout5=SimulationData.load(<span class="string">'SfileName'</span>,[CossanX.getCossanWorkingPath <span class="string">'/SimulationData5'</span>]);
+Xout7=SimulationData.load(<span class="string">'SfileName'</span>,[CossanX.getCossanWorkingPath <span class="string">'/SimulationData7'</span>]);
+Xout8=SimulationData.load(<span class="string">'SfileName'</span>,[CossanX.getCossanWorkingPath <span class="string">'/SimulationData8'</span>]);
+display(Xout8)
+</pre><pre class="codeoutput"> SimulationData Object  -   Description: 
+</pre><h2>Validate results<a name="8"></a></h2><pre class="codeinput"><span class="comment">% Values of Xout1</span>
+Mdata1 = [1.7574    1.3633    1.5000    2.5000    3.2574   -1.1367    2.6360
+          1.0673    1.8226    1.5000    2.5000    2.5673   -0.6774    1.6010
+          1.4665   -0.9409    1.5000    2.5000    2.9665   -3.4409    2.1997
+          1.0321    2.2229    1.5000    2.5000    2.5321   -0.2771    1.5482
+          1.1190    0.6093    1.5000    2.5000    2.6190   -1.8907    1.6786];
+assert(all(all(abs(Xout1.getValues(<span class="string">'Cnames'</span>,Xout1.Cnames)-Mdata1)&lt;1.e-4)),<span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialSimulationData'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution Xout1 does not match.'</span>);
+
+<span class="comment">% Values of Xout2</span>
+Mdata2 = [1.3249   -0.5443    1.5000    2.5000    2.8249   -3.0443    1.9873
+          1.0842    0.1492    1.5000    2.5000    2.5842   -2.3508    1.6263
+          1.0363   -1.5908    1.5000    2.5000    2.5363   -4.0908    1.5545
+          1.8597    0.5174    1.5000    2.5000    3.3597   -1.9826    2.7896
+          1.1718    1.9195    1.5000    2.5000    2.6718   -0.5805    1.7577];
+assert(all(all(abs(Xout2.getValues(<span class="string">'Cnames'</span>,Xout2.Cnames)-Mdata2)&lt;1.e-4)),<span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialSimulationData'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution Xout2 does not match.'</span>);
+
+<span class="comment">% Values of Xout3</span>
+Mdata3 = [3.0822    0.8190    3.0000    5.0000    6.0822   -4.1810    4.6234    1.0000
+          2.1515    1.9718    3.0000    5.0000    5.1515   -3.0282    3.2272    2.0000
+          2.5028   -2.5316    3.0000    5.0000    5.5028   -7.5316    3.7541    3.0000
+          2.8918    2.7403    3.0000    5.0000    5.8918   -2.2597    4.3377    4.0000
+          2.2909    2.5289    3.0000    5.0000    5.2909   -2.4711    3.4363    5.0000];
+assert(all(all(abs(Xout3.getValues(<span class="string">'Cnames'</span>,Xout3.Cnames)-Mdata3)&lt;1.e-4)),<span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialSimulationData'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution Xout3 does not match.'</span>);
+
+<span class="comment">% Values of Xout4</span>
+Mdata4 = [0.4325    1.9076         0         0    0.4325    1.9076    0.6487
+          1.0673    1.8226    1.5000    2.5000    2.5673   -0.6774    1.6010
+          1.4665   -0.9409    1.5000    2.5000    2.9665   -3.4409    2.1997
+          1.0321    2.2229    1.5000    2.5000    2.5321   -0.2771    1.5482
+          1.1190    0.6093    1.5000    2.5000    2.6190   -1.8907    1.6786];
+assert(all(all(abs(Xout4.getValues(<span class="string">'Cnames'</span>,Xout4.Cnames)-Mdata4)&lt;1.e-4)),<span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialSimulationData'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution Xout4 does not match.'</span>);
+
+<span class="comment">% Values of Xout5</span>
+Mdata5 = [3.9342    2.5424    3.5000    4.5000    7.4342   -1.9576   13.7696
+          4.9600    2.1784    3.5000    4.5000    8.4600   -2.3216   17.3599
+          3.4128    2.2902    3.5000    4.5000    6.9128   -2.2098   11.9447
+          3.8183    1.6696    3.5000    4.5000    7.3183   -2.8304   13.3641
+          3.7228    1.4184    3.5000    4.5000    7.2228   -3.0816   13.0296];
+assert(all(all(abs(Xout5.getValues(<span class="string">'Cnames'</span>,Xout5.Cnames)-Mdata5)&lt;1.e-4)),<span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialSimulationData'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution Xout5 does not match.'</span>);
+
+<span class="comment">% Values of Xout6</span>
+Mdata6 =[1.7574    1.3633    1.5000    2.5000    3.2574   -1.1367    2.6360    3.9342   2.5424    3.5000    4.5000    7.4342   -1.9576   13.7696
+         1.0673    1.8226    1.5000    2.5000    2.5673   -0.6774    1.6010    4.9600   2.1784    3.5000    4.5000    8.4600   -2.3216   17.3599
+         1.4665   -0.9409    1.5000    2.5000    2.9665   -3.4409    2.1997    3.4128   2.2902    3.5000    4.5000    6.9128   -2.2098   11.9447
+         1.0321    2.2229    1.5000    2.5000    2.5321   -0.2771    1.5482    3.8183   1.6696    3.5000    4.5000    7.3183   -2.8304   13.3641
+         1.1190    0.6093    1.5000    2.5000    2.6190   -1.8907    1.6786    3.7228   1.4184    3.5000    4.5000    7.2228   -3.0816   13.0296];
+assert(all(all(abs(Xout6.getValues(<span class="string">'Cnames'</span>,Xout6.Cnames)-Mdata6)&lt;1.e-4)),<span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialSimulationData'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution Xout6 does not match.'</span>);
+
+<span class="comment">% Values of Xout7</span>
+Mdata7 = [-0.4746    1.1455   -1.2186
+           0.1461   -1.2698    0.2469
+          -0.6349   -0.4849    1.6717
+          -0.8929    0.1372   -0.5108
+          -0.2598   -0.5100    0.4744];
+assert(all(all(abs(Xout7.getValues(<span class="string">'Cnames'</span>,Xout7.Cnames)-Mdata7)&lt;1.e-4)),<span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialSimulationData'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution Xout7 does not match.'</span>);
+
+<span class="comment">% Values of Xout8</span>
+Mdata8 = [-0.3233    0.2433    0.5796
+          -1.3204    0.6165    0.4520];
+assert(all(all(abs(Xout8.getValues(<span class="string">'Cnames'</span>,Xout8.Cnames)-Mdata8)&lt;1.e-4)),<span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialSimulationData'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution Xout8 does not match.'</span>);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALSIMULATIONDATA
+%
+% In this tutorial it is shown how to construct a SimulationData object and 
+% how to use it
+%
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@SimulationData
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli~and~Barbara-Goller$ 
+
+% Reset the random number generator in order to always obtain the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(51125)
+
+%% Create output object by using Mio
+
+% Define an input object containing random variables and parameters
+
+Xrv1    = RandomVariable('Sdistribution','uniform','par1',1,'par2',2);  
+Xrv2    = RandomVariable('Sdistribution','normal','mean',0,'std',1); 
+Xrvs1    = RandomVariableSet('Cmembers',{'Xrv1','Xrv2'});    
+
+Xrv3    = RandomVariable('Sdistribution','uniform','par1',3,'par2',5);  
+Xrv4    = RandomVariable('Sdistribution','normal','mean',2,'std',0.5);   
+Xrvs2    = RandomVariableSet('Cmembers',{'Xrv3','Xrv4'});    
+
+Xpar1   = Parameter('Sdescription','Parameter 1','value',1.5);
+Xpar2   = Parameter('Sdescription','Parameter 2','value',2.5);
+Xpar3   = Parameter('Sdescription','Parameter 1','value',3.5);
+Xpar4   = Parameter('Sdescription','Parameter 2','value',4.5);
+
+Xin1     = Input;             % create input object
+Xin1     = add(Xin1,Xrvs1);     % add random variable set 1 to Input object
+Xin1     = add(Xin1,Xpar1);    % add parameter 1 to Input object
+Xin1     = add(Xin1,Xpar2);    % add parameter 2 to Input object
+
+Xin2     = Input;
+Xin2     = add(Xin2,Xrvs2);     % add random variable set 2 to Input object
+Xin2     = add(Xin2,Xpar3);    % add parameter 3 to Input object
+Xin2     = add(Xin2,Xpar4);    % add parameter 4 to Input object
+
+% Generate some samples
+Xin1     = sample(Xin1,'Nsamples',5);
+Xin2     = sample(Xin2,'Nsamples',5);
+
+%% Define models (using Mio)
+
+% Define model 1
+
+Xm1  = Mio('Sscript',['for i=1:length(Tinput), Toutput(i).add1=Tinput(i).Xrv1+Tinput(i).Xpar1;' ...
+                                             'Toutput(i).sub1=Tinput(i).Xrv2-Tinput(i).Xpar2;' ... 
+                                             'Toutput(i).linfunc1=Tinput(i).Xrv1*Tinput(i).Xpar1; end'], ...
+          'Liostructure',true,... 
+          'Cinputnames',{'Xrv1','Xrv2','Xpar1','Xpar2'},...
+          'Coutputnames',{'add1','sub1','linfunc1'},...
+		  'Lfunction',false); 
+Xev1 = Evaluator('Xmio',Xm1);
+Xmdl1 = Model('Xevaluator',Xev1,'Xinput',Xin1);      
+      
+
+% Define model 2
+
+Xm2  = Mio('Sscript',['for i=1:length(Tinput), Toutput(i).add2=Tinput(i).Xrv3+Tinput(i).Xpar3;' ...
+                                              'Toutput(i).sub2=Tinput(i).Xrv4-Tinput(i).Xpar4;' ... 
+                                              'Toutput(i).linfunc2=Tinput(i).Xrv3*Tinput(i).Xpar3; end'], ...
+          'Cinputnames',{'Xrv3','Xrv4','Xpar3','Xpar4'},...
+          'Coutputnames',{'add2','sub2','linfunc2'},...
+          'Liostructure',true,... 
+		  'Lfunction',false); 
+Xev2 = Evaluator('Xmio',Xm2);
+Xmdl2 = Model('Xevaluator',Xev2,'Xinput',Xin2);          
+
+%% Apply model and hence generate an output -> SimulationData
+
+% Generate output with five samples of Xin1
+Xout1 = apply(Xmdl1,Xin1);
+
+% Generate output with other five samples of Xin1
+Xin1   = sample(Xin1,'Nsamples',5);
+Xout2  =  apply(Xmdl1,Xin1);
+
+
+%% Methods available for SimulationData
+
+% Sum up the results of two output objects (with same fields & no. of
+% simulations)
+Xout3 = plus(Xout1,Xout2);
+
+% Subtract Xout2 from Xout1 (must have the same fields and no. of sims)
+Xout4 = minus(Xout1,Xout2);
+
+% Add new field with values to SimulationData object Xout3
+Xout3 = addVariable(Xout3,'Cnames',{'sequence'},'Mvalues',[1:5]');
+
+% Get values of field "add1"
+Vsamples_add1 = Xout1.getValues('Sname','add1');
+Vsamples_add2 = Xout2.getValues('Sname','add1');
+Vsamples_add3 = Xout3.getValues('Sname','add1');
+Vsamples_add4 = Xout4.getValues('Sname','add1');
+
+% Get names of output and input variables and numerb of samples
+Xout3.Cnames   % number of variables
+Xout3.Nsamples % number of simulations
+
+% Create new SimulationData object and merge with Xout1 (the number
+% of sims must be the same, but the two objects can have different fields
+Xout5  = apply(Xmdl2,Xin2);
+Xout6 = merge(Xout1,Xout5);
+
+%% Create SimulationData by direclty passing the values 
+
+% Create SimulationData by passing a matrix
+Xout7 = SimulationData('Sdescription','new output', ...
+        'Cnames',{'a','b','c'},'Mvalues',randn(5,3));
+    
+% Create SimulationData by passing a structure
+T(1).a = randn;
+T(1).b = randn;
+T(1).c = randn;
+T(2).a = randn;
+T(2).b = randn;
+T(2).c = randn;
+Xout8 = SimulationData('Sdescription','new output','Tvalues',T);
+    
+
+%% Save and load SimulationData
+
+% Save files
+Xout5.save('SfileName',[CossanX.getCossanWorkingPath '/SimulationData5']);
+Xout7.save('SfileName',[CossanX.getCossanWorkingPath '/SimulationData7']);
+Xout8.save('SfileName',[CossanX.getCossanWorkingPath '/SimulationData8']);
+
+% Load files
+Xout5=SimulationData.load('SfileName',[CossanX.getCossanWorkingPath '/SimulationData5']);
+Xout7=SimulationData.load('SfileName',[CossanX.getCossanWorkingPath '/SimulationData7']);
+Xout8=SimulationData.load('SfileName',[CossanX.getCossanWorkingPath '/SimulationData8']);
+display(Xout8)
+
+
+%% Validate results
+
+% Values of Xout1
+Mdata1 = [1.7574    1.3633    1.5000    2.5000    3.2574   -1.1367    2.6360
+          1.0673    1.8226    1.5000    2.5000    2.5673   -0.6774    1.6010
+          1.4665   -0.9409    1.5000    2.5000    2.9665   -3.4409    2.1997
+          1.0321    2.2229    1.5000    2.5000    2.5321   -0.2771    1.5482
+          1.1190    0.6093    1.5000    2.5000    2.6190   -1.8907    1.6786];
+assert(all(all(abs(Xout1.getValues('Cnames',Xout1.Cnames)-Mdata1)<1.e-4)),...
+       'CossanX:Tutorials:TutorialSimulationData', ...
+       'Reference Solution Xout1 does not match.');
+
+% Values of Xout2   
+Mdata2 = [1.3249   -0.5443    1.5000    2.5000    2.8249   -3.0443    1.9873
+          1.0842    0.1492    1.5000    2.5000    2.5842   -2.3508    1.6263
+          1.0363   -1.5908    1.5000    2.5000    2.5363   -4.0908    1.5545
+          1.8597    0.5174    1.5000    2.5000    3.3597   -1.9826    2.7896
+          1.1718    1.9195    1.5000    2.5000    2.6718   -0.5805    1.7577];
+assert(all(all(abs(Xout2.getValues('Cnames',Xout2.Cnames)-Mdata2)<1.e-4)),...
+       'CossanX:Tutorials:TutorialSimulationData', ...
+       'Reference Solution Xout2 does not match.');      
+ 
+% Values of Xout3      
+Mdata3 = [3.0822    0.8190    3.0000    5.0000    6.0822   -4.1810    4.6234    1.0000
+          2.1515    1.9718    3.0000    5.0000    5.1515   -3.0282    3.2272    2.0000
+          2.5028   -2.5316    3.0000    5.0000    5.5028   -7.5316    3.7541    3.0000
+          2.8918    2.7403    3.0000    5.0000    5.8918   -2.2597    4.3377    4.0000
+          2.2909    2.5289    3.0000    5.0000    5.2909   -2.4711    3.4363    5.0000];
+assert(all(all(abs(Xout3.getValues('Cnames',Xout3.Cnames)-Mdata3)<1.e-4)),...
+       'CossanX:Tutorials:TutorialSimulationData', ...
+       'Reference Solution Xout3 does not match.');  
+   
+% Values of Xout4     
+Mdata4 = [0.4325    1.9076         0         0    0.4325    1.9076    0.6487
+          1.0673    1.8226    1.5000    2.5000    2.5673   -0.6774    1.6010
+          1.4665   -0.9409    1.5000    2.5000    2.9665   -3.4409    2.1997
+          1.0321    2.2229    1.5000    2.5000    2.5321   -0.2771    1.5482
+          1.1190    0.6093    1.5000    2.5000    2.6190   -1.8907    1.6786];
+assert(all(all(abs(Xout4.getValues('Cnames',Xout4.Cnames)-Mdata4)<1.e-4)),...
+       'CossanX:Tutorials:TutorialSimulationData', ...
+       'Reference Solution Xout4 does not match.'); 
+
+% Values of Xout5      
+Mdata5 = [3.9342    2.5424    3.5000    4.5000    7.4342   -1.9576   13.7696
+          4.9600    2.1784    3.5000    4.5000    8.4600   -2.3216   17.3599
+          3.4128    2.2902    3.5000    4.5000    6.9128   -2.2098   11.9447
+          3.8183    1.6696    3.5000    4.5000    7.3183   -2.8304   13.3641
+          3.7228    1.4184    3.5000    4.5000    7.2228   -3.0816   13.0296];   
+assert(all(all(abs(Xout5.getValues('Cnames',Xout5.Cnames)-Mdata5)<1.e-4)),...
+       'CossanX:Tutorials:TutorialSimulationData', ...
+       'Reference Solution Xout5 does not match.');  
+
+% Values of Xout6     
+Mdata6 =[1.7574    1.3633    1.5000    2.5000    3.2574   -1.1367    2.6360    3.9342   2.5424    3.5000    4.5000    7.4342   -1.9576   13.7696
+         1.0673    1.8226    1.5000    2.5000    2.5673   -0.6774    1.6010    4.9600   2.1784    3.5000    4.5000    8.4600   -2.3216   17.3599
+         1.4665   -0.9409    1.5000    2.5000    2.9665   -3.4409    2.1997    3.4128   2.2902    3.5000    4.5000    6.9128   -2.2098   11.9447
+         1.0321    2.2229    1.5000    2.5000    2.5321   -0.2771    1.5482    3.8183   1.6696    3.5000    4.5000    7.3183   -2.8304   13.3641
+         1.1190    0.6093    1.5000    2.5000    2.6190   -1.8907    1.6786    3.7228   1.4184    3.5000    4.5000    7.2228   -3.0816   13.0296];
+assert(all(all(abs(Xout6.getValues('Cnames',Xout6.Cnames)-Mdata6)<1.e-4)),...
+       'CossanX:Tutorials:TutorialSimulationData', ...
+       'Reference Solution Xout6 does not match.');  
+
+% Values of Xout7   
+Mdata7 = [-0.4746    1.1455   -1.2186
+           0.1461   -1.2698    0.2469
+          -0.6349   -0.4849    1.6717
+          -0.8929    0.1372   -0.5108
+          -0.2598   -0.5100    0.4744];
+assert(all(all(abs(Xout7.getValues('Cnames',Xout7.Cnames)-Mdata7)<1.e-4)),...
+       'CossanX:Tutorials:TutorialSimulationData', ...
+       'Reference Solution Xout7 does not match.');  
+   
+% Values of Xout8       
+Mdata8 = [-0.3233    0.2433    0.5796
+          -1.3204    0.6165    0.4520];
+assert(all(all(abs(Xout8.getValues('Cnames',Xout8.Cnames)-Mdata8)<1.e-4)),...
+       'CossanX:Tutorials:TutorialSimulationData', ...
+       'Reference Solution Xout8 does not match.');  
+        
+
+##### SOURCE END #####
+--></body></html>

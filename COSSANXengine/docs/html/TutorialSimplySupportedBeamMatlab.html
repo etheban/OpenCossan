@@ -1,0 +1,134 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialSimplySupportedBeamMatlab</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-02-24"><meta name="DC.source" content="TutorialSimplySupportedBeamMatlab.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Tutorial Simpy Supported Beam</a></li><li><a href="#2">Create the input</a></li><li><a href="#3">Preparation of the Evaluator</a></li><li><a href="#4">Preparation of the Model</a></li></ul></div><h2>Tutorial Simpy Supported Beam<a name="1"></a></h2><p>See also <a href="http://mechanik.uibk.ac.at/wiki/index.php/Beam_3-point_bending_(overview">http://mechanik.uibk.ac.at/wiki/index.php/Beam_3-point_bending_(overview</a>)</p><pre class="codeinput"><span class="comment">%   Copyright 1990-2010 Cossan Working Group</span>
+</pre><h2>Create the input<a name="2"></a></h2><pre class="codeinput">youngs   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,210e3,<span class="string">'std'</span>,10e3);
+force    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'lognormal'</span>,<span class="string">'mean'</span>,10,<span class="string">'std'</span>,1.4);
+height   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,4,<span class="string">'upperbound'</span>,6);
+width    = Parameter(<span class="string">'value'</span>,8.1);
+max_disp = Parameter(<span class="string">'value'</span>,0.015);
+inertia  = Function(<span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;width&amp;&gt;.*&lt;&amp;height&amp;&gt;.^3/12'</span>);
+
+Xrvs = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'youngs'</span>,<span class="string">'force'</span>,<span class="string">'height'</span>});
+Xinp = Input(<span class="string">'Sdescription'</span>,<span class="string">'Xinput object'</span>);
+Xinp = add(Xinp,Xrvs);
+Xinp = add(Xinp,width);
+Xinp = add(Xinp,inertia);
+Xinp = add(Xinp,max_disp);
+
+<span class="comment">% See summary of the Input</span>
+display(Xinp)
+</pre><h2>Preparation of the Evaluator<a name="3"></a></h2><pre class="codeinput">Xmio = Mio(<span class="string">'Sfile'</span>,<span class="string">'displacement.m'</span>,<span class="string">'Cinputnames'</span>,{<span class="string">'youngs'</span>,<span class="string">'force'</span>,<span class="string">'height'</span>,<span class="string">'width'</span>,<span class="string">'inertia'</span>}, <span class="keyword">...</span>
+           <span class="string">'Coutputnames'</span>,{<span class="string">'disp'</span>});
+
+Xevaluator = Evaluator(<span class="string">'CXmembers'</span>,{Xmio},<span class="string">'CSmembers'</span>,{<span class="string">'Xmio'</span>});
+</pre><h2>Preparation of the Model<a name="4"></a></h2><pre class="codeinput">Xmodel=Model(<span class="string">'Xinput'</span>,Xinp,<span class="string">'Xevaluator'</span>,Xevaluator);
+
+<span class="comment">% See summary of the Model</span>
+display(Xmodel)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial Simpy Supported Beam
+%
+% See also http://mechanik.uibk.ac.at/wiki/index.php/Beam_3-point_bending_(overview)
+
+%   Copyright 1990-2010 Cossan Working Group
+%   $Revision: 1 $  $Date: 2011/02/18 $
+
+%% Create the input
+
+youngs   = RandomVariable('Sdistribution','normal','mean',210e3,'std',10e3);    
+force    = RandomVariable('Sdistribution','lognormal','mean',10,'std',1.4); 
+height   = RandomVariable('Sdistribution','uniform','lowerbound',4,'upperbound',6);    
+width    = Parameter('value',8.1);  
+max_disp = Parameter('value',0.015); 
+inertia  = Function('Sexpression','<&width&>.*<&height&>.^3/12');
+
+Xrvs = RandomVariableSet('Cmembers',{'youngs','force','height'}); 
+Xinp = Input('Sdescription','Xinput object');       
+Xinp = add(Xinp,Xrvs);
+Xinp = add(Xinp,width);
+Xinp = add(Xinp,inertia);
+Xinp = add(Xinp,max_disp);
+
+% See summary of the Input
+display(Xinp)
+
+%% Preparation of the Evaluator
+
+Xmio = Mio('Sfile','displacement.m','Cinputnames',{'youngs','force','height','width','inertia'}, ...
+           'Coutputnames',{'disp'});
+       
+Xevaluator = Evaluator('CXmembers',{Xmio},'CSmembers',{'Xmio'});
+
+%% Preparation of the Model
+
+Xmodel=Model('Xinput',Xinp,'Xevaluator',Xevaluator);
+
+% See summary of the Model
+display(Xmodel)
+
+##### SOURCE END #####
+--></body></html>

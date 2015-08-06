@@ -1,0 +1,196 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutotial for the Object FailureProbability</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialFailureProbability.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutotial for the Object FailureProbability</h1><!--introduction--><pre> This tutorial is intended for showing how to use the object
+ FailureProbability.</pre><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@FailureProbability">http://mechanik.uibk.ac.at/wiki/index.php/@FailureProbability</a></p><p><img src="TutorialFailureProbability_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialFailureProbability_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">CREATE FailureProbability OBJECT (Constructor)</a></li><li><a href="#2">CREATE FailureProbability OBJECT using Simulation Output</a></li><li><a href="#3">CREATE FailureProbability OBJECT using COSSAN objects</a></li><li><a href="#4">Add new batches</a></li><li><a href="#5">Show values</a></li></ul></div><h2>CREATE FailureProbability OBJECT (Constructor)<a name="1"></a></h2><p>The object FailureProbability can be constructor passing the values of the estimation of the failure probability, the variance of the estimator and the number of samples</p><pre class="codeinput">Xopf=FailureProbability(<span class="string">'pf'</span>,0.01,<span class="string">'variancepf'</span>,0.00001,<span class="string">'Nsamples'</span>,10,<span class="string">'Smethod'</span>,<span class="string">'UserDefined'</span>);
+
+<span class="comment">% Show the object details</span>
+display(Xopf)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+</pre><h2>CREATE FailureProbability OBJECT using Simulation Output<a name="2"></a></h2><p>The object can also be constructed passing a SimulationData object and the name of the performance function (only for MCS IS HS and SS)</p><pre class="codeinput"><span class="comment">% Construct a SimulationData object</span>
+
+T = cell2struct({rand(1,1)},<span class="string">'a'</span>);
+Xsimout = SimulationData(<span class="string">'Sdescription'</span>,<span class="string">'new output'</span>,<span class="string">'Tvalues'</span>,T);
+
+Xopf=FailureProbability(<span class="string">'XsimulationData'</span>,Xsimout,<span class="string">'Sperformancefunction'</span>,<span class="string">'a'</span>,<span class="string">'Smethod'</span>,<span class="string">'MonteCarlo'</span>);
+
+display(Xopf)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+</pre><h2>CREATE FailureProbability OBJECT using COSSAN objects<a name="3"></a></h2><pre class="codeinput">Xsim=MonteCarlo(<span class="string">'Nsamples'</span>,1); <span class="comment">%#ok&lt;SNASGU&gt;</span>
+Xprobmod=PerformanceFunction(<span class="string">'Soutputname'</span>,<span class="string">'a'</span>,<span class="string">'Scapacity'</span>,<span class="string">'a'</span>,<span class="string">'Sdemand'</span>,<span class="string">'a'</span>); <span class="comment">%#ok&lt;SNASGU&gt;</span>
+Xopf=FailureProbability(<span class="string">'Csmembers'</span>,{<span class="string">'Xsimout'</span>,<span class="string">'Xsim'</span>,<span class="string">'Xprobmod'</span>});
+
+display(Xopf)
+
+<span class="comment">% The object passed with Cmembers must be present in the base workspace</span>
+<span class="comment">% The object ProbabilisticModel can also be used instead of the object PerformanceFunction</span>
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+</pre><h2>Add new batches<a name="4"></a></h2><pre class="codeinput">Xopf=Xopf.addBatch(<span class="string">'Xsimulationoutput'</span>,Xsimout);
+<span class="comment">% the object now contains 2 batches</span>
+display(Xopf)
+
+Xopf=Xopf.addBatch(<span class="string">'pf'</span>,0.1,<span class="string">'variancepf'</span>,0.04,<span class="string">'Nsamples'</span>,15,<span class="string">'secondMoment'</span>,0.1);
+
+display(Xopf)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+</pre><h2>Show values<a name="5"></a></h2><p>display pfhat</p><pre class="codeinput">Xopf.pfhat
+<span class="comment">% show pf of all batches</span>
+Xopf.Vpf
+
+<span class="comment">% display CoV</span>
+Xopf.cov
+<span class="comment">% show Variance pf all batches</span>
+Xopf.VvariancePf
+</pre><pre class="codeoutput">
+ans =
+
+     8.823529411764706e-02
+
+
+ans =
+
+                         0                         0     1.000000000000000e-01
+
+
+ans =
+
+     1.993740203737688e+00
+
+
+ans =
+
+                         0                         0     4.000000000000000e-02
+
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutotial for the Object FailureProbability
+%
+%   This tutorial is intended for showing how to use the object
+%   FailureProbability.
+%
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@FailureProbability
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+%% CREATE FailureProbability OBJECT (Constructor)
+% The object FailureProbability can be constructor passing the values of the
+% estimation of the failure probability, the variance of the estimator and the number of samples 
+Xopf=FailureProbability('pf',0.01,'variancepf',0.00001,'Nsamples',10,'Smethod','UserDefined');
+
+% Show the object details
+display(Xopf)
+
+%% CREATE FailureProbability OBJECT using Simulation Output
+% The object can also be constructed passing a SimulationData object and
+% the name of the performance function (only for MCS IS HS and SS)
+
+% Construct a SimulationData object
+
+T = cell2struct({rand(1,1)},'a');
+Xsimout = SimulationData('Sdescription','new output','Tvalues',T);
+
+Xopf=FailureProbability('XsimulationData',Xsimout,'Sperformancefunction','a','Smethod','MonteCarlo');
+
+display(Xopf)
+
+%% CREATE FailureProbability OBJECT using COSSAN objects
+
+Xsim=MonteCarlo('Nsamples',1); %#ok<SNASGU>
+Xprobmod=PerformanceFunction('Soutputname','a','Scapacity','a','Sdemand','a'); %#ok<SNASGU>
+Xopf=FailureProbability('Csmembers',{'Xsimout','Xsim','Xprobmod'});
+
+display(Xopf)
+
+% The object passed with Cmembers must be present in the base workspace
+% The object ProbabilisticModel can also be used instead of the object PerformanceFunction
+
+%% Add new batches
+Xopf=Xopf.addBatch('Xsimulationoutput',Xsimout);
+% the object now contains 2 batches
+display(Xopf)
+
+Xopf=Xopf.addBatch('pf',0.1,'variancepf',0.04,'Nsamples',15,'secondMoment',0.1);
+
+display(Xopf)
+
+
+%% Show values
+% display pfhat
+Xopf.pfhat
+% show pf of all batches
+Xopf.Vpf
+
+% display CoV
+Xopf.cov
+% show Variance pf all batches
+Xopf.VvariancePf
+
+
+
+##### SOURCE END #####
+--></body></html>

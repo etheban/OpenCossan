@@ -1,0 +1,332 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for the Line Sampling Object</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialLineSampling.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for the Line Sampling Object</h1><!--introduction--><p>This tutorial is focus on the use and definition of the Line Sampling The line sampling is not applicable to simulate the Model since it required a performace function.</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@LineSampling">http://mechanik.uibk.ac.at/wiki/index.php/@LineSampling</a></p><p><img src="TutorialLineSampling_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialLineSampling_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Problem Definition</a></li><li><a href="#2">Define the Evaluator (i.e. how our model is evaluate)</a></li><li><a href="#3">Define the Physical Model based on the Input and the Evaluator</a></li><li><a href="#4">Test the Model</a></li><li><a href="#5">Define LineSampling object</a></li><li><a href="#6">Generate samples using LineSampling</a></li><li><a href="#7">Perform LineSampling simulation</a></li><li><a href="#8">Apply the Line Sampling simulation method to a ProbabilisticModel</a></li><li><a href="#9">Compute Reference Solution</a></li><li><a href="#10">Compute important direction</a></li><li><a href="#11">Use Adaptive Lines</a></li><li><a href="#12">Output for Line Sampling</a></li><li><a href="#13">Validate Solutions</a></li></ul></div><h2>Problem Definition<a name="1"></a></h2><p>Here we define our problem</p><pre class="codeinput"><span class="comment">% Define RandomVariable</span>
+RV1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+RV2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+<span class="comment">% Define the RandomVariableSet</span>
+Xrvs1=RandomVariableSet(<span class="string">'CSmembers'</span>,{<span class="string">'RV1'</span>, <span class="string">'RV2'</span>},<span class="string">'CXrandomVariables'</span>,{RV1, RV2});
+<span class="comment">% Add parameter for the performance function</span>
+Xthreshold=Parameter(<span class="string">'value'</span>,2);
+<span class="comment">% Construct Input Object</span>
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input Object of our model'</span>, <span class="keyword">...</span>
+    <span class="string">'CXmembers'</span>,{Xrvs1 Xthreshold},<span class="string">'CSmembers'</span>,{<span class="string">'Xrvs1'</span> <span class="string">'Xthreshold'</span>});
+</pre><h2>Define the Evaluator (i.e. how our model is evaluate)<a name="2"></a></h2><p>Construct a Mio object</p><pre class="codeinput">Xm=Mio(<span class="string">'Sdescription'</span>, <span class="string">'This define our Model'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out=-Tinput(j).RV1+Tinput(j).RV2; end'</span>, <span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'out'</span>},<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'RV1'</span> <span class="string">'RV2'</span>},<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+<span class="comment">% Construct the Evaluator</span>
+Xeval = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'Evaluator for the IS tutorial'</span>);
+</pre><h2>Define the Physical Model based on the Input and the Evaluator<a name="3"></a></h2><pre class="codeinput">Xmdl=Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xin);
+</pre><h2>Test the Model<a name="4"></a></h2><p>Generate 10 random realization of the input</p><pre class="codeinput">Xin = sample(Xin,<span class="string">'Nsamples'</span>,10);
+
+<span class="comment">% Check the Model object</span>
+Xo = apply(Xmdl,Xin);
+<span class="comment">% Show Resukts</span>
+display(Xo);
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+</pre><h2>Define LineSampling object<a name="5"></a></h2><p>The LineSampling object requires an important direction defined by means of a Gradient object or a localSensitivityMeasures</p><pre class="codeinput">Xgrad=Sensitivity.gradientFiniteDifferences(<span class="string">'Xtarget'</span>,Xmdl,<span class="string">'Coutputname'</span>,{<span class="string">'out'</span>});
+
+
+Xls =LineSampling(<span class="string">'Nlines'</span>,20,<span class="string">'Xgradient'</span>,Xgrad);
+</pre><h2>Generate samples using LineSampling<a name="6"></a></h2><pre class="codeinput">Xsample=Xls.sample(<span class="string">'Xinput'</span>,Xin);
+display(Xsample)
+</pre><pre class="codeoutput">Samples Object - Description: 
+Nsamples= 120
+-----------------------------------------------------------
+* No design of experiments for Design Variables present
+* No stochastic process defined
+</pre><h2>Perform LineSampling simulation<a name="7"></a></h2><pre class="codeinput">Xo =Xls.apply(Xmdl);
+display(Xo)
+</pre><h2>Apply the Line Sampling simulation method to a ProbabilisticModel<a name="8"></a></h2><p>Define a probabilisti model (Requires a Model object and a PerfomanceFunction object Construct the performance function</p><pre class="codeinput">Xpf=PerformanceFunction(<span class="string">'Scapacity'</span>,<span class="string">'Xthreshold'</span>,<span class="string">'Sdemand'</span>,<span class="string">'out'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Vg'</span>);
+<span class="comment">% Construct a ProbabilisticModel Object</span>
+Xpm=ProbabilisticModel(<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'XperformanceFunction'</span>,Xpf);
+</pre><h2>Compute Reference Solution<a name="9"></a></h2><p>This can take a while</p><pre class="codeinput">Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,5e4);
+XpfMC=Xpm.pf(Xmc);
+display(XpfMC)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+</pre><h2>Compute important direction<a name="10"></a></h2><pre class="codeinput">Xgrad=Sensitivity.gradientFiniteDifferences(<span class="string">'Xtarget'</span>,Xpm,<span class="string">'Coutputname'</span>,{<span class="string">'Vg'</span>});
+Xlocal=Sensitivity.localFiniteDifferences(<span class="string">'Xtarget'</span>,Xpm,<span class="string">'Coutputname'</span>,{<span class="string">'Vg'</span>});
+XlocalMC=Sensitivity.localMonteCarlo(<span class="string">'Xtarget'</span>,Xpm,<span class="string">'Coutputname'</span>,{<span class="string">'Vg'</span>});
+
+Xls1=LineSampling(<span class="string">'Nlines'</span>,10,<span class="string">'Xgradient'</span>,Xgrad);
+Xls2=LineSampling(<span class="string">'Nlines'</span>,10,<span class="string">'Xgradient'</span>,Xlocal);
+Xls3=LineSampling(<span class="string">'Nlines'</span>,10,<span class="string">'Xgradient'</span>,XlocalMC);
+
+[Xpf1 Xout1]=Xpm.pf(Xls1);
+[Xpf2 Xout2]=Xpm.pf(Xls2);
+[Xpf3 Xout3]=Xpm.pf(Xls3);
+
+display(Xpf1)
+display(Xpf2)
+display(Xpf3)
+
+Xout1.plotLines(<span class="string">'Stitle'</span>,<span class="string">'LineSampling + Gradient'</span>,<span class="string">'Ldistance'</span>,false);
+Xout2.plotLines(<span class="string">'Stitle'</span>,<span class="string">'LineSampling + LocalFiniteDifference'</span>,<span class="string">'Ldistance'</span>,false);
+Xout3.plotLines(<span class="string">'Stitle'</span>,<span class="string">'LineSampling + LocalMonteCarlo'</span>,<span class="string">'Ldistance'</span>,false);
+
+<span class="comment">% Change the important direction (defined in the Gradient object in the</span>
+<span class="comment">% field Valpha)</span>
+Xgrad=Sensitivity.gradientFiniteDifferences(<span class="string">'Xtarget'</span>,Xpm,<span class="string">'Coutputname'</span>,{<span class="string">'Vg'</span>});
+Xls=LineSampling(<span class="string">'Nlines'</span>,20,<span class="string">'Xgradient'</span>,Xgrad);
+
+<span class="comment">% Change the number of batches and number of lines</span>
+Xls.Nbatches=1;
+Xls.Nlines=200;
+[Xpf XlsData]=Xpm.pf(Xls);
+
+XlsData.plotLines;
+
+display(Xpf)    <span class="comment">% Show FailureProbability object</span>
+
+<span class="comment">%  use local sensitivity measures</span>
+Xlsm=Sensitivity.localFiniteDifferences(<span class="string">'Xtarget'</span>,Xpm,<span class="string">'Coutputname'</span>,{<span class="string">'Vg'</span>});
+Xls=LineSampling(<span class="string">'Nlines'</span>,20,<span class="string">'XlocalSensitivityMeasures'</span>,Xlsm);
+
+<span class="comment">% Change the number of batches and number of lines</span>
+Xls.Nbatches=1;
+Xls.Nlines=600;
+[Xpf XlsData]=Xpm.pf(Xls);
+
+XlsData.plotLines;
+
+display(Xpf)    <span class="comment">% Show FailureProbability object</span>
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+</pre><img vspace="5" hspace="5" src="TutorialLineSampling_01.png" alt=""> <img vspace="5" hspace="5" src="TutorialLineSampling_02.png" alt=""> <img vspace="5" hspace="5" src="TutorialLineSampling_03.png" alt=""> <img vspace="5" hspace="5" src="TutorialLineSampling_04.png" alt=""> <img vspace="5" hspace="5" src="TutorialLineSampling_05.png" alt=""> <h2>Use Adaptive Lines<a name="11"></a></h2><p>The adaptive method allows to recude considerable the number of samples required.</p><pre class="codeinput"><span class="comment">% Reset random number stream</span>
+CossanX.resetRandomNumberGenerator(51125)
+
+Xls=LineSampling(<span class="string">'Nlines'</span>,20,<span class="string">'XlocalSensitivityMeasures'</span>,Xlsm,<span class="string">'Ladaptive'</span>,true);
+Xpf =Xpm.pf(Xls);
+
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,1e4);
+XpfMC=Xpm.pf(Xmc);
+display(XpfMC)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+</pre><h2>Output for Line Sampling<a name="12"></a></h2><p>Please refer to the tutorial TutorialLineSamplingOutput in order to see more options and plot methods for the LineSamplingOutput</p><h2>Validate Solutions<a name="13"></a></h2><pre class="codeinput">assert(abs(Xpf.pfhat-7.775e-2)&lt;1e-4,<span class="string">'COSSANX:Tutorials'</span>,<span class="string">'Wrong results'</span>)
+</pre><pre class="codeoutput">Error using ==&gt; TutorialLineSampling at 150
+Wrong results
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the Line Sampling Object
+%
+% This tutorial is focus on the use and definition of the Line Sampling
+% The line sampling is not applicable to simulate the Model since it
+% required a performace function.
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@LineSampling
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+ 
+%% Problem Definition
+% Here we define our problem
+
+% Define RandomVariable
+RV1=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);  
+RV2=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);
+% Define the RandomVariableSet
+Xrvs1=RandomVariableSet('CSmembers',{'RV1', 'RV2'},'CXrandomVariables',{RV1, RV2});
+% Add parameter for the performance function
+Xthreshold=Parameter('value',2);
+% Construct Input Object
+Xin = Input('Sdescription','Input Object of our model', ...
+    'CXmembers',{Xrvs1 Xthreshold},'CSmembers',{'Xrvs1' 'Xthreshold'});
+
+%% Define the Evaluator (i.e. how our model is evaluate)
+% Construct a Mio object
+Xm=Mio('Sdescription', 'This define our Model', ...
+    'Sscript','for j=1:length(Tinput), Toutput(j).out=-Tinput(j).RV1+Tinput(j).RV2; end', ...
+    'Liostructure',true,...
+    'Coutputnames',{'out'},...
+    'Cinputnames',{'RV1' 'RV2'},...
+    'Lfunction',false); % This flag specify if the .m file is a script or a function.
+% Construct the Evaluator
+Xeval = Evaluator('Xmio',Xm,'Sdescription','Evaluator for the IS tutorial');
+
+%% Define the Physical Model based on the Input and the Evaluator
+Xmdl=Model('Xevaluator',Xeval,'Xinput',Xin);
+
+%% Test the Model
+% Generate 10 random realization of the input
+Xin = sample(Xin,'Nsamples',10);
+
+% Check the Model object
+Xo = apply(Xmdl,Xin);
+% Show Resukts
+display(Xo);
+
+
+%% Define LineSampling object
+% The LineSampling object requires an important direction defined by means
+% of a Gradient object or a localSensitivityMeasures
+
+Xgrad=Sensitivity.gradientFiniteDifferences('Xtarget',Xmdl,'Coutputname',{'out'});
+
+
+Xls =LineSampling('Nlines',20,'Xgradient',Xgrad);
+ 
+%% Generate samples using LineSampling
+Xsample=Xls.sample('Xinput',Xin);
+display(Xsample)
+
+%% Perform LineSampling simulation
+Xo =Xls.apply(Xmdl);
+display(Xo)
+
+%% Apply the Line Sampling simulation method to a ProbabilisticModel
+% Define a probabilisti model (Requires a Model object and a PerfomanceFunction object
+% Construct the performance function
+Xpf=PerformanceFunction('Scapacity','Xthreshold','Sdemand','out','Soutputname','Vg');
+% Construct a ProbabilisticModel Object
+Xpm=ProbabilisticModel('Xmodel',Xmdl,'XperformanceFunction',Xpf);
+
+
+%% Compute Reference Solution
+% This can take a while
+Xmc=MonteCarlo('Nsamples',5e4);
+XpfMC=Xpm.pf(Xmc);
+display(XpfMC)
+
+%% Compute important direction 
+Xgrad=Sensitivity.gradientFiniteDifferences('Xtarget',Xpm,'Coutputname',{'Vg'});
+Xlocal=Sensitivity.localFiniteDifferences('Xtarget',Xpm,'Coutputname',{'Vg'});
+XlocalMC=Sensitivity.localMonteCarlo('Xtarget',Xpm,'Coutputname',{'Vg'});
+
+Xls1=LineSampling('Nlines',10,'Xgradient',Xgrad);
+Xls2=LineSampling('Nlines',10,'Xgradient',Xlocal);
+Xls3=LineSampling('Nlines',10,'Xgradient',XlocalMC);
+
+[Xpf1 Xout1]=Xpm.pf(Xls1);
+[Xpf2 Xout2]=Xpm.pf(Xls2);
+[Xpf3 Xout3]=Xpm.pf(Xls3);
+
+display(Xpf1)
+display(Xpf2)
+display(Xpf3)
+
+Xout1.plotLines('Stitle','LineSampling + Gradient','Ldistance',false);
+Xout2.plotLines('Stitle','LineSampling + LocalFiniteDifference','Ldistance',false);
+Xout3.plotLines('Stitle','LineSampling + LocalMonteCarlo','Ldistance',false);
+
+% Change the important direction (defined in the Gradient object in the
+% field Valpha)
+Xgrad=Sensitivity.gradientFiniteDifferences('Xtarget',Xpm,'Coutputname',{'Vg'});
+Xls=LineSampling('Nlines',20,'Xgradient',Xgrad);
+
+% Change the number of batches and number of lines
+Xls.Nbatches=1;
+Xls.Nlines=200;
+[Xpf XlsData]=Xpm.pf(Xls);
+
+XlsData.plotLines;
+
+display(Xpf)    % Show FailureProbability object
+
+%  use local sensitivity measures 
+Xlsm=Sensitivity.localFiniteDifferences('Xtarget',Xpm,'Coutputname',{'Vg'});
+Xls=LineSampling('Nlines',20,'XlocalSensitivityMeasures',Xlsm);
+
+% Change the number of batches and number of lines
+Xls.Nbatches=1;
+Xls.Nlines=600;
+[Xpf XlsData]=Xpm.pf(Xls);
+
+XlsData.plotLines;
+
+display(Xpf)    % Show FailureProbability object
+
+%% Use Adaptive Lines
+% The adaptive method allows to recude considerable the number of samples
+% required.
+
+% Reset random number stream
+CossanX.resetRandomNumberGenerator(51125)
+
+Xls=LineSampling('Nlines',20,'XlocalSensitivityMeasures',Xlsm,'Ladaptive',true);
+Xpf =Xpm.pf(Xls);
+
+Xmc=MonteCarlo('Nsamples',1e4);
+XpfMC=Xpm.pf(Xmc);
+display(XpfMC)
+
+%% Output for Line Sampling
+% Please refer to the tutorial TutorialLineSamplingOutput in order to see more
+% options and plot methods for the LineSamplingOutput
+
+
+%% Validate Solutions
+assert(abs(Xpf.pfhat-7.775e-2)<1e-4,'COSSANX:Tutorials','Wrong results')
+
+
+
+##### SOURCE END #####
+--></body></html>

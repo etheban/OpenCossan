@@ -1,0 +1,264 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialSamples</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialSamples.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">1.   Create random variables</a></li><li><a href="#3">2.   Create random variable set</a></li><li><a href="#4">3.   Create input object</a></li><li><a href="#5">4.   Generate samples</a></li><li><a href="#6">5.   Construct object Samples</a></li></ul></div><pre class="codeinput"><span class="comment">%**************************************************************************</span>
+<span class="comment">%</span>
+<span class="comment">%   Tutorial 01 - Samples object</span>
+<span class="comment">%</span>
+<span class="comment">%   Creation of an object of the class samples and setting values</span>
+<span class="comment">%</span>
+<span class="comment">%**************************************************************************</span>
+</pre><h2>1.   Create random variables<a name="2"></a></h2><pre class="codeinput">Xrv1    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'exponential'</span>,<span class="string">'par1'</span>,1);
+Xrv2    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,3,<span class="string">'std'</span>,1);
+Xrv3    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'lognormal'</span>,<span class="string">'mean'</span>,3,<span class="string">'std'</span>,1);
+
+Xrv4    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'lognormal'</span>,<span class="string">'mean'</span>,3,<span class="string">'std'</span>,1);
+</pre><h2>2.   Create random variable set<a name="3"></a></h2><pre class="codeinput">Mcorr   = [1.0,0.5,0.2;<span class="keyword">...</span>
+    0.5,1.0,0.1;<span class="keyword">...</span>
+    0.2,0.1,1.0];
+Xrvs1   = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xrv1'</span>,<span class="string">'Xrv2'</span>,<span class="string">'Xrv3'</span>},<span class="keyword">...</span>
+    <span class="string">'Mcorrelation'</span>,Mcorr);
+
+Xrvs2   = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xrv4'</span>});
+</pre><h2>3.   Create input object<a name="4"></a></h2><pre class="codeinput">Xin     = Input;
+Xin     = add(Xin,Xrvs1);
+
+Xin2     = Input;
+Xin2     = add(Xin2,Xrvs1);
+Xin2     = add(Xin2,Xrvs2);
+</pre><h2>4.   Generate samples<a name="5"></a></h2><pre class="codeinput"><span class="comment">%4.1.   Fix stream of random number</span>
+stream_rnd_n    = RandStream(<span class="string">'mt19937ar'</span>,<span class="string">'Seed'</span>,0);
+RandStream.setDefaultStream(stream_rnd_n)
+<span class="comment">%4.2.   Generate samples</span>
+Xin     = Xin.sample(<span class="string">'Nsamples'</span>,1e3);
+<span class="comment">%4.3.   Extract samples - matrix</span>
+MX      = getSampleMatrix (Xin);
+MX=Xin.Xsamples.MsamplesPhysicalSpace;
+MU=Xin.Xsamples.MsamplesStandardNormalSpace;
+
+Xin2 = Xin2.sample(<span class="string">'Nsamples'</span>,10);
+
+<span class="comment">%4.4.   Prepare Structures</span>
+Crvnames    = Xin.CnamesRandomVariable;
+<span class="keyword">for</span> i=1:size(MX,1),<span class="keyword">...</span>
+    <span class="keyword">for</span> j=1:length(Crvnames),<span class="keyword">...</span>
+        TMX(i,1).(Crvnames{j})  = MX(i,j);<span class="keyword">...</span>
+        TMU(i,1).(Crvnames{j})  = MU(i,j);<span class="keyword">...</span>
+    <span class="keyword">end</span>, <span class="keyword">...</span>
+<span class="keyword">end</span>
+</pre><h2>5.   Construct object Samples<a name="6"></a></h2><p>There are many different approaches for constructing an object of the class Samples. 8 of these approaches are shown below. It should be noted that other combinations aside these 8 approaches are also valid</p><pre class="codeinput"><span class="comment">%5.1.   First approach - pass Input object and matrix of samples in physical space</span>
+Xsamp1  = Samples(<span class="string">'Xinput'</span>,Xin,<span class="string">'MsamplesPhysicalSpace'</span>,MX)
+<span class="comment">%5.2.   Second approach - pass Input object and matrix of samples in standard normal space</span>
+Xsamp2  = Samples(<span class="string">'Xinput'</span>,Xin,<span class="string">'MsamplesStandardNormalSpace'</span>,MU)
+<span class="comment">%5.3.   Third approach - pass Input object and structure of samples in physical space</span>
+Xsamp3  = Samples(<span class="string">'Xinput'</span>,Xin,<span class="string">'TsamplesPhysicalSpace'</span>,TMX)
+<span class="comment">%5.4.   Fourth approach - pass Input object and structure of samples in standard normal space</span>
+Xsamp4  = Samples(<span class="string">'Xinput'</span>,Xin,<span class="string">'TsamplesStandardNormalSpace'</span>,TMU)
+<span class="comment">%5.5.   Fifth approach - pass RandomVariableSet object and matrix of samples in physical space</span>
+Xsamp5  = Samples(<span class="string">'Xrvset'</span>,Xrvs1,<span class="string">'MsamplesPhysicalSpace'</span>,MX)
+<span class="comment">%5.6.   Create samples from the random variable set</span>
+Xsamp6  = Xrvs1.sample(10)
+</pre><pre class="codeoutput">===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 1000
+-----------------------------------------------------------
+Samples in the Physical Space 
+Xrv1:  1.219e+00 3.401e+00 1.202e-02 1.638e+00 9.810e-01 ...
+Xrv2:  3.859e+00 3.473e+00 1.403e+00 2.927e+00 3.655e+00 ...
+Xrv3:  3.231e+00 4.785e+00 3.419e+00 2.723e+00 2.781e+00 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 1000
+-----------------------------------------------------------
+Samples in the Physical Space 
+Xrv1:  1.219e+00 3.401e+00 1.202e-02 1.638e+00 9.810e-01 ...
+Xrv2:  3.859e+00 3.473e+00 1.403e+00 2.927e+00 3.655e+00 ...
+Xrv3:  3.231e+00 4.785e+00 3.419e+00 2.723e+00 2.781e+00 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 1000
+-----------------------------------------------------------
+Samples in the Physical Space 
+Xrv1:  1.219e+00 3.401e+00 1.202e-02 1.638e+00 9.810e-01 ...
+Xrv2:  3.859e+00 3.473e+00 1.403e+00 2.927e+00 3.655e+00 ...
+Xrv3:  3.231e+00 4.785e+00 3.419e+00 2.723e+00 2.781e+00 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 1000
+-----------------------------------------------------------
+Samples in the Physical Space 
+Xrv1:  1.219e+00 3.401e+00 1.202e-02 1.638e+00 9.810e-01 ...
+Xrv2:  3.859e+00 3.473e+00 1.403e+00 2.927e+00 3.655e+00 ...
+Xrv3:  3.231e+00 4.785e+00 3.419e+00 2.723e+00 2.781e+00 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 1000
+-----------------------------------------------------------
+Samples in the Physical Space 
+Xrv1:  1.219e+00 3.401e+00 1.202e-02 1.638e+00 9.810e-01 ...
+Xrv2:  3.859e+00 3.473e+00 1.403e+00 2.927e+00 3.655e+00 ...
+Xrv3:  3.231e+00 4.785e+00 3.419e+00 2.723e+00 2.781e+00 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+===================================================================
+Samples Object - Description: 
+===================================================================
+Nsamples= 10
+-----------------------------------------------------------
+Samples in the Physical Space 
+Xrv1:  4.970e-01 1.614e+00 2.797e-03 1.719e+00 3.592e-01 ...
+Xrv2:  3.845e+00 3.637e+00 8.618e-01 4.522e+00 3.013e+00 ...
+Xrv3:  3.142e+00 3.090e+00 1.270e+00 3.899e+00 4.070e+00 ...
+* No design of experiments for Design Variables present
+* No stochastic process defined
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%**************************************************************************
+%
+%   Tutorial 01 - Samples object
+%
+%   Creation of an object of the class samples and setting values
+%
+%**************************************************************************
+
+%% 1.   Create random variables
+Xrv1    = RandomVariable('Sdistribution','exponential','par1',1);
+Xrv2    = RandomVariable('Sdistribution','normal','mean',3,'std',1);
+Xrv3    = RandomVariable('Sdistribution','lognormal','mean',3,'std',1);
+
+Xrv4    = RandomVariable('Sdistribution','lognormal','mean',3,'std',1);
+
+%% 2.   Create random variable set
+Mcorr   = [1.0,0.5,0.2;...
+    0.5,1.0,0.1;...
+    0.2,0.1,1.0];
+Xrvs1   = RandomVariableSet('Cmembers',{'Xrv1','Xrv2','Xrv3'},...
+    'Mcorrelation',Mcorr);
+
+Xrvs2   = RandomVariableSet('Cmembers',{'Xrv4'});
+%% 3.   Create input object
+Xin     = Input;
+Xin     = add(Xin,Xrvs1);
+
+Xin2     = Input;
+Xin2     = add(Xin2,Xrvs1);
+Xin2     = add(Xin2,Xrvs2);
+%% 4.   Generate samples
+%4.1.   Fix stream of random number
+stream_rnd_n    = RandStream('mt19937ar','Seed',0);
+RandStream.setDefaultStream(stream_rnd_n)
+%4.2.   Generate samples
+Xin     = Xin.sample('Nsamples',1e3);
+%4.3.   Extract samples - matrix
+MX      = getSampleMatrix (Xin);
+MX=Xin.Xsamples.MsamplesPhysicalSpace;
+MU=Xin.Xsamples.MsamplesStandardNormalSpace;
+
+Xin2 = Xin2.sample('Nsamples',10);
+
+%4.4.   Prepare Structures
+Crvnames    = Xin.CnamesRandomVariable;
+for i=1:size(MX,1),...
+    for j=1:length(Crvnames),...
+        TMX(i,1).(Crvnames{j})  = MX(i,j);...
+        TMU(i,1).(Crvnames{j})  = MU(i,j);...
+    end, ...
+end
+
+
+%% 5.   Construct object Samples
+% There are many different approaches for constructing an object of the 
+% class Samples. 8 of these approaches are shown below. It should be noted
+% that other combinations aside these 8 approaches are also valid
+%5.1.   First approach - pass Input object and matrix of samples in physical space
+Xsamp1  = Samples('Xinput',Xin,'MsamplesPhysicalSpace',MX)
+%5.2.   Second approach - pass Input object and matrix of samples in standard normal space
+Xsamp2  = Samples('Xinput',Xin,'MsamplesStandardNormalSpace',MU)
+%5.3.   Third approach - pass Input object and structure of samples in physical space
+Xsamp3  = Samples('Xinput',Xin,'TsamplesPhysicalSpace',TMX)
+%5.4.   Fourth approach - pass Input object and structure of samples in standard normal space
+Xsamp4  = Samples('Xinput',Xin,'TsamplesStandardNormalSpace',TMU)
+%5.5.   Fifth approach - pass RandomVariableSet object and matrix of samples in physical space
+Xsamp5  = Samples('Xrvset',Xrvs1,'MsamplesPhysicalSpace',MX)
+%5.6.   Create samples from the random variable set
+Xsamp6  = Xrvs1.sample(10)
+
+
+
+##### SOURCE END #####
+--></body></html>

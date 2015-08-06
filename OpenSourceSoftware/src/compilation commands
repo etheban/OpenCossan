@@ -1,0 +1,24 @@
+linux 32
+./configure --prefix=/home/mbroggi/workspace/COSSAN-X --exec-prefix=/home/mbroggi/workspace/COSSAN-X --libdir=/home/mbroggi/workspace/COSSAN-X/lib/glnx86
+linux 64
+./configure --prefix=/home/mbroggi/workspace/COSSAN-X --exec-prefix=/home/mbroggi/workspace/COSSAN-X --libdir=/home/mbroggi/workspace/COSSAN-X/lib/glnxa64
+make
+make install
+
+for mex:
+linux 32
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mbroggi/workspace/COSSAN-X/lib/glnx86
+/usr/site/matlab/R2010a/bin/mex -O CC#gcc CFLAGS#"-Wall -fPIC -O3" -I/home/mbroggi/workspace/COSSAN-X/include -lm -lfann -c helperFann.c
+/usr/site/matlab/R2010a/bin/mex -O CC#gcc CFLAGS#"-Wall -fPIC -O3" -I/home/mbroggi/workspace/COSSAN-X/include -L/home/mbroggi/workspace/COSSAN-X/lib/glnx86 -lm -lfann createFann.c helperFann.o
+/usr/site/matlab/R2010a/bin/mex -O CC#gcc CFLAGS#"-Wall -fPIC -O3" -I/home/mbroggi/workspace/COSSAN-X/include -L/home/mbroggi/workspace/COSSAN-X/lib/glnx86 -lm -lfann trainFann.c helperFann.o
+/usr/site/matlab/R2010a/bin/mex -O CC#gcc CFLAGS#"-Wall -fPIC -O3" -I/home/mbroggi/workspace/COSSAN-X/include -L/home/mbroggi/workspace/COSSAN-X/lib/glnx86 -lm -lfann testFann.c helperFann.o
+
+linux 64
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/mbroggi/workspace/COSSAN-X/lib/glnxa64
+/usr/site/matlab/R2010a/bin/mex -O CC#gcc CFLAGS#"-Wall -fPIC -O3" -I/home/mbroggi/workspace/COSSAN-X/include -lm -lfann -c helperFann.c
+/usr/site/matlab/R2010a/bin/mex -O CC#gcc CFLAGS#"-Wall -fPIC -O3" -I/home/mbroggi/workspace/COSSAN-X/include -L/home/mbroggi/workspace/COSSAN-X/lib/glnxa64 -lm -lfann createFann.c helperFann.o
+/usr/site/matlab/R2010a/bin/mex -O CC#gcc CFLAGS#"-Wall -fPIC -O3" -I/home/mbroggi/workspace/COSSAN-X/include -L/home/mbroggi/workspace/COSSAN-X/lib/glnxa64 -lm -lfann trainFann.c helperFann.o
+/usr/site/matlab/R2010a/bin/mex -O CC#gcc CFLAGS#"-Wall -fPIC -O3" -I/home/mbroggi/workspace/COSSAN-X/include -L/home/mbroggi/workspace/COSSAN-X/lib/glnxa64 -lm -lfann testFann.c helperFann.o
+
+LD_LIBRARY_PATH exported for mex compilation is needed also before starting Matlab
+

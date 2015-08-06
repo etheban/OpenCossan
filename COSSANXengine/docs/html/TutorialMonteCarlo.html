@@ -1,0 +1,337 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for MonteCarlo Simulation</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialMonteCarlo.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for MonteCarlo Simulation</h1><!--introduction--><p>This tutorial shows how to use the object MonteCarlo to perfrom simulation of the model defined by the object Model</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@MonteCarlo">http://mechanik.uibk.ac.at/wiki/index.php/@MonteCarlo</a></p><p><img src="TutorialMonteCarlo_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialMonteCarlo_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Problem Definition</a></li><li><a href="#2">Define the evaluator</a></li><li><a href="#3">Define a Model</a></li><li><a href="#4">Define a Monte Carlo object</a></li><li><a href="#5">Run simulation</a></li><li><a href="#6">Construct the Probabilistic Model</a></li><li><a href="#7">Estimate failure probability</a></li><li><a href="#8">change properties of the Xmontecarlo object</a></li><li><a href="#9">Run analysis with many more samples</a></li><li><a href="#10">MCS using Common Random Numbers</a></li><li><a href="#11">Validate Results</a></li><li><a href="#12">MCS using smooth indicator function</a></li><li><a href="#13">Construct probabilistic model</a></li><li><a href="#14">Validate Solutions</a></li></ul></div><h2>Problem Definition<a name="1"></a></h2><p>The MonteCarlo simulation requires the definition of a Model, that requires an Input and an Evaluator object, respectively.</p><pre class="codeinput"><span class="comment">% Define 2 random variable</span>
+RV1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+RV2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+
+<span class="comment">% Define the RVset</span>
+Xrvs1=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>, <span class="string">'RV2'</span>},<span class="string">'CXrv'</span>,{RV1 RV2});
+
+<span class="comment">% Define Input object</span>
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input satellite_inp'</span>);
+Xthreshold=Parameter(<span class="string">'value'</span>,1);
+Xadditionalparameter=Parameter(<span class="string">'Vvalue'</span>,rand(100,1));
+Xin = add(Xin,Xrvs1);
+Xin = add(Xin,Xthreshold);
+Xin = add(Xin,Xadditionalparameter);
+</pre><h2>Define the evaluator<a name="2"></a></h2><p>Construct a Mio object</p><pre class="codeinput">Xm=Mio(         <span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+                <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out1=sqrt(Tinput(j).RV1^2+Tinput(j).RV2^2); end'</span>, <span class="keyword">...</span>
+                <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+                <span class="string">'Coutputnames'</span>,{<span class="string">'out1'</span>},<span class="keyword">...</span>
+                <span class="string">'Cinputnames'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>},<span class="keyword">...</span>
+				<span class="string">'Lfunction'</span>,false); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+
+
+<span class="comment">% Construct the Evaluator</span>
+Xeval = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'Evaluator xmio'</span>);
+</pre><h2>Define a Model<a name="3"></a></h2><pre class="codeinput">Xmdl=Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xin);
+</pre><h2>Define a Monte Carlo object<a name="4"></a></h2><p>The montecarlo object defines the number of simulations to be used, the number of batches</p><pre class="codeinput">Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,10,<span class="string">'Nbatches'</span>,10);
+</pre><h2>Run simulation<a name="5"></a></h2><p>The method apply allows to perform the simulation of the Model It returns a SimulationData object</p><pre class="codeinput">Xo=Xmc.apply(Xmdl);
+display(Xo)
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+</pre><h2>Construct the Probabilistic Model<a name="6"></a></h2><p>Define performance function</p><pre class="codeinput">Xpf=PerformanceFunction(<span class="string">'Scapacity'</span>,<span class="string">'Xthreshold'</span>,<span class="string">'Sdemand'</span>,<span class="string">'out1'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Vg'</span>);
+<span class="comment">% Construct the model</span>
+Xpm=ProbabilisticModel(<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'XperformanceFunction'</span>,Xpf);
+
+<span class="comment">% Apply MC object to generate samples of the ProbabilisticModel</span>
+Xo=Xmc.apply(Xpm);
+display(Xo)
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model) - apply(@ProbabilisticModel)
+</pre><h2>Estimate failure probability<a name="7"></a></h2><p>The method pf allows to estimate the failure of probability associated to the probabilistic model</p><pre class="codeinput">Xpf=Xpm.pf(Xmc);
+display(Xpf)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+</pre><h2>change properties of the Xmontecarlo object<a name="8"></a></h2><pre class="codeinput">Xmc.Nsamples=200;
+Xpf=Xpm.pf(Xmc);
+display(Xpf)
+
+<span class="comment">% If a SimulationData must be exported (at the end of each batch) used the following option</span>
+Xpf=Xpm.pf(Xmc);
+display(Xpf);
+
+<span class="comment">% If a SimulationData must be exported used the following option</span>
+[Xpf Xoutput]=Xpm.pf(Xmc);
+display(Xpf)
+display(Xoutput)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+ SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model) - apply(@ProbabilisticModel)
+</pre><h2>Run analysis with many more samples<a name="9"></a></h2><pre class="codeinput">tic
+Xmc.Nbatches=1;
+Xmc.Nsamples=10000;
+Xpf=Xpm.pf(Xmc);
+toc
+
+CossanX.cossanDisp(<span class="string">'Expected results: Pfhat   = 0.607 and CoV  = 0.0025 in &lt;7 s'</span>)
+display(Xpf)
+</pre><pre class="codeoutput">Elapsed time is 1.397529 seconds.
+Expected results: Pfhat   = 0.607 and CoV  = 0.0025 in &lt;7 s
+FailureProbability Object  -  Description: 
+</pre><h2>MCS using Common Random Numbers<a name="10"></a></h2><p>This section shows an important feature that can be used for the   calculation of failure probabilities. This feature refers to the   calculation of failure probabilities using common random numbers.   That is, the same stream of random numbers is used to calculate the   failure probability.</p><p>The field NseedRandomNumberGenerator allows to reset the Random Number Generator</p><pre class="codeinput">Xmc = MonteCarlo(<span class="string">'Sdescription'</span>,<span class="string">'MCS object WITH common random numbers'</span>,<span class="keyword">...</span>
+    <span class="string">'Nsamples'</span>,100,<span class="keyword">...</span><span class="comment">  %total number of samples</span>
+    <span class="string">'Nbatches'</span>,1,<span class="keyword">...</span><span class="comment">    %number of batches for simulation</span>
+    <span class="string">'Lintermediateresults'</span>,false,<span class="keyword">...</span><span class="comment">     %do not store intermediate results</span>
+    <span class="string">'NSeedRandomNumberGenerator'</span>,0);    <span class="comment">%by defining this field, a RandStream object is defined using the indicated seed</span>
+
+Xpf1    = pf(Xpm,Xmc);
+Xpf2    = pf(Xpm,Xmc);
+
+<span class="comment">% The simulation is performed using exaclty the same random numbers. Hence the</span>
+<span class="comment">% results shoul be the same</span>
+display(Xpf1)
+display(Xpf2)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+</pre><h2>Validate Results<a name="11"></a></h2><pre class="codeinput">assert(abs(Xpf1.pfhat-Xpf2.pfhat)&lt;1e-8,<span class="string">'COSSANX:Tutorials'</span>,<span class="string">'Wrong results'</span>)
+</pre><h2>MCS using smooth indicator function<a name="12"></a></h2><p>This section shows an important feature of the object  "PerformanceFunction" that allows calculating the probability of failure using a smooth indicator function.</p><pre> The concept of smooth indicator function implies that the traditional
+ indicator function (which is a heaviside or step function) is replaced
+ by a smooth version. The smooth version is modeled using the CDF of a
+ Gaussian distribution. Details on the theoretical aspects of this
+ smooth indicator function can be found at:</pre><pre> Taflanidis, A. and J. Beck: 2008, `An efficient framework for optimal
+ robust stochastic system design using stochastic simulation'. Computer
+ Methods in Applied Mechanics and Engineering, 198(1), 88-101.</pre><pre class="codeinput"><span class="comment">% In order to use the smooth indicator function</span>
+XpfSmooth     = PerformanceFunction(<span class="string">'Scapacity'</span>,<span class="string">'Xthreshold'</span>,<span class="keyword">...</span><span class="comment">  %indicate threshold to be used</span>
+    <span class="string">'Sdemand'</span>,<span class="string">'out1'</span>,<span class="keyword">...</span><span class="comment">    %indicate parameter modeling the demand</span>
+    <span class="string">'Soutputname'</span>,<span class="string">'Vg'</span>,<span class="keyword">...</span><span class="comment">  %name of performance function</span>
+    <span class="string">'stdDeviationIndicatorFunction'</span>,0.05);  <span class="comment">%this parameter is used to define the standard</span>
+    <span class="comment">%deviation of the Gaussian CDF used to define the indicator function</span>
+</pre><h2>Construct probabilistic model<a name="13"></a></h2><pre class="codeinput">XpmSmooth     = ProbabilisticModel(<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'XperformanceFunction'</span>,XpfSmooth);
+
+
+<span class="comment">% Reset random number stream</span>
+CossanX.resetRandomNumberGenerator(51125)
+
+<span class="comment">% And finally compute the failure probability</span>
+Xof1    = pf(XpmSmooth,Xmc);
+display(Xof1)
+</pre><pre class="codeoutput">FailureProbability Object  -  Description: 
+</pre><h2>Validate Solutions<a name="14"></a></h2><pre class="codeinput">assert(abs(Xof1.pfhat-0.6354)&lt;1e-4,<span class="string">'COSSANX:Tutorials'</span>,<span class="string">'Wrong results'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for MonteCarlo Simulation 
+% This tutorial shows how to use the object MonteCarlo to perfrom simulation of
+% the model defined by the object Model
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@MonteCarlo
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+
+%% Problem Definition
+% The MonteCarlo simulation requires the definition of a Model, that requires an
+% Input and an Evaluator object, respectively.
+
+% Define 2 random variable
+RV1=RandomVariable('Sdistribution','normal', 'mean',0,'std',1); 
+RV2=RandomVariable('Sdistribution','normal', 'mean',0,'std',1); 
+
+% Define the RVset
+Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'},'CXrv',{RV1 RV2}); 
+
+% Define Input object
+Xin = Input('Sdescription','Input satellite_inp');
+Xthreshold=Parameter('value',1);
+Xadditionalparameter=Parameter('Vvalue',rand(100,1));
+Xin = add(Xin,Xrvs1);
+Xin = add(Xin,Xthreshold);
+Xin = add(Xin,Xadditionalparameter);
+
+%% Define the evaluator
+% Construct a Mio object
+Xm=Mio(         'Sdescription', 'Performance function', ...
+                'Sscript','for j=1:length(Tinput), Toutput(j).out1=sqrt(Tinput(j).RV1^2+Tinput(j).RV2^2); end', ...
+                'Liostructure',true,...
+                'Coutputnames',{'out1'},...
+                'Cinputnames',{'RV1','RV2'},...
+				'Lfunction',false); % This flag specify if the .m file is a script or a function. 
+
+            
+% Construct the Evaluator
+Xeval = Evaluator('Xmio',Xm,'Sdescription','Evaluator xmio');
+
+%% Define a Model
+Xmdl=Model('Xevaluator',Xeval,'Xinput',Xin);
+
+%% Define a Monte Carlo object
+% The montecarlo object defines the number of simulations to be used, the number
+% of batches
+Xmc=MonteCarlo('Nsamples',10,'Nbatches',10);
+
+%% Run simulation 
+% The method apply allows to perform the simulation of the Model
+% It returns a SimulationData object
+Xo=Xmc.apply(Xmdl);
+display(Xo)
+
+%% Construct the Probabilistic Model
+% Define performance function 
+Xpf=PerformanceFunction('Scapacity','Xthreshold','Sdemand','out1','Soutputname','Vg');
+% Construct the model
+Xpm=ProbabilisticModel('Xmodel',Xmdl,'XperformanceFunction',Xpf);
+
+% Apply MC object to generate samples of the ProbabilisticModel
+Xo=Xmc.apply(Xpm);
+display(Xo)
+
+%% Estimate failure probability
+% The method pf allows to estimate the failure of probability associated to the
+% probabilistic model
+Xpf=Xpm.pf(Xmc);
+display(Xpf)
+
+%% change properties of the Xmontecarlo object 
+Xmc.Nsamples=200;
+Xpf=Xpm.pf(Xmc);
+display(Xpf)
+
+% If a SimulationData must be exported (at the end of each batch) used the following option
+Xpf=Xpm.pf(Xmc);
+display(Xpf);
+
+% If a SimulationData must be exported used the following option
+[Xpf Xoutput]=Xpm.pf(Xmc);
+display(Xpf)
+display(Xoutput)
+
+
+%% Run analysis with many more samples
+tic
+Xmc.Nbatches=1;
+Xmc.Nsamples=10000;
+Xpf=Xpm.pf(Xmc);
+toc
+
+CossanX.cossanDisp('Expected results: Pfhat   = 0.607 and CoV  = 0.0025 in <7 s')
+display(Xpf)
+
+%% MCS using Common Random Numbers
+% This section shows an important feature that can be used for the
+%   calculation of failure probabilities. This feature refers to the 
+%   calculation of failure probabilities using common random numbers. 
+%   That is, the same stream of random numbers is used to calculate the 
+%   failure probability.
+%
+% The field NseedRandomNumberGenerator allows to reset the Random Number
+% Generator
+
+Xmc = MonteCarlo('Sdescription','MCS object WITH common random numbers',...
+    'Nsamples',100,...  %total number of samples
+    'Nbatches',1,...    %number of batches for simulation
+    'Lintermediateresults',false,...     %do not store intermediate results
+    'NSeedRandomNumberGenerator',0);    %by defining this field, a RandStream object is defined using the indicated seed
+
+Xpf1    = pf(Xpm,Xmc);
+Xpf2    = pf(Xpm,Xmc);
+
+% The simulation is performed using exaclty the same random numbers. Hence the
+% results shoul be the same
+display(Xpf1)
+display(Xpf2)
+
+%% Validate Results
+
+assert(abs(Xpf1.pfhat-Xpf2.pfhat)<1e-8,'COSSANX:Tutorials','Wrong results')
+
+%% MCS using smooth indicator function
+% This section shows an important feature of the object  "PerformanceFunction"
+% that allows calculating the probability of failure using a smooth indicator
+% function. 
+%
+%   The concept of smooth indicator function implies that the traditional
+%   indicator function (which is a heaviside or step function) is replaced
+%   by a smooth version. The smooth version is modeled using the CDF of a
+%   Gaussian distribution. Details on the theoretical aspects of this
+%   smooth indicator function can be found at:
+%   
+%   Taflanidis, A. and J. Beck: 2008, `An efficient framework for optimal 
+%   robust stochastic system design using stochastic simulation'. Computer 
+%   Methods in Applied Mechanics and Engineering, 198(1), 88-101.
+%
+
+% In order to use the smooth indicator function
+XpfSmooth     = PerformanceFunction('Scapacity','Xthreshold',...  %indicate threshold to be used
+    'Sdemand','out1',...    %indicate parameter modeling the demand
+    'Soutputname','Vg',...  %name of performance function
+    'stdDeviationIndicatorFunction',0.05);  %this parameter is used to define the standard
+    %deviation of the Gaussian CDF used to define the indicator function
+
+%%   Construct probabilistic model
+XpmSmooth     = ProbabilisticModel('Xmodel',Xmdl,'XperformanceFunction',XpfSmooth);
+
+
+% Reset random number stream
+CossanX.resetRandomNumberGenerator(51125)
+
+% And finally compute the failure probability
+Xof1    = pf(XpmSmooth,Xmc);
+display(Xof1)
+
+%% Validate Solutions
+assert(abs(Xof1.pfhat-0.6354)<1e-4,'COSSANX:Tutorials','Wrong results')
+
+##### SOURCE END #####
+--></body></html>

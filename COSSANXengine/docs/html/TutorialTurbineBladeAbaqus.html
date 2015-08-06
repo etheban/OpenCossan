@@ -1,0 +1,136 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial Turbine Blade - Creating the ABAQUS model</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialTurbineBladeAbaqus.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial Turbine Blade - Creating the ABAQUS model</h1><!--introduction--><p>See also <a href="http://mechanik.uibk.ac.at/wiki/Turbine_Blade">http://mechanik.uibk.ac.at/wiki/Turbine_Blade</a></p><p>Copyright 1990-2011 Cossan Working Group</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create the input</a></li><li><a href="#2">Construct the Model</a></li></ul></div><h2>Create the input<a name="1"></a></h2><pre class="codeinput"><span class="comment">% define the RVs</span>
+RV1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e7,<span class="string">'std'</span>,7e6);
+RV2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e7,<span class="string">'std'</span>,7e6);
+RV3=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e7,<span class="string">'std'</span>,7e6);
+
+Xrvs = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>,<span class="string">'RV3'</span>});
+Xinp = Input(<span class="string">'Sdescription'</span>,<span class="string">'Xinput object'</span>);
+Xinp = add(Xinp,Xrvs);
+</pre><h2>Construct the Model<a name="2"></a></h2><pre class="codeinput">Sdirectory = fileparts(which(<span class="string">'TutorialTurbineBladeAbaqus.m'</span>));
+Xinj       = Injector(<span class="string">'Sscanfilepath'</span>,fullfile(Sdirectory,<span class="string">'FEinputFiles'</span>),<span class="string">'Sscanfilename'</span>,<span class="string">'Abaqus.cossan'</span>,<span class="string">'Sfile'</span>,<span class="string">'Abaqus.inp'</span>);
+Xcon       = Connector(<span class="string">'Spredefinedtype'</span>,<span class="string">'abaqus'</span>,<span class="keyword">...</span>
+                     <span class="string">'SmaininputPath'</span>,fullfile(Sdirectory,<span class="string">'FEinputFiles'</span>),<span class="keyword">...</span>
+                     <span class="string">'Smaininputfile'</span>,<span class="string">'Abaqus.inp'</span>,<span class="keyword">...</span>
+                     <span class="string">'Sworkingdirectory'</span>,<span class="string">'/tmp/'</span>);
+Xcon   = add(Xcon,Xinj);
+Xjmi   = JobManagerInterface(<span class="string">'Stype'</span>,<span class="string">'gridengine'</span>);
+Xeval  = Evaluator(<span class="string">'Xconnector'</span>,Xcon,<span class="string">'CSmembers'</span>,{<span class="string">'Xcon'</span>},<span class="string">'XJobManagerInterface'</span>,Xjmi,<span class="keyword">...</span>
+                   <span class="string">'LremoteInjectExtract'</span>,false,<span class="string">'CSqueues'</span>,{<span class="string">'pizzas64.q'</span>},<span class="string">'Nconcurrent'</span>,4);
+Xmodel = Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xinp);
+
+display(Xmodel);
+</pre><pre class="codeoutput">[COSSAN-X.Injector.createByScan] File to be scanned: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Tutorials/TurbineBlade/FEinputFiles/Abaqus.cossan
+[COSSAN-X.Injector.createByScan] Close File to be scanned: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Tutorials/TurbineBlade/FEinputFiles/Abaqus.cossan
+EOF found after 23301 lines
+Add Injector Object to Connector
+===================================================================
+ Model Object  -  Description: 
+===================================================================
+Required Inputs :  RV1; RV2; RV3;
+Provided Outputs :  
+The Model contains 1 solvers
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial Turbine Blade - Creating the ABAQUS model
+%
+% See also http://mechanik.uibk.ac.at/wiki/Turbine_Blade
+%
+% Copyright 1990-2011 Cossan Working Group
+% $Revision: 1 $  $Date: 2011/02/22 $
+
+
+%% Create the input
+
+% define the RVs
+RV1=RandomVariable('Sdistribution','normal', 'mean',7e7,'std',7e6);    
+RV2=RandomVariable('Sdistribution','normal', 'mean',7e7,'std',7e6); 
+RV3=RandomVariable('Sdistribution','normal', 'mean',7e7,'std',7e6);           
+
+Xrvs = RandomVariableSet('Cmembers',{'RV1','RV2','RV3'}); 
+Xinp = Input('Sdescription','Xinput object');       
+Xinp = add(Xinp,Xrvs);
+
+%% Construct the Model
+
+Sdirectory = fileparts(which('TutorialTurbineBladeAbaqus.m'));
+Xinj       = Injector('Sscanfilepath',fullfile(Sdirectory,'FEinputFiles'),'Sscanfilename','Abaqus.cossan','Sfile','Abaqus.inp');
+Xcon       = Connector('Spredefinedtype','abaqus',...
+                     'SmaininputPath',fullfile(Sdirectory,'FEinputFiles'),...
+                     'Smaininputfile','Abaqus.inp',...
+                     'Sworkingdirectory','/tmp/');
+Xcon   = add(Xcon,Xinj);
+Xjmi   = JobManagerInterface('Stype','gridengine');
+Xeval  = Evaluator('Xconnector',Xcon,'CSmembers',{'Xcon'},'XJobManagerInterface',Xjmi,...
+                   'LremoteInjectExtract',false,'CSqueues',{'pizzas64.q'},'Nconcurrent',4);
+Xmodel = Model('Xevaluator',Xeval,'Xinput',Xinp);
+
+display(Xmodel);
+
+
+##### SOURCE END #####
+--></body></html>

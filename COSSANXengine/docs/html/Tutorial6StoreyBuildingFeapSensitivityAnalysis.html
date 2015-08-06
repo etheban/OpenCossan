@@ -1,0 +1,164 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial 6 storey Building FEAP: Sensitivity Analyis</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="Tutorial6StoreyBuildingFeapSensitivityAnalysis.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial 6 storey Building FEAP: Sensitivity Analyis</h1><!--introduction--><p>This tutorial shows how to perform LocalSensitivity analysis (i.e. compute the gradient) of a multi-storey building model</p><p><img src="Tutorial6StoreyBuildingFeapSensitivityAnalysis_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="Tutorial6StoreyBuildingFeapSensitivityAnalysis_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create the model</a></li><li><a href="#2">Compute the Gradient of the model</a></li><li><a href="#3">Test with a very large model</a></li></ul></div><h2>Create the model<a name="1"></a></h2><pre class="codeinput">run(<span class="string">'TutorialBuildingFeap'</span>);
+</pre><h2>Compute the Gradient of the model<a name="2"></a></h2><p>Around the origin in standard normal space</p><pre class="codeinput"><span class="comment">% In order compute the gradient the static method gradient of the</span>
+<span class="comment">% Sensitivity toolbox must be invoked</span>
+Xgfd=Sensitivity.gradientFiniteDifferences(<span class="string">'Xtarget'</span>,Xmdl);
+display(Xgfd)
+
+Xg=Sensitivity.gradientMonteCarlo(<span class="string">'Xtarget'</span>,Xmdl,<span class="string">'Nsimulations'</span>,7);
+<span class="comment">% The gradient output contains</span>
+display(Xg)
+
+<span class="comment">% Gradient in a different reference point</span>
+Xg=Sensitivity.gradientMonteCarlo(<span class="string">'Xtarget'</span>,Xmdl,<span class="string">'Nsimulations'</span>,7,<span class="string">'CnamesRandomVariable'</span>,{<span class="string">'RV_1'</span> <span class="string">'RV_3'</span>},<span class="string">'VreferencePoint'</span>,[0 4]);
+display(Xg)
+
+
+Xg=Sensitivity.gradientMonteCarlo(<span class="string">'Xtarget'</span>,Xmdl,<span class="string">'Nsimulations'</span>,50);
+
+error=Xgfd.Vgradient+Xg.Vgradient
+</pre><h2>Test with a very large model<a name="3"></a></h2><pre class="codeinput">RV=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+Xrvs2=RandomVariableSet(<span class="string">'Xrv'</span>,RV,<span class="string">'Nrviid'</span>,250);
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'TestGradient'</span>);
+Xin = add(Xin,Xrvs2);
+
+<span class="comment">% Construct a Mio object</span>
+Xm2=Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+                <span class="string">'Sscript'</span>,<span class="string">'Moutput=Minput(:,1).^2+5*Minput(:,2)-0.1*Minput(:,3)+0.01*Minput(:,4);'</span>, <span class="keyword">...</span>
+                <span class="string">'Liomatrix'</span>,true,<span class="keyword">...</span>
+                <span class="string">'Liostructure'</span>,false,<span class="keyword">...</span>
+				<span class="string">'Lfunction'</span>,false, <span class="keyword">...</span>
+                <span class="string">'Cinputnames'</span>,{<span class="string">'RV_1'</span> <span class="string">'RV_2'</span> <span class="string">'RV_3'</span> <span class="string">'RV_4'</span> <span class="string">'RV_5'</span>}, <span class="keyword">...</span>
+                <span class="string">'Coutputnames'</span>,{<span class="string">'out1'</span>}); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+
+<span class="comment">% Construct the Evaluator</span>
+Xeval2 = Evaluator(<span class="string">'Xmio'</span>,Xm2,<span class="string">'Sdescription'</span>,<span class="string">'fist Evaluator'</span>);
+
+Xmdl2=Model(<span class="string">'Xinput'</span>,Xin,<span class="string">'Xevaluator'</span>,Xeval2);
+Xg2=Sensitivity.gradientMonteCarlo(<span class="string">'Xtarget'</span>,Xmdl2,<span class="string">'Nsimulations'</span>,7);
+display(Xg2)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial 6 storey Building FEAP: Sensitivity Analyis
+%
+% This tutorial shows how to perform LocalSensitivity analysis (i.e. compute the
+% gradient) of a multi-storey building model
+% 
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+%% Create the model
+run('TutorialBuildingFeap');
+
+
+%% Compute the Gradient of the model 
+% Around the origin in standard normal space
+
+% In order compute the gradient the static method gradient of the
+% Sensitivity toolbox must be invoked
+Xgfd=Sensitivity.gradientFiniteDifferences('Xtarget',Xmdl);
+display(Xgfd)
+
+Xg=Sensitivity.gradientMonteCarlo('Xtarget',Xmdl,'Nsimulations',7);
+% The gradient output contains 
+display(Xg)
+
+% Gradient in a different reference point
+Xg=Sensitivity.gradientMonteCarlo('Xtarget',Xmdl,'Nsimulations',7,'CnamesRandomVariable',{'RV_1' 'RV_3'},'VreferencePoint',[0 4]);
+display(Xg)
+
+
+Xg=Sensitivity.gradientMonteCarlo('Xtarget',Xmdl,'Nsimulations',50);
+
+error=Xgfd.Vgradient+Xg.Vgradient
+
+
+%% Test with a very large model 
+RV=RandomVariable('Sdistribution','normal','mean',0,'std',1);
+Xrvs2=RandomVariableSet('Xrv',RV,'Nrviid',250);
+Xin = Input('Sdescription','TestGradient');
+Xin = add(Xin,Xrvs2);
+
+% Construct a Mio object
+Xm2=Mio('Sdescription', 'Performance function', ...
+                'Sscript','Moutput=Minput(:,1).^2+5*Minput(:,2)-0.1*Minput(:,3)+0.01*Minput(:,4);', ...
+                'Liomatrix',true,...
+                'Liostructure',false,...
+				'Lfunction',false, ...
+                'Cinputnames',{'RV_1' 'RV_2' 'RV_3' 'RV_4' 'RV_5'}, ...
+                'Coutputnames',{'out1'}); % This flag specify if the .m file is a script or a function. 
+
+% Construct the Evaluator
+Xeval2 = Evaluator('Xmio',Xm2,'Sdescription','fist Evaluator');
+
+Xmdl2=Model('Xinput',Xin,'Xevaluator',Xeval2);
+Xg2=Sensitivity.gradientMonteCarlo('Xtarget',Xmdl2,'Nsimulations',7);
+display(Xg2)
+
+##### SOURCE END #####
+--></body></html>

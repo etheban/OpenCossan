@@ -1,0 +1,317 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial Cantilever Beam Reliability Based Optimization</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-07-29"><meta name="DC.source" content="TutorialCantileverBeamMatlabRBO.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Tutorial Cantilever Beam Reliability Based Optimization</h1><!--introduction--><p>This tutorial shows how to perform a Reliability Analysis Optimization. It is using the most basic component and a vary simple model</p><p>The aim of this tutorial is optimize a clamped beam under tip load considering uncertainties. The performance function is defined by the maximum allowable stress level minus the actual stress in a clamped beam.</p><pre>                                        |
+//|                                      v
+//|---------------------------------------
+//|</pre><p>
+<h3 style="color:#317ECC">Copyright 2006-2014: <b> COSSAN working group</b></h3>
+Author: <b>Edoardo-Patelli</b> <br>
+<i>Institute for Risk and Uncertainty, University of Liverpool, UK</i>
+<br>COSSAN web site: <a href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>
+<br><br>
+<span style="color:gray"> This file is part of <span style="color:orange">openCOSSAN</span>.  The open source general purpose matlab toolbox
+for numerical analysis, risk and uncertainty quantification (<a
+href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>).
+<br>
+<span style="color:orange">openCOSSAN</span> is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License.
+<span style="color:orange">openCOSSAN</span> is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License
+ along with openCOSSAN.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/"</a>.
+</span></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Check avilability of the probabilistic model</a></li><li><a href="#2">Define the objective function</a></li><li><a href="#3">Define the RBOproblem</a></li><li><a href="#4">Define a method to estimate the failure probability</a></li><li><a href="#5">Performing optimization using Direct Approach.</a></li><li><a href="#6">Plot results</a></li><li><a href="#7">validate results</a></li><li><a href="#8">Close figures</a></li></ul></div><h2>Check avilability of the probabilistic model<a name="1"></a></h2><pre class="codeinput">assert(logical(exist(<span class="string">'XprobModelBeamMatlab'</span>,<span class="string">'var'</span>)),<span class="string">'openCOSSAN:Tutorial'</span>, <span class="keyword">...</span>
+    <span class="string">'Please run first the tutorial TutorialCantileverBeamMatlabReliabilityAnalysis'</span>)
+
+
+<span class="comment">% Define Design Variables</span>
+Xdvb=DesignVariable(<span class="string">'value'</span>,0.12,<span class="string">'lowerBound'</span>,0.01,<span class="string">'upperBound'</span>,0.20,<span class="string">'Sdescription'</span>,<span class="string">'Beam width'</span>);
+Xdvh=DesignVariable(<span class="string">'value'</span>,0.24,<span class="string">'lowerBound'</span>,0.02,<span class="string">'upperBound'</span>,0.4,<span class="string">'Sdescription'</span>,<span class="string">'Beam Heigth'</span>);
+
+XtargetPf=Parameter(<span class="string">'value'</span>,1e-3',<span class="string">'Sdescription'</span>,<span class="string">'Target failure probability'</span>);
+<span class="comment">% Define Input object for OptimizationProblem</span>
+XinOptimization = Input(<span class="string">'Sdescription'</span>,<span class="string">'Test Input'</span>, <span class="keyword">...</span>
+    <span class="string">'CSmembers'</span>,{<span class="string">'Xdvb'</span> <span class="string">'Xdvh'</span> <span class="string">'XtargetPf'</span>},<span class="string">'CXmember'</span>,{Xdvb Xdvh XtargetPf});
+</pre><pre class="codeoutput error">Error using TutorialCantileverBeamMatlabRBO (line 38)
+Please run first the tutorial TutorialCantileverBeamMatlabReliabilityAnalysis
+</pre><h2>Define the objective function<a name="2"></a></h2><p>The objective function is the minimization of the failure probability associated to the ProbabilisticModel defined above.</p><pre class="codeinput">XobjFun = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'Minimize Pf'</span>,<span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput), Toutput(n).fobj=(Tinput(n).XtargetPf-Tinput(n).pf)^2; end'</span>,<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'XtargetPf'</span> <span class="string">'Xdvb'</span> <span class="string">'Xdvh'</span> <span class="string">'pf'</span>},<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'fobj'</span>},<span class="string">'Liostructure'</span>,true);
+</pre><h2>Define the RBOproblem<a name="3"></a></h2><p>The RBO problem is defined by combining a probabilistic model, a Simulations object used to estimate the failure probability, Objective function and Constraint, an Input containing Design Variables and finally a mapping between  DesignVariable(s) and input(s) of the Probabilistic model.</p><h2>Define a method to estimate the failure probability<a name="4"></a></h2><p>The montecarlo object defines the number of simulations to be used, the number of batches</p><p>The mapping between the Design Variable and Input of the Probabilistic model is done by means the field CdesignvariableMapping This field contains in the first column the name of the DesignVariables (Xdvh and Xdvb), in the second column the name of input in the Probabilistic Model  (h and b) and the last column the specific property that has to be replace by the  current value of the DesignVariable (the mean for the random variable h and the current value for the paramenter b.</p><pre class="codeinput">XLS=LineSampling(<span class="string">'Nlines'</span>,50,<span class="string">'Vset'</span>,[1:2:12],<span class="string">'Vimportancedirection'</span>,[0.2 3]);
+
+<span class="comment">%XmcA=MonteCarlo('Nsamples',10000,'Nbatches',1);</span>
+
+XrboProblem = RBOProblem(<span class="string">'Sdescription'</span>,<span class="string">'RBO problem for Cantilever Beam'</span>, <span class="keyword">...</span>
+        <span class="string">'XprobabilisticModel'</span>,XprobModelBeamMatlab, <span class="keyword">...</span>
+        <span class="string">'Xsimulator'</span>,XLS, <span class="keyword">...</span>
+        <span class="string">'Xinput'</span>,XinOptimization, <span class="keyword">...</span><span class="comment"> % input containing the Design Variable</span>
+        <span class="string">'XobjectiveFunction'</span>,XobjFun,<span class="keyword">...</span>
+        <span class="string">'SfailureProbabilityName'</span>,<span class="string">'pf'</span>,<span class="keyword">...</span><span class="comment"> % Name of the failure probability</span>
+        <span class="string">'CdesignvariableMapping'</span>,{<span class="string">'Xdvh'</span> <span class="string">'h'</span> <span class="string">'mean'</span>; <span class="string">'Xdvb'</span> <span class="string">'b'</span> <span class="string">'parametervalue'</span>});  <span class="comment">%#ok&lt;*SUSENS&gt;</span>
+
+
+
+<span class="comment">% XrboProblem = RBOProblem('Sdescription','RBO problem for Cantilever Beam', ...</span>
+<span class="comment">%         'XprobabilisticModel',XprobModelBeamMatlab, ...</span>
+<span class="comment">%         'Xsimulator',XmcA, ...</span>
+<span class="comment">%         'VweightsObjectiveFunctions',1, ...</span>
+<span class="comment">%         'Xinput',XinOptimization, ... % input containing the Design Variable</span>
+<span class="comment">%         'XobjectiveFunction',XobjFun,...</span>
+<span class="comment">%         'SfailureProbabilityName','pf',... % Name of the failure probability</span>
+<span class="comment">%         'CdesignvariableMapping',{'Xdvh' 'h' 'mean'; 'Xdvb' 'b' 'parametervalue'});  %#ok&lt;*SUSENS&gt;</span>
+</pre><h2>Performing optimization using Direct Approach.<a name="5"></a></h2><p>To perform RBO analysis using Direct approch use the method optimize of the Object RBOproblem The method optimize requires as input a Optimizer object used to define the optimization algorithm to be used.</p><pre class="codeinput">Xoptimum=XrboProblem.optimize(<span class="string">'Xoptimizer'</span>,Simplex);
+<span class="comment">% Show results</span>
+display(Xoptimum)
+</pre><h2>Plot results<a name="6"></a></h2><pre class="codeinput">f1=Xoptimum.plotObjectiveFunction;
+f2=Xoptimum.plotDesignVariable;
+
+Voptimum=Xoptimum.getOptimalDesign;
+</pre><h2>validate results<a name="7"></a></h2><pre class="codeinput">b=Parameter(<span class="string">'value'</span>,Voptimum(1),<span class="string">'Sdescription'</span>,<span class="string">'Beam width'</span>);
+h=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,Voptimum(2),<span class="string">'std'</span>,0.01,<span class="string">'Sdescription'</span>,<span class="string">'Beam Heigth'</span>);
+<span class="comment">% Definition of the Random Varibles</span>
+P=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'lognormal'</span>,<span class="string">'mean'</span>,5000,<span class="string">'std'</span>,400,<span class="string">'Sdescription'</span>,<span class="string">'Load'</span>);
+h=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0.24,<span class="string">'std'</span>,0.01,<span class="string">'Sdescription'</span>,<span class="string">'Beam Heigth'</span>);
+rho=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'lognormal'</span>,<span class="string">'mean'</span>,600,<span class="string">'std'</span>,140,<span class="string">'Sdescription'</span>,<span class="string">'density'</span>);
+E=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'lognormal'</span>,<span class="string">'mean'</span>,10e9,<span class="string">'std'</span>,1.6e9,<span class="string">'Sdescription'</span>,<span class="string">'Young''s modulus'</span>);
+<span class="comment">% Redefine correlation</span>
+Mcorrelation=eye(4);
+Mcorrelation(3,4)=0.8; <span class="comment">% Add correlation between rho and E</span>
+Mcorrelation(4,3)=0.8;
+<span class="comment">% Redifine Random Variable set</span>
+Xrvset=RandomVariableSet(<span class="string">'CXrandomVariables'</span>,{P h rho E},<span class="string">'CSmembers'</span>,{<span class="string">'P'</span> <span class="string">'h'</span> <span class="string">'rho'</span> <span class="string">'E'</span>},<span class="string">'Mcorrelation'</span>,Mcorrelation);
+<span class="comment">% Redifine input</span>
+XinputValidation=Input(<span class="string">'CXmembers'</span>,{L b Xrvset I maxDiplacement},<span class="string">'CSmembers'</span>,{<span class="string">'L'</span> <span class="string">'b'</span> <span class="string">'Xrvset'</span> <span class="string">'I'</span> <span class="string">'maxDiplacement'</span>});
+
+<span class="comment">% Redifine ProbModel</span>
+XprobModelBeamMatlab.Xmodel.Xinput=XinputValidation;
+Xoptimum=XrboProblem.optimize(<span class="string">'Xoptimizer'</span>,Simplex);
+<span class="comment">% Compute Reference Solution</span>
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,1e5,<span class="string">'Nbatches'</span>,1);
+
+<span class="comment">% Run Reliability Analysis</span>
+XfailireProbMC=Xmc.computeFailureProbability(XprobModelBeamMatlab);
+<span class="comment">% Show the estimated failure probability</span>
+display(XfailireProbMC);
+</pre><h2>Close figures<a name="8"></a></h2><pre class="codeinput">close(f1), close(f2)
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial Cantilever Beam Reliability Based Optimization
+%
+% This tutorial shows how to perform a Reliability Analysis Optimization.
+% It is using the most basic component and a vary simple model
+%
+%
+% The aim of this tutorial is optimize a clamped beam under tip load considering uncertainties.
+% The performance function is defined by the maximum allowable
+% stress level minus the actual stress in a clamped beam.
+%
+%                                          |
+% //|                                      v
+% //|REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% //|
+%
+% <html>
+% <h3 style="color:#317ECC">Copyright 2006-2014: <b> COSSAN working group</b></h3>
+% Author: <b>Edoardo-Patelli</b> <br> 
+% <i>Institute for Risk and Uncertainty, University of Liverpool, UK</i>
+% <br>COSSAN web site: <a href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>
+% <br><br>
+% <span style="color:gray"> This file is part of <span style="color:orange">openCOSSAN</span>.  The open source general purpose matlab toolbox
+% for numerical analysis, risk and uncertainty quantification (<a
+% href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>).
+% <br>
+% <span style="color:orange">openCOSSAN</span> is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License.
+% <span style="color:orange">openCOSSAN</span> is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details. 
+%  You should have received a copy of the GNU General Public License
+%  along with openCOSSAN.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/"</a>.
+% </span></html>
+
+%% Check avilability of the probabilistic model
+assert(logical(exist('XprobModelBeamMatlab','var')),'openCOSSAN:Tutorial', ...
+    'Please run first the tutorial TutorialCantileverBeamMatlabReliabilityAnalysis')
+
+
+% Define Design Variables
+Xdvb=DesignVariable('value',0.12,'lowerBound',0.01,'upperBound',0.20,'Sdescription','Beam width');
+Xdvh=DesignVariable('value',0.24,'lowerBound',0.02,'upperBound',0.4,'Sdescription','Beam Heigth');
+
+XtargetPf=Parameter('value',1e-3','Sdescription','Target failure probability');
+% Define Input object for OptimizationProblem
+XinOptimization = Input('Sdescription','Test Input', ...
+    'CSmembers',{'Xdvb' 'Xdvh' 'XtargetPf'},'CXmember',{Xdvb Xdvh XtargetPf});
+
+%% Define the objective function
+% The objective function is the minimization of the failure probability
+% associated to the ProbabilisticModel defined above.
+XobjFun = ObjectiveFunction('Sdescription','Minimize Pf',...
+    'Sscript','for n=1:length(Tinput), Toutput(n).fobj=(Tinput(n).XtargetPf-Tinput(n).pf)^2; end',...
+    'Cinputnames',{'XtargetPf' 'Xdvb' 'Xdvh' 'pf'},...
+    'Coutputnames',{'fobj'},'Liostructure',true);
+
+
+%% Define the RBOproblem
+% The RBO problem is defined by combining a probabilistic model, a Simulations
+% object used to estimate the failure probability, Objective function and
+% Constraint, an Input containing Design Variables and finally a mapping
+% between  DesignVariable(s) and input(s) of the Probabilistic model.
+
+
+%% Define a method to estimate the failure probability 
+% The montecarlo object defines the number of simulations to be used, the number
+% of batches
+%
+% The mapping between the Design Variable and Input of the Probabilistic model
+% is done by means the field CdesignvariableMapping
+% This field contains in the first column the name of the
+% DesignVariables (Xdvh and Xdvb), in the second column the name of input in the
+% Probabilistic Model  (h and b) and the last column the specific property that
+% has to be replace by the  current value of the DesignVariable (the mean for
+% the random variable h and the current value for the paramenter b. 
+
+XLS=LineSampling('Nlines',50,'Vset',[1:2:12],'Vimportancedirection',[0.2 3]);
+
+%XmcA=MonteCarlo('Nsamples',10000,'Nbatches',1);
+
+XrboProblem = RBOProblem('Sdescription','RBO problem for Cantilever Beam', ...
+        'XprobabilisticModel',XprobModelBeamMatlab, ...
+        'Xsimulator',XLS, ...
+        'Xinput',XinOptimization, ... % input containing the Design Variable
+        'XobjectiveFunction',XobjFun,...
+        'SfailureProbabilityName','pf',... % Name of the failure probability 
+        'CdesignvariableMapping',{'Xdvh' 'h' 'mean'; 'Xdvb' 'b' 'parametervalue'});  %#ok<*SUSENS>
+    
+
+
+% XrboProblem = RBOProblem('Sdescription','RBO problem for Cantilever Beam', ...
+%         'XprobabilisticModel',XprobModelBeamMatlab, ...
+%         'Xsimulator',XmcA, ...
+%         'VweightsObjectiveFunctions',1, ...
+%         'Xinput',XinOptimization, ... % input containing the Design Variable
+%         'XobjectiveFunction',XobjFun,...
+%         'SfailureProbabilityName','pf',... % Name of the failure probability 
+%         'CdesignvariableMapping',{'Xdvh' 'h' 'mean'; 'Xdvb' 'b' 'parametervalue'});  %#ok<*SUSENS>
+    
+
+    
+%% Performing optimization using Direct Approach. 
+% To perform RBO analysis using Direct approch use the method optimize of the
+% Object RBOproblem
+% The method optimize requires as input a Optimizer object used to define the
+% optimization algorithm to be used.
+
+Xoptimum=XrboProblem.optimize('Xoptimizer',Simplex);
+% Show results
+display(Xoptimum)
+
+%% Plot results
+f1=Xoptimum.plotObjectiveFunction;
+f2=Xoptimum.plotDesignVariable;
+
+Voptimum=Xoptimum.getOptimalDesign;
+%% validate results
+b=Parameter('value',Voptimum(1),'Sdescription','Beam width');
+h=RandomVariable('Sdistribution','normal','mean',Voptimum(2),'std',0.01,'Sdescription','Beam Heigth');
+% Definition of the Random Varibles
+P=RandomVariable('Sdistribution','lognormal','mean',5000,'std',400,'Sdescription','Load');
+h=RandomVariable('Sdistribution','normal','mean',0.24,'std',0.01,'Sdescription','Beam Heigth');
+rho=RandomVariable('Sdistribution','lognormal','mean',600,'std',140,'Sdescription','density');
+E=RandomVariable('Sdistribution','lognormal','mean',10e9,'std',1.6e9,'Sdescription','Young''s modulus');
+% Redefine correlation
+Mcorrelation=eye(4);
+Mcorrelation(3,4)=0.8; % Add correlation between rho and E
+Mcorrelation(4,3)=0.8;
+% Redifine Random Variable set
+Xrvset=RandomVariableSet('CXrandomVariables',{P h rho E},'CSmembers',{'P' 'h' 'rho' 'E'},'Mcorrelation',Mcorrelation);
+% Redifine input
+XinputValidation=Input('CXmembers',{L b Xrvset I maxDiplacement},'CSmembers',{'L' 'b' 'Xrvset' 'I' 'maxDiplacement'});
+
+% Redifine ProbModel
+XprobModelBeamMatlab.Xmodel.Xinput=XinputValidation;
+Xoptimum=XrboProblem.optimize('Xoptimizer',Simplex);
+% Compute Reference Solution
+Xmc=MonteCarlo('Nsamples',1e5,'Nbatches',1);
+
+% Run Reliability Analysis
+XfailireProbMC=Xmc.computeFailureProbability(XprobModelBeamMatlab);
+% Show the estimated failure probability
+display(XfailireProbMC);
+
+%% Close figures
+close(f1), close(f2)
+
+##### SOURCE END #####
+--></body></html>

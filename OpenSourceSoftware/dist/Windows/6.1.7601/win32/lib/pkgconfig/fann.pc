@@ -1,0 +1,10 @@
+prefix=C:/_Dev/workspace/OpenCossan/OpenSourceSoftware/dist/Windows/6.1.7601/win32
+exec_prefix=.
+libdir=.
+includedir=
+ 
+Name: fann
+Description: Fast Artificial Neural Network Library
+Version: 2.2.0
+Libs: -L${libdir} -lm -lfann
+Cflags: -I${includedir}

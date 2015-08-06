@@ -1,0 +1,384 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialAntennaTowerSixSigma</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialAntennaTowerSixSigma.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Tutorial AntennaTower</a></li><li><a href="#2">Define Inner loop Model</a></li><li><a href="#3">Input definition</a></li><li><a href="#4">Model definition</a></li><li><a href="#5">Define Outer loop Optimization problem</a></li><li><a href="#6">Definition of the constrain</a></li><li><a href="#7">Definition of the objective function</a></li><li><a href="#8">Define the RobustDesign</a></li><li><a href="#9">Create optimizer</a></li><li><a href="#10">Perform the analysis</a></li><li><a href="#11">Close figures and validate solution</a></li></ul></div><h2>Tutorial AntennaTower<a name="1"></a></h2><p>In this tutorial, a robust optimization of a 25-bars truss structure, an antenna tower, is carried out. The direction of the force acting on the structure and the structural parameter are affected by uncertainties.</p><p>Objective of the optimization is to minimize the volume of the structure, while assuring that the maximum nodal displacement is under a certain threshold. Because of the uncertainties involved in the problem, the maximum displacement is varying for fixed values of the design variables. Thus, a design-by-six-sigma approach is used to take into account the output variability in the constraint function.</p><p>Note that this approach is actually a simplification of RBO, where the distribution of the output is assumed to be Gaussian.</p><p>Implemented in the Engine by MB.</p><p>See Also <a href="http://mechanik.uibk.ac.at/wiki/index.php/Truss_Structure">http://mechanik.uibk.ac.at/wiki/index.php/Truss_Structure</a></p><pre class="codeinput"><span class="comment">%  Copyright 1993-2011, COSSAN Working Group</span>
+<span class="comment">%  University of Innsbruck, Austria</span>
+
+<span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(123456)
+CossanX.setVerbosityLevel(1)
+<span class="comment">% Retrieve the directory where this tutorial is stored</span>
+StutorialPath = fileparts(which(<span class="string">'TutorialAntennaTowerSixSigma.m'</span>));
+</pre><h2>Define Inner loop Model<a name="2"></a></h2><p>The inner loop model computes the maximum displacements of the truss structure whith random Young's moduli of the beams and random direction of the applied force. The Young's moduli of the beams is Gaussian with a 5% coeficient of variation. The module of the force is 100e3 N, with a variable direction of +-5 degrees from the vertical direction.</p><h2>Input definition<a name="3"></a></h2><pre class="codeinput"><span class="comment">% Create a set of 25 independent, identical distributed random variables</span>
+<span class="comment">% for the Young's moduli of the beams</span>
+E = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,1e7,<span class="string">'std'</span>,0.05*1e7);
+Xrvset1 = RandomVariableSet(<span class="string">'CXrv'</span>,{E},<span class="string">'Cmembers'</span>,{<span class="string">'E'</span>},<span class="string">'Nrviid'</span>,25);
+
+<span class="comment">% Create a set of two uniform distributed random variables for the force</span>
+<span class="comment">% direction. This direction is a spherical angle deviation of +- 5 degrees</span>
+<span class="comment">% from the vertical direction, and a totally random direction in the</span>
+<span class="comment">% horizontal plane.</span>
+theta = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'parameter1'</span>,-5/180*pi,<span class="string">'parameter2'</span>,5/180*pi);
+phi = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'parameter1'</span>,-pi,<span class="string">'parameter2'</span>,pi);
+Xrvset2 = RandomVariableSet(<span class="string">'CXrv'</span>,{theta,phi},<span class="string">'Cmembers'</span>,{<span class="string">'theta'</span>,<span class="string">'phi'</span>});
+
+<span class="comment">% The following functions computes the force components given the random</span>
+<span class="comment">% direction</span>
+Fx = Function(<span class="string">'Sexpression'</span>,<span class="string">'-100e3*cos(&lt;&amp;phi&amp;&gt;)*sin(&lt;&amp;theta&amp;&gt;)'</span>);
+Fy = Function(<span class="string">'Sexpression'</span>,<span class="string">'-100e3*sin(&lt;&amp;phi&amp;&gt;)*sin(&lt;&amp;theta&amp;&gt;)'</span>);
+Fz = Function(<span class="string">'Sexpression'</span>,<span class="string">'-100e3*cos(&lt;&amp;theta&amp;&gt;)'</span>);
+
+<span class="comment">% The starting values of the sections are assigned to parameters. There are</span>
+<span class="comment">% 6 groups of beams, charaterized by the same section.</span>
+A1 = Parameter(<span class="string">'value'</span>,0.4);
+A2 = Parameter(<span class="string">'value'</span>,0.1);
+A3 = Parameter(<span class="string">'value'</span>,3.4);
+A4 = Parameter(<span class="string">'value'</span>,1.3);
+A5 = Parameter(<span class="string">'value'</span>,0.9);
+A6 = Parameter(<span class="string">'value'</span>,1.0);
+
+<span class="comment">% Add all the input quantities to an Input object</span>
+XinpA = Input(<span class="string">'CXmembers'</span>,{Xrvset1,Xrvset2,Fx,Fy,Fz,A1,A2,A3,A4,A5,A6},<span class="keyword">...</span>
+    <span class="string">'CSmembers'</span>,{<span class="string">'Xrvset1'</span>,<span class="string">'Xrvset2'</span>,<span class="string">'Fx'</span>,<span class="string">'Fy'</span>,<span class="string">'Fz'</span>,<span class="string">'A1'</span>,<span class="string">'A2'</span>,<span class="string">'A3'</span>,<span class="string">'A4'</span>,<span class="string">'A5'</span>,<span class="string">'A6'</span>});
+</pre><h2>Model definition<a name="4"></a></h2><p>A matlab function is used to compute the maximum displacement of the truss structure. The volume of the beams are also returned as an additional output. This second output is used by the objective funtion. To see the function used in the MIO, please open the file TrussMaxDisp.m found in the tutorial folder.</p><pre class="codeinput">XmioA = Mio(<span class="string">'Spath'</span>,StutorialPath,<span class="keyword">...</span>
+    <span class="string">'Spath'</span>,StutorialPath,<span class="keyword">...</span>
+    <span class="string">'Sfile'</span>,<span class="string">'TrussMaxDispScript.m'</span>,<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false,<span class="keyword">...</span>
+    <span class="string">'LIOstructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'E_1'</span>,<span class="string">'E_2'</span>,<span class="string">'E_3'</span>,<span class="string">'E_4'</span>,<span class="string">'E_5'</span>,<span class="string">'E_6'</span>,<span class="string">'E_7'</span>,<span class="string">'E_8'</span>,<span class="string">'E_9'</span>,<span class="string">'E_10'</span>,<span class="keyword">...</span>
+    <span class="string">'E_11'</span>,<span class="string">'E_12'</span>,<span class="string">'E_13'</span>,<span class="string">'E_14'</span>,<span class="string">'E_15'</span>,<span class="string">'E_16'</span>,<span class="string">'E_17'</span>,<span class="string">'E_18'</span>,<span class="string">'E_19'</span>,<span class="string">'E_20'</span>,<span class="keyword">...</span>
+    <span class="string">'E_21'</span>,<span class="string">'E_22'</span>,<span class="string">'E_23'</span>,<span class="string">'E_24'</span>,<span class="string">'E_25'</span>,<span class="string">'theta'</span>,<span class="string">'phi'</span>},<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'maxDisp'</span>,<span class="string">'beamVolumes'</span>});
+
+<span class="comment">% The model object is constructed</span>
+XevalA = Evaluator(<span class="string">'CXmembers'</span>,{XmioA},<span class="string">'CSnames'</span>,{<span class="string">'XmioA'</span>});
+XmodelA = Model(<span class="string">'Xevaluator'</span>,XevalA,<span class="string">'Xinput'</span>,XinpA);
+</pre><h2>Define Outer loop Optimization problem<a name="5"></a></h2><p>The outer loop optimization problem takes the output of the inner loop as inputs of an optimization. The sections of the beams are introduced here as design variables.</p><pre class="codeinput"><span class="comment">% Define Design Variables.</span>
+XdvA1 = DesignVariable(<span class="string">'value'</span>,0.4,<span class="string">'lowerbound'</span>,0.4*0.8,<span class="string">'upperbound'</span>,0.4*1.2);
+XdvA2 = DesignVariable(<span class="string">'value'</span>,0.1,<span class="string">'lowerbound'</span>,0.1*0.8,<span class="string">'upperbound'</span>,0.1*1.2);
+XdvA3 = DesignVariable(<span class="string">'value'</span>,3.4,<span class="string">'lowerbound'</span>,3.4*0.8,<span class="string">'upperbound'</span>,3.4*1.2);
+XdvA4 = DesignVariable(<span class="string">'value'</span>,1.3,<span class="string">'lowerbound'</span>,1.3*0.8,<span class="string">'upperbound'</span>,1.3*1.2);
+XdvA5 = DesignVariable(<span class="string">'value'</span>,0.9,<span class="string">'lowerbound'</span>,0.9*0.8,<span class="string">'upperbound'</span>,0.9*1.2);
+XdvA6 = DesignVariable(<span class="string">'value'</span>,1.0,<span class="string">'lowerbound'</span>,1.0*0.8,<span class="string">'upperbound'</span>,1.0*1.2);
+<span class="comment">% Define Input object for OptimizationProblem</span>
+Xinp = Input(<span class="string">'CXmembers'</span>,{XdvA1,XdvA2,XdvA3,XdvA4,XdvA5,XdvA6},<span class="keyword">...</span>
+    <span class="string">'CSmembers'</span>,{<span class="string">'XdvA1'</span>,<span class="string">'XdvA2'</span>,<span class="string">'XdvA3'</span>,<span class="string">'XdvA4'</span>,<span class="string">'XdvA5'</span>,<span class="string">'XdvA6'</span>});
+</pre><h2>Definition of the constrain<a name="6"></a></h2><p>A six-sigma constraint is defined for the maximum displacement. The constrain is defined such that:</p><p><img src="TutorialAntennaTowerSixSigma_eq91478.png" alt="$$\mu( max(\mathbf{x}) ) - 6 \sigma ( max(\mathbf{x}) ) \leq 4m.$$"></p><p><img src="TutorialAntennaTowerSixSigma_eq60671.png" alt="$\mathbf{x}$"> indicates the nodal displacements of the truss structure.</p><pre class="codeinput">Xcon = Constraint(<span class="string">'Sscript'</span>,[<span class="string">'for n=1:length(Tinput);'</span> <span class="keyword">...</span>
+<span class="string">'Toutput(n).sixSigmaConstraint = 4.0 -mean(Tinput(n).maxDisp)-6*std(Tinput(n).maxDisp);end'</span>],<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'maxDisp'</span>},<span class="keyword">...</span>
+    <span class="string">'Soutputname'</span>,<span class="string">'sixSigmaConstraint'</span>,<span class="keyword">...</span>
+    <span class="string">'Linequality'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true);
+</pre><h2>Definition of the objective function<a name="7"></a></h2><p>The objective function is the total volume of the truss structure. The inner loop model returns the beam volumes for each execution of the matlab function. Since the volume does not depend on random parameters, only the volume of the first sample is kept.</p><pre class="codeinput">XobjFun = ObjectiveFunction(<span class="string">'Sscript'</span>,[<span class="string">'for n=1:length(Tinput);'</span> <span class="keyword">...</span>
+    <span class="string">'Toutput(n).totVolume = sum(Tinput(n).beamVolumes);'</span> <span class="keyword">...</span>
+    <span class="string">'Toutput(n).totVolume=Toutput(n).totVolume(1);end'</span>],<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'beamVolumes'</span>}, <span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'totVolume'</span>},<span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true);
+</pre><h2>Define the RobustDesign<a name="8"></a></h2><p>The RobustDesign problem is defined by combining a model, an Objective function and Constraint, an Input containing the Design Variables and finally a mapping between the DesignVariable and the input of the Model.</p><pre class="codeinput">XrobustDesign = RobustDesign(<span class="string">'Sdescription'</span>,<span class="string">'Antenna tower robust design optimization'</span>, <span class="keyword">...</span>
+        <span class="string">'XinnerLoopModel'</span>,XmodelA, <span class="keyword">...</span>
+        <span class="string">'Xinput'</span>,Xinp, <span class="keyword">...</span>
+        <span class="string">'XobjectiveFunction'</span>,XobjFun,<span class="keyword">...</span>
+        <span class="string">'Xconstraint'</span>,Xcon,<span class="keyword">...</span>
+        <span class="string">'Xsimulator'</span>,LatinHypercubeSampling(<span class="string">'Nsamples'</span>,100),<span class="keyword">...</span>
+        <span class="string">'CSinnerLoopOutputNames'</span>,{<span class="string">'maxDisp'</span>,<span class="string">'beamVolumes'</span>},<span class="keyword">...</span>
+        <span class="string">'CdesignvariableMapping'</span>,{<span class="string">'XdvA1'</span> <span class="string">'A1'</span> <span class="string">'parametervalue'</span>;<span class="keyword">...</span>
+                                  <span class="string">'XdvA2'</span> <span class="string">'A2'</span> <span class="string">'parametervalue'</span>;<span class="keyword">...</span>
+                                  <span class="string">'XdvA3'</span> <span class="string">'A3'</span> <span class="string">'parametervalue'</span>;<span class="keyword">...</span>
+                                  <span class="string">'XdvA4'</span> <span class="string">'A4'</span> <span class="string">'parametervalue'</span>;<span class="keyword">...</span>
+                                  <span class="string">'XdvA5'</span> <span class="string">'A5'</span> <span class="string">'parametervalue'</span>;<span class="keyword">...</span>
+                                  <span class="string">'XdvA6'</span> <span class="string">'A6'</span> <span class="string">'parametervalue'</span>}<span class="keyword">...</span>
+        );
+</pre><h2>Create optimizer<a name="9"></a></h2><p>The optimization algorithm of choice is Sequential Quadratic Programming. Since no optional parameter is passed to the constructor, the default parameters values of the algorithm are used.</p><pre class="codeinput">Xoptimizer   = SequentialQuadraticProgramming;
+</pre><h2>Perform the analysis<a name="10"></a></h2><p>The optimization analysis is performed. The initial solution is set to the default values of the parameters defined for the inner loop model.</p><pre class="codeinput">Xoptimum = XrobustDesign.optimize(<span class="string">'Xoptimizer'</span>,Xoptimizer,<span class="keyword">...</span>
+    <span class="string">'VinitialSolution'</span>,[0.4,0.1,3.4,1.3,0.9,1.0]);
+CossanX.setVerbosityLevel(3) <span class="comment">% increase verbosity to show more info with display</span>
+display(Xoptimum)
+<span class="comment">% plot the objective function evolution</span>
+f1=Xoptimum.plotObjectiveFunction;
+<span class="comment">% plot the constraint evolution</span>
+f2=Xoptimum.plotConstraint;
+<span class="comment">% plot the design variable evolution</span>
+f3=Xoptimum.plotDesignVariable;
+</pre><pre class="codeoutput">Sexpression could not be evaluated successfully, syntax may be invalid
+</pre><pre class="codeoutput">Error using ==&gt; SolutionSequence.runScript at 43
+ The user define script can not be evaluate! 
+ Please check your script 
+
+Error in ==&gt; SolutionSequence.apply at 56
+    Coutput=Xobj.runScript(Cinputs{:});
+
+Error in ==&gt; Evaluator.apply at 136
+            XSimOutTmp=Xobj.CXsolvers{n}.apply(TinputSolver);
+
+Error in ==&gt; Model.apply at 17
+Xout = apply(Xmdl.Xevaluator,Pinput);
+
+Error in ==&gt; ObjectiveFunction.evaluate at 161
+        XsimOutGlobal = apply(Xmodel,Tinput);
+
+Error in ==&gt; SequentialQuadraticProgramming.apply&gt;@(x)evaluate(Xop.XobjectiveFunction,'Xoptimizationproblem',Xop,'MreferencePoints',x,'Lgradient',true,'finiteDifferencePerturbation',Xobj.finiteDifferencePerturbation,'scaling',Xobj.scalingFactor,'Xmodel',Xop.Xmodel)
+
+
+Error in ==&gt; fmincon at 583
+      [initVals.f,initVals.g(:)] = feval(funfcn{3},X,varargin{:});
+
+Error in ==&gt; SequentialQuadraticProgramming.apply at 147
+[~,~,Nexitflag]  = fmincon(hobjfun,... % ObjectiveFunction
+
+Error in ==&gt; OptimizationProblem.OptimizationProblem&gt;OptimizationProblem.optimize at 296
+            [Xopt, XSimOutput]  = Xoptimizer.apply('XOptimizationProblem',Xobj,varargin{:});
+
+Error in ==&gt; TutorialAntennaTowerSixSigma at 159
+Xoptimum = XrobustDesign.optimize('Xoptimizer',Xoptimizer,...
+
+Caused by:
+    Failure in initial user-supplied objective function evaluation. FMINCON cannot continue.</pre><h2>Close figures and validate solution<a name="11"></a></h2><pre class="codeinput">close(f1); close(f2); close(f3);
+
+<span class="comment">% Validate Solution</span>
+assert(abs(Xoptimum.XobjectiveFunction.Mdata(end) -  4000)&lt;10,<span class="keyword">...</span><span class="comment">the optimum is around 4000</span>
+    <span class="string">'CossanX:Tutorials:TutorialAntennaTower'</span>,<span class="keyword">...</span>
+    <span class="string">'Reference Solution for the antenna tower does not match.'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial AntennaTower
+%
+% In this tutorial, a robust optimization of a 25-bars truss structure, an
+% antenna tower, is carried out. The direction of the force acting on the 
+% structure and the structural parameter are affected by uncertainties.
+%
+% Objective of the optimization is to minimize the volume of the structure,
+% while assuring that the maximum nodal displacement is under a certain
+% threshold. Because of the uncertainties involved in the problem, the
+% maximum displacement is varying for fixed values of the design
+% variables. Thus, a design-by-six-sigma approach is used to take into
+% account the output variability in the constraint function.
+% 
+% Note that this approach is actually a simplification of RBO, where the
+% distribution of the output is assumed to be Gaussian.
+%
+% Implemented in the Engine by MB.
+%
+% See Also http://mechanik.uibk.ac.at/wiki/index.php/Truss_Structure
+
+%  Copyright 1993-2011, COSSAN Working Group
+%  University of Innsbruck, Austria
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(123456)
+CossanX.setVerbosityLevel(1)
+% Retrieve the directory where this tutorial is stored
+StutorialPath = fileparts(which('TutorialAntennaTowerSixSigma.m'));
+%% Define Inner loop Model 
+% The inner loop model computes the maximum displacements of the truss
+% structure whith random Young's moduli of the beams and random direction
+% of the applied force. 
+% The Young's moduli of the beams is Gaussian with a 5% coeficient of
+% variation. The module of the force is 100e3 N, with a variable direction
+% of +-5 degrees from the vertical direction.
+%% Input definition
+
+% Create a set of 25 independent, identical distributed random variables
+% for the Young's moduli of the beams
+E = RandomVariable('Sdistribution','normal','mean',1e7,'std',0.05*1e7);
+Xrvset1 = RandomVariableSet('CXrv',{E},'Cmembers',{'E'},'Nrviid',25);
+
+% Create a set of two uniform distributed random variables for the force
+% direction. This direction is a spherical angle deviation of +- 5 degrees
+% from the vertical direction, and a totally random direction in the
+% horizontal plane.
+theta = RandomVariable('Sdistribution','uniform','parameter1',-5/180*pi,'parameter2',5/180*pi);
+phi = RandomVariable('Sdistribution','uniform','parameter1',-pi,'parameter2',pi);
+Xrvset2 = RandomVariableSet('CXrv',{theta,phi},'Cmembers',{'theta','phi'});
+
+% The following functions computes the force components given the random
+% direction
+Fx = Function('Sexpression','-100e3*cos(<&phi&>)*sin(<&theta&>)');
+Fy = Function('Sexpression','-100e3*sin(<&phi&>)*sin(<&theta&>)');
+Fz = Function('Sexpression','-100e3*cos(<&theta&>)');
+
+% The starting values of the sections are assigned to parameters. There are
+% 6 groups of beams, charaterized by the same section.
+A1 = Parameter('value',0.4);
+A2 = Parameter('value',0.1);
+A3 = Parameter('value',3.4);
+A4 = Parameter('value',1.3);
+A5 = Parameter('value',0.9);
+A6 = Parameter('value',1.0);
+
+% Add all the input quantities to an Input object
+XinpA = Input('CXmembers',{Xrvset1,Xrvset2,Fx,Fy,Fz,A1,A2,A3,A4,A5,A6},...
+    'CSmembers',{'Xrvset1','Xrvset2','Fx','Fy','Fz','A1','A2','A3','A4','A5','A6'});
+%% Model definition
+% A matlab function is used to compute the maximum displacement of the
+% truss structure. The volume of the beams are also returned as an
+% additional output. This second output is used by the objective funtion.
+% To see the function used in the MIO, please open the file TrussMaxDisp.m
+% found in the tutorial folder.
+XmioA = Mio('Spath',StutorialPath,...
+    'Spath',StutorialPath,...
+    'Sfile','TrussMaxDispScript.m',...
+    'Lfunction',false,...
+    'LIOstructure',true,...
+    'CinputNames',{'E_1','E_2','E_3','E_4','E_5','E_6','E_7','E_8','E_9','E_10',...
+    'E_11','E_12','E_13','E_14','E_15','E_16','E_17','E_18','E_19','E_20',...
+    'E_21','E_22','E_23','E_24','E_25','theta','phi'},...
+    'CoutputNames',{'maxDisp','beamVolumes'});
+
+% The model object is constructed
+XevalA = Evaluator('CXmembers',{XmioA},'CSnames',{'XmioA'});
+XmodelA = Model('Xevaluator',XevalA,'Xinput',XinpA);
+
+%% Define Outer loop Optimization problem 
+% The outer loop optimization problem takes the output of the inner loop as
+% inputs of an optimization. The sections of the beams are introduced here
+% as design variables.
+
+% Define Design Variables. 
+XdvA1 = DesignVariable('value',0.4,'lowerbound',0.4*0.8,'upperbound',0.4*1.2);
+XdvA2 = DesignVariable('value',0.1,'lowerbound',0.1*0.8,'upperbound',0.1*1.2);
+XdvA3 = DesignVariable('value',3.4,'lowerbound',3.4*0.8,'upperbound',3.4*1.2);
+XdvA4 = DesignVariable('value',1.3,'lowerbound',1.3*0.8,'upperbound',1.3*1.2);
+XdvA5 = DesignVariable('value',0.9,'lowerbound',0.9*0.8,'upperbound',0.9*1.2);
+XdvA6 = DesignVariable('value',1.0,'lowerbound',1.0*0.8,'upperbound',1.0*1.2);
+% Define Input object for OptimizationProblem
+Xinp = Input('CXmembers',{XdvA1,XdvA2,XdvA3,XdvA4,XdvA5,XdvA6},...
+    'CSmembers',{'XdvA1','XdvA2','XdvA3','XdvA4','XdvA5','XdvA6'});
+
+%% Definition of the constrain
+% A six-sigma constraint is defined for the maximum displacement. The
+% constrain is defined such that:
+%
+% $$\mu( max(\mathbf{x}) ) - 6 \sigma ( max(\mathbf{x}) ) \leq 4m.$$
+%
+% $\mathbf{x}$ indicates the nodal displacements of the truss structure.
+Xcon = Constraint('Sscript',['for n=1:length(Tinput);' ...
+'Toutput(n).sixSigmaConstraint = 4.0 -mean(Tinput(n).maxDisp)-6*std(Tinput(n).maxDisp);end'],...
+    'Cinputnames',{'maxDisp'},...
+    'Soutputname','sixSigmaConstraint',...
+    'Linequality',true,...
+    'Liostructure',true);
+%% Definition of the objective function
+% The objective function is the total volume of the truss structure. The
+% inner loop model returns the beam volumes for each execution of the
+% matlab function. Since the volume does not depend on random parameters,
+% only the volume of the first sample is kept.
+XobjFun = ObjectiveFunction('Sscript',['for n=1:length(Tinput);' ...
+    'Toutput(n).totVolume = sum(Tinput(n).beamVolumes);' ...
+    'Toutput(n).totVolume=Toutput(n).totVolume(1);end'],...
+    'CinputNames',{'beamVolumes'}, ...
+    'Coutputnames',{'totVolume'},...
+    'Liostructure',true);
+
+%% Define the RobustDesign 
+% The RobustDesign problem is defined by combining a model, an Objective
+% function and Constraint, an Input containing the Design Variables and 
+% finally a mapping between the DesignVariable and the input of the Model.
+XrobustDesign = RobustDesign('Sdescription','Antenna tower robust design optimization', ...
+        'XinnerLoopModel',XmodelA, ...
+        'Xinput',Xinp, ...
+        'XobjectiveFunction',XobjFun,...
+        'Xconstraint',Xcon,...
+        'Xsimulator',LatinHypercubeSampling('Nsamples',100),...
+        'CSinnerLoopOutputNames',{'maxDisp','beamVolumes'},...
+        'CdesignvariableMapping',{'XdvA1' 'A1' 'parametervalue';...
+                                  'XdvA2' 'A2' 'parametervalue';...
+                                  'XdvA3' 'A3' 'parametervalue';...
+                                  'XdvA4' 'A4' 'parametervalue';...
+                                  'XdvA5' 'A5' 'parametervalue';...
+                                  'XdvA6' 'A6' 'parametervalue'}...
+        );
+    
+%% Create optimizer
+% The optimization algorithm of choice is Sequential Quadratic Programming.
+% Since no optional parameter is passed to the constructor, the default
+% parameters values of the algorithm are used.
+Xoptimizer   = SequentialQuadraticProgramming;
+
+%% Perform the analysis
+% The optimization analysis is performed. The initial solution is set to
+% the default values of the parameters defined for the inner loop model.
+Xoptimum = XrobustDesign.optimize('Xoptimizer',Xoptimizer,...
+    'VinitialSolution',[0.4,0.1,3.4,1.3,0.9,1.0]);
+CossanX.setVerbosityLevel(3) % increase verbosity to show more info with display
+display(Xoptimum)
+% plot the objective function evolution
+f1=Xoptimum.plotObjectiveFunction;
+% plot the constraint evolution
+f2=Xoptimum.plotConstraint;
+% plot the design variable evolution
+f3=Xoptimum.plotDesignVariable;
+
+%% Close figures and validate solution
+close(f1); close(f2); close(f3);
+
+% Validate Solution
+assert(abs(Xoptimum.XobjectiveFunction.Mdata(end) -  4000)<10,...the optimum is around 4000
+    'CossanX:Tutorials:TutorialAntennaTower',...
+    'Reference Solution for the antenna tower does not match.')
+##### SOURCE END #####
+--></body></html>

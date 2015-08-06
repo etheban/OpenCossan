@@ -1,0 +1,204 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALSIMPLEX</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialSimplex.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALSIMPLEX</h1><!--introduction--><pre> This tutorial show how to perform unconstrained multivaable optimization
+ using derivative-free method (the Nelder-Mead simplex direct search)</pre><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Simplex">http://mechanik.uibk.ac.at/wiki/index.php/@Simplex</a></p><p><img src="TutorialSimplex_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialSimplex_eq55270.png" alt="$Author: Edoardo~Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">prepate Input objects</a></li><li><a href="#2">Create objective function</a></li><li><a href="#3">Create object OptimizationProblem</a></li><li><a href="#4">Define an optimization method</a></li><li><a href="#5">Solve optimization problem</a></li><li><a href="#6">Reference Solution</a></li><li><a href="#7">Validate solution</a></li></ul></div><h2>prepate Input objects<a name="1"></a></h2><p>The simple example function requires two design variables. The design variables are defined by means of the parameters objects.</p><pre class="codeinput"><span class="comment">% Create Parameter objects</span>
+X1      = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 1'</span>,<span class="string">'value'</span>,7);
+X2      = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 2'</span>,<span class="string">'value'</span>,2);
+<span class="comment">% Create an Input object containing the design variables</span>
+Xin     = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input for the simple example function'</span>,<span class="string">'CSmembers'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>},<span class="string">'CXmembers'</span>,{X1 X2});
+</pre><h2>Create objective function<a name="2"></a></h2><pre class="codeinput">Xobjfun   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).out1=Tinput(n).X1^2+Tinput(n).X2^2;end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'out1'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>});
+</pre><h2>Create object OptimizationProblem<a name="3"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+    <span class="string">'Xinput'</span>,Xin,<span class="string">'VinitialSolution'</span>,[7 2], <span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>,Xobjfun);
+</pre><h2>Define an optimization method<a name="4"></a></h2><pre class="codeinput">Xspx    = Simplex;
+display(Xspx)
+</pre><pre class="codeoutput"> Simplex Object  -  Description: Simplex object
+** Timeout                     : Inf
+** Iterations                  : Inf
+** Function Evaluation         : 1000
+** Limit Objective Function    : -Inf
+** Tolerance Objective Function: 1e-06
+** Tolerance Constraint        : 0.001
+** Tolerance Design Variables  : 0.001
+</pre><h2>Solve optimization problem<a name="5"></a></h2><pre class="codeinput">Xopt = Xspx.apply(<span class="string">'XOptimizationProblem'</span>,Xop);
+
+display(Xopt)
+</pre><pre class="codeoutput"> 
+ Iteration   Func-count     min f(x)         Procedure
+     0            1               53         
+     1            3               53         initial simplex
+     2            5          44.3125         expand
+     3            7          39.5031         expand
+     4            9          24.2595         expand
+     5           11          12.8799         expand
+     6           13          7.33363         reflect
+     7           15          5.03703         reflect
+     8           17          5.03703         contract outside
+     9           19          5.03703         contract inside
+    10           20          5.03703         reflect
+    11           22          3.85184         expand
+    12           23          3.85184         reflect
+    13           25          2.88609         expand
+    14           27          1.88486         expand
+    15           29         0.133829         expand
+    16           30         0.133829         reflect
+    17           32         0.133829         contract inside
+    18           34         0.133829         contract outside
+    19           36         0.133829         contract inside
+    20           38        0.0607229         reflect
+    21           40        0.0196766         contract inside
+    22           42        0.0186361         contract inside
+    23           44       0.00597431         contract inside
+    24           46       0.00326952         contract inside
+    25           48       0.00326952         contract inside
+    26           50      0.000275857         contract inside
+    27           52      0.000275857         contract inside
+    28           54      0.000275857         contract inside
+    29           55      0.000275857         reflect
+    30           57      0.000131681         contract inside
+    31           58      0.000131681         reflect
+    32           60      3.45004e-05         contract inside
+    33           62      3.45004e-05         contract inside
+    34           64      1.41933e-05         contract inside
+    35           66      6.68419e-06         contract inside
+    36           68      5.03217e-06         contract inside
+    37           70      9.83881e-07         contract inside
+    38           72      9.83881e-07         contract inside
+    39           74      9.83881e-07         contract inside
+    40           76      4.43607e-07         contract inside
+    41           78      1.64694e-07         contract inside
+    42           80      9.75056e-08         contract inside
+ 
+Optimization terminated:
+ the current x satisfies the termination criteria using OPTIONS.TolX of 1.000000e-03 
+ and F(X) satisfies the convergence criteria using OPTIONS.TolFun of 1.000000e-06 
+
+Optimum Object  -  Description: 
+|-- Termination criterion : Converged to a solution
+</pre><h2>Reference Solution<a name="6"></a></h2><pre class="codeinput">CossanX.cossanDisp(<span class="string">' '</span>);
+CossanX.cossanDisp(<span class="string">'Reference solution'</span>);
+CossanX.cossanDisp(<span class="string">'f(0.0,0.0) = 0.0'</span>);
+</pre><pre class="codeoutput"> 
+Reference solution
+f(0.0,0.0) = 0.0
+</pre><h2>Validate solution<a name="7"></a></h2><pre class="codeinput">assert(abs(Xopt.XobjectiveFunction.Mdata(end)-0)&lt;1e-4,<span class="string">'COSSANX:Tutorials'</span>,<span class="string">'wrong results'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALSIMPLEX
+%
+%   This tutorial show how to perform unconstrained multivaable optimization
+%   using derivative-free method (the Nelder-Mead simplex direct search)
+%   
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@Simplex
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo~Patelli$ 
+
+%% prepate Input objects
+% The simple example function requires two design variables. The design variables
+% are defined by means of the parameters objects.
+
+% Create Parameter objects
+X1      = DesignVariable('Sdescription','design variable 1','value',7);
+X2      = DesignVariable('Sdescription','design variable 2','value',2);
+% Create an Input object containing the design variables
+Xin     = Input('Sdescription','Input for the simple example function','CSmembers',{'X1' 'X2'},'CXmembers',{X1 X2});
+
+%% Create objective function
+Xobjfun   = ObjectiveFunction('Sdescription','objective function', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).out1=Tinput(n).X1^2+Tinput(n).X2^2;end',...
+    'CoutputNames',{'out1'},...
+    'CinputNames',{'X1' 'X2'});
+
+
+%% Create object OptimizationProblem
+Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+    'Xinput',Xin,'VinitialSolution',[7 2], ...
+    'XobjectiveFunction',Xobjfun);
+
+%% Define an optimization method 
+Xspx    = Simplex;
+display(Xspx)
+
+%% Solve optimization problem
+Xopt = Xspx.apply('XOptimizationProblem',Xop);
+
+display(Xopt)
+
+%% Reference Solution
+CossanX.cossanDisp(' ');
+CossanX.cossanDisp('Reference solution');
+CossanX.cossanDisp('f(0.0,0.0) = 0.0');
+
+%% Validate solution
+assert(abs(Xopt.XobjectiveFunction.Mdata(end)-0)<1e-4,'COSSANX:Tutorials','wrong results')
+
+##### SOURCE END #####
+--></body></html>

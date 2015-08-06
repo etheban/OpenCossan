@@ -1,0 +1,285 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALINPUT</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialInput.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALINPUT</h1><!--introduction--><p>This turorial shows how to create and use an Input object The Input object is uses to generate samples of random variables, collection parameters, function and design variables</p><p>See Also:  <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Input">http://mechanik.uibk.ac.at/wiki/index.php/@Input</a></p><p><img src="TutorialInput_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialInput_eq30863.png" alt="$Author:~Pierre~Beaurepaire$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create additional object</a></li><li><a href="#2">Create Functions</a></li><li><a href="#3">Create an Input object that contains all the object already prepared</a></li><li><a href="#4">Show summary of the Input object</a></li><li><a href="#5">Generate samples from the Xinput object</a></li><li><a href="#6">Using get and dependent field to retrieve information from Xinput</a></li><li><a href="#7">Retrieve values from the Input object</a></li></ul></div><h2>Create additional object<a name="1"></a></h2><p>Now we create 4 different parameter objects that will be included in the Input object. Please refer to the documentation of the Parameter for more details</p><pre class="codeinput">Xmat1   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'material 1 E'</span>,<span class="string">'value'</span>,7E+7);
+Xmat2   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'material 2 E'</span>,<span class="string">'value'</span>,2E+7);
+Xmat3   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'material 3 E'</span>,<span class="string">'value'</span>,1E+4);
+Xconfiguration  = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'material configuration'</span>,<span class="string">'value'</span>,unidrnd(3,16,16));
+
+<span class="comment">% Now we create RandomVariable and RandomVariableSet</span>
+x1  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,2.763,<span class="string">'std'</span>,0.4);
+x2  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,1.25,<span class="string">'std'</span>,0.4);
+Xrvs1 = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'x1'</span>,<span class="string">'x2'</span>},<span class="string">'Xrv'</span>,[x1 x2]);
+
+<span class="comment">% Create a second RandomVariableSet</span>
+<span class="comment">% Definition of Random Variables</span>
+x3  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,0,<span class="string">'upperbound'</span>,10);
+x4  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'mean'</span>,5,<span class="string">'std'</span>,1);
+
+Xrvs2   = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'x3'</span>,<span class="string">'x4'</span>},<span class="string">'Xrv'</span>,[x3 x4]);
+
+<span class="comment">% Create RandomVariableSet with IID RandomVariable</span>
+Xrvs3 = RandomVariableSet(<span class="string">'Xrv'</span>,x1,<span class="string">'Nrviid'</span>,10);
+</pre><pre class="codeoutput">Error using ==&gt; Parameter.Parameter&gt;Parameter.Parameter at 45
+The valus after the PropertyName value must be a scalar value 
+
+Error in ==&gt; TutorialInput at 19
+Xconfiguration  = Parameter('Sdescription','material configuration','value',unidrnd(3,16,16));
+</pre><h2>Create Functions<a name="2"></a></h2><pre class="codeinput">Xfun1   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #1'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;x3&amp;&gt;+&lt;&amp;x4&amp;&gt;'</span>);
+Xfun2   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #2'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;Xmat3&amp;&gt;/&lt;&amp;x1&amp;&gt;'</span>);
+Xfun3   = Function(<span class="string">'Sdescription'</span>,<span class="string">'function #2'</span>, <span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;Xmat3&amp;&gt;+1'</span>);
+</pre><h2>Create an Input object that contains all the object already prepared<a name="3"></a></h2><pre class="codeinput">Xin=Input(<span class="string">'Sdescription'</span>,<span class="string">'My first Input'</span>); <span class="comment">% initialize Input object</span>
+
+<span class="comment">% Add parameters to the input object</span>
+Xin = Xin.add(Xconfiguration);
+Xin = Xin.add(Xmat1);
+Xin = Xin.add(Xmat2);
+Xin = Xin.add(Xmat3);
+<span class="comment">% Add RandomVariable</span>
+Xin     = Xin.add(Xrvs1);
+Xin     = Xin.add(Xrvs2);
+Xin     = Xin.add(Xrvs3);
+
+<span class="comment">% Add Functions</span>
+Xin = Xin.add(Xfun1);
+Xin = Xin.add(Xfun2);
+Xin = Xin.add(Xfun3);
+</pre><h2>Show summary of the Input object<a name="4"></a></h2><pre class="codeinput">display(Xin)
+</pre><h2>Generate samples from the Xinput object<a name="5"></a></h2><pre class="codeinput">Xin = Xin.sample; <span class="comment">% Generate a single sample</span>
+display(Xin)
+
+Xin = Xin.sample(<span class="string">'Nsamples'</span>,20); <span class="comment">% Generate 20 samples and replace the</span>
+                                     <span class="comment">% previous generated sample</span>
+display(Xin)
+
+<span class="comment">% Add additional samples to the previous sample</span>
+Xin = Xin.sample(<span class="string">'Nsamples'</span>,25,<span class="string">'Ladd'</span>,true);
+display(Xin)
+</pre><h2>Using get and dependent field to retrieve information from Xinput<a name="6"></a></h2><p>get the list of the  RandomVariableSet</p><pre class="codeinput">Cname=Xin.CnamesRandomVariableSet;
+display(<span class="string">'Name of the RandomVariableSet'</span>)
+display(Cname')
+<span class="comment">% get the list of the Parameter</span>
+Cname=Xin.CnamesParameter;
+display(<span class="string">'Name of the Parameter'</span>)
+display(Cname')
+<span class="comment">% get the list of Function</span>
+Cname=Xin.CnamesFunction;
+display(<span class="string">'Name of the Function'</span>)
+display(Cname')
+<span class="comment">% get the list of StochasticProcess</span>
+Cname=Xin.CnamesStochasticProcess;
+display(<span class="string">'Name of the StochasticProcess'</span>)
+display(Cname')
+<span class="comment">% get the list of all variables</span>
+Cname=Xin.Cnames;
+display(<span class="string">'Name of the Variable present in the Input'</span>)
+display(Cname')
+</pre><h2>Retrieve values from the Input object<a name="7"></a></h2><p>recompute the values of the function</p><pre class="codeinput">Vfvalues=get(Xin,<span class="string">'Xfunctionvalue'</span>);
+display(Vfvalues)
+
+<span class="comment">% The function returns a cell array</span>
+Cvalue=Xin.getValues(<span class="string">'Sname'</span>,<span class="string">'Xfun1'</span>);
+display(Cvalue)
+
+<span class="comment">% retrive the values of the input (as a structure)</span>
+Tstruct=Xin.getStructure;
+display(Tstruct)
+
+<span class="comment">% or as a matrix (rvs and functions only)</span>
+Msamples=Xin.getSampleMatrix;
+display(Msamples);
+
+<span class="comment">% retrieve default values of the Xinput (i.e. mean values of the rvs)</span>
+get(Xin,<span class="string">'defaultvalues'</span>)
+
+CossanX.cossanDisp(<span class="string">'End of the Tutorial, bye bye! '</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALINPUT
+% This turorial shows how to create and use an Input object
+% The Input object is uses to generate samples of random variables, collection
+% parameters, function and design variables
+%
+% See Also:  http://mechanik.uibk.ac.at/wiki/index.php/@Input
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Pierre~Beaurepaire$ 
+
+
+%% Create additional object
+% Now we create 4 different parameter objects that will be included in the
+% Input object. Please refer to the documentation of the Parameter for more
+% details
+Xmat1   = Parameter('Sdescription','material 1 E','value',7E+7);
+Xmat2   = Parameter('Sdescription','material 2 E','value',2E+7);
+Xmat3   = Parameter('Sdescription','material 3 E','value',1E+4);
+Xconfiguration  = Parameter('Sdescription','material configuration','value',unidrnd(3,16,16));
+
+% Now we create RandomVariable and RandomVariableSet
+x1  = RandomVariable('Sdistribution','normal','mean',2.763,'std',0.4);
+x2  = RandomVariable('Sdistribution','normal','mean',1.25,'std',0.4);
+Xrvs1 = RandomVariableSet('Cmembers',{'x1','x2'},'Xrv',[x1 x2]);
+
+% Create a second RandomVariableSet
+% Definition of Random Variables
+x3  = RandomVariable('Sdistribution','uniform','lowerbound',0,'upperbound',10);
+x4  = RandomVariable('Sdistribution','uniform','mean',5,'std',1);
+
+Xrvs2   = RandomVariableSet('Cmembers',{'x3','x4'},'Xrv',[x3 x4]);
+
+% Create RandomVariableSet with IID RandomVariable
+Xrvs3 = RandomVariableSet('Xrv',x1,'Nrviid',10);
+    
+%% Create Functions
+Xfun1   = Function('Sdescription','function #1', ...
+    'Sexpression','<&x3&>+<&x4&>');
+Xfun2   = Function('Sdescription','function #2', ...
+    'Sexpression','<&Xmat3&>/<&x1&>');
+Xfun3   = Function('Sdescription','function #2', ...
+    'Sexpression','<&Xmat3&>+1');
+
+%% Create an Input object that contains all the object already prepared
+Xin=Input('Sdescription','My first Input'); % initialize Input object
+
+% Add parameters to the input object
+Xin = Xin.add(Xconfiguration);
+Xin = Xin.add(Xmat1);
+Xin = Xin.add(Xmat2);
+Xin = Xin.add(Xmat3);
+% Add RandomVariable
+Xin     = Xin.add(Xrvs1);
+Xin     = Xin.add(Xrvs2);
+Xin     = Xin.add(Xrvs3);
+
+% Add Functions
+Xin = Xin.add(Xfun1);
+Xin = Xin.add(Xfun2);
+Xin = Xin.add(Xfun3);
+
+%% Show summary of the Input object
+display(Xin)
+
+%% Generate samples from the Xinput object
+Xin = Xin.sample; % Generate a single sample
+display(Xin)
+
+Xin = Xin.sample('Nsamples',20); % Generate 20 samples and replace the 
+                                     % previous generated sample
+display(Xin)
+
+% Add additional samples to the previous sample                                     
+Xin = Xin.sample('Nsamples',25,'Ladd',true);
+display(Xin)
+
+%% Using get and dependent field to retrieve information from Xinput
+% get the list of the  RandomVariableSet
+Cname=Xin.CnamesRandomVariableSet;
+display('Name of the RandomVariableSet')
+display(Cname')
+% get the list of the Parameter
+Cname=Xin.CnamesParameter;
+display('Name of the Parameter')
+display(Cname')
+% get the list of Function
+Cname=Xin.CnamesFunction;
+display('Name of the Function')
+display(Cname')
+% get the list of StochasticProcess
+Cname=Xin.CnamesStochasticProcess;
+display('Name of the StochasticProcess')
+display(Cname')
+% get the list of all variables
+Cname=Xin.Cnames;
+display('Name of the Variable present in the Input')
+display(Cname')
+
+%% Retrieve values from the Input object
+% recompute the values of the function
+Vfvalues=get(Xin,'Xfunctionvalue');
+display(Vfvalues)
+
+% The function returns a cell array
+Cvalue=Xin.getValues('Sname','Xfun1');
+display(Cvalue)
+
+% retrive the values of the input (as a structure)
+Tstruct=Xin.getStructure;
+display(Tstruct)
+
+% or as a matrix (rvs and functions only)
+Msamples=Xin.getSampleMatrix;
+display(Msamples);
+
+% retrieve default values of the Xinput (i.e. mean values of the rvs)
+get(Xin,'defaultvalues')
+
+CossanX.cossanDisp('End of the Tutorial, bye bye! ')
+
+
+##### SOURCE END #####
+--></body></html>

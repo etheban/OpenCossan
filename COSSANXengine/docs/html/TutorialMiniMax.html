@@ -1,0 +1,207 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALMINIMAX</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialMiniMax.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALMINIMAX</h1><!--introduction--><p>Tutorial for MiniMax optimization method. This tutorial shows a very simple example to perform multi-objective optimization adoptin min-max method.</p><p>the Aim of this tutorial is to find x that minimize the maximum value of 5 objective functions.</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@MiniMax">http://mechanik.uibk.ac.at/wiki/index.php/@MiniMax</a></p><p><img src="TutorialMiniMax_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialMiniMax_eq82982.png" alt="$Author:~Edoardo~Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">prepate Input objects</a></li><li><a href="#2">Create objective functions</a></li><li><a href="#3">Create object OptimizationProblem</a></li><li><a href="#4">Define an optimization method</a></li><li><a href="#5">Solve optimization problem</a></li><li><a href="#6">Reference Solution</a></li></ul></div><h2>prepate Input objects<a name="1"></a></h2><p>Create Parameter objects</p><pre class="codeinput">X1      = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 1'</span>,<span class="string">'value'</span>,0.1);
+X2      = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 2'</span>,<span class="string">'value'</span>,0.1);
+
+<span class="comment">% Create an Input object containing the design variables</span>
+Xin     = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input for the MinMax optimization'</span>,<span class="string">'CSmembers'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>},<span class="string">'CXmembers'</span>,{X1 X2});
+</pre><h2>Create objective functions<a name="2"></a></h2><pre class="codeinput">Xobjfun1   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function #1'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).out1=2*Tinput(n).X1^2+Tinput(n).X2^2 - 48*Tinput(n).X1-40*Tinput(n).X2 +304;end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'out1'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>});
+
+Xobjfun2   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function #2'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).out2=-Tinput(n).X1^2-3*Tinput(n).X2^2;end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'out2'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>});
+
+Xobjfun3   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function #3'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).out3=Tinput(n).X1+3*Tinput(n).X2-18;end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'out3'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>});
+
+Xobjfun4   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function #4'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).out4=-Tinput(n).X1-Tinput(n).X2;end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'out4'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>});
+
+Xobjfun5   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function #5'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).out5=Tinput(n).X1+Tinput(n).X2-8;end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'out5'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>});
+</pre><h2>Create object OptimizationProblem<a name="3"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+    <span class="string">'Xinput'</span>,Xin,<span class="string">'VinitialSolution'</span>,[0.1 0.1], <span class="keyword">...</span>
+    <span class="string">'CXobjectiveFunctions'</span>,{Xobjfun1 Xobjfun2 Xobjfun3 Xobjfun4 Xobjfun5});
+</pre><h2>Define an optimization method<a name="4"></a></h2><pre class="codeinput">Xmm   = MiniMax;
+display(Xmm)
+</pre><pre class="codeoutput"> MiniMax Object  -  Description: MiniMax object
+** Timeout                     : Inf
+** Iterations                  : Inf
+** Function Evaluation         : 1000
+** Limit Objective Function    : -Inf
+** Tolerance Objective Function: 1e-06
+** Tolerance Constraint        : 0.001
+** Tolerance Design Variables  : 0.001
+</pre><h2>Solve optimization problem<a name="5"></a></h2><pre class="codeinput">Xopt = Xmm.apply(<span class="string">'XOptimizationProblem'</span>,Xop);
+
+display(Xopt)
+</pre><pre class="codeoutput">
+                  Objective        Max     Line search     Directional 
+ Iter F-count         value    constraint   steplength      derivative   Procedure 
+    0      1              0        295.23                                            
+    1      3         -1.087         36.77            1          -0.222     
+    2      5       -0.01408        0.8357            1           0.816     
+    3      7       0.009454      0.002695            1           0.441     
+    4      9      -0.009045        0.2988            1         -0.0418    Hessian modified  
+    5     11      -8.48e-06     0.0002799            1           0.496     
+
+Optimization stopped because the norm of the current search direction, 8.482845e-06,
+is less than 2*options.TolX = 1.000000e-03, and the maximum constraint 
+violation, 2.799227e-04, is less than options.TolCon = 1.000000e-03.
+
+Optimization Metric                                               Options
+norm(search direction) =   8.48e-06                        TolX =   1e-03 (selected)
+max(constraint violation)  =   2.80e-04                  TolCon =   1e-03 (selected)
+
+Optimum Object  -  Description: 
+|-- Termination criterion : Magnitude of the search direction was less than the specified tolerance and constraint violation was less than options.TolCon
+</pre><h2>Reference Solution<a name="6"></a></h2><pre class="codeinput">CossanX.cossanDisp(<span class="string">' '</span>);
+CossanX.cossanDisp(<span class="string">'Reference solution'</span>);
+CossanX.cossanDisp(<span class="string">'f(4.0,4.0) = 0 -64 -2 -8 0'</span>);
+</pre><pre class="codeoutput"> 
+Reference solution
+f(4.0,4.0) = 0 -64 -2 -8 0
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALMINIMAX
+% Tutorial for MiniMax optimization method.
+% This tutorial shows a very simple example to perform multi-objective
+% optimization adoptin min-max method.
+%
+% the Aim of this tutorial is to find x that minimize the maximum value of 5
+% objective functions. 
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@MiniMax
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Edoardo~Patelli$ 
+
+%% prepate Input objects
+% Create Parameter objects
+X1      = DesignVariable('Sdescription','design variable 1','value',0.1);
+X2      = DesignVariable('Sdescription','design variable 2','value',0.1);
+
+% Create an Input object containing the design variables
+Xin     = Input('Sdescription','Input for the MinMax optimization','CSmembers',{'X1' 'X2'},'CXmembers',{X1 X2});
+
+%% Create objective functions
+Xobjfun1   = ObjectiveFunction('Sdescription','objective function #1', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).out1=2*Tinput(n).X1^2+Tinput(n).X2^2 - 48*Tinput(n).X1-40*Tinput(n).X2 +304;end',...
+    'CoutputNames',{'out1'},...
+    'CinputNames',{'X1' 'X2'});
+
+Xobjfun2   = ObjectiveFunction('Sdescription','objective function #2', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).out2=-Tinput(n).X1^2-3*Tinput(n).X2^2;end',...
+    'CoutputNames',{'out2'},...
+    'CinputNames',{'X1' 'X2'});
+
+Xobjfun3   = ObjectiveFunction('Sdescription','objective function #3', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).out3=Tinput(n).X1+3*Tinput(n).X2-18;end',...
+    'CoutputNames',{'out3'},...
+    'CinputNames',{'X1' 'X2'});
+
+Xobjfun4   = ObjectiveFunction('Sdescription','objective function #4', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).out4=-Tinput(n).X1-Tinput(n).X2;end',...
+    'CoutputNames',{'out4'},...
+    'CinputNames',{'X1' 'X2'});
+
+Xobjfun5   = ObjectiveFunction('Sdescription','objective function #5', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).out5=Tinput(n).X1+Tinput(n).X2-8;end',...
+    'CoutputNames',{'out5'},...
+    'CinputNames',{'X1' 'X2'});
+
+
+%% Create object OptimizationProblem
+Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+    'Xinput',Xin,'VinitialSolution',[0.1 0.1], ...
+    'CXobjectiveFunctions',{Xobjfun1 Xobjfun2 Xobjfun3 Xobjfun4 Xobjfun5});
+
+%% Define an optimization method 
+Xmm   = MiniMax;
+display(Xmm)
+
+%% Solve optimization problem
+Xopt = Xmm.apply('XOptimizationProblem',Xop);
+
+display(Xopt)
+
+%% Reference Solution
+CossanX.cossanDisp(' ');
+CossanX.cossanDisp('Reference solution');
+CossanX.cossanDisp('f(4.0,4.0) = 0 -64 -2 -8 0');
+
+##### SOURCE END #####
+--></body></html>

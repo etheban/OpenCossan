@@ -1,0 +1,33 @@
+rm ./build/*.*
+
+ifort -O1 -r8 -warn all -check all -c -module ./build modules/mod_global.f90   -o ./build/mod_global.o	
+ifort -O1 -r8 -warn all -check all -c -module ./build modules/mod_dynamic_allocation.f90 -o ./build/mod_dynamic_allocation.o
+ifort -O1 -r8 -warn all -check all -c -module ./build modules/mod_sampling.f90 -o ./build/mod_sampling.o
+
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/scattering_kernel.f90 -o ./build/scattering_kernel.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/redistribution_kernel.f90 -o ./build/redistribution_kernel.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/fr_update_counter1d.f90 -o ./build/fr_update_counter1d.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/fr_update_counter2d.f90 -o ./build/fr_update_counter2d.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/fr_source.f90 -o ./build/fr_source.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/fr_main.f90 -o ./build/fr_main.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/collision_kernel.f90 -o ./build/collision_kernel.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/fr_zoning.f90 -o ./build/fr_zoning.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/fr_tau.f90 -o ./build/fr_beta.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/fr_beta.f90 -o ./build/fr_tau.o
+ifort -O1 -r8 -warn all -check all -c -module ./build fracture/cdf_sampling.f90 -o ./build/cdf_sampling.o
+
+ifort -O1 -r8 -warn all -check all -c -module ./build main/main_fracture.f90 -o ./build/main_fracture.o
+ifort -O1 -r8 -warn all -check all -c -module ./build main/allocate_memory.f90 -o ./build/allocate_memory.o
+ifort -O1 -r8 -warn all -check all -c -module ./build main/deallocate_memory.f90 -o ./build/deallocate_memory.o
+
+ifort -O1 -r8 -warn all -check all -c -module ./build preprocessing/input_fracture_properties.f90 -o ./build/input_fracture_properties.o
+ifort -O1 -r8 -warn all -check all -c -module ./build preprocessing/load_cdfs.f90 -o ./build/load_cdfs.o
+ifort -O1 -r8 -warn all -check all -c -module ./build preprocessing/load_mesh.f90 -o ./build/load_mesh.o
+ifort -O1 -r8 -warn all -check all -c -module ./build preprocessing/load_sources.f90 -o ./build/load_sources.o
+ifort -O1 -r8 -warn all -check all -c -module ./build preprocessing/openfile.f90 -o ./build/openfile.o
+ifort -O1 -r8 -warn all -check all -c -module ./build preprocessing/readerror.f90 -o ./build/readerror.o
+ifort -O1 -r8 -warn all -check all -c -module ./build preprocessing/generate_mesh.f90 -o ./build/generete_mesh.o
+
+ifort -O1 -r8 -warn all -check all -c -module ./build postprocessing/fracture_output.f90 -o ./build/fracture_output.o
+
+ifort -O1 -r8 -warn all -check all ./build/*.o -o ./bin/mascot.08.release_v1.5

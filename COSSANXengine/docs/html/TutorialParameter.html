@@ -1,0 +1,112 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALPARAMETER</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialParameter.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALPARAMETER</h1><!--introduction--><p>This tutorial shows the basics on how to define an object of the class   Parameter</p><p>See Also:  <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Input">http://mechanik.uibk.ac.at/wiki/index.php/@Input</a></p><p><img src="TutorialParameter_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialParameter_eq30863.png" alt="$Author:~Pierre~Beaurepaire$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create empty object</a></li><li><a href="#2">Create Parameter object</a></li><li><a href="#3">Access to the value</a></li></ul></div><h2>Create empty object<a name="1"></a></h2><pre class="codeinput">Xpar1     = Parameter;
+
+<span class="comment">% show summary of the object</span>
+display(Xpar1)
+</pre><pre class="codeoutput">Parameter Object  -  Description: 
+* Number of elements: 0
+</pre><h2>Create Parameter object<a name="2"></a></h2><pre class="codeinput">Xpar2   = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'My Parameter'</span>,<span class="string">'value'</span>,2);
+
+<span class="comment">% show summary of the object</span>
+display(Xpar2)
+</pre><pre class="codeoutput">Parameter Object  -  Description: My Parameter
+* Number of elements: 1
+</pre><h2>Access to the value<a name="3"></a></h2><pre class="codeinput">Val = Xpar2.value;
+
+Nelement = Xpar2.Nelements;
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALPARAMETER
+% This tutorial shows the basics on how to define an object of the class
+%   Parameter
+%
+% See Also:  http://mechanik.uibk.ac.at/wiki/index.php/@Input
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Pierre~Beaurepaire$ 
+
+
+%%  Create empty object
+Xpar1     = Parameter;
+
+% show summary of the object
+display(Xpar1)
+
+%%  Create Parameter object
+
+Xpar2   = Parameter('Sdescription','My Parameter','value',2);
+
+% show summary of the object
+display(Xpar2)
+
+%%   Access to the value
+Val = Xpar2.value;
+
+Nelement = Xpar2.Nelements;
+
+##### SOURCE END #####
+--></body></html>

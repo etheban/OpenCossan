@@ -1,0 +1,330 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALSIMULATEDANNEALING</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialSimulatedAnnealing.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALSIMULATEDANNEALING</h1><!--introduction--><p>The optimization method Simulated Annealing is used to optimize the Himmelblau Function and the De Jong's fifth function is a two-dimensional function with many (25) local minima</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Simulated">http://mechanik.uibk.ac.at/wiki/index.php/@Simulated</a> Annealing</p><p><img src="TutorialSimulatedAnnealing_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialSimulatedAnnealing_eq55270.png" alt="$Author: Edoardo~Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">prepate Input objects</a></li><li><a href="#2">Create objective function</a></li><li><a href="#3">Define OptimizationProblem</a></li><li><a href="#4">Create optimizer object SimulatedAnnealing</a></li><li><a href="#5">Validate solutions</a></li><li><a href="#6">Customize solver</a></li><li><a href="#7">Reference Solution</a></li><li><a href="#8">Minimize  De Jong's fifth function</a></li><li><a href="#9">Create objective function</a></li></ul></div><h2>prepate Input objects<a name="1"></a></h2><p>The Himmelblau function requires two design variables. The design variables are defined by means of the parameters objects.</p><pre class="codeinput"><span class="comment">% Create DesignVariable objects</span>
+X1      = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 1'</span>,<span class="string">'value'</span>,0);
+X2      = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 2'</span>,<span class="string">'value'</span>,0);
+<span class="comment">% Create an Input object containing the design variables</span>
+Xin     = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input for the Himmelblau function'</span>,<span class="string">'CSmembers'</span>,{<span class="string">'X1'</span> <span class="string">'X2'</span>},<span class="string">'CXmembers'</span>,{X1 X2});
+</pre><h2>Create objective function<a name="2"></a></h2><pre class="codeinput">Xofun   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'Himmelblau function'</span>, <span class="keyword">...</span>
+         <span class="string">'Lfunction'</span>,true,<span class="string">'Liomatrix'</span>,true,<span class="string">'Liostructure'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'X1'</span>,<span class="string">'X2'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+          <span class="string">'Spath'</span>,fullfile(CossanX.getCossanRoot,<span class="string">'examples'</span>,<span class="string">'Matlab_functions'</span>,<span class="string">'Himmelblau'</span>),<span class="keyword">...</span>
+          <span class="string">'Sfile'</span>,<span class="string">'Himmelblau'</span>,<span class="keyword">...</span><span class="comment"> % external file</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fobj'</span>}); <span class="comment">% Define the outputs</span>
+</pre><h2>Define OptimizationProblem<a name="3"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Himmelblau optimization problem'</span>,<span class="string">'Xinput'</span>,Xin,<span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>, Xofun);
+</pre><h2>Create optimizer object SimulatedAnnealing<a name="4"></a></h2><pre class="codeinput">Xsa     = SimulatedAnnealing(<span class="string">'toleranceObjectiveFunction'</span>,1e-2,<span class="string">'Nmaxmoves'</span>,100);
+
+<span class="comment">% Show details of the object</span>
+display(Xsa)
+
+<span class="comment">% Solve optimization problem</span>
+<span class="comment">%Many standard optimization algorithms get stuck in local minima. Because the</span>
+<span class="comment">%simulated annealing algorithm performs a wide random search, the chance of</span>
+<span class="comment">%being trapped in local minima is decreased.</span>
+
+<span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(46375)
+
+Xoptimum  = Xsa.apply(<span class="string">'XoptimizationProblem'</span>,Xop);
+display(Xoptimum)
+</pre><pre class="codeoutput"> SimulatedAnnealing Object  -  Description: SimulatedAnnealing object
+** Timeout                     : Inf
+** Iterations                  : Inf
+** Function Evaluation         : Inf
+** Limit Objective Function    : -Inf
+** Tolerance Objective Function: 0.01
+** Tolerance Constraint        : 0.001
+** Tolerance Design Variables  : 0.001
+** Annealing Function           :annealingboltz
+** Temperature Function         :temperatureexp
+** Reanniling interval          :100
+* Initial Temperature          : 1.000e+02
+
+                           Best        Current           Mean
+Iteration   f-count         f(x)         f(x)         temperature
+     0          1            170            170            100
+    10         11            170            170          56.88
+    20         21            170        356.948        34.0562
+    30         31         159.39         159.39        20.3907
+    40         41         37.295         37.295        12.2087
+    50         51        23.1789        23.1789        7.30977
+    60         61        17.2443        17.2443        4.37663
+    70         71        11.5136        11.5136        2.62045
+    80         81        9.14736        9.14736        1.56896
+    90         91        3.01254        3.01254       0.939395
+   100        101        3.01254        3.01254        0.56245
+   110        111        3.01254        3.01254        0.33676
+   120        121       0.867919       0.867919       0.201631
+   130        131       0.249935       0.249935       0.120724
+   140        141       0.249935       0.249935      0.0722817
+   150        151       0.167517       0.167517      0.0432777
+   160        161       0.167517       0.167517       0.025912
+   170        171      0.0893143      0.0893143      0.0155145
+   180        181      0.0893143      0.0893143     0.00928908
+   190        191      0.0175604      0.0175604     0.00556171
+   200        201      0.0175604      0.0175604        0.00333
+   210        211      0.0019588      0.0019588      0.0019938
+   220        221      0.0019588      0.0019588     0.00119376
+   230        231      0.0019588      0.0019588    0.000714748
+   240        241      0.0017279      0.0017279    0.000427946
+   250        251      0.0017279     0.00208738    0.000256227
+   260        261    0.000326922    0.000326922    0.000153413
+   270        271     0.00030358     0.00030358    9.18538e-05
+   280        281    0.000276245    0.000276245    5.49963e-05
+   290        291    0.000102412    0.000102412    3.29283e-05
+   300        301    0.000102412    0.000102412    1.97154e-05
+
+                           Best        Current           Mean
+Iteration   f-count         f(x)         f(x)         temperature
+Optimization terminated: change in best function value less than options.TolFun.
+Optimum Object  -  Description: 
+|-- Termination criterion : Average change in the value of the objective function over options.StallIterLimit iterations is less than options.TolFun
+</pre><h2>Validate solutions<a name="5"></a></h2><pre class="codeinput">assert(abs(Xoptimum.XobjectiveFunction.Mdata(end))&lt;1e-4,<span class="string">'COSSANX:Tutorial'</span>,<span class="string">'Wrong solution'</span>)
+</pre><h2>Customize solver<a name="6"></a></h2><p>Be carefull when you use the different options of SimulationAnneling, This can lead to a not efficient simulation</p><pre class="codeinput">Xsa     = SimulatedAnnealing(<span class="string">'initialTemperature'</span>,10,<span class="string">'Nmaxmoves'</span>,50,<span class="keyword">...</span>
+    <span class="string">'StemperatureFunction'</span>,<span class="string">'temperatureboltz'</span>);
+Xoptimum2  = Xsa.apply(<span class="string">'XoptimizationProblem'</span>,Xop);
+display(Xoptimum2)
+
+<span class="comment">% In this case the optimization procedure remained trapped in a local minima.</span>
+</pre><pre class="codeoutput">
+                           Best        Current           Mean
+Iteration   f-count         f(x)         f(x)         temperature
+     0          1            170            170             10
+    10         11        2.26111        2.26111        4.17032
+    20         21        2.26111        13.0801        3.28459
+    30         31        2.26111        9.04955        2.91207
+    40         41        2.26111        9.04955        2.69283
+    50         51        2.26111        9.04955        2.54335
+Optimization terminated: change in best function value less than options.TolFun.
+Optimum Object  -  Description: 
+|-- Termination criterion : Average change in the value of the objective function over options.StallIterLimit iterations is less than options.TolFun
+</pre><h2>Reference Solution<a name="7"></a></h2><pre class="codeinput">CossanX.cossanDisp(<span class="string">' '</span>);
+CossanX.cossanDisp(<span class="string">'Reference solution'</span>);
+CossanX.cossanDisp(<span class="string">'f(3.0,2.0) = 0.0'</span>);
+CossanX.cossanDisp(<span class="string">'f(-2.805118, 3.131312) = 0.0'</span>);
+CossanX.cossanDisp(<span class="string">'f(-3.779310, -3.283186) = 0.0'</span>);
+CossanX.cossanDisp(<span class="string">'f(3.584428, -1.848126) = 0.0'</span>);
+</pre><pre class="codeoutput"> 
+Reference solution
+f(3.0,2.0) = 0.0
+f(-2.805118, 3.131312) = 0.0
+f(-3.779310, -3.283186) = 0.0
+f(3.584428, -1.848126) = 0.0
+</pre><h2>Minimize  De Jong's fifth function<a name="8"></a></h2><p>This section presents an example that shows how to find the minimum of the function using simulated annealing. De Jong's fifth function is a two-dimensional function with many (25) local minima</p><pre class="codeinput"><span class="comment">% Show function to be minimize</span>
+dejong5fcn
+</pre><img vspace="5" hspace="5" src="TutorialSimulatedAnnealing_01.png" alt=""> <h2>Create objective function<a name="9"></a></h2><pre class="codeinput">Xofun   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'De Jong''s fifth function function'</span>, <span class="keyword">...</span>
+          <span class="string">'Lfunction'</span>,true,<span class="string">'Liomatrix'</span>,true,<span class="string">'Liostructure'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'X1'</span>,<span class="string">'X2'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+          <span class="string">'Afunction'</span>,@dejong5fcn,<span class="keyword">...</span><span class="comment"> % external file</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fobj'</span>}); <span class="comment">% Define the outputs</span>
+
+<span class="comment">% Define OptimizationProblem</span>
+Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Himmelblau optimization problem'</span>,<span class="string">'Xinput'</span>,Xin,<span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>, Xofun);
+
+Xsa     = SimulatedAnnealing(<span class="string">'SannealingFunction'</span>,<span class="string">'annealingfast'</span>,<span class="string">'Nmaxmoves'</span>,100);
+
+<span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(46375)
+Xoptimum  = Xsa.apply(<span class="string">'Lplotevolution'</span>,true,<span class="string">'XoptimizationProblem'</span>,Xop, <span class="keyword">...</span>
+    <span class="string">'Vinitialsolution'</span>,[0 0]);
+display(Xoptimum)
+</pre><pre class="codeoutput">
+                           Best        Current           Mean
+Iteration   f-count         f(x)         f(x)         temperature
+     0          1        12.6705        12.6705            100
+    10         11        12.6705        12.6705          56.88
+    20         21        12.6705        12.6705        34.0562
+    30         31        12.6705        34.9459        20.3907
+    40         41        4.63238        4.63238        12.2087
+    50         51        4.63238        4.63238        7.30977
+    60         61        4.63238        4.63238        4.37663
+    70         71        4.63238        4.63238        2.62045
+    80         81        4.38516        4.38516        1.56896
+    90         91        3.97514        3.97514       0.939395
+   100        101        3.96825        4.05809        0.56245
+   110        111        3.96825        3.97074        0.33676
+   120        121        3.96825        3.96833       0.201631
+   130        131        3.96825        3.96942       0.120724
+   140        141        3.96825        3.96825      0.0722817
+   150        151        3.96825        3.96825      0.0432777
+   160        161        3.96825        3.96825       0.025912
+   170        171        3.96825        3.96825      0.0155145
+   180        181        3.96825        3.96825     0.00928908
+   190        191        3.96825        3.96825     0.00556171
+Optimization terminated: change in best function value less than options.TolFun.
+Optimum Object  -  Description: 
+|-- Termination criterion : Average change in the value of the objective function over options.StallIterLimit iterations is less than options.TolFun
+</pre><img vspace="5" hspace="5" src="TutorialSimulatedAnnealing_02.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALSIMULATEDANNEALING
+% The optimization method Simulated Annealing is used to optimize the Himmelblau
+% Function and the De Jong's fifth function is a two-dimensional function with
+% many (25) local minima 
+%   
+%   
+%   
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@Simulated Annealing
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo~Patelli$ 
+
+%% prepate Input objects
+% The Himmelblau function requires two design variables. The design variables
+% are defined by means of the parameters objects.
+
+% Create DesignVariable objects
+X1      = DesignVariable('Sdescription','design variable 1','value',0); 
+X2      = DesignVariable('Sdescription','design variable 2','value',0); 
+% Create an Input object containing the design variables
+Xin     = Input('Sdescription','Input for the Himmelblau function','CSmembers',{'X1' 'X2'},'CXmembers',{X1 X2});
+
+%% Create objective function
+Xofun   = ObjectiveFunction('Sdescription','Himmelblau function', ...
+         'Lfunction',true,'Liomatrix',true,'Liostructure',false,...
+          'Cinputnames',{'X1','X2'},... % Define the inputs 
+          'Spath',fullfile(CossanX.getCossanRoot,'examples','Matlab_functions','Himmelblau'),...
+          'Sfile','Himmelblau',... % external file
+          'Coutputnames',{'fobj'}); % Define the outputs
+      
+
+%% Define OptimizationProblem
+Xop     = OptimizationProblem('Sdescription','Himmelblau optimization problem','Xinput',Xin,...
+    'XobjectiveFunction', Xofun);
+
+%% Create optimizer object SimulatedAnnealing
+Xsa     = SimulatedAnnealing('toleranceObjectiveFunction',1e-2,'Nmaxmoves',100);
+
+% Show details of the object
+display(Xsa)
+
+% Solve optimization problem
+%Many standard optimization algorithms get stuck in local minima. Because the
+%simulated annealing algorithm performs a wide random search, the chance of
+%being trapped in local minima is decreased.
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(46375)
+
+Xoptimum  = Xsa.apply('XoptimizationProblem',Xop);
+display(Xoptimum)
+
+%% Validate solutions
+assert(abs(Xoptimum.XobjectiveFunction.Mdata(end))<1e-4,'COSSANX:Tutorial','Wrong solution')
+
+%% Customize solver
+% Be carefull when you use the different options of SimulationAnneling, 
+% This can lead to a not efficient simulation
+
+Xsa     = SimulatedAnnealing('initialTemperature',10,'Nmaxmoves',50,...
+    'StemperatureFunction','temperatureboltz');
+Xoptimum2  = Xsa.apply('XoptimizationProblem',Xop);
+display(Xoptimum2)
+
+% In this case the optimization procedure remained trapped in a local minima.
+
+
+%%  Reference Solution
+CossanX.cossanDisp(' ');
+CossanX.cossanDisp('Reference solution');
+CossanX.cossanDisp('f(3.0,2.0) = 0.0');
+CossanX.cossanDisp('f(-2.805118, 3.131312) = 0.0');
+CossanX.cossanDisp('f(-3.779310, -3.283186) = 0.0');
+CossanX.cossanDisp('f(3.584428, -1.848126) = 0.0');
+
+%% Minimize  De Jong's fifth function
+% This section presents an example that shows how to find the minimum of the function using simulated annealing.
+% De Jong's fifth function is a two-dimensional function with many (25) local minima
+
+% Show function to be minimize
+dejong5fcn
+
+%% Create objective function
+Xofun   = ObjectiveFunction('Sdescription','De Jong''s fifth function function', ...
+          'Lfunction',true,'Liomatrix',true,'Liostructure',false,...
+          'Cinputnames',{'X1','X2'},... % Define the inputs 
+          'Afunction',@dejong5fcn,... % external file
+          'Coutputnames',{'fobj'}); % Define the outputs
+
+% Define OptimizationProblem
+Xop     = OptimizationProblem('Sdescription','Himmelblau optimization problem','Xinput',Xin,...
+    'XobjectiveFunction', Xofun);
+
+Xsa     = SimulatedAnnealing('SannealingFunction','annealingfast','Nmaxmoves',100);
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(46375)
+Xoptimum  = Xsa.apply('Lplotevolution',true,'XoptimizationProblem',Xop, ...
+    'Vinitialsolution',[0 0]);
+display(Xoptimum)
+
+##### SOURCE END #####
+--></body></html>

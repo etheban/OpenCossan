@@ -1,0 +1,218 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialGOCEsatellite</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialGOCEsatellite.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">GOCE satellite Tutorial</a></li><li><a href="#2">Definition of the Neural Networks</a></li><li><a href="#3">Regression plots of 1st eigenfrequency and 1st diagonal term of MAC-matrix</a></li><li><a href="#4">Sensitivity analysis of 1st eigenfrequency and 1st diagonal term of MAC-matrix</a></li><li><a href="#5">Plot figures of Sensitivity measures</a></li><li><a href="#6">validate solution</a></li></ul></div><h2>GOCE satellite Tutorial<a name="1"></a></h2><p>In this tutorial, the first eigenfrequency and the first term of the diagonal terms of the MAC-matrix are approximated by neural networks. These neural networks are then used for sensitivity analysis</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/GOCE_satellite">http://mechanik.uibk.ac.at/wiki/index.php/GOCE_satellite</a></p><p><img src="TutorialGOCEsatellite_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialGOCEsatellite_eq28365.png" alt="$Author:~ BG$"></p><pre class="codeinput"><span class="comment">% Reset the random number generator in order to always obtain the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(51125)
+</pre><h2>Definition of the Neural Networks<a name="2"></a></h2><pre class="codeinput"><span class="comment">% load file which contains the Input objects and Simulation Data objects used for calibration and validation</span>
+Sdirectory = fileparts(which(<span class="string">'TutorialGOCESatellite.m'</span>));
+load(fullfile(Sdirectory,<span class="string">'NeuralNetworkInput.mat'</span>));
+
+<span class="comment">% Neural network for 1st eigenfrequency</span>
+XnnFREQ1 = NeuralNetwork(<span class="string">'Sdescription'</span>,<span class="string">'1st eigenfrequency of GOCE satellite'</span>,<span class="keyword">...</span>
+    <span class="string">'Stype'</span>,<span class="string">'HyperbolicTangent'</span>,<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'Freq1'</span>},<span class="keyword">...</span><span class="comment">  %response to be extracted from full model</span>
+    <span class="string">'Vnnodes'</span>,[18, 7, 1],<span class="keyword">...</span><span class="comment"> % number of layers used within the NN</span>
+    <span class="string">'Vnormminmax'</span>,[-0.8 0.8],<span class="keyword">...</span><span class="comment"> % normalization factors</span>
+    <span class="string">'Xcalibrationinput'</span>, Xincalibration,<span class="keyword">...</span><span class="comment"> % Input object with calibration points</span>
+    <span class="string">'Xcalibrationoutput'</span>,Xoutcalibration,<span class="keyword">...</span><span class="comment">% SimulationData object with model evaluations at calibration points</span>
+    <span class="string">'Xvalidationinput'</span>,Xinvalidation, <span class="keyword">...</span><span class="comment">% Input object with validation points</span>
+    <span class="string">'Xvalidationoutput'</span>,Xoutvalidation); <span class="comment">% SimulationData object with model evaluations ar validation points</span>
+
+<span class="comment">% Neural network for 1st term of MAC-matrix</span>
+XnnMAC1 = NeuralNetwork(<span class="string">'Sdescription'</span>,<span class="string">'1st MAC term of GOCE satellite'</span>,<span class="keyword">...</span>
+    <span class="string">'Stype'</span>,<span class="string">'HyperbolicTangent'</span>,<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'DiagMAC1'</span>},<span class="keyword">...</span><span class="comment">  %response to be extracted from full model</span>
+    <span class="string">'Vnnodes'</span>,[18, 7, 1],<span class="keyword">...</span><span class="comment"> % number of layers used within the NN</span>
+    <span class="string">'Vnormminmax'</span>,[-0.8 0.8],<span class="keyword">...</span><span class="comment"> % normalization factors</span>
+    <span class="string">'Xcalibrationinput'</span>, Xincalibration,<span class="keyword">...</span><span class="comment"> % Input object with calibration points</span>
+    <span class="string">'Xcalibrationoutput'</span>,Xoutcalibration,<span class="keyword">...</span><span class="comment"> % SimulationData object with model evaluations at calibration points</span>
+    <span class="string">'Xvalidationinput'</span>,Xinvalidation, <span class="keyword">...</span><span class="comment"> % Input object with validation points</span>
+    <span class="string">'Xvalidationoutput'</span>,Xoutvalidation); <span class="comment">% SimulationData object with model evaluations ar validation points</span>
+</pre><h2>Regression plots of 1st eigenfrequency and 1st diagonal term of MAC-matrix<a name="3"></a></h2><pre class="codeinput"><span class="comment">% regression plot of validation samples for 1st eigenfrequency</span>
+f1 = figure;
+XnnFREQ1.plotregression(<span class="string">'Stype'</span>,<span class="string">'validation'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Freq1'</span>);
+
+<span class="comment">% regression plot of validation samples for 1st diagonal term of MAC-matrix</span>
+f2 = figure;
+XnnMAC1.plotregression(<span class="string">'Stype'</span>,<span class="string">'validation'</span>,<span class="string">'Soutputname'</span>,<span class="string">'DiagMAC1'</span>);
+</pre><pre class="codeoutput">Error using ==&gt; MetaModel.plotregression at 73
+MetaModel not validated
+
+Error in ==&gt; TutorialGOCEsatellite at 49
+XnnFREQ1.plotregression('Stype','validation','Soutputname','Freq1');
+</pre><h2>Sensitivity analysis of 1st eigenfrequency and 1st diagonal term of MAC-matrix<a name="4"></a></h2><pre class="codeinput">Nsamples=2e4; <span class="comment">% number of samples</span>
+Xlh=MonteCarlo(<span class="string">'Nsamples'</span>,Nsamples); <span class="comment">% define Simulations object</span>
+
+<span class="comment">% compute sensitivity measures for both the eigenfrequency and MAC-term</span>
+XsmRBD_FREQ1=Sensitivity.randomBalanceDesign(<span class="string">'Xmodel'</span>,XnnFREQ1,<span class="string">'Nsamples'</span>,Nsamples,<span class="string">'Coutputnames'</span>,{<span class="string">'Freq1'</span>});
+XsmRBD_DiagMAC1=Sensitivity.randomBalanceDesign(<span class="string">'Xmodel'</span>,XnnFREQ1,<span class="string">'Nsamples'</span>,Nsamples,<span class="string">'Coutputnames'</span>,{<span class="string">'Freq1'</span>});
+</pre><h2>Plot figures of Sensitivity measures<a name="5"></a></h2><pre class="codeinput">XsmRBD_FREQ1.plot;
+XsmRBD_DiagMAC1.plot;
+</pre><h2>validate solution<a name="6"></a></h2><pre class="codeinput">close(f1);
+close(f2);
+
+assert(all(all(abs(XsmRBD_FREQ1.VsobolFirstIndices(1:10)'-[4.1623e-04, 5.4004e-04, 1.0516e-03, 5.8427e-04 <span class="keyword">...</span>
+        4.5886e-04, 4.6985e-04, 1.1752e-03, 7.2778e-04, 5.3344e-02, 4.2141e-01])&lt;1e-4)), <span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution of first Sobol Indices (Freq1) does not match.'</span>)
+
+assert(all(all(abs(XsmRBD_FREQ1.VsobolFirstIndices(1:10)'-[4.1623e-04, 5.4004e-04, 1.0516e-03, 5.8427e-04, <span class="keyword">...</span>
+        4.5886e-04, 4.6985e-04, 1.1752e-03, 7.2778e-04, 5.3344e-02, 4.2141e-01])&lt;1e-4)), <span class="keyword">...</span>
+       <span class="string">'CossanX:Tutorials:TutorialDataseries'</span>, <span class="keyword">...</span>
+       <span class="string">'Reference Solution of first Sobol Indices (DiagMAC1) does not match.'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% GOCE satellite Tutorial
+% 
+% In this tutorial, the first eigenfrequency and the first term of the
+% diagonal terms of the MAC-matrix are approximated by neural networks.
+% These neural networks are then used for sensitivity analysis
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/GOCE_satellite
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~ BG$ 
+
+% Reset the random number generator in order to always obtain the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(51125)
+
+%% Definition of the Neural Networks
+
+% load file which contains the Input objects and Simulation Data objects used for calibration and validation 
+Sdirectory = fileparts(which('TutorialGOCESatellite.m'));
+load(fullfile(Sdirectory,'NeuralNetworkInput.mat')); 
+
+% Neural network for 1st eigenfrequency
+XnnFREQ1 = NeuralNetwork('Sdescription','1st eigenfrequency of GOCE satellite',...
+    'Stype','HyperbolicTangent',...
+    'Coutputnames',{'Freq1'},...  %response to be extracted from full model
+    'Vnnodes',[18, 7, 1],... % number of layers used within the NN
+    'Vnormminmax',[-0.8 0.8],... % normalization factors
+    'Xcalibrationinput', Xincalibration,... % Input object with calibration points
+    'Xcalibrationoutput',Xoutcalibration,...% SimulationData object with model evaluations at calibration points
+    'Xvalidationinput',Xinvalidation, ...% Input object with validation points
+    'Xvalidationoutput',Xoutvalidation); % SimulationData object with model evaluations ar validation points
+
+% Neural network for 1st term of MAC-matrix
+XnnMAC1 = NeuralNetwork('Sdescription','1st MAC term of GOCE satellite',...
+    'Stype','HyperbolicTangent',...
+    'Coutputnames',{'DiagMAC1'},...  %response to be extracted from full model
+    'Vnnodes',[18, 7, 1],... % number of layers used within the NN
+    'Vnormminmax',[-0.8 0.8],... % normalization factors
+    'Xcalibrationinput', Xincalibration,... % Input object with calibration points
+    'Xcalibrationoutput',Xoutcalibration,... % SimulationData object with model evaluations at calibration points
+    'Xvalidationinput',Xinvalidation, ... % Input object with validation points
+    'Xvalidationoutput',Xoutvalidation); % SimulationData object with model evaluations ar validation points
+
+
+%% Regression plots of 1st eigenfrequency and 1st diagonal term of MAC-matrix
+
+% regression plot of validation samples for 1st eigenfrequency
+f1 = figure;
+XnnFREQ1.plotregression('Stype','validation','Soutputname','Freq1');
+
+% regression plot of validation samples for 1st diagonal term of MAC-matrix
+f2 = figure;
+XnnMAC1.plotregression('Stype','validation','Soutputname','DiagMAC1');
+
+
+%% Sensitivity analysis of 1st eigenfrequency and 1st diagonal term of MAC-matrix
+
+Nsamples=2e4; % number of samples
+Xlh=MonteCarlo('Nsamples',Nsamples); % define Simulations object
+
+% compute sensitivity measures for both the eigenfrequency and MAC-term
+XsmRBD_FREQ1=Sensitivity.randomBalanceDesign('Xmodel',XnnFREQ1,'Nsamples',Nsamples,'Coutputnames',{'Freq1'});
+XsmRBD_DiagMAC1=Sensitivity.randomBalanceDesign('Xmodel',XnnFREQ1,'Nsamples',Nsamples,'Coutputnames',{'Freq1'});
+
+%% Plot figures of Sensitivity measures
+
+XsmRBD_FREQ1.plot;
+XsmRBD_DiagMAC1.plot;
+
+%% validate solution
+
+close(f1);
+close(f2);
+
+assert(all(all(abs(XsmRBD_FREQ1.VsobolFirstIndices(1:10)'-[4.1623e-04, 5.4004e-04, 1.0516e-03, 5.8427e-04 ...
+        4.5886e-04, 4.6985e-04, 1.1752e-03, 7.2778e-04, 5.3344e-02, 4.2141e-01])<1e-4)), ...
+       'CossanX:Tutorials:TutorialDataseries', ...
+       'Reference Solution of first Sobol Indices (Freq1) does not match.')
+
+assert(all(all(abs(XsmRBD_FREQ1.VsobolFirstIndices(1:10)'-[4.1623e-04, 5.4004e-04, 1.0516e-03, 5.8427e-04, ...        
+        4.5886e-04, 4.6985e-04, 1.1752e-03, 7.2778e-04, 5.3344e-02, 4.2141e-01])<1e-4)), ...
+       'CossanX:Tutorials:TutorialDataseries', ...
+       'Reference Solution of first Sobol Indices (DiagMAC1) does not match.')
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

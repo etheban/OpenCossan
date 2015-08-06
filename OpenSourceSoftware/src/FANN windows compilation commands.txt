@@ -1,0 +1,10 @@
+First, extract the archive with the modified src\CMakeLists.txt, src\fann_error.c and src\include\fann_error.h in the FANN folder (overwrite the original files).
+
+Then from the Windows SDK/Visual studio command prompt, go to the FANN folder and give:
+
+cmake -DCMAKE_INSTALL_PREFIX="E:\workspace\OpenCossan\OpenSourceSoftware\dist\Windows\6.1.7601\win64" -DCMAKE_BUILD_TYPE="Release" -G "NMake Makefiles" .
+nmake
+nmake install
+
+Obviously, the destination dir should be changed automatically to match the cossan external path as initialized from OpenCossan.
+Be sure to have the correct VCREDIST that corresponds to the compiler and architecture you used.

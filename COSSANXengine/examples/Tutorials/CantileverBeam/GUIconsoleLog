@@ -1,0 +1,436 @@
+* PropertyName: Sscript
+* PropertyValue class: char
+% Matlab Script Template
+
+% =========================================================================
+% COSSAN-X 
+% University of Innsbruck, Austria, EU
+% Copyright 1993-2011 
+% =========================================================================
+
+% Cycle over realizations (samples)
+%% DO NOT REMOVE THIS CYCLE
+for n= 1:length(Tinput)
+	 % Insert your code here
+	 % Example:  
+	 Toutput(n).w=(Tinput(n).rho*9.81*Tinput(n).b*Tinput(n).h*Tinput(n).L^4)/(8*Tinput(n).E*Tinput(n).I) + ...
+(Tinput(n).P*Tinput(n).L^3)/(3*Tinput(n).E*Tinput(n).I);
+	
+end
+
+* PropertyName: Liostructure
+* PropertyValue class: logical
+     1
+
+* PropertyName: Lfunction
+* PropertyValue class: logical
+     0
+
+[Mio:validateConstructor] Validate Constructor
+Object constructed in Matlab:  
+===================================================================
+Mio Object - Description: Compute displacement of the Beam
+===================================================================
+ 
+ * Matlab script defined in the field Sscript
+ * Input Variables: h; E; I; P; rho; L; b; 
+ * Output Variables: w; 
+ * No COSSAN object required to evaluate the mio
+[w_objectFactory] SobjType Input
+[w_objectFactory] SobjName physm1_input
+[w_objectFactory] physm1_input=Input(varargin{:})
+* PropertyName: CSmembers
+* PropertyValue class: cell
+    'b'
+    'rvset1'
+    'I'
+    'L'
+    'MaxDisplacement'
+
+* PropertyName: CCXmembers
+* PropertyValue class: cell
+    {1x1 cell}
+    {1x1 cell}
+    {1x1 cell}
+    {1x1 cell}
+    {1x1 cell}
+
+Object constructed in Matlab:  
+===================================================================
+Input Object  - Description: 
+===================================================================
+* 1 Sets of RandomVariables
+** Names: "rvset1" 
+* 3 Parameter object(s)
+** Names: "b" "L" "MaxDisplacement" 
+* 1 Functions object(s)
+** Names: "I" 
+[w_objectFactory] SobjType Evaluator
+[w_objectFactory] SobjName physm1_evaluator
+[w_objectFactory] physm1_evaluator=Evaluator(varargin{:})
+* PropertyName: CSmembers
+* PropertyValue class: cell
+    'DisplacementBeam'
+
+* PropertyName: CCXmembers
+* PropertyValue class: cell
+    {1x1 cell}
+
+Object constructed in Matlab:  
+===================================================================
+ Evaluator Object  -  Description: 
+===================================================================
+ The evaluator contains: 
+ 1:  Solver DisplacementBeam (Compute displacement of the Beam) 
+    * type Mio
+    * evaluate on the localhost
+[w_objectFactory] SobjType Model
+[w_objectFactory] SobjName physm1
+[w_objectFactory] physm1=Model(varargin{:})
+* PropertyName: Sdescription
+* PropertyValue class: char
+Physical Model
+* PropertyName: CXinput
+* PropertyValue class: cell
+    [1x1 Input]
+
+* PropertyName: CXevaluator
+* PropertyValue class: cell
+    [1x1 Evaluator]
+
+Object constructed in Matlab:  
+===================================================================
+ Model Object  -  Description: Physical Model
+===================================================================
+Required Inputs :  h; P; rho; E; I; b; L; MaxDisplacement;
+Provided Outputs :  w;
+The Model contains 1 solvers
+[w_objectFactory] SobjType PerformanceFunction
+[w_objectFactory] SobjName perfun1
+[w_objectFactory] perfun1=PerformanceFunction(varargin{:})
+* PropertyName: Sdescription
+* PropertyValue class: char
+Performance Function
+* PropertyName: SoutputName
+* PropertyValue class: char
+vg
+* PropertyName: Scapacity
+* PropertyValue class: char
+MaxDisplacement
+* PropertyName: Sdemand
+* PropertyValue class: char
+w
+Object constructed in Matlab:  
+===================================================================
+ PerformanceFunction Object  -  Description: Performance Function
+===================================================================
+ The performance function defined as CAPACITY-DEMAND
+* CAPACITY : MaxDisplacement
+* DEMAND   : w
+[w_objectFactory] SobjType ProbabilisticModel
+[w_objectFactory] SobjName probmodel1
+[w_objectFactory] probmodel1=ProbabilisticModel(varargin{:})
+* PropertyName: Sdescription
+* PropertyValue class: char
+Probabilistic Model for the Cantilever Beam
+* PropertyName: CXmodel
+* PropertyValue class: cell
+    [1x1 Model]
+
+* PropertyName: CXPerformanceFunction
+* PropertyValue class: cell
+    [1x1 PerformanceFunction]
+
+Object constructed in Matlab:  
+===================================================================
+ ProbabilisticModel Object  -  Description: Probabilistic Model for the Cantilever Beam
+===================================================================
+  * Model object: Physical Model
+  * PerformanceFunction object: Performance Function
+[w_objectFactory] SobjType Parameter
+[w_objectFactory] SobjName targetPf
+[w_objectFactory] targetPf=Parameter(varargin{:})
+* PropertyName: Sdescription
+* PropertyValue class: char
+target failure probability
+* PropertyName: Cvalue
+* PropertyValue class: cell
+    [1.0000e-03]
+
+Object constructed in Matlab:  
+===================================================================
+Parameter Object  -  Description: target failure probability
+===================================================================
+* Number of elements: 1
+* Values : 1.000e-03 
+[w_objectFactory] SobjType ObjectiveFunction
+[w_objectFactory] SobjName XobjFun
+[w_objectFactory] XobjFun=ObjectiveFunction(varargin{:})
+* PropertyName: Sdescription
+* PropertyValue class: char
+Reach a failure probability of 10-3
+* PropertyName: Cinputnames
+* PropertyValue class: cell
+    'targetPf'    'Xdvb'    'Xdvh'    'pf'
+
+* PropertyName: Coutputnames
+* PropertyValue class: cell
+    'fobj'
+
+* PropertyName: Sscript
+* PropertyValue class: char
+%% Cantilever Beam - Objective function
+%
+% University of Innsbruck, Austria 2011
+% Author: Edoardo Patelli
+
+% targetPf = parameter that defined the desired failure probability 
+% pf= estimated failure probability of the Cantilever Beam
+
+for n=1:length(Tinput),
+	Toutput(n).fobj=(Tinput(n).targetPf -Tinput(n).pf)^2;
+end
+
+* PropertyName: Liostructure
+* PropertyValue class: logical
+     1
+
+* PropertyName: Lfunction
+* PropertyValue class: logical
+     0
+
+[Mio:validateConstructor] Validate Constructor
+Object constructed in Matlab:  
+===================================================================
+ObjectiveFunction Object - Description: Reach a failure probability of 10-3
+===================================================================
+ 
+ * Matlab script defined in the field Sscript
+ * Input Variables: targetPf; Xdvb; Xdvh; pf; 
+ * Output Variables: fobj; 
+ * No COSSAN object required to evaluate the mio
+[w_objectFactory] SobjType Input
+[w_objectFactory] SobjName rboprobl8640616475745742667_input
+[w_objectFactory] rboprobl8640616475745742667_input=Input(varargin{:})
+* PropertyName: CSmembers
+* PropertyValue class: cell
+    'targetPf'
+    'Xdvh'
+    'Xdvb'
+
+* PropertyName: CCXmembers
+* PropertyValue class: cell
+    {1x1 cell}
+    {1x1 cell}
+    {1x1 cell}
+
+Object constructed in Matlab:  
+===================================================================
+Input Object  - Description: 
+===================================================================
+* 1 Parameter object(s)
+** Names: "targetPf" 
+* 2 DesignVariable object(s)
+** Names: "Xdvh" "Xdvb" 
+[w_objectFactory] SobjType MonteCarlo
+[w_objectFactory] SobjName mcobj6064008411549882798
+[w_objectFactory] mcobj6064008411549882798=MonteCarlo(varargin{:})
+* PropertyName: Nsamples
+* PropertyValue class: double
+       10000
+
+* PropertyName: Nbatches
+* PropertyValue class: double
+     1
+
+* PropertyName: timeout
+* PropertyValue class: double
+     0
+
+Object constructed in Matlab:  
+==============================================
+=            Monte Carlo Object              =
+==============================================
+
+Description: 
+Termination Criteria: 
+Number of samples: 1.000000e+04
+Max computational time: 0.000000e+00
+*
+Simulation will perform in 1 batches
+Partial results files will be stored
+[w_objectFactory] SobjType RBOProblem
+[w_objectFactory] SobjName rboprobl8640616475745742667
+[w_objectFactory] rboprobl8640616475745742667=RBOProblem(varargin{:})
+* PropertyName: CCXobjectiveFunctions
+* PropertyValue class: cell
+    {1x1 cell}
+
+* PropertyName: VweightsObjectiveFunctions
+* PropertyValue class: double
+     1
+
+* PropertyName: CdesignVariableMapping
+* PropertyValue class: cell
+    'Xdvb'    'b'    'parametervalue'
+    'Xdvh'    'h'    'mean'          
+
+* PropertyName: SfailureProbabilityName
+* PropertyValue class: char
+pf
+* PropertyName: CXmodel
+* PropertyValue class: cell
+    [1x1 ProbabilisticModel]
+
+* PropertyName: CXinput
+* PropertyValue class: cell
+    [1x1 Input]
+
+* PropertyName: CXsimulator
+* PropertyValue class: cell
+    [1x1 MonteCarlo]
+
+Object constructed in Matlab:  
+===================================================================
+RBOProblem object  -  Description: 
+===================================================================
+* ProbabilistiModel to be evaluated
+* * Required input: targetPf; Xdvh; Xdvb; 
+* * Provided output: pf; 
+* * Simulation method: MonteCarlo
+* Design Parameters: Xdvh; Xdvb; 
+* Objective Function #1
+* * Required input: targetPf; Xdvb; Xdvh; pf; 
+* * Provided output: fobj; 
+* No constraints defined
+* No meta-model type defined
+[w_objectFactory] SobjType Simplex
+[w_objectFactory] SobjName simploptm6231152289915833676
+[w_objectFactory] simploptm6231152289915833676=Simplex(varargin{:})
+* PropertyName: NmaxIterations
+* PropertyValue class: double
+     1
+
+* PropertyName: NmaxModelEvaluations
+* PropertyValue class: double
+     1
+
+* PropertyName: timeout
+* PropertyValue class: double
+   Inf
+
+* PropertyName: toleranceDesignVariables
+* PropertyValue class: double
+   1.0000e-03
+
+* PropertyName: toleranceObjectiveFunction
+* PropertyValue class: double
+   1.0000e-06
+
+Warning: PropertyName timeout not valid  
+> In Simplex.Simplex>Simplex.Simplex at 60
+  In w_objectFactory at 144
+Object constructed in Matlab:  
+===================================================================
+ Simplex Object  -  Description: Simplex object
+===================================================================
+* Termination criteria 
+** Timeout                     : Inf
+** Iterations                  : 1
+** Function Evaluation         : 1
+** Limit Objective Function    : -Inf
+** Tolerance Objective Function: 1e-06
+** Tolerance Constraint        : 0.001
+** Tolerance Design Variables  : 0.001
+* Main Settings  : 
+* Other Settings  
+** Scaling factor               : 1
+** penalty factor               : 100
+* Simulation Output stored in  : 
+[w_method] receiver objType: RBOProblem
+[w_method] methodName: optimize
+[w_method] returnName: optm_output 
+[w_method] varargout=RBOProblem.optimize(varargin)
+[w_method] Details of varargin (2) 
+* PropertyName  : CXoptimizer
+* PropertyValue class: cell
+    [1x1 Simplex]
+
+[COSSANX:ObjectiveFunction:evaluate] Ri-evaluating all samples
+[Status:Evaluator  ]       * Processing solver 1/1
+[SolutionSequence:apply] Target object of type struct
+[Status:SolutionSequence]    * Simulation 1/1
+[SolutionSequence:runScript] Evaluate Sscript
+Monte Carlo Sampling simulation Batch 1 ( 10000 samples)
+[Status:Evaluator  ]       * Processing solver 1/1
+[Mio:runScript] Evaluate matlab script
+[Mio:runScript] End evaluation of the matlab script
+[Simulation:merge] Collection of the fieldnames: "h" "P" "rho" "E" "I" "b" "L" "MaxDisplacement" "w" 
+[Simulation:merge] Collection of the fieldnames: "h" "P" "rho" "E" "I" "b" "L" "MaxDisplacement" "w" "vg" 
+[Simulation:exportResults] Writing partial results (SimulationData_batch_1_of_1) on the folder: /home/ep/cossanx_workspace/Cantilever_Beam/analysis/optimization/optm1_analysis6/results/20110823T181754
+[Simulation:exportResults] Batch #1 written in 0.21871
+[Simulation:exportResults] Results stored in the folder: /home/ep/cossanx_workspace/Cantilever_Beam/analysis/optimization/optm1_analysis6/results/20110823T181754/SimulationData_batch_1_of_1
+Maximum no. of samples reached. Samples computed 10000; Maximum allowed samples: 10000
+[Simulation:merge] Collection of the fieldnames: "targetPf" "Xdvh" "Xdvb" "pf" 
+[Mio:runScript] Evaluate matlab script
+[Mio:runScript] End evaluation of the matlab script
+ 
+ Iteration   Func-count     min f(x)         Procedure
+     0            1         0.283769         
+[COSSANX:ObjectiveFunction:evaluate] Ri-evaluating all samples
+[Status:Evaluator  ]       * Processing solver 1/1
+[SolutionSequence:apply] Target object of type struct
+[Status:SolutionSequence]    * Simulation 1/1
+[SolutionSequence:runScript] Evaluate Sscript
+Monte Carlo Sampling simulation Batch 1 ( 10000 samples)
+[Status:Evaluator  ]       * Processing solver 1/1
+[Mio:runScript] Evaluate matlab script
+[Mio:runScript] End evaluation of the matlab script
+[Simulation:merge] Collection of the fieldnames: "h" "P" "rho" "E" "I" "b" "L" "MaxDisplacement" "w" 
+[Simulation:merge] Collection of the fieldnames: "h" "P" "rho" "E" "I" "b" "L" "MaxDisplacement" "w" "vg" 
+[Simulation:exportResults] Writing partial results (SimulationData_batch_1_of_1) on the folder: /home/ep/cossanx_workspace/Cantilever_Beam/analysis/optimization/optm1_analysis6/results/20110823T181759
+[Simulation:exportResults] Batch #1 written in 0.19551
+[Simulation:exportResults] Results stored in the folder: /home/ep/cossanx_workspace/Cantilever_Beam/analysis/optimization/optm1_analysis6/results/20110823T181759/SimulationData_batch_1_of_1
+Maximum no. of samples reached. Samples computed 10000; Maximum allowed samples: 10000
+[Simulation:merge] Collection of the fieldnames: "targetPf" "Xdvh" "Xdvb" "pf" 
+[Mio:runScript] Evaluate matlab script
+[Mio:runScript] End evaluation of the matlab script
+[COSSANX:ObjectiveFunction:evaluate] Ri-evaluating all samples
+[Status:Evaluator  ]       * Processing solver 1/1
+[SolutionSequence:apply] Target object of type struct
+[Status:SolutionSequence]    * Simulation 1/1
+[SolutionSequence:runScript] Evaluate Sscript
+Monte Carlo Sampling simulation Batch 1 ( 10000 samples)
+[Status:Evaluator  ]       * Processing solver 1/1
+[Mio:runScript] Evaluate matlab script
+[Mio:runScript] End evaluation of the matlab script
+[Simulation:merge] Collection of the fieldnames: "h" "P" "rho" "E" "I" "b" "L" "MaxDisplacement" "w" 
+[Simulation:merge] Collection of the fieldnames: "h" "P" "rho" "E" "I" "b" "L" "MaxDisplacement" "w" "vg" 
+[Simulation:exportResults] Writing partial results (SimulationData_batch_1_of_1) on the folder: /home/ep/cossanx_workspace/Cantilever_Beam/analysis/optimization/optm1_analysis6/results/20110823T181804
+[Simulation:exportResults] Batch #1 written in 0.20479
+[Simulation:exportResults] Results stored in the folder: /home/ep/cossanx_workspace/Cantilever_Beam/analysis/optimization/optm1_analysis6/results/20110823T181804/SimulationData_batch_1_of_1
+Maximum no. of samples reached. Samples computed 10000; Maximum allowed samples: 10000
+[Simulation:merge] Collection of the fieldnames: "targetPf" "Xdvh" "Xdvb" "pf" 
+[Mio:runScript] Evaluate matlab script
+[Mio:runScript] End evaluation of the matlab script
+     1            3         0.283769         initial simplex
+ 
+Exiting: Maximum number of function evaluations has been exceeded
+         - increase MaxFunEvals option.
+         Current function value: 0.283769 
+
+[w_method]  Check output objects
+[w_method] Assign variable optm_output to the base workspace
+[w_method] Show details of returned object optm_output : 
+===================================================================
+Optimum Object  -  Description: 
+===================================================================
+|- Design Variables: Xdvh Xdvb 
+|-- Values: 1.000e-03 2.520e-01 
+|-- Objective function #1 at the optimum: 2.957e-01 
+|
+|
+|-- Evaluations of the objective function:   3
+|-- Evaluations of the constrains        :   0
+|-- Number of candidate solutions        :   3
+|-- Termination criterion : Number of iterations exceeded options.MaxIter or number of function evaluations exceeded options.MaxFunEvals

@@ -1,0 +1,231 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial Infection Dynamic Model</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialInfectionDynamicModel.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial Infection Dynamic Model</h1><!--introduction--><p>This example shows how to perform the global sensitivity analysis of a mathematical model representing an infective process at its early state, where we assume that the infection is propagated through some kind of contact between individuals who do not take any precaution to avoid contgion.</p><p>The equatios describe the dynamics of I and S, repesenting the model of the infection process are:</p><p><img src="TutorialInfectionDynamicModel_eq98312.png" alt="$$\frac{dI}{dt}=\gamma \kappa I S \textrm{--} r I \textrm{--} \delta I$$"></p><p>and</p><p><img src="TutorialInfectionDynamicModel_eq43801.png" alt="$$\frac{dS}{dt}= \textrm{--} \gamma \kappa I S+b S+m$$"></p><p>where:</p><div><ul><li>I is the number of Infected idividuals at time t</li><li>S number of individual susceptible to infection</li><li><img src="TutorialInfectionDynamicModel_eq53478.png" alt="$\kappa<1$"> contact coefficient</li><li><img src="TutorialInfectionDynamicModel_eq64427.png" alt="$\gamma<1$"> infection coefficient</li><li><img src="TutorialInfectionDynamicModel_eq25861.png" alt="$r$"> recovery rate</li><li><img src="TutorialInfectionDynamicModel_eq71031.png" alt="$\delta$"> death rate</li><li><img src="TutorialInfectionDynamicModel_eq81831.png" alt="$m$"> migration rate</li><li><img src="TutorialInfectionDynamicModel_eq28812.png" alt="$b$"> birth rate</li></ul></div><p>At the early stage <img src="TutorialInfectionDynamicModel_eq59102.png" alt="$$(t ~ 0) S(t) \gg I(t)$">$ and then S(t)~S0. Therefore the first equation becames linear and the solution is:</p><p><img src="TutorialInfectionDynamicModel_eq27682.png" alt="$I=I_0*exp(Y)$"> where <img src="TutorialInfectionDynamicModel_eq25702.png" alt="$Y=\gamma \kappa S0 \textrm{--} r \textrm{--} \delta$"></p><p>If the coefficient of the exponential is greater then 0 the infection spreads, otherwise the infection dies out.</p><p>This tutorial is base on the example provided in the book:A.Saltelli et al., Global Sensitivity Analysis: the primer, Wiley, 2008: ISBN 978-0-470-05997-5</p><p>See also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/Infection_Dynamic_Model">http://mechanik.uibk.ac.at/wiki/index.php/Infection_Dynamic_Model</a></p><p><img src="TutorialInfectionDynamicModel_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialInfectionDynamicModel_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Model definition</a></li><li><a href="#2">Uncertainty analysis</a></li><li><a href="#3">Close figure and validate solution</a></li></ul></div><h2>Model definition<a name="1"></a></h2><p>Reset the random number generator in order to obtain always the same results. DO NOT CHANGE THE VALUES OF THE SEED</p><pre class="codeinput">CossanX.resetRandomNumberGenerator(46354)
+
+<span class="comment">% Define inputs</span>
+Szero=Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Number of susceptible individuals'</span>,<span class="string">'value'</span>,1000);
+gamma=RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'Infection coefficient'</span>, <span class="keyword">...</span>
+    <span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,0,<span class="string">'upperbound'</span>,1);
+kappa=RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'Contact coefficient'</span>, <span class="keyword">...</span>
+    <span class="string">'Sdistribution'</span>,<span class="string">'beta'</span>,<span class="string">'par1'</span>,2,<span class="string">'par2'</span>,7);
+r=RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'Recovery rate'</span>, <span class="keyword">...</span>
+    <span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,0,<span class="string">'upperbound'</span>,1);
+delta=RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'Death rate'</span>, <span class="keyword">...</span>
+    <span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,0,<span class="string">'upperbound'</span>,1);
+
+<span class="comment">% Now we group all the inputs in a Input object</span>
+Xrvset=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'gamma'</span> <span class="string">'kappa'</span> <span class="string">'r'</span> <span class="string">'delta'</span>}, <span class="keyword">...</span>
+    <span class="string">'CXmembers'</span>,{gamma kappa r delta});
+
+Xin=Input(<span class="string">'Sdescription'</span>,<span class="string">'Inputs of the infective process'</span>, <span class="keyword">...</span>
+    <span class="string">'XrandomVariableSet'</span>,Xrvset,<span class="string">'Xparameter'</span>,Szero);
+
+<span class="comment">% Define the physical model</span>
+<span class="comment">% Creating a matlab script for computing Y=gamma*kappa*S0-r-delta</span>
+Xm=Mio(<span class="string">'Sdescription'</span>,<span class="string">'Infection model early stage'</span>, <span class="keyword">...</span>
+       <span class="string">'Cinputnames'</span>,{<span class="string">'Szero'</span> <span class="string">'gamma'</span> <span class="string">'kappa'</span>  <span class="string">'r'</span> <span class="string">'delta'</span>}, <span class="keyword">...</span>
+       <span class="string">'Coutputnames'</span>,{<span class="string">'Y'</span>},<span class="keyword">...</span>
+       <span class="string">'Sfile'</span>,<span class="string">'infectionMatrix.m'</span>,<span class="keyword">...</span>
+       <span class="string">'Lfunction'</span>,false,<span class="string">'Liomatrix'</span>,true,<span class="string">'Liostructure'</span>,false);
+
+Xev=Evaluator(<span class="string">'Xmio'</span>,Xm);
+Xmdl=Model(<span class="string">'Xinput'</span>,Xin,<span class="string">'Xevaluator'</span>,Xev,<span class="keyword">...</span>
+    <span class="string">'Sdescription'</span>,<span class="string">'Model for TutorialInfectionDynamicModel'</span>);
+</pre><pre class="codeoutput">Error using ==&gt; Mio.validateConstructor at 24
+A full file path must be supplied.
+
+Error in ==&gt; Mio.Mio&gt;Mio.Mio at 141
+            Xobj=validateConstructor(Xobj);
+
+Error in ==&gt; TutorialInfectionDynamicModel at 71
+Xm=Mio('Sdescription','Infection model early stage', ... 
+</pre><h2>Uncertainty analysis<a name="2"></a></h2><p>In order to verified the above model we generate a input object containing 20 reliazations and we compute the quantity of interest Y</p><pre class="codeinput">Xin=Xin.sample(<span class="string">'Nsamples'</span>,1000);
+Xout=Xmdl.apply(Xin);
+
+<span class="comment">% extract quantity of interest (Y) from simulation data object</span>
+VY=Xout.getValues(<span class="string">'Sname'</span>,<span class="string">'Y'</span>);
+
+<span class="comment">% Plot histogramm of Y</span>
+f1=figure;
+hist(gca(f1),VY,50)
+</pre><h2>Close figure and validate solution<a name="3"></a></h2><pre class="codeinput">close(f1);
+
+<span class="comment">% Validate Solution</span>
+assert(abs(min(VY)+1.14706539)&lt;1e-8,<span class="keyword">...</span>
+    <span class="string">'CossanX:Tutorials:InfectionDynamicModel'</span>,<span class="keyword">...</span>
+    <span class="string">'Reference Solution for the infection dynamic model does not matched.'</span>)
+
+<span class="comment">% Please continue with the tutotial</span>
+<span class="comment">% TutorialInfectionDynamicModelGlobalSensitivityAnalysis</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial Infection Dynamic Model
+%
+% This example shows how to perform the global sensitivity analysis of a
+% mathematical model representing an infective process at its early state, where
+% we assume that the infection is propagated through some kind of contact
+% between individuals who do not take any precaution to avoid contgion.   
+%
+% The equatios describe the dynamics of I and S, repesenting the model of the
+% infection process are: 
+%
+% $$\frac{dI}{dt}=\gamma \kappa I S \textrm{REPLACE_WITH_DASH_DASH} r I \textrm{REPLACE_WITH_DASH_DASH} \delta I$$
+%
+% and
+%
+% $$\frac{dS}{dt}= \textrm{REPLACE_WITH_DASH_DASH} \gamma \kappa I S+b S+m$$
+%
+% where:
+% 
+% * I is the number of Infected idividuals at time t
+% * S number of individual susceptible to infection
+% * $\kappa<1$ contact coefficient
+% * $\gamma<1$ infection coefficient
+% * $r$ recovery rate
+% * $\delta$ death rate
+% * $m$ migration rate
+% * $b$ birth rate
+%
+% At the early stage $$(t ~ 0) S(t) \gg I(t)$$ and then S(t)~S0. Therefore the first
+% equation becames linear and the solution is: 
+%
+% $I=I_0*exp(Y)$ where $Y=\gamma \kappa S0 \textrm{REPLACE_WITH_DASH_DASH} r \textrm{REPLACE_WITH_DASH_DASH} \delta$
+%
+% If the coefficient of the exponential is greater then 0 the infection spreads,
+% otherwise the infection dies out. 
+%
+% This tutorial is base on the example provided in the book:A.Saltelli et al.,
+% Global Sensitivity Analysis: the primer, Wiley, 2008: ISBN 978-0-470-05997-5 
+%
+% See also: http://mechanik.uibk.ac.at/wiki/index.php/Infection_Dynamic_Model
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+
+
+%% Model definition
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(46354)
+
+% Define inputs
+Szero=Parameter('Sdescription','Number of susceptible individuals','value',1000);
+gamma=RandomVariable('Sdescription','Infection coefficient', ...
+    'Sdistribution','uniform','lowerbound',0,'upperbound',1);
+kappa=RandomVariable('Sdescription','Contact coefficient', ...
+    'Sdistribution','beta','par1',2,'par2',7);
+r=RandomVariable('Sdescription','Recovery rate', ...
+    'Sdistribution','uniform','lowerbound',0,'upperbound',1);
+delta=RandomVariable('Sdescription','Death rate', ...
+    'Sdistribution','uniform','lowerbound',0,'upperbound',1);
+
+% Now we group all the inputs in a Input object
+Xrvset=RandomVariableSet('Cmembers',{'gamma' 'kappa' 'r' 'delta'}, ...
+    'CXmembers',{gamma kappa r delta});
+
+Xin=Input('Sdescription','Inputs of the infective process', ...
+    'XrandomVariableSet',Xrvset,'Xparameter',Szero);
+
+% Define the physical model
+% Creating a matlab script for computing Y=gamma*kappa*S0-r-delta
+Xm=Mio('Sdescription','Infection model early stage', ... 
+       'Cinputnames',{'Szero' 'gamma' 'kappa'  'r' 'delta'}, ...
+       'Coutputnames',{'Y'},...
+       'Sfile','infectionMatrix.m',...
+       'Lfunction',false,'Liomatrix',true,'Liostructure',false);
+   
+Xev=Evaluator('Xmio',Xm);
+Xmdl=Model('Xinput',Xin,'Xevaluator',Xev,...
+    'Sdescription','Model for TutorialInfectionDynamicModel');
+
+
+
+%% Uncertainty analysis 
+% In order to verified the above model we generate a input object containing 20
+% reliazations and we compute the quantity of interest Y
+Xin=Xin.sample('Nsamples',1000);
+Xout=Xmdl.apply(Xin);
+
+% extract quantity of interest (Y) from simulation data object
+VY=Xout.getValues('Sname','Y');
+
+% Plot histogramm of Y
+f1=figure;
+hist(gca(f1),VY,50)
+%% Close figure and validate solution
+close(f1);
+
+% Validate Solution
+assert(abs(min(VY)+1.14706539)<1e-8,...
+    'CossanX:Tutorials:InfectionDynamicModel',...
+    'Reference Solution for the infection dynamic model does not matched.')
+
+% Please continue with the tutotial
+% TutorialInfectionDynamicModelGlobalSensitivityAnalysis 
+
+##### SOURCE END #####
+--></body></html>

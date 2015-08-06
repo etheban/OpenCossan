@@ -1,0 +1,277 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for the SobolSampling class</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialSobolSampling.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for the SobolSampling class</h1><!--introduction--><p>This tutorial is focus on the use and definition of the SobolSampling class</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@SobolSampling">http://mechanik.uibk.ac.at/wiki/index.php/@SobolSampling</a></p><p><img src="TutorialSobolSampling_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> $Author:~Edoardo~Patelli $</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Problem Definition</a></li><li><a href="#2">Define the Input</a></li><li><a href="#3">Define the Evaluator (i.e. how our model is evaluate)</a></li><li><a href="#4">Define the Physical Model based on the Input and the Evaluator</a></li><li><a href="#5">Test the Model</a></li><li><a href="#6">Here we go!!!</a></li><li><a href="#7">Define SobolSampling object</a></li><li><a href="#8">Generate samples with Sobol Sampling object</a></li><li><a href="#9">Perform HaltonSampling simulation</a></li><li><a href="#10">Apply the SobolSampling simulation method to a ProbabilisticModel</a></li><li><a href="#11">Validate Solutions</a></li></ul></div><h2>Problem Definition<a name="1"></a></h2><p>Here we define our problem. It does not represent any physical problem.</p><h2>Define the Input<a name="2"></a></h2><p>Define RandomVariable</p><pre class="codeinput">RV1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,2,<span class="string">'std'</span>,1);
+RV2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,2);
+<span class="comment">% Define the RandomVariableSet</span>
+Xrvs1=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>, <span class="string">'RV2'</span>});
+Xdemand=Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Define threshold'</span>,<span class="string">'value'</span>,0);
+<span class="comment">% Construct Input Object</span>
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input Object of our model'</span>);
+Xin = add(Xin,Xrvs1);
+Xin = add(Xin,Xdemand);
+</pre><h2>Define the Evaluator (i.e. how our model is evaluate)<a name="3"></a></h2><p>Construct a Mio object</p><pre class="codeinput">Xm=Mio( <span class="string">'Sdescription'</span>, <span class="string">'This is our Model'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out=-Tinput(j).RV1+Tinput(j).RV2; end'</span>, <span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'out'</span>},<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>},<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+<span class="comment">% Construct the Evaluator</span>
+Xeval = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'Evaluator for the IS tutorial'</span>);
+</pre><h2>Define the Physical Model based on the Input and the Evaluator<a name="4"></a></h2><pre class="codeinput">Xmdl=Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xin);
+</pre><h2>Test the Model<a name="5"></a></h2><p>Generate 10 random realization of the input</p><pre class="codeinput">Xin = sample(Xin,<span class="string">'Nsamples'</span>,10);
+
+<span class="comment">% Evaluate the model</span>
+
+Xo = apply(Xmdl,Xin);
+<span class="comment">% Show Results</span>
+display(Xo)
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+</pre><h2>Here we go!!!<a name="6"></a></h2><p>Now we define the SobolSampling object and try to generate samples from this object</p><h2>Define SobolSampling object<a name="7"></a></h2><p>Can the SobolSampling class be constructed and used like the MonteCarlo class?</p><pre class="codeinput"><span class="keyword">try</span>
+    <span class="comment">% Let's try</span>
+    Xss=SobolSampling(<span class="string">'Nsamples'</span>,10,<span class="string">'Nbatches'</span>,2);
+<span class="keyword">catch</span> ME
+    CossanX.cossanDisp(ME.message)
+    <span class="comment">% It is mandatory to define the field Leap and Skip</span>
+    Xss=SobolSampling(<span class="string">'Nsamples'</span>,10,<span class="string">'Nbatches'</span>,2,<span class="string">'NLeap'</span>,100,<span class="string">'NSkip'</span>,10);
+<span class="keyword">end</span>
+</pre><h2>Generate samples with Sobol Sampling object<a name="8"></a></h2><p>The method samples accept as input also Input object or RandomVariableSet object These object are only used to retrieve the number of random variable (Nrv)</p><pre class="codeinput">Xsmp=Xss.sample(<span class="string">'Nsamples'</span>,5,<span class="string">'Xinput'</span>,Xin);
+display(Xsmp);
+
+Xsmp=Xss.sample(<span class="string">'Nsamples'</span>,7,<span class="string">'Xrandomvariableset'</span>,Xrvs1);
+display(Xsmp);
+</pre><pre class="codeoutput">Samples Object - Description: 
+Nsamples= 5
+-----------------------------------------------------------
+* No design of experiments for Design Variables present
+* No stochastic process defined
+Samples Object - Description: 
+Nsamples= 7
+-----------------------------------------------------------
+* No design of experiments for Design Variables present
+* No stochastic process defined
+</pre><h2>Perform HaltonSampling simulation<a name="9"></a></h2><pre class="codeinput">Xo=Xss.apply(Xmdl); <span class="comment">% The simulation is performed adopting the</span>
+<span class="comment">% number of samples defined in the object Xss</span>
+<span class="comment">% Use Xss.Nsamples to retrive the number of</span>
+<span class="comment">% samples defined</span>
+display(Xo);
+
+Xss.Nsamples=200;
+Xo=Xss.apply(Xmdl);
+display(Xo);
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+ SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model)
+</pre><h2>Apply the SobolSampling simulation method to a ProbabilisticModel<a name="10"></a></h2><p>Define a probabilistic model (Requires a Model object and a PerfomanceFunction object Construct the performance function</p><pre class="codeinput">Xpf=PerformanceFunction(<span class="string">'Sdemand'</span>,<span class="string">'Xdemand'</span>,<span class="string">'Scapacity'</span>,<span class="string">'out'</span>,<span class="string">'SoutputName'</span>,<span class="string">'Vg'</span>);
+<span class="comment">% Construct a ProbabilisticModel Object</span>
+Xpm=ProbabilisticModel(<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'XperformanceFunction'</span>,Xpf);
+<span class="comment">% now we can apply the ImportanceSampling object to the</span>
+<span class="comment">% ProbabilisticModel</span>
+Xo=Xss.apply(Xpm);
+display(Xo);
+<span class="comment">% The object Xo contains now also the estimation of the performance</span>
+<span class="comment">% function.</span>
+
+<span class="comment">% In order to estimate the failure probability the method pf of the</span>
+<span class="comment">% ProbabilisticModel object should be used</span>
+
+Xpf=Xpm.pf(Xss);
+display(Xpf);
+
+<span class="comment">% Reset random number stream</span>
+CossanX.resetRandomNumberGenerator(51125)
+
+<span class="comment">% Change Flag of the generation of the samples</span>
+Xss.Nskip=25;
+[Xpf Xo]=Xpm.pf(Xss);
+display(Xpf);
+display(Xo);
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model) - apply(@ProbabilisticModel)
+FailureProbability Object  -  Description: 
+FailureProbability Object  -  Description: 
+ SimulationData Object  -   Description:  - apply(@evaluator) - apply(@Model) - apply(@ProbabilisticModel)
+</pre><h2>Validate Solutions<a name="11"></a></h2><pre class="codeinput">assert(abs(Xpf.pfhat-0.81)&lt;1e-4,<span class="string">'COSSANX:Tutorials'</span>,<span class="string">'Wrong results'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the SobolSampling class
+%
+% This tutorial is focus on the use and definition of the
+% SobolSampling class
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@SobolSampling
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Edoardo~Patelli $ 
+
+%% Problem Definition
+% Here we define our problem. It does not represent any physical problem.
+
+%% Define the Input
+% Define RandomVariable
+RV1=RandomVariable('Sdistribution','normal', 'mean',2,'std',1);
+RV2=RandomVariable('Sdistribution','normal', 'mean',0,'std',2);
+% Define the RandomVariableSet
+Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'});
+Xdemand=Parameter('Sdescription','Define threshold','value',0);
+% Construct Input Object
+Xin = Input('Sdescription','Input Object of our model');
+Xin = add(Xin,Xrvs1);
+Xin = add(Xin,Xdemand);
+
+%% Define the Evaluator (i.e. how our model is evaluate)
+% Construct a Mio object
+Xm=Mio( 'Sdescription', 'This is our Model', ...
+    'Sscript','for j=1:length(Tinput), Toutput(j).out=-Tinput(j).RV1+Tinput(j).RV2; end', ...
+    'Liostructure',true,...
+    'Coutputnames',{'out'},...
+    'Cinputnames',{'RV1','RV2'},...
+    'Lfunction',false); % This flag specify if the .m file is a script or a function.
+% Construct the Evaluator
+Xeval = Evaluator('Xmio',Xm,'Sdescription','Evaluator for the IS tutorial');
+
+%% Define the Physical Model based on the Input and the Evaluator
+Xmdl=Model('Xevaluator',Xeval,'Xinput',Xin);
+
+%% Test the Model
+% Generate 10 random realization of the input
+Xin = sample(Xin,'Nsamples',10);
+
+% Evaluate the model
+
+Xo = apply(Xmdl,Xin);
+% Show Results
+display(Xo)
+
+%% Here we go!!!
+% Now we define the SobolSampling object and try to generate samples from
+% this object
+
+%% Define SobolSampling object
+% Can the SobolSampling class be constructed and used like the
+% MonteCarlo class?
+try
+    % Let's try
+    Xss=SobolSampling('Nsamples',10,'Nbatches',2);
+catch ME
+    CossanX.cossanDisp(ME.message)
+    % It is mandatory to define the field Leap and Skip
+    Xss=SobolSampling('Nsamples',10,'Nbatches',2,'NLeap',100,'NSkip',10);
+end
+
+%% Generate samples with Sobol Sampling object
+% The method samples accept as input also Input object or RandomVariableSet object
+% These object are only used to retrieve the number of random variable
+% (Nrv)
+
+Xsmp=Xss.sample('Nsamples',5,'Xinput',Xin);
+display(Xsmp);
+
+Xsmp=Xss.sample('Nsamples',7,'Xrandomvariableset',Xrvs1);
+display(Xsmp);
+
+%% Perform HaltonSampling simulation
+Xo=Xss.apply(Xmdl); % The simulation is performed adopting the
+% number of samples defined in the object Xss
+% Use Xss.Nsamples to retrive the number of
+% samples defined
+display(Xo);
+
+Xss.Nsamples=200;
+Xo=Xss.apply(Xmdl);
+display(Xo);
+
+
+%% Apply the SobolSampling simulation method to a ProbabilisticModel
+% Define a probabilistic model (Requires a Model object and a PerfomanceFunction object
+% Construct the performance function
+Xpf=PerformanceFunction('Sdemand','Xdemand','Scapacity','out','SoutputName','Vg');
+% Construct a ProbabilisticModel Object
+Xpm=ProbabilisticModel('Xmodel',Xmdl,'XperformanceFunction',Xpf);
+% now we can apply the ImportanceSampling object to the
+% ProbabilisticModel
+Xo=Xss.apply(Xpm);
+display(Xo);
+% The object Xo contains now also the estimation of the performance
+% function.
+
+% In order to estimate the failure probability the method pf of the
+% ProbabilisticModel object should be used
+
+Xpf=Xpm.pf(Xss);
+display(Xpf);
+
+% Reset random number stream
+CossanX.resetRandomNumberGenerator(51125)
+
+% Change Flag of the generation of the samples
+Xss.Nskip=25;
+[Xpf Xo]=Xpm.pf(Xss);
+display(Xpf);
+display(Xo);
+
+%% Validate Solutions
+assert(abs(Xpf.pfhat-0.81)<1e-4,'COSSANX:Tutorials','Wrong results')
+
+##### SOURCE END #####
+--></body></html>

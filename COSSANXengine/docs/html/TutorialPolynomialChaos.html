@@ -1,0 +1,194 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialPolynomialChaos</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialPolynomialChaos.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">load the previously calculated SfemPC object</a></li><li><a href="#3">Calculate the P-C coefficients</a></li><li><a href="#4">Generate more samples using the PC as the meta model</a></li><li><a href="#5">Validate results</a></li></ul></div><pre class="codeinput"><span class="comment">% Tutorial for the PolynomialChaos Object</span>
+<span class="comment">% This tutorial shows how to create and use a PolynomialChaos object</span>
+</pre><h2>load the previously calculated SfemPC object<a name="2"></a></h2><pre class="codeinput">load ([CossanX.getCossanRoot <span class="string">'/examples/Tutorials/CossanObjects/Xsfem'</span>])
+
+display(Xsfem);
+Xpc   = PolynomialChaos(<span class="string">'Xsfem'</span>,Xsfem,<span class="string">'Norder'</span>,3);
+display(Xpc);
+</pre><pre class="codeoutput"> 
+===================================================================
+ SFEM P-C Object  -  Name: Xsfem
+===================================================================
+ 
+Analysis type            : Static Analysis
+Input File               : Nastran.cossan
+Implementation type      : Regular
+Applied Method           : Guyan
+Applied Order (input)    : 2
+Applied Order (response) : 2
+ 
+===================================================================
+ Polynomial Chaos Object : 
+===================================================================
+ 
+Order of the Exp.         : 3
+Dimension of the Exp.     : 3
+Method                    : Guyan
+</pre><h2>Calculate the P-C coefficients<a name="3"></a></h2><p>Calibrate method calculates the P-C coefficients for the whole displacement vector of the FE model defined in the Sfem object, i.e. currently PC object is only developed to work with SFEM</p><pre class="codeinput">Xpc = calibrate(Xpc);
+</pre><h2>Generate more samples using the PC as the meta model<a name="4"></a></h2><p>Once the P-C exp. is constructed, it can be used to generate more samples of the displacement vector</p><pre class="codeinput"><span class="comment">% For this purpose, first an RVSET involving std. normal RV's</span>
+<span class="comment">% (as many as the dimension of the PC exp.) should be constructed</span>
+rv1     = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+rv2     = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+rv3     = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);
+Xrvs    = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'rv1'</span>,<span class="string">'rv2'</span>,<span class="string">'rv3'</span>},<span class="string">'CXrandomvariables'</span>,{rv1 rv2 rv3});
+Xinp    = Input(<span class="string">'Sdescription'</span>,<span class="string">'Xinput object'</span>);
+Xinp    = add(Xinp,Xrvs);
+
+<span class="comment">% Then generate samples of this RVs</span>
+<span class="comment">% Fix the seed in order to generate same samples =&gt; to validate results</span>
+CossanX.resetRandomNumberGenerator(1);
+Xinp    = Xinp.sample(<span class="string">'Nsamples'</span>,5000);
+
+<span class="comment">% Using the samples of the RVs, obtain the samples of the displacement vector</span>
+Xsimout = apply(Xpc,Xinp);
+display(Xsimout);
+</pre><pre class="codeoutput"> SimulationData Object  -   Description: Simulation Output from PC
+</pre><h2>Validate results<a name="5"></a></h2><pre class="codeinput"><span class="comment">% statistics of the first entry of the displacement vector is checked here</span>
+<span class="comment">% reference results are as follows</span>
+referenceMean = 0.9040;
+referenceStd  = 0.0917;
+
+<span class="comment">% calculated mean &amp; CoV</span>
+calculatedMean = mean(Xsimout.Mvalues);
+calculatedStd  = std(Xsimout.Mvalues);
+
+assert(abs(calculatedMean-referenceMean)&lt;1e-4,<span class="string">'CossanX:Tutorials:TutorialPC'</span>, <span class="keyword">...</span>
+      <span class="string">'Reference mean value does not match.'</span>)
+
+assert(abs(calculatedStd-referenceStd)&lt;1e-4,<span class="string">'CossanX:Tutorials:TutorialPC'</span>, <span class="keyword">...</span>
+      <span class="string">'Reference Std value does not match.'</span>)
+</pre><pre class="codeoutput">Error using ==&gt; TutorialPolynomialChaos at 54
+Reference mean value does not match.
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+% Tutorial for the PolynomialChaos Object
+% This tutorial shows how to create and use a PolynomialChaos object
+
+%% load the previously calculated SfemPC object 
+
+load ([CossanX.getCossanRoot '/examples/Tutorials/CossanObjects/Xsfem'])
+
+display(Xsfem);
+Xpc   = PolynomialChaos('Xsfem',Xsfem,'Norder',3); 
+display(Xpc);
+
+%% Calculate the P-C coefficients
+%
+% Calibrate method calculates the P-C coefficients for the whole
+% displacement vector of the FE model defined in the Sfem object, i.e.
+% currently PC object is only developed to work with SFEM
+
+Xpc = calibrate(Xpc);
+
+%% Generate more samples using the PC as the meta model
+%
+% Once the P-C exp. is constructed, it can be used to generate more samples
+% of the displacement vector
+
+% For this purpose, first an RVSET involving std. normal RV's 
+% (as many as the dimension of the PC exp.) should be constructed
+rv1     = RandomVariable('Sdistribution','normal','mean',0,'std',1);
+rv2     = RandomVariable('Sdistribution','normal','mean',0,'std',1);
+rv3     = RandomVariable('Sdistribution','normal','mean',0,'std',1);
+Xrvs    = RandomVariableSet('Cmembers',{'rv1','rv2','rv3'},'CXrandomvariables',{rv1 rv2 rv3});
+Xinp    = Input('Sdescription','Xinput object');
+Xinp    = add(Xinp,Xrvs);
+
+% Then generate samples of this RVs
+% Fix the seed in order to generate same samples => to validate results
+CossanX.resetRandomNumberGenerator(1);
+Xinp    = Xinp.sample('Nsamples',5000);
+
+% Using the samples of the RVs, obtain the samples of the displacement vector
+Xsimout = apply(Xpc,Xinp);
+display(Xsimout);
+    
+%% Validate results
+
+% statistics of the first entry of the displacement vector is checked here
+% reference results are as follows
+referenceMean = 0.9040;
+referenceStd  = 0.0917;
+
+% calculated mean & CoV
+calculatedMean = mean(Xsimout.Mvalues);
+calculatedStd  = std(Xsimout.Mvalues);
+
+assert(abs(calculatedMean-referenceMean)<1e-4,'CossanX:Tutorials:TutorialPC', ...
+      'Reference mean value does not match.')
+  
+assert(abs(calculatedStd-referenceStd)<1e-4,'CossanX:Tutorials:TutorialPC', ...
+      'Reference Std value does not match.')
+  
+  
+  
+  
+
+    
+##### SOURCE END #####
+--></body></html>

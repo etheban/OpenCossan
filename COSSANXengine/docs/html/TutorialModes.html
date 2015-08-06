@@ -1,0 +1,241 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALMODES</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialModes.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALMODES</h1><!--introduction--><p>In this tutorial it is shown how to construct a Modes object and how to compute frequency response functions</p><p>See Also:  <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Modes">http://mechanik.uibk.ac.at/wiki/index.php/@Modes</a></p><p><img src="TutorialModes_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialModes_eq26303.png" alt="$Author: Barbara-Goller$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prapare definition of Modes object</a></li><li><a href="#2">Perform FRF-analysis</a></li><li><a href="#3">Plot magnitude of FRFs</a></li><li><a href="#4">Close figure and validate solution</a></li></ul></div><h2>Prapare definition of Modes object<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Load structural matrices (truss structure of tutorial for metamodel)</span>
+Sdirectory = fileparts(which(<span class="string">'TutorialModes.m'</span>));
+load(fullfile([Sdirectory <span class="string">'/stiffness_mass_matrices.mat'</span>]));
+
+<span class="comment">% Determine modal properties</span>
+opts.disp = 0;
+Nmodes = 20;  <span class="comment">% number of modes to be retained</span>
+[Phi Lam]=eigs(stiff,mass,Nmodes,0,opts);
+Vlam = diag(Lam);
+
+<span class="comment">% Construct object Modes</span>
+Xmodes = Modes(<span class="string">'Mphi'</span>,Phi,<span class="string">'Vlambda'</span>,Vlam);
+</pre><h2>Perform FRF-analysis<a name="2"></a></h2><pre class="codeinput">DOF_obs = 48; <span class="comment">% observed DOF</span>
+DOF_exc = 30; <span class="comment">% DOF where load acts</span>
+Vfreq = 0.:0.05:5.; <span class="comment">% frequency range</span>
+mod_damp_ratio = 0.02*ones(Nmodes,1); <span class="comment">% modal damping ratios</span>
+Vforce = zeros(size(stiff,1),1);
+Vforce(DOF_exc)=1.0; <span class="comment">% force vector in physical space;</span>
+Vforce_mod = Phi'*Vforce; <span class="comment">% force vector in modal space</span>
+
+<span class="comment">% displacement FRF</span>
+Tfrf_disp = frf(Xmodes,<span class="string">'Sfrftype'</span>,<span class="string">'disp'</span>,<span class="string">'Vforce'</span>,Vforce_mod',<span class="string">'Vexcitationfrequency'</span>,Vfreq,<span class="string">'Vdofs'</span>,DOF_obs,<span class="string">'Vzeta'</span>,mod_damp_ratio);
+
+<span class="comment">% velocity FRF</span>
+Tfrf_vel = frf(Xmodes,<span class="string">'Sfrftype'</span>,<span class="string">'vel'</span>,<span class="string">'Vforce'</span>,Vforce_mod',<span class="string">'Vexcitationfrequency'</span>,Vfreq,<span class="string">'Vdofs'</span>,DOF_obs,<span class="string">'Vzeta'</span>,mod_damp_ratio);
+
+<span class="comment">% acceleration FRF</span>
+Tfrf_acc = frf(Xmodes,<span class="string">'Sfrftype'</span>,<span class="string">'acc'</span>,<span class="string">'Vforce'</span>,Vforce_mod',<span class="string">'Vexcitationfrequency'</span>,Vfreq,<span class="string">'Vdofs'</span>,DOF_obs,<span class="string">'Vzeta'</span>,mod_damp_ratio);
+</pre><pre class="codeoutput">FRF computation in progress...
+FRF computation in progress...
+FRF computation in progress...
+</pre><h2>Plot magnitude of FRFs<a name="3"></a></h2><pre class="codeinput">f1=figure;
+semilogy(Vfreq,abs(Tfrf_disp.FRF_48),<span class="string">'Linewidth'</span>,2);
+grid <span class="string">on</span>
+xlabel(<span class="string">'excitation frequency [Hz]'</span>);
+ylabel(<span class="string">'|displacement|'</span>);
+h1=gca; h2=get(gca,<span class="string">'XLabel'</span>); h3=get(gca,<span class="string">'YLabel'</span>); h4 = get(gca,<span class="string">'Title'</span>);
+set([h1 h2 h3 h4],<span class="string">'FontSize'</span>,16);
+
+f2=figure;
+semilogy(Vfreq,abs(Tfrf_vel.FRF_48),<span class="string">'Linewidth'</span>,2);
+grid <span class="string">on</span>
+xlabel(<span class="string">'excitation frequency [Hz]'</span>);
+ylabel(<span class="string">'|velocity|'</span>);
+h1=gca; h2=get(gca,<span class="string">'XLabel'</span>); h3=get(gca,<span class="string">'YLabel'</span>); h4 = get(gca,<span class="string">'Title'</span>);
+set([h1 h2 h3 h4],<span class="string">'FontSize'</span>,16);
+
+f3=figure;
+semilogy(Vfreq,abs(Tfrf_acc.FRF_48),<span class="string">'Linewidth'</span>,2);
+grid <span class="string">on</span>
+xlabel(<span class="string">'excitation frequency [Hz]'</span>);
+ylabel(<span class="string">'|acceleration|'</span>);
+h1=gca; h2=get(gca,<span class="string">'XLabel'</span>); h3=get(gca,<span class="string">'YLabel'</span>); h4 = get(gca,<span class="string">'Title'</span>);
+set([h1 h2 h3 h4],<span class="string">'FontSize'</span>,16);
+</pre><img vspace="5" hspace="5" src="TutorialModes_01.png" alt=""> <img vspace="5" hspace="5" src="TutorialModes_02.png" alt=""> <img vspace="5" hspace="5" src="TutorialModes_03.png" alt=""> <h2>Close figure and validate solution<a name="4"></a></h2><pre class="codeinput">close(f1);
+close(f2);
+close(f3);
+
+<span class="comment">% check displacent FRF</span>
+assert(all(all(abs(abs(Tfrf_disp.FRF_48(1:10))-[0.0327, 0.0346, 0.0423, 0.0677, 0.4429, <span class="keyword">...</span>
+                                    0.0642, 0.0260, 0.0145, 0.0089, 0.0055])&lt;1e-4)), <span class="keyword">...</span>
+                                    <span class="string">'CossanX:Tutorials:TutorialModes'</span>, <span class="keyword">...</span>
+                                    <span class="string">'Reference Solution of displacement FRF does not match.'</span>)
+
+<span class="comment">% check velocity FRF</span>
+assert(all(all(abs(abs(Tfrf_vel.FRF_48(1:10))-[0, 0.0109, 0.0266, 0.0638, 0.5566, <span class="keyword">...</span>
+                                     0.1008, 0.0490, 0.0318, 0.0224, 0.0156])&lt;1e-4)), <span class="keyword">...</span>
+                                    <span class="string">'CossanX:Tutorials:TutorialModes'</span>, <span class="keyword">...</span>
+                                    <span class="string">'Reference Solution of velocity FRF does not match.'</span>)
+
+<span class="comment">% check acceleration FRF</span>
+assert(all(all(abs(abs(Tfrf_acc.FRF_48(1:10))-[0, 0.0034, 0.0167, 0.0601, 0.6994, <span class="keyword">...</span>
+                                     0.1583, 0.0923, 0.0699, 0.0563, 0.0441])&lt;1e-4)), <span class="keyword">...</span>
+                                    <span class="string">'CossanX:Tutorials:TutorialModes'</span>, <span class="keyword">...</span>
+                                    <span class="string">'Reference Solution of displacement FRF does not match.'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALMODES
+% In this tutorial it is shown how to construct a Modes object and how to
+% compute frequency response functions
+%
+%
+% See Also:  http://mechanik.uibk.ac.at/wiki/index.php/@Modes
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Barbara-Goller$ 
+
+%% Prapare definition of Modes object
+
+% Load structural matrices (truss structure of tutorial for metamodel)
+Sdirectory = fileparts(which('TutorialModes.m'));
+load(fullfile([Sdirectory '/stiffness_mass_matrices.mat']));
+
+% Determine modal properties
+opts.disp = 0;
+Nmodes = 20;  % number of modes to be retained
+[Phi Lam]=eigs(stiff,mass,Nmodes,0,opts);
+Vlam = diag(Lam);
+
+% Construct object Modes
+Xmodes = Modes('Mphi',Phi,'Vlambda',Vlam);
+
+%% Perform FRF-analysis
+
+DOF_obs = 48; % observed DOF
+DOF_exc = 30; % DOF where load acts
+Vfreq = 0.:0.05:5.; % frequency range
+mod_damp_ratio = 0.02*ones(Nmodes,1); % modal damping ratios
+Vforce = zeros(size(stiff,1),1);
+Vforce(DOF_exc)=1.0; % force vector in physical space;
+Vforce_mod = Phi'*Vforce; % force vector in modal space
+
+% displacement FRF
+Tfrf_disp = frf(Xmodes,'Sfrftype','disp','Vforce',Vforce_mod','Vexcitationfrequency',Vfreq,'Vdofs',DOF_obs,'Vzeta',mod_damp_ratio);
+
+% velocity FRF
+Tfrf_vel = frf(Xmodes,'Sfrftype','vel','Vforce',Vforce_mod','Vexcitationfrequency',Vfreq,'Vdofs',DOF_obs,'Vzeta',mod_damp_ratio);
+
+% acceleration FRF
+Tfrf_acc = frf(Xmodes,'Sfrftype','acc','Vforce',Vforce_mod','Vexcitationfrequency',Vfreq,'Vdofs',DOF_obs,'Vzeta',mod_damp_ratio);
+
+%% Plot magnitude of FRFs
+
+f1=figure;
+semilogy(Vfreq,abs(Tfrf_disp.FRF_48),'Linewidth',2);
+grid on
+xlabel('excitation frequency [Hz]');
+ylabel('|displacement|');
+h1=gca; h2=get(gca,'XLabel'); h3=get(gca,'YLabel'); h4 = get(gca,'Title');
+set([h1 h2 h3 h4],'FontSize',16);
+
+f2=figure;
+semilogy(Vfreq,abs(Tfrf_vel.FRF_48),'Linewidth',2);
+grid on
+xlabel('excitation frequency [Hz]');
+ylabel('|velocity|');
+h1=gca; h2=get(gca,'XLabel'); h3=get(gca,'YLabel'); h4 = get(gca,'Title');
+set([h1 h2 h3 h4],'FontSize',16);
+
+f3=figure;
+semilogy(Vfreq,abs(Tfrf_acc.FRF_48),'Linewidth',2);
+grid on
+xlabel('excitation frequency [Hz]');
+ylabel('|acceleration|');
+h1=gca; h2=get(gca,'XLabel'); h3=get(gca,'YLabel'); h4 = get(gca,'Title');
+set([h1 h2 h3 h4],'FontSize',16);
+
+
+
+%% Close figure and validate solution
+
+close(f1);
+close(f2);
+close(f3);
+
+% check displacent FRF
+assert(all(all(abs(abs(Tfrf_disp.FRF_48(1:10))-[0.0327, 0.0346, 0.0423, 0.0677, 0.4429, ...
+                                    0.0642, 0.0260, 0.0145, 0.0089, 0.0055])<1e-4)), ...
+                                    'CossanX:Tutorials:TutorialModes', ...
+                                    'Reference Solution of displacement FRF does not match.')
+                                
+% check velocity FRF
+assert(all(all(abs(abs(Tfrf_vel.FRF_48(1:10))-[0, 0.0109, 0.0266, 0.0638, 0.5566, ...
+                                     0.1008, 0.0490, 0.0318, 0.0224, 0.0156])<1e-4)), ...
+                                    'CossanX:Tutorials:TutorialModes', ...
+                                    'Reference Solution of velocity FRF does not match.')
+                                
+% check acceleration FRF
+assert(all(all(abs(abs(Tfrf_acc.FRF_48(1:10))-[0, 0.0034, 0.0167, 0.0601, 0.6994, ...
+                                     0.1583, 0.0923, 0.0699, 0.0563, 0.0441])<1e-4)), ...
+                                    'CossanX:Tutorials:TutorialModes', ...
+                                    'Reference Solution of displacement FRF does not match.')
+                                
+
+##### SOURCE END #####
+--></body></html>

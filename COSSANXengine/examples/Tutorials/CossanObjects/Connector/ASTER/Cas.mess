@@ -1,0 +1,1539 @@
+==========================================
+==========================================
+# PATRON 
+# ANALYSE STATIQUE
+# 2D
+
+DEBUT();
+
+# MISE EN DONNEES
+
+MAIL=LIRE_MAILLAGE(UNITE=20,
+                   FORMAT='MED',);
+
+MAIL=DEFI_GROUP(reuse =MAIL,
+                MAILLAGE=MAIL,
+                CREA_GROUP_MA=_F(NOM='VOL',
+                                 TOUT='OUI',),);
+
+MODMECA=AFFE_MODELE(MAILLAGE=MAIL,
+                    AFFE=_F(GROUP_MA='VOL',
+                            PHENOMENE='MECANIQUE',
+                            MODELISATION='C_PLAN',),);
+
+ACIER=DEFI_MATERIAU(ELAS=_F(E=2.302e+11,
+                            NU=0.3,),);
+
+# Crack
+
+CHMAT=AFFE_MATERIAU(MAILLAGE=MAIL,
+                    AFFE=_F(TOUT='OUI',
+                            MATER=ACIER,),);
+
+#
+
+leng1=7.507e-03
+leng2=8.535e-03
+leng3=8.792e-03
+leng4=8.236e-03
+
+LN = FORMULE(VALE='Y-0.1',
+             NOM_PARA=('X','Y',),);
+
+LT = FORMULE(VALE='(X-0.116- leng1)*(X-0.116+leng2)',
+             NOM_PARA=('X','Y',),);
+
+LN2 = FORMULE(VALE='Y-0.1',
+              NOM_PARA=('X','Y',),);
+
+LT2 = FORMULE(VALE='(X-0.148- leng3)*(X-0.148+leng4)',
+              NOM_PARA=('X','Y',),);
+
+fiss=DEFI_FISS_XFEM(MODELE=MODMECA,
+                    DEFI_FISS=_F(FONC_LT=LT,
+                                 FONC_LN=LN,),
+                    GROUP_MA_ENRI='VOL',);
+
+fiss2=DEFI_FISS_XFEM(MODELE=MODMECA,
+                     DEFI_FISS=_F(FONC_LT=LT2,
+                                  FONC_LN=LN2,),
+                     GROUP_MA_ENRI='VOL',);
+
+# xfem
+
+modelk=MODI_MODELE_XFEM(MODELE_IN=MODMECA,
+                        FISSURE=(fiss2,fiss,),);
+
+loadxfem=AFFE_CHAR_MECA(MODELE=modelk,
+                        LIAISON_XFEM='OUI',);
+
+load=AFFE_CHAR_MECA(MODELE=modelk,
+                    DDL_IMPO=(_F(GROUP_NO='bot',
+                                 DY=0.0,),
+                              _F(GROUP_NO='node1',
+                                 DX=0.0,),),
+                    FORCE_NODALE=(_F(GROUP_NO='top',
+                                     FY=1380000.0,),
+                                  _F(GROUP_NO='top1_2',
+                                     FY=690000.0,),),);
+
+list=DEFI_LIST_REEL(DEBUT=0.0,
+                    INTERVALLE=_F(JUSQU_A=1.0,
+                                  NOMBRE=1,),);
+
+#Defining the calculation model using previously defined model and load ('meca' and 'load' )
+
+resu2=STAT_NON_LINE(MODELE=modelk,
+                    CHAM_MATER=CHMAT,
+                    EXCIT=(_F(CHARGE=load,),
+                           _F(CHARGE=loadxfem,),),
+                    COMP_ELAS=_F(RELATION='ELAS',
+                                 GROUP_MA='VOL',),
+                    INCREMENT=_F(LIST_INST=list,),
+                    NEWTON=_F(REAC_ITER=1,),
+                    SOLVEUR=_F(METHODE='MULT_FRONT',),);
+
+#
+
+meshxfem=POST_MAIL_XFEM(MODELE=modelk,
+                        MAILLAGE_SAIN=MAIL,);
+
+#
+
+modVisu=AFFE_MODELE(MAILLAGE=meshxfem,
+                    AFFE=_F(TOUT='OUI',
+                            PHENOMENE='MECANIQUE',
+                            MODELISATION='C_PLAN',),);
+
+resuxfem=POST_CHAM_XFEM(MAILLAGE_SAIN=MAIL,
+                        MAILLAGE_FISS=meshxfem,
+                        NOM_CHAM=('DEPL','SIEF_ELGA',),
+                        MODELE=modelk,
+                        RESULTAT=resu2,
+                        MODELE_VISU=modVisu,
+                        INFO=2,);
+
+resuxfem=CALC_ELEM(reuse =resuxfem,
+                   RESULTAT=resuxfem,
+                   OPTION=('EQUI_ELGA_SIGM','EQUI_ELNO_SIGM','SIEF_ELNO_ELGA',),);
+
+resuxfem=CALC_NO(reuse =resuxfem,
+                 RESULTAT=resuxfem,
+                 OPTION=('EQUI_NOEU_SIGM','DEGE_NOEU_DEPL',),);
+
+IMPR_RESU(FORMAT='MED',
+          RESU=(_F(RESULTAT=resuxfem,
+                   NOM_CHAM=('DEPL','SIEF_ELNO_ELGA','DEPL_ABSOLU',),),
+                _F(RESULTAT=resu2,
+                   NOM_CHAM=('DEPL','DEPL_ABSOLU',),),),);
+
+
+sif=POST_K1_K2_K3(MODELISATION='C_PLAN',
+                  FISSURE=fiss,
+                  MAILLAGE=MAIL,
+                  NUME_FOND=2,
+                  MATER=ACIER,
+                  RESULTAT=resu2,
+                  ABSC_CURV_MAXI=1.0,
+                  INFO=1,);
+
+sif2=CALC_G(THETA=_F(FISSURE=fiss,
+                     NUME_FOND=2,
+                     R_INF=0.001,
+                     R_SUP=.004,
+                     DIRECTION=(-1.0,0.0,0.0,),),
+            RESULTAT=resu2,
+            LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                       LISSAGE_G='LAGRANGE',),
+            OPTION='CALC_K_G',
+            INFO=2,);
+
+sif3=CALC_G(THETA=_F(FISSURE=fiss,
+                     NUME_FOND=2,
+                     R_INF=0.004,
+                     R_SUP=.005,
+                     DIRECTION=(-1.0,0.0,0.0,),),
+            RESULTAT=resu2,
+            LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                       LISSAGE_G='LAGRANGE',),
+            OPTION='CALC_K_G',
+            INFO=2,);
+sif4=CALC_G(THETA=_F(FISSURE=fiss,
+                     NUME_FOND=2,
+                     R_INF=0.005,
+                     R_SUP=.006,
+                     DIRECTION=(-1.0,0.0,0.0,),),
+            RESULTAT=resu2,
+            LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                       LISSAGE_G='LAGRANGE',),
+            OPTION='CALC_K_G',
+            INFO=2,);
+
+sif5=CALC_G(THETA=_F(FISSURE=fiss,
+                     NUME_FOND=2,
+                     R_INF=0.004,
+                     R_SUP=.0045,
+                     DIRECTION=(-1.0,0.0,0.0,),),
+            RESULTAT=resu2,
+            LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                       LISSAGE_G='LAGRANGE',),
+            OPTION='CALC_K_G',
+            INFO=2,);
+
+#IMPR_TABLE(TABLE=sif,);
+
+#IMPR_TABLE(TABLE=sif2,);
+
+IMPR_TABLE(TABLE=sif3,);
+
+#IMPR_TABLE(TABLE=sif4,);
+
+#IMPR_TABLE(TABLE=sif5,);
+
+FIN();
+
+==========================================
+==========================================
+
+ PARAMETRES DE LA GESTION MEMOIRE JEVEUX  
+ =======================================
+ LIMITE MEMOIRE STATIQUE       :        1048576 OCTETS (       1.000 Mo)
+ MEMOIRE DISPONIBLE            :        1048576 OCTETS
+ MEMOIRE PRISE                 :        1048576 OCTETS (       1.000 Mo)
+ LIMITE MEMOIRE DYNAMIQUE      :      133169152 OCTETS (     127.000 Mo)
+
+ LIMITE TAILLE DES BASES       :        48.00   Go 
+ =======================================
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0001            CONCEPT DE TYPE : 
+    #  -------------                  ----------------- 
+   DEBUT(RESERVE_CPU=_F(BORNE=900),
+        MEMOIRE=_F(GESTION='RAPIDE',
+                   TYPE_ALLOCATION=1,
+                   TAILLE_BLOC=800.0,
+                   DYNAMIQUE=1),
+        PAR_LOT='OUI',
+        IMPR_MACRO='NON',
+        );
+
+                                         -- CODE_ASTER -- VERSION D'EXPLOITATION  9.04    --
+
+                                                   COPYRIGHT  EDF-R&D 1991 - 2008
+
+                                               EXECUTION DU : LU-05-OCTO-2009 11:40:22
+
+                                                   PLATE-FORME : C810-CL2        
+
+                                                NB MAX PROC OpenMP:   1             
+
+                                                     SYSTEME : LINUX           
+
+                                                       CPU : I686            
+
+
+
+
+
+  Valeur initiale du temps CPU maximum =   120 secondes
+  Valeur du temps CPU maximum passé aux commandes =   108 secondes
+  Réserve CPU prévue = 12 secondes
+
+     NOM DE LA BASE                          :  LDUMMY
+     NOMBRE D'ENREGISTREMENTS UTILISES       :  4
+     NOMBRE D'ENREGISTREMENTS MAXIMUM        :  100
+     LONGUEUR D'ENREGISTREMENT (OCTETS)      :  4096
+     NOMBRE TOTAL D'ENTREES/SORTIES          :  1
+     NOMBRE D'IDENTIFICATEURS UTILISES       :  20
+     TAILLE MAXIMUM DU REPERTOIRE            :  250
+     POURCENTAGE D'UTILISATION DU REPERTOIRE :  8 %
+
+ Debut de lecture
+
+     REOUVERTURE DE LA BASE                  :  ELEMBASE
+     CREEE AVEC LA VERSION                   :  9.04.00
+     NOMBRE D'ENREGISTREMENTS UTILISES       :  19
+     NOMBRE D'ENREGISTREMENTS MAXIMUM        :  512
+     LONGUEUR D'ENREGISTREMENT (OCTETS)      :  409600
+     NOMBRE D'IDENTIFICATEURS UTILISES       :  113
+     TAILLE MAXIMUM DU REPERTOIRE            :  300
+     POURCENTAGE D'UTILISATION DU REPERTOIRE :  37 %
+
+     NOM DE LA BASE                          :  ELEMBASE
+     NOMBRE D'ENREGISTREMENTS UTILISES       :  19
+     NOMBRE D'ENREGISTREMENTS MAXIMUM        :  512
+     LONGUEUR D'ENREGISTREMENT (OCTETS)      :  409600
+     NOMBRE TOTAL D'ENTREES/SORTIES          :  42
+     NOMBRE D'IDENTIFICATEURS UTILISES       :  113
+     TAILLE MAXIMUM DU REPERTOIRE            :  300
+     POURCENTAGE D'UTILISATION DU REPERTOIRE :  37 %
+
+ Relecture des catalogues dans ELEMBASE faite.
+
+ fin de lecture (durée  0.010000  s.) 
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        11.81 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :         8.93 Mo) 
+
+    #  FIN COMMANDE NO : 0001   DUREE TOTALE:        0.08s (SYST:        0.04s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0002            CONCEPT DE TYPE : maillage_sdaster
+    #  -------------                  ----------------- 
+   MAIL=LIRE_MAILLAGE(INFO=1,
+                     INFO_MED=1,
+                     VERI_MAIL=_F(APLAT=1.E-3,
+                                  VERIF='OUI'),
+                     UNITE=20,
+                     FORMAT='MED',
+                     );
+
+
+  -> Lecture de la famille numéro    2 de nom FAM_2_bot.
+
+      Groupe numéro      1 : bot
+
+  -> Lecture de la famille numéro    3 de nom FAM_3_bot_node1.
+
+      Groupe numéro      1 : bot
+
+      Groupe numéro      2 : node1
+
+  -> Lecture de la famille numéro    4 de nom FAM_4_top.
+
+      Groupe numéro      1 : top
+
+  -> Lecture de la famille numéro    5 de nom FAM_5_top1-2.
+
+      Groupe numéro      1 : top1-2
+   
+   !----------------------------------------------------------------!
+   ! <A> <MED_10>                                                   !
+   !                                                                !
+   !                                                                !
+   !   -> Le nom de groupe numéro 1 de la famille FAM_5_top1-2      !
+   !      est contient des caractères interdits.                    !
+   !      Le groupe "top1-2" est renommé en "top1_2".               !
+   !                                                                !
+   !                                                                !
+   !                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette !
+   ! alarme, vous pouvez obtenir des résultats inattendus !         !
+   !----------------------------------------------------------------!
+   
+  ====== VERIFICATION DU MAILLAGE ======
+
+
+------------ MAILLAGE MAIL     - IMPRESSIONS NIVEAU  1 ------------
+
+LU-05-OCTO-2009 11:40:22                                                        
+
+NOMBRE DE NOEUDS                        3937
+
+NOMBRE DE MAILLES                       3792
+                              QUAD4                3792
+
+NOMBRE DE GROUPES DE NOEUDS                4
+                              bot                  5
+                              node1                1
+                              top                  3
+                              top1_2               2
+
+--------------------------------------------------------------------------------
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        12.13 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :         8.93 Mo) 
+
+    #  FIN COMMANDE NO : 0002   DUREE TOTALE:        0.07s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0003            CONCEPT DE TYPE : maillage_sdaster
+    #  -------------                  ----------------- 
+   MAIL=DEFI_GROUP(reuse = MAIL,
+                  MAILLAGE=MAIL,
+                  ALARME='OUI',
+                  CREA_GROUP_MA=_F(NOM='VOL',
+                                   TOUT='OUI'),
+                  );
+
+
+
+NOMBRE  DE GROUPES DE MAILLES CREES :      1
+=============================================
+
+               --------------------------------------
+               ! NOM DU GROUPE ! NBRE DE MAILLES DU !
+               !    MAILLES    !     GROUPE_MA      !
+               --------------------------------------
+               !  VOL          !      3792          !
+               --------------------------------------
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        12.14 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :         8.93 Mo) 
+
+    #  FIN COMMANDE NO : 0003   DUREE TOTALE:        0.00s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0004            CONCEPT DE TYPE : modele_sdaster
+    #  -------------                  ----------------- 
+   MODMECA=AFFE_MODELE(MAILLAGE=MAIL,
+                      INFO=1,
+                      AFFE=_F(PHENOMENE='MECANIQUE',
+                              GROUP_MA='VOL',
+                              MODELISATION='C_PLAN'),
+                      VERI_JACOBIEN='OUI',
+                      );
+
+
+ SUR LES         3792 MAILLES DU MAILLAGE MAIL    
+    ON A DEMANDE L'AFFECTATION DE         3792
+    ON A PU EN AFFECTER                   3792
+
+    MODELISATION      ELEMENT FINI      TYPE MAILLE          NOMBRE
+    C_PLAN            MECPQU4           QUAD4                  3792
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        12.27 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        11.66 Mo) 
+
+    #  FIN COMMANDE NO : 0004   DUREE TOTALE:        0.02s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0005            CONCEPT DE TYPE : mater_sdaster
+    #  -------------                  ----------------- 
+   ACIER=DEFI_MATERIAU(INFO=1,
+                      ELAS=_F(E=2.30200000000E11,
+                              NU=0.29999999999999999),
+                      );
+
+
+ MATERIAU : ACIER   
+ RELATION DE COMPORTEMENT: ELAS            
+
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        12.27 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        11.66 Mo) 
+
+    #  FIN COMMANDE NO : 0005   DUREE TOTALE:        0.01s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0006            CONCEPT DE TYPE : cham_mater
+    #  -------------                  ----------------- 
+   CHMAT=AFFE_MATERIAU(VARC_M_ZIRC=_F(),
+                      INFO=1,
+                      VARC_TEMP=_F(),
+                      MAILLAGE=MAIL,
+                      VARC_HYDR=_F(),
+                      VARC_CORR=_F(),
+                      VARC_EPSA=_F(),
+                      VARC_IRRA=_F(),
+                      VARC_NEUT1=_F(),
+                      VARC_NEUT2=_F(),
+                      AFFE=_F(MATER=ACIER,
+                              TOUT='OUI'),
+                      VARC_M_ACIER=_F(),
+                      VARC_SECH=_F(),
+                      );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        12.27 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        11.66 Mo) 
+
+    #  FIN COMMANDE NO : 0006   DUREE TOTALE:        0.00s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0007            CONCEPT DE TYPE : formule
+    #  -------------                  ----------------- 
+   LN=FORMULE(VALE='Y-0.1',
+             NOM_PARA=('X','Y',),
+             );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        12.27 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        11.66 Mo) 
+
+    #  FIN COMMANDE NO : 0007   DUREE TOTALE:        0.00s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0008            CONCEPT DE TYPE : formule
+    #  -------------                  ----------------- 
+   LT=FORMULE(VALE='(X-0.116- leng1)*(X-0.116+leng2)',
+             NOM_PARA=('X','Y',),
+             );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        12.28 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        11.66 Mo) 
+
+    #  FIN COMMANDE NO : 0008   DUREE TOTALE:        0.00s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0009            CONCEPT DE TYPE : formule
+    #  -------------                  ----------------- 
+   LN2=FORMULE(VALE='Y-0.1',
+              NOM_PARA=('X','Y',),
+              );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        12.28 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        11.66 Mo) 
+
+    #  FIN COMMANDE NO : 0009   DUREE TOTALE:        0.01s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0010            CONCEPT DE TYPE : formule
+    #  -------------                  ----------------- 
+   LT2=FORMULE(VALE='(X-0.148- leng3)*(X-0.148+leng4)',
+              NOM_PARA=('X','Y',),
+              );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        12.28 Mo (MAXIMUM ATTEINT :        13.54 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        11.66 Mo) 
+
+    #  FIN COMMANDE NO : 0010   DUREE TOTALE:        0.00s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0011            CONCEPT DE TYPE : fiss_xfem
+    #  -------------                  ----------------- 
+   fiss=DEFI_FISS_XFEM(INFO=1,
+                      TYPE_ENRI_FOND='TOPOLOGIQUE',
+                      MODELE=MODMECA,
+                      GROUP_MA_ENRI='VOL',
+                      DEFI_FISS=_F(FONC_LT=LT,
+                                   FONC_LN=LN),
+                      );
+
+ CALCUL DES LEVEL-SETS AVEC LA METHODE 1
+ NOMBRE DE LEVEL SET REAJUSTEES APRES CONTROLE: 240
+ FIN DU CALCUL DES LEVEL-SETS
+ GRADIENTS DES LEVEL-SETS CALCULES
+ XENRCH-1) RESTRICTION DE LA ZONE D ENRICHISSEMENT
+ NOMBRE DE MAILLES DE LA ZONE FISSURE : 120
+ XENRCH-2) ATTRIBUTION DU STATUT DES NOEUDS DE GROUPENRI
+ XENRCH-3) ATTRIBUTION DU STATUT DES MAILLES
+ NOMBRE DE MAILLES DE MAFON  : 4
+ NOMBRE DE MAILLES DE MAENR1 : 28
+ NOMBRE DE MAILLES DE MAENR2 : 20
+ NOMBRE DE MAILLES DE MAENR3 : 4
+ XENRCH-4) RECHERCHE DES POINTS DE FONFIS
+ LA LONGUEUR DE LA PLUS PETITE ARETE DU MAILLAGE EST  0.27222E-03.
+ NOMBRE DE POINTS DE FOND DE FISSURE : 2
+ XENRCH-6) CALCUL DES EVENTUELS FONDS MULTIPLES
+ NOMBRE DE FONDS DE FISSURES DETECTES : 2
+ COORDONNEES DES POINTS DE FONFIS
+ FOND DE FISSURE  1
+       X             Y             Z             S
+   0.12350E+00   0.10000E+00   0.00000E+00   0.00000E+00
+ FOND DE FISSURE  2
+       X             Y             Z             S
+   0.10747E+00   0.10000E+00   0.00000E+00   0.00000E+00
+ XENRCH-7) FIN DE XENRCH
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        13.90 Mo (MAXIMUM ATTEINT :        15.42 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        12.23 Mo) 
+
+    #  FIN COMMANDE NO : 0011   DUREE TOTALE:        0.73s (SYST:        0.01s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0012            CONCEPT DE TYPE : fiss_xfem
+    #  -------------                  ----------------- 
+   fiss2=DEFI_FISS_XFEM(INFO=1,
+                       TYPE_ENRI_FOND='TOPOLOGIQUE',
+                       MODELE=MODMECA,
+                       GROUP_MA_ENRI='VOL',
+                       DEFI_FISS=_F(FONC_LT=LT2,
+                                    FONC_LN=LN2),
+                       );
+
+ CALCUL DES LEVEL-SETS AVEC LA METHODE 1
+ NOMBRE DE LEVEL SET REAJUSTEES APRES CONTROLE: 240
+ FIN DU CALCUL DES LEVEL-SETS
+ GRADIENTS DES LEVEL-SETS CALCULES
+ XENRCH-1) RESTRICTION DE LA ZONE D ENRICHISSEMENT
+ NOMBRE DE MAILLES DE LA ZONE FISSURE : 120
+ XENRCH-2) ATTRIBUTION DU STATUT DES NOEUDS DE GROUPENRI
+ XENRCH-3) ATTRIBUTION DU STATUT DES MAILLES
+ NOMBRE DE MAILLES DE MAFON  : 4
+ NOMBRE DE MAILLES DE MAENR1 : 30
+ NOMBRE DE MAILLES DE MAENR2 : 20
+ NOMBRE DE MAILLES DE MAENR3 : 4
+ XENRCH-4) RECHERCHE DES POINTS DE FONFIS
+ LA LONGUEUR DE LA PLUS PETITE ARETE DU MAILLAGE EST  0.27222E-03.
+ NOMBRE DE POINTS DE FOND DE FISSURE : 2
+ XENRCH-6) CALCUL DES EVENTUELS FONDS MULTIPLES
+ NOMBRE DE FONDS DE FISSURES DETECTES : 2
+ COORDONNEES DES POINTS DE FONFIS
+ FOND DE FISSURE  1
+       X             Y             Z             S
+   0.13977E+00   0.10000E+00   0.00000E+00   0.00000E+00
+ FOND DE FISSURE  2
+       X             Y             Z             S
+   0.15678E+00   0.10000E+00   0.00000E+00   0.00000E+00
+ XENRCH-7) FIN DE XENRCH
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        15.53 Mo (MAXIMUM ATTEINT :        17.05 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        12.23 Mo) 
+
+    #  FIN COMMANDE NO : 0012   DUREE TOTALE:        0.71s (SYST:        0.01s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0013            CONCEPT DE TYPE : modele_sdaster
+    #  -------------                  ----------------- 
+   modelk=MODI_MODELE_XFEM(INFO=1,
+                          CRITERE=1.6700000000000001E-08,
+                          MODELE_IN=MODMECA,
+                          CONTACT='NON',
+                          FISSURE=(fiss2,fiss,),
+                          );
+
+ IMPRESSION DES ELEMENTS X-FEM 
+                 TYPE      XH      XT     XHT
+             CP QUAD4      58      40       8
+   
+ NOMBRE DE SOUS-ELEMENTS DE PEAU RE-ORIENTES : 0
+ NOMBRE DE SOUS-ELEMENTS DE PEAU RE-ORIENTES : 0
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        17.49 Mo (MAXIMUM ATTEINT :        20.87 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        13.42 Mo) 
+
+    #  FIN COMMANDE NO : 0013   DUREE TOTALE:        1.03s (SYST:        0.02s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0014            CONCEPT DE TYPE : char_meca
+    #  -------------                  ----------------- 
+   loadxfem=AFFE_CHAR_MECA(INFO=1,
+                          VERI_NORM='OUI',
+                          LIAISON_XFEM='OUI',
+                          MODELE=modelk,
+                          );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        17.65 Mo (MAXIMUM ATTEINT :        20.87 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        13.42 Mo) 
+
+    #  FIN COMMANDE NO : 0014   DUREE TOTALE:        0.19s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0015            CONCEPT DE TYPE : char_meca
+    #  -------------                  ----------------- 
+   load=AFFE_CHAR_MECA(INFO=1,
+                      DDL_IMPO=(_F(GROUP_NO='bot',
+                                   DY=0.0),
+                                _F(GROUP_NO='node1',
+                                   DX=0.0)),
+                      LIAISON_XFEM='NON',
+                      VERI_NORM='OUI',
+                      FORCE_NODALE=(_F(GROUP_NO='top',
+                                       FY=1.380000E6),
+                                    _F(GROUP_NO='top1_2',
+                                       FY=6.90000E5)),
+                      MODELE=modelk,
+                      );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        17.71 Mo (MAXIMUM ATTEINT :        20.87 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        13.42 Mo) 
+
+    #  FIN COMMANDE NO : 0015   DUREE TOTALE:        0.02s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0016            CONCEPT DE TYPE : listr8_sdaster
+    #  -------------                  ----------------- 
+   list=DEFI_LIST_REEL(INTERVALLE=_F(NOMBRE=1,
+                                    JUSQU_A=1.0),
+                      INFO=1,
+                      DEBUT=0.0,
+                      );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        17.72 Mo (MAXIMUM ATTEINT :        20.87 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.77 Mo (MAXIMUM ATTEINT :        13.42 Mo) 
+
+    #  FIN COMMANDE NO : 0016   DUREE TOTALE:        0.00s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0017            CONCEPT DE TYPE : evol_noli
+    #  -------------                  ----------------- 
+   resu2=STAT_NON_LINE(EXCIT=(_F(TYPE_CHARGE='FIXE_CSTE',
+                                CHARGE=load),
+                             _F(TYPE_CHARGE='FIXE_CSTE',
+                                CHARGE=loadxfem)),
+                      SOLVEUR=_F(RENUM='METIS',
+                                 STOP_SINGULIER='OUI',
+                                 METHODE='MULT_FRONT',
+                                 NPREC=8,
+                                 SYME='NON'),
+                      NEWTON=_F(REAC_INCR=1,
+                                MATRICE='TANGENTE',
+                                REAC_ITER=1,
+                                REAC_ITER_ELAS=0),
+                      INCREMENT=_F(SUBD_NIVEAU=3,
+                                   SUBD_METHODE='UNIFORME',
+                                   LIST_INST=list,
+                                   SUBD_PAS=4,
+                                   SUBD_COEF_PAS_1=1.0,
+                                   PRECISION=9.9999999999999995E-07,
+                                   ERRE_TEMPS='NON'),
+                      CONVERGENCE=_F(ARRET='OUI',
+                                     TYPE='PIC',
+                                     ITER_GLOB_MAXI=10,
+                                     ITER_GLOB_ELAS=25),
+                      COMP_ELAS=_F(RESO_INTE='IMPLICITE',
+                                   GROUP_MA='VOL',
+                                   RESI_INTE_RELA=9.9999999999999995E-07,
+                                   ITER_INTE_PAS=0,
+                                   ITER_INTE_MAXI=10,
+                                   RELATION='ELAS',
+                                   DEFORMATION='PETIT'),
+                      MODELE=modelk,
+                      CHAM_MATER=CHMAT,
+                      );
+
+ --- NOMBRE TOTAL DE NOEUDS :  4389 DONT :  452 NOEUDS "LAGRANGE"
+ --- NOMBRE TOTAL D'EQUATIONS :  9408
+ --- TAILLE DU PROFIL MORSE DE LA TRIANGULAIRE SUPERIEURE (FORMAT SCR):       126352
+ --- DONC LA TAILLE DE LA MATRICE EST:
+ --- EN SYMETRIQUE     NNZ=       126352
+ --- EN NON SYMETRIQUE NNZ=       243296
+
+
+---------------------------------------------------------------------
+
+INSTANT DE CALCUL :  1.000000000E+00
+
+---------------------------------------------------------------------
+|   ITERATIONS   |     RESIDU     |     RESIDU     |     OPTION     |
+|     NEWTON     |     RELATIF    |     ABSOLU     |   ASSEMBLAGE   |
+|                | RESI_GLOB_RELA | RESI_GLOB_MAXI |                |
+---------------------------------------------------------------------
+|     0          | 3.88578E-14    | 5.36238E-08    |TANGENTE        |
+---------------------------------------------------------------------
+
+<*> CRITERE(S) DE CONVERGENCE ATTEINT(S)
+
+RESIDU RESI_GLOB_RELA   VAUT  3.885783161E-14 SUR N3176   DCY     
+
+ARCHIVAGE DES CHAMPS: 
+   CHAMP STOCKE : DEPL             INSTANT :  1.00000E+00  NUMERO D'ORDRE :     1
+   CHAMP STOCKE : SIEF_ELGA        INSTANT :  1.00000E+00  NUMERO D'ORDRE :     1
+   CHAMP STOCKE : VARI_ELGA        INSTANT :  1.00000E+00  NUMERO D'ORDRE :     1
+
+TEMPS CPU CONSOMME DANS CE PAS DE TEMPS :  1.510 s                
+   TEMPS PAR ITERATION DE NEWTON  :  0.480 s                 - NBRE NEWT.:     1
+   TEMPS ARCHIVAGE                :  0.010 s                
+   TEMPS CREATION NUMEROTATION    :  0.080 s                 - NBRE NUME.:     1
+   TEMPS FACTORISATION MATRICE    :  0.300 s                 - NBRE FACT.:     1
+   TEMPS INTEGRATION COMPORTEMENT :  0.830 s                 - NBRE INTE.:     2
+   TEMPS RESOLUTION K.U = F       :  0.020 s                 - NBRE RESO.:     1
+   TEMPS AUTRES OPERATIONS        :  0.360 s                
+
+
+---------------------------------------------------------------------
+STATISTIQUES SUR LE TRANSITOIRE 
+---------------------------------------------------------------------
+   NOMBRE DE PAS DE TEMPS                  :      1
+   NOMBRE D'ITERATIONS DE NEWTON           :      1
+   NOMBRE DE CREATION DE NUMEROTATION      :      1
+   NOMBRE DE FACTORISATION DE MATRICE      :      1
+   NOMBRE D'INTEGRATION DE COMPORTEMENT    :      2
+   NOMBRE DE RESOLUTION K.U = F            :      1
+   TEMPS POUR CREATION NUMEROTATION        :  0.080 s                
+   TEMPS POUR FACTORISATION MATRICE        :  0.300 s                
+   TEMPS POUR INTEGRATION COMPORTEMENT     :  0.830 s                
+   TEMPS POUR RESOLUTION K.U = F           :  0.020 s                
+---------------------------------------------------------------------
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        20.78 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0017   DUREE TOTALE:        3.76s (SYST:        0.13s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0018            CONCEPT DE TYPE : maillage_sdaster
+    #  -------------                  ----------------- 
+   meshxfem=POST_MAIL_XFEM(INFO=1,
+                          PREF_NOEUD_M='NM',
+                          PREF_NOEUD_P='NP',
+                          PREF_MAILLE_X='MX',
+                          PREF_NOEUD_X='NX',
+                          MAILLAGE_SAIN=MAIL,
+                          MODELE=modelk,
+                          );
+
+
+     Il y a 0 mailles NON TRAITEES 
+
+     Il y a 3686 mailles CLASSIQUES 
+
+     Il y a 106 mailles X-FEM 
+
+    NOMBRE DE GROUPES DE MAILLES           1
+                              VOL               3898
+  
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        21.14 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0018   DUREE TOTALE:        0.25s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0019            CONCEPT DE TYPE : modele_sdaster
+    #  -------------                  ----------------- 
+   modVisu=AFFE_MODELE(MAILLAGE=meshxfem,
+                      INFO=1,
+                      AFFE=_F(PHENOMENE='MECANIQUE',
+                              TOUT='OUI',
+                              MODELISATION='C_PLAN'),
+                      VERI_JACOBIEN='OUI',
+                      );
+
+
+ SUR LES         3898 MAILLES DU MAILLAGE meshxfem
+    ON A DEMANDE L'AFFECTATION DE         3898
+    ON A PU EN AFFECTER                   3898
+
+    MODELISATION      ELEMENT FINI      TYPE MAILLE          NOMBRE
+    C_PLAN            MECPQU4           QUAD4                  3686
+    C_PLAN            MECPTR3           TRIA3                   212
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        21.29 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0019   DUREE TOTALE:        0.02s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0020            CONCEPT DE TYPE : evol_noli
+    #  -------------                  ----------------- 
+   resuxfem=POST_CHAM_XFEM(INFO=2,
+                          MAILLAGE_FISS=meshxfem,
+                          RESULTAT=resu2,
+                          NOM_CHAM=('DEPL','SIEF_ELGA',),
+                          MODELE_VISU=modVisu,
+                          MAILLAGE_SAIN=MAIL,
+                          MODELE=modelk,
+                          );
+
+  
+ 1. XPOINI
+  
+ 2. XPOSEP
+
+     Il y a 0 mailles NON TRAITEES 
+
+     Il y a 3686 mailles CLASSIQUES 
+
+     Il y a 106 mailles X-FEM 
+  
+ 3. XPODIM
+  
+ 4. XPOMAC
+  
+ 5. XPOMAX
+ 6. ENREGISTREMENT DE DEPL            
+ 6. ENREGISTREMENT DE SIEF_ELGA       
+ FIN DE POST_CHAM_XFEM
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        22.11 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0020   DUREE TOTALE:        0.31s (SYST:        0.01s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0021            CONCEPT DE TYPE : evol_noli
+    #  -------------                  ----------------- 
+   resuxfem=CALC_ELEM(reuse = resuxfem,
+                     INFO=1,
+                     CRITERE='RELATIF',
+                     OPTION=('EQUI_ELGA_SIGM','EQUI_ELNO_SIGM','SIEF_ELNO_ELGA',),
+                     TYPE_OPTION='TOUTES',
+                     SOLVEUR=_F(RENUM='METIS',
+                                STOP_SINGULIER='OUI',
+                                METHODE='MULT_FRONT',
+                                NPREC=8),
+                     PRECISION=9.9999999999999995E-07,
+                     NORME='VMIS',
+                     RESULTAT=resuxfem,
+                     );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        25.41 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0021   DUREE TOTALE:        0.23s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0022            CONCEPT DE TYPE : evol_noli
+    #  -------------                  ----------------- 
+   resuxfem=CALC_NO(reuse = resuxfem,
+                   CRITERE='RELATIF',
+                   RESULTAT=resuxfem,
+                   OPTION=('EQUI_NOEU_SIGM','DEGE_NOEU_DEPL',),
+                   PRECISION=9.9999999999999995E-07,
+                   );
+
+   
+   !--------------------------------------------------------------------------------------------!
+   ! <A> <PREPOST5_4>                                                                           !
+   !                                                                                            !
+   !                                                                                            !
+   ! Champ inexistant DEGE_ELNO_DEPL numero d'ordre 1 pour le calcul de l'option DEGE_NOEU_DEPL !
+   !                                                                                            !
+   !                                                                                            !
+   !                                                                                            !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette                             !
+   ! alarme, vous pouvez obtenir des résultats inattendus !                                     !
+   !--------------------------------------------------------------------------------------------!
+   
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        26.13 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0022   DUREE TOTALE:        0.12s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0023            CONCEPT DE TYPE : 
+    #  -------------                  ----------------- 
+   IMPR_RESU(INFO=1,
+            RESU=(_F(INFO_MAILLAGE='NON',
+                     RESULTAT=resuxfem,
+                     NOM_CHAM=('DEPL','SIEF_ELNO_ELGA','DEPL_ABSOLU',)),
+                  _F(INFO_MAILLAGE='NON',
+                     RESULTAT=resu2,
+                     NOM_CHAM=('DEPL','DEPL_ABSOLU',))),
+            UNITE=80,
+            FORMAT='MED',
+            );
+
+   
+   !----------------------------------------------------------------!
+   ! <A> <POSTRELE_41>                                              !
+   !                                                                !
+   !                                                                !
+   !  champ inexistant nom_cham: DEPL_ABSOLU  nume_ordre: 1         !
+   !                                                                !
+   !                                                                !
+   !                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette !
+   ! alarme, vous pouvez obtenir des résultats inattendus !         !
+   !----------------------------------------------------------------!
+   
+   
+   !----------------------------------------------------------------!
+   ! <A> <POSTRELE_41>                                              !
+   !                                                                !
+   !                                                                !
+   !  champ inexistant nom_cham: DEPL_ABSOLU  nume_ordre: 1         !
+   !                                                                !
+   !                                                                !
+   !                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette !
+   ! alarme, vous pouvez obtenir des résultats inattendus !         !
+   !----------------------------------------------------------------!
+   
+
+  -> Votre modèle semble etre composé de plusieurs modélisations, les composantes
+     qui n'existent pas pour une partie du modèle ont été mises à zéro.
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        26.13 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0023   DUREE TOTALE:        0.21s (SYST:        0.01s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0024            CONCEPT DE TYPE : table_sdaster
+    #  -------------                  ----------------- 
+   sif=POST_K1_K2_K3(INFO=1,
+                    NB_NOEUD_COUPE=5,
+                    FISSURE=fiss,
+                    MAILLAGE=MAIL,
+                    PREC_VIS_A_VIS=0.10000000000000001,
+                    MODELISATION='C_PLAN',
+                    SYME_CHAR='SANS',
+                    MATER=ACIER,
+                    RESULTAT=resu2,
+                    NUME_FOND=2,
+                    ABSC_CURV_MAXI=1.0,
+                    );
+
+  ====== VERIFICATION DU MAILLAGE ======
+
+
+------------ MAILLAGE .9000026 - IMPRESSIONS NIVEAU  1 ------------
+
+LU-05-OCTO-2009 11:40:39                                                        
+
+NOMBRE DE NOEUDS                           3
+
+NOMBRE DE MAILLES                          2
+                              SEG2                    2
+
+NOMBRE DE GROUPES DE MAILLES               1
+                              LICOU1               2
+
+--------------------------------------------------------------------------------
+
+
+
+NOMBRE  DE GROUPES DE NOEUDS CREES :      1
+=======================================
+
+               --------------------------------------
+               ! NOM DU GROUPE ! NBRE DE NOEUDS DU  !
+               !    NOEUDS     !      GROUPE_NO     !
+               --------------------------------------
+               !  LICOU1       !         3          !
+               --------------------------------------
+
+
+ SUR LES            2 MAILLES DU MAILLAGE .9000026
+    ON A DEMANDE L'AFFECTATION DE            2
+    ON A PU EN AFFECTER                      2
+
+    MODELISATION      ELEMENT FINI      TYPE MAILLE          NOMBRE
+    BARRE             MECA_BARRE        SEG2                      2
+   
+   !--------------------------------------------------------------------------------!
+   ! <A> <CALCULEL5_48>                                                             !
+   !                                                                                !
+   !                                                                                !
+   !  PROJ_CHAMP (ou LIAISON_MAIL) :                                                !
+   !  Certains noeuds ont été projetés sur des mailles un peu distantes             !
+   !  (la distance à la maille est supérieure à 1/10ième du diamètre de la maille)  !
+   !  Le noeud projeté le plus loin est le noeud: N1                                !
+   !  Il a été projeté à la distance 0.008611                                       !
+   !                                                                                !
+   !                                                                                !
+   !                                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette                 !
+   ! alarme, vous pouvez obtenir des résultats inattendus !                         !
+   !--------------------------------------------------------------------------------!
+   
+
+
+NOMBRE  DE GROUPES DE NOEUDS CREES :      1
+=======================================
+
+               --------------------------------------
+               ! NOM DU GROUPE ! NBRE DE NOEUDS DU  !
+               !    NOEUDS     !      GROUPE_NO     !
+               --------------------------------------
+               !  LICOF1       !         3          !
+               --------------------------------------
+
+  ====== VERIFICATION DU MAILLAGE ======
+
+
+------------ MAILLAGE .9000033 - IMPRESSIONS NIVEAU  1 ------------
+
+LU-05-OCTO-2009 11:40:40                                                        
+
+NOMBRE DE NOEUDS                           5
+
+NOMBRE DE MAILLES                          4
+                              SEG2                    4
+
+NOMBRE DE GROUPES DE MAILLES               1
+                              LICOU1               4
+
+--------------------------------------------------------------------------------
+
+
+
+NOMBRE  DE GROUPES DE NOEUDS CREES :      1
+=======================================
+
+               --------------------------------------
+               ! NOM DU GROUPE ! NBRE DE NOEUDS DU  !
+               !    NOEUDS     !      GROUPE_NO     !
+               --------------------------------------
+               !  LICOU1       !         5          !
+               --------------------------------------
+
+
+ SUR LES            4 MAILLES DU MAILLAGE .9000033
+    ON A DEMANDE L'AFFECTATION DE            4
+    ON A PU EN AFFECTER                      4
+
+    MODELISATION      ELEMENT FINI      TYPE MAILLE          NOMBRE
+    BARRE             MECA_BARRE        SEG2                      4
+   
+   !--------------------------------------------------------------------------------!
+   ! <A> <CALCULEL5_48>                                                             !
+   !                                                                                !
+   !                                                                                !
+   !  PROJ_CHAMP (ou LIAISON_MAIL) :                                                !
+   !  Certains noeuds ont été projetés sur des mailles un peu distantes             !
+   !  (la distance à la maille est supérieure à 1/10ième du diamètre de la maille)  !
+   !  Le noeud projeté le plus loin est le noeud: N3                                !
+   !  Il a été projeté à la distance 0.003009                                       !
+   !                                                                                !
+   !                                                                                !
+   !                                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette                 !
+   ! alarme, vous pouvez obtenir des résultats inattendus !                         !
+   !--------------------------------------------------------------------------------!
+   
+
+
+NOMBRE  DE GROUPES DE NOEUDS CREES :      1
+=======================================
+
+               --------------------------------------
+               ! NOM DU GROUPE ! NBRE DE NOEUDS DU  !
+               !    NOEUDS     !      GROUPE_NO     !
+               --------------------------------------
+               !  LICOF1       !         5          !
+               --------------------------------------
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        26.13 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0024   DUREE TOTALE:        0.79s (SYST:        0.01s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0053            CONCEPT DE TYPE : table_sdaster
+    #  -------------                  ----------------- 
+   sif2=CALC_G(INFO=2,
+              OPTION='CALC_K_G',
+              SYME_CHAR='SANS',
+              LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                         DEGRE=5,
+                         LISSAGE_G='LAGRANGE'),
+              RESULTAT=resu2,
+              THETA=_F(DIRECTION=(-1.0,0.0,0.0,),
+                       NUME_FOND=2,
+                       FISSURE=fiss,
+                       R_INF=1.E-3,
+                       R_SUP=4.0000000000000001E-3,
+                       MODULE=1.0),
+              );
+
+
+Création de la table  sif2.
+    
+     TRAITEMENT DU FOND DE FISSURE NUMERO  2
+     NOMME NUM_2   
+     DE COORDONNEES  0.107470598  0.1
+     LA NORMALE A LA FISSURE EN CE POINT EST  -2.7672504E-19 -0.0160820094
+TEMPS CPU/SYS CALCUL ELEM CALC_K_G        :  0.7000E-01 0.0000E+00
+
+************************************************************
+
+
+ COORDONNEES DU NOEUD DE FOND DE FISSURE :   0.107470598   0.1
+
+ COORDONNEES DE LA NORMALE A LA FISSURE :   -2.7672504E-19  -0.0160820094
+
+        K1                K2              G (IRWIN)
+
+ 1.90008E+07         1.33480E+04         1.56834E+03
+
+TAUX DE RESTITUTION D'ENERGIE G :  1.04103E+03
+
+ DIRECTION DE LA DEVIATION DE LA FISSURE (EN DEGRES): 
+
+SELON LE CRITERE K1 MAXIMUM :   0 AVEC K1MAX =  1.90008E+07
+SELON LE CRITERE K2 NUL     :   0 AVEC K2NUL =  1.33480E+04
+SELON LE CRITERE G MAXIMUM  :   0 AVEC GMAX  =  1.56834E+03
+************************************************************
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        26.14 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0053   DUREE TOTALE:        0.23s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0054            CONCEPT DE TYPE : table_sdaster
+    #  -------------                  ----------------- 
+   sif3=CALC_G(INFO=2,
+              OPTION='CALC_K_G',
+              SYME_CHAR='SANS',
+              LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                         DEGRE=5,
+                         LISSAGE_G='LAGRANGE'),
+              RESULTAT=resu2,
+              THETA=_F(DIRECTION=(-1.0,0.0,0.0,),
+                       NUME_FOND=2,
+                       FISSURE=fiss,
+                       R_INF=4.0000000000000001E-3,
+                       R_SUP=5.0000000000000001E-3,
+                       MODULE=1.0),
+              );
+
+
+Création de la table  sif3.
+    
+     TRAITEMENT DU FOND DE FISSURE NUMERO  2
+     NOMME NUM_2   
+     DE COORDONNEES  0.107470598  0.1
+     LA NORMALE A LA FISSURE EN CE POINT EST  -2.7672504E-19 -0.0160820094
+TEMPS CPU/SYS CALCUL ELEM CALC_K_G        :  0.8000E-01 0.0000E+00
+
+************************************************************
+
+
+ COORDONNEES DU NOEUD DE FOND DE FISSURE :   0.107470598   0.1
+
+ COORDONNEES DE LA NORMALE A LA FISSURE :   -2.7672504E-19  -0.0160820094
+
+        K1                K2              G (IRWIN)
+
+ 1.70605E+07         6.34451E+03         1.26438E+03
+
+TAUX DE RESTITUTION D'ENERGIE G :  1.15204E+03
+
+ DIRECTION DE LA DEVIATION DE LA FISSURE (EN DEGRES): 
+
+SELON LE CRITERE K1 MAXIMUM :   0 AVEC K1MAX =  1.70605E+07
+SELON LE CRITERE K2 NUL     :   0 AVEC K2NUL =  6.34451E+03
+SELON LE CRITERE G MAXIMUM  :   0 AVEC GMAX  =  1.26438E+03
+************************************************************
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        26.14 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0054   DUREE TOTALE:        0.23s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0055            CONCEPT DE TYPE : table_sdaster
+    #  -------------                  ----------------- 
+   sif4=CALC_G(INFO=2,
+              OPTION='CALC_K_G',
+              SYME_CHAR='SANS',
+              LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                         DEGRE=5,
+                         LISSAGE_G='LAGRANGE'),
+              RESULTAT=resu2,
+              THETA=_F(DIRECTION=(-1.0,0.0,0.0,),
+                       NUME_FOND=2,
+                       FISSURE=fiss,
+                       R_INF=5.0000000000000001E-3,
+                       R_SUP=6.0000000000000001E-3,
+                       MODULE=1.0),
+              );
+
+
+Création de la table  sif4.
+    
+     TRAITEMENT DU FOND DE FISSURE NUMERO  2
+     NOMME NUM_2   
+     DE COORDONNEES  0.107470598  0.1
+     LA NORMALE A LA FISSURE EN CE POINT EST  -2.7672504E-19 -0.0160820094
+TEMPS CPU/SYS CALCUL ELEM CALC_K_G        :  0.9000E-01 0.0000E+00
+
+************************************************************
+
+
+ COORDONNEES DU NOEUD DE FOND DE FISSURE :   0.107470598   0.1
+
+ COORDONNEES DE LA NORMALE A LA FISSURE :   -2.7672504E-19  -0.0160820094
+
+        K1                K2              G (IRWIN)
+
+ 1.63322E+07        -9.89957E+02         1.15874E+03
+
+TAUX DE RESTITUTION D'ENERGIE G :  1.15508E+03
+
+ DIRECTION DE LA DEVIATION DE LA FISSURE (EN DEGRES): 
+
+SELON LE CRITERE K1 MAXIMUM :   0 AVEC K1MAX =  1.63322E+07
+SELON LE CRITERE K2 NUL     :   0 AVEC K2NUL =  9.89957E+02
+SELON LE CRITERE G MAXIMUM  :   0 AVEC GMAX  =  1.15874E+03
+************************************************************
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        26.14 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0055   DUREE TOTALE:        0.25s (SYST:        0.01s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0056            CONCEPT DE TYPE : table_sdaster
+    #  -------------                  ----------------- 
+   sif5=CALC_G(INFO=2,
+              OPTION='CALC_K_G',
+              SYME_CHAR='SANS',
+              LISSAGE=_F(LISSAGE_THETA='LAGRANGE',
+                         DEGRE=5,
+                         LISSAGE_G='LAGRANGE'),
+              RESULTAT=resu2,
+              THETA=_F(DIRECTION=(-1.0,0.0,0.0,),
+                       NUME_FOND=2,
+                       FISSURE=fiss,
+                       R_INF=4.0000000000000001E-3,
+                       R_SUP=4.4999999999999997E-3,
+                       MODULE=1.0),
+              );
+
+
+Création de la table  sif5.
+    
+     TRAITEMENT DU FOND DE FISSURE NUMERO  2
+     NOMME NUM_2   
+     DE COORDONNEES  0.107470598  0.1
+     LA NORMALE A LA FISSURE EN CE POINT EST  -2.7672504E-19 -0.0160820094
+TEMPS CPU/SYS CALCUL ELEM CALC_K_G        :  0.8000E-01 0.0000E+00
+
+************************************************************
+
+
+ COORDONNEES DU NOEUD DE FOND DE FISSURE :   0.107470598   0.1
+
+ COORDONNEES DE LA NORMALE A LA FISSURE :   -2.7672504E-19  -0.0160820094
+
+        K1                K2              G (IRWIN)
+
+ 1.70696E+07         6.70175E+03         1.26573E+03
+
+TAUX DE RESTITUTION D'ENERGIE G :  1.15234E+03
+
+ DIRECTION DE LA DEVIATION DE LA FISSURE (EN DEGRES): 
+
+SELON LE CRITERE K1 MAXIMUM :   0 AVEC K1MAX =  1.70696E+07
+SELON LE CRITERE K2 NUL     :   0 AVEC K2NUL =  6.70175E+03
+SELON LE CRITERE G MAXIMUM  :   0 AVEC GMAX  =  1.26573E+03
+************************************************************
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        26.14 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0056   DUREE TOTALE:        0.23s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0057            CONCEPT DE TYPE : 
+    #  -------------                  ----------------- 
+   IMPR_TABLE(IMPR_FONCTION='NON',
+             FORMAT='TABLEAU',
+             COMMENTAIRE='#',
+             FORMAT_R='E12.5',
+             FIN_LIGNE='\n',
+             UNITE=8,
+             FORMAT_C='MODULE_PHASE',
+             INFO=1,
+             DEBUT_LIGNE='',
+             SEPARATEUR=' ',
+             COMM_PARA='',
+             TABLE=sif3,
+             );
+
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :        26.14 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         5.78 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0057   DUREE TOTALE:        0.04s (SYST:        0.00s)
+    #  ---------------------------------------------------------------------------
+
+   !-----------------------------------------------------------------------!
+   !   Liste des alarmes émises lors de l'exécution du calcul.             !
+   !                                                                       !
+   !   Les alarmes que vous avez choisies d'ignorer sont précédées de (*). !
+   !   Nombre d'occurrences pour chacune des alarmes :                     !
+   !          CALCULEL5_48         émise    2 fois                         !
+   !          MED_10               émise    1 fois                         !
+   !          POSTRELE_41          émise    2 fois                         !
+   !          PREPOST5_4           émise    1 fois                         !
+   !-----------------------------------------------------------------------!
+
+
+    #  --------------------------------------------------------------------------- 
+    #  COMMANDE NO :  0065            CONCEPT DE TYPE : 
+    #  -------------                  ----------------- 
+   FIN(RETASSAGE='NON',
+      INFO_RESU='OUI',
+      FORMAT_HDF='NON',
+      UNITE=6,
+      PERFORMANCE='OUI',
+      );
+
+
+ ======>
+
+ STRUCTURE DU CONCEPT resu2    CALCULE POUR 1 NUMERO D'ORDRE
+
+ LISTE DES NOMS SYMBOLIQUES:
+ ! ---------- !----------------!----------------!----------------!----------------!
+ ! NUME_ORDRE !      DEPL      !   SIEF_ELGA    !   VARI_ELGA    !  COMPORTEMENT  !
+ ! ---------- !----------------!----------------!----------------!----------------!
+ !          1 !     DEPL_R     !     SIEF_R     !     VARI_R     !     COMPOR     !
+ ! ---------- !----------------!----------------!----------------!----------------!
+
+ LISTE DES NOMS DE VARIABLES D'ACCES:
+                                      INST             DE TYPE  R
+
+ LISTE DES NOMS DE PARAMETRES:
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!
+ ! NUME_ORDRE !    CARAELEM    !    CHAMPMAT    !   CHAR_MINI    !  ETA_PILOTAGE  !     EXCIT      !     GFITER     !  ITER_DASHPOT  !   ITER_GLOB    !   ITER_LINE    !     MODELE     !   RESI_GLOB    !RESI_GLOB_MOINS ! RESI_GLOB_RELA !   RESI_REFE    ! TRAN_GENE_NOLI !
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!
+ !          1 !       K8       !       K8       !       R        !       R        !      K24       !       I        !       I        !       I        !       I        !       K8       !       R        !       R        !       R        !       R        !      K24       !
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!
+
+ ======>
+
+ STRUCTURE DU CONCEPT resuxfem CALCULE POUR 1 NUMERO D'ORDRE
+
+ LISTE DES NOMS SYMBOLIQUES:
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!
+ ! NUME_ORDRE !      DEPL      !   SIEF_ELGA    ! SIEF_ELNO_ELGA ! EQUI_ELGA_SIGM ! EQUI_ELNO_SIGM ! EQUI_NOEU_SIGM !
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!
+ !          1 !     DEPL_R     !     SIEF_R     !     SIEF_R     !     SIEF_R     !     SIEF_R     !     SIEF_R     !
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!
+
+ LISTE DES NOMS DE VARIABLES D'ACCES:
+                                      INST             DE TYPE  R
+
+ LISTE DES NOMS DE PARAMETRES:
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!
+ ! NUME_ORDRE !    CARAELEM    !    CHAMPMAT    !     EXCIT      !     GFITER     !  ITER_DASHPOT  !   ITER_GLOB    !   ITER_LINE    !     MODELE     ! TRAN_GENE_NOLI !
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!
+ !          1 !       K8       !       K8       !      K24       !       I        !       I        !       I        !       I        !       K8       !      K24       !
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!----------------!
+ ---------------------------------------------------------------------------
+ Concepts de la base: G
+    Nom       Type                 Taille (Mo)         Nombre      Nombre de
+                                                     d'objets       segments
+    TOTAL                                20.34            541            763
+  
+    MAIL       MAILLAGE_SDASTER           0.32             36             62
+    MODMECA    MODELE_SDASTER             0.13              7             12
+    ACIER      MATER_SDASTER              0.00              4              4
+    CHMAT      CHAM_MATER                 0.00              5             10
+    LN         FORMULE                    0.00              2              2
+    LT         FORMULE                    0.00              2              2
+    LN2        FORMULE                    0.00              2              2
+    LT2        FORMULE                    0.00              2              2
+    fiss       FISS_XFEM                  1.62             59             73
+    fiss2      FISS_XFEM                  1.62             59             73
+    modelk     MODELE_SDASTER             1.96             82            100
+    loadxfem   CHAR_MECA                  0.15             19             39
+    load       CHAR_MECA                  0.06             24             49
+    list       LISTR8_SDASTER             0.00              5              5
+    resu2      EVOL_NOLI                  3.06             31             45
+    meshxfem   MAILLAGE_SDASTER           0.36             33             47
+    modVisu    MODELE_SDASTER             0.15              7             12
+    resuxfem   EVOL_NOLI                  4.84             35             43
+    sif        TABLE_SDASTER              0.00             20             20
+    sif3       TABLE_SDASTER              0.00             16             16
+    sif4       TABLE_SDASTER              0.00             16             16
+    sif2       TABLE_SDASTER              0.00             16             16
+    sif5       TABLE_SDASTER              0.00             16             16
+    &FOZERO                               0.00              2              2
+    &&_NUM_C                              0.00              1              1
+    &&SYS.KR                              0.04              1              1
+    &CATA.AC                              0.00              2              4
+    &CATA.CL                              0.17              1              3
+    &CATA.GD                              0.03              4             11
+    &CATA.ME                              0.04              2              4
+    &CATA.OP                              0.10              3             13
+    &CATA.PH                              0.00              1              1
+    &CATA.TE                              5.64             17             42
+    &CATA.TH                              0.00              2              4
+    &CATA.TM                              0.01              7             11
+ ---------------------------------------------------------------------------
+
+     NOM DE LA BASE                          :  GLOBALE
+     NOMBRE D'ENREGISTREMENTS UTILISES       :  68
+     NOMBRE D'ENREGISTREMENTS MAXIMUM        :  125829
+     LONGUEUR D'ENREGISTREMENT (OCTETS)      :  409600
+     NOMBRE TOTAL D'ENTREES/SORTIES          :  45
+     NOMBRE D'IDENTIFICATEURS UTILISES       :  1180
+     TAILLE MAXIMUM DU REPERTOIRE            :  2000
+     POURCENTAGE D'UTILISATION DU REPERTOIRE :  59 %
+
+     NOM DE LA BASE                          :  VOLATILE
+     NOMBRE D'ENREGISTREMENTS UTILISES       :  7
+     NOMBRE D'ENREGISTREMENTS MAXIMUM        :  125829
+     LONGUEUR D'ENREGISTREMENT (OCTETS)      :  409600
+     NOMBRE TOTAL D'ENTREES/SORTIES          :  3
+     NOMBRE D'IDENTIFICATEURS UTILISES       :  1561
+     TAILLE MAXIMUM DU REPERTOIRE            :  2000
+     POURCENTAGE D'UTILISATION DU REPERTOIRE :  78 %
+  
+   STATISTIQUES CONCERNANT L'ALLOCATION DYNAMIQUE :
+     TAILLE CUMULEE MAXIMUM  52 Mo,
+     TAILLE CUMULEE LIBEREE  408 Mo.
+     NOMBRE TOTAL D'ALLOCATIONS  : 453961.
+     NOMBRE TOTAL DE LIBERATIONS : 453962.
+      0 APPELS AU MECANISME DE LIBERATION.
+     TAILLE MEMOIRE CUMULEE RECUPEREE : 0 Mo.
+  
+ <I>       FIN D'EXECUTION LE : LU-05-OCTO-2009 11:40:43
+  
+    #  USAGE DE LA MEMOIRE JEVEUX
+    #     - MEMOIRE DYNAMIQUE CONSOMMEE :         0.00 Mo (MAXIMUM ATTEINT :        52.33 Mo) 
+    #     - MEMOIRE UTILISEE            :         0.00 Mo (MAXIMUM ATTEINT :        26.83 Mo) 
+
+    #  FIN COMMANDE NO : 0065   DUREE TOTALE:        0.12s (SYST:        0.08s)
+    #  ---------------------------------------------------------------------------
+
+
+  <I> <INFORMATION TEMPS D'EXECUTION> (EN SECONDE)
+      TEMPS CPU TOTAL ..............         12.51
+      TEMPS CPU USER TOTAL .........         11.93
+      TEMPS CPU SYSTEME TOTAL ......          0.58
+      TEMPS CPU RESTANT ............        107.49
+
+EXECUTION_CODE_ASTER_EXIT_28093=0

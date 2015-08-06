@@ -1,0 +1,425 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialCantileverBeamOptimization</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialCantileverBeamOptimization.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">TutorialCantileverBeam: Optimization</a></li><li><a href="#2">Preparation of the Input</a></li><li><a href="#3">Prepare Input Object</a></li><li><a href="#4">Preparation of the Evaluator</a></li><li><a href="#5">Preparation of the Physical Model</a></li><li><a href="#6">Check feasibility of the optimization preoblem</a></li><li><a href="#7">Show the quantify of interest</a></li><li><a href="#8">Define the Objective Funtion</a></li><li><a href="#9">Create (inequality) constraint</a></li><li><a href="#10">Create object OptimizationProblem</a></li><li><a href="#11">Perform optimization</a></li><li><a href="#12">Compare Optimizarion results</a></li><li><a href="#13">Validate Solutions</a></li></ul></div><h2>TutorialCantileverBeam: Optimization<a name="1"></a></h2><p>The documentation and the problem description of this example is available on the User Manual -&gt; Tutorials -&gt; Cantilever_Beam</p><p>See Also <a href="http://mechanik.uibk.ac.at/wiki/index.php/Cantilever_Beam">http://mechanik.uibk.ac.at/wiki/index.php/Cantilever_Beam</a></p><p><img src="TutorialCantileverBeamOptimization_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialCantileverBeamOptimization_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><pre class="codeinput"><span class="comment">% Set verbosity level to 2</span>
+CossanX.setVerbosityLevel(2);
+</pre><h2>Preparation of the Input<a name="2"></a></h2><p>The optimization analysis requires the definition of Design Variables (i.e. the variables that define new configurations)</p><pre class="codeinput">b=DesignVariable(<span class="string">'value'</span>,0.12,<span class="string">'lowerBound'</span>,0.01,<span class="string">'upperBound'</span>,0.50,<span class="string">'Sdescription'</span>,<span class="string">'Beam width'</span>);
+h=DesignVariable(<span class="string">'value'</span>,0.54,<span class="string">'lowerBound'</span>,0.02,<span class="string">'upperBound'</span>,1,<span class="string">'Sdescription'</span>,<span class="string">'Beam Heigth'</span>);
+
+<span class="comment">% In this example we do not use random variables and we only use Parameters</span>
+L=Parameter(<span class="string">'value'</span>,1.8,<span class="string">'Sdescription'</span>,<span class="string">'Beam Length'</span>);
+MaxW=Parameter(<span class="string">'value'</span>,0.001,<span class="string">'Sdescription'</span>,<span class="string">'Maximum allowed displacement'</span>);
+P=Parameter(<span class="string">'value'</span>,10000,<span class="string">'Sdescription'</span>,<span class="string">'Load'</span>);
+rho=Parameter(<span class="string">'value'</span>,600,<span class="string">'Sdescription'</span>,<span class="string">'density'</span>);
+E=Parameter(<span class="string">'value'</span>,10e9,<span class="string">'Sdescription'</span>,<span class="string">'Young''s modulus'</span>);
+<span class="comment">% Definition of the Function</span>
+I=Function(<span class="string">'Sdescription'</span>,<span class="string">'Moment of Inertia'</span>,<span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;b&amp;&gt;.*&lt;&amp;h&amp;&gt;.^3/12'</span>);
+</pre><h2>Prepare Input Object<a name="3"></a></h2><p>The above prepared objects can be added to an Input Object</p><pre class="codeinput">Xinput=Input(<span class="string">'CXmembers'</span>,{L b P h rho E I MaxW},<span class="keyword">...</span>
+    <span class="string">'CSmembers'</span>,{<span class="string">'L'</span> <span class="string">'b'</span> <span class="string">'P'</span> <span class="string">'h'</span> <span class="string">'rho'</span> <span class="string">'E'</span> <span class="string">'I'</span> <span class="string">'MaxW'</span>});
+<span class="comment">% Show summary of the Input Object</span>
+display(Xinput)
+</pre><pre class="codeoutput">Input Object  - Description: 
+* 5 Parameter object(s)
+** Names: "L" "P" "rho" "E" "MaxW" 
+* 1 Functions object(s)
+** Names: "I" 
+* 2 DesignVariable object(s)
+** Names: "b" "h" 
+</pre><h2>Preparation of the Evaluator<a name="4"></a></h2><p>Use of a matlab script to compute the Beam displacement</p><pre class="codeinput">Sfolder=fileparts(mfilename(<span class="string">'fullpath'</span>));<span class="comment">% returns the current folder</span>
+Xmio=Mio(<span class="string">'Spath'</span>,fullfile(Sfolder,<span class="string">'MatlabModel'</span>),<span class="string">'Sfile'</span>,<span class="string">'tipDisplacement.m'</span>,<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'I'</span> <span class="string">'b'</span> <span class="string">'L'</span> <span class="string">'h'</span> <span class="string">'rho'</span> <span class="string">'P'</span>}, <span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'w'</span>});
+<span class="comment">% Add the MIO object to an Evaluator object</span>
+Xevaluator=Evaluator(<span class="string">'CXmembers'</span>,{Xmio},<span class="string">'CSmembers'</span>,{<span class="string">'Xmio'</span>});
+</pre><h2>Preparation of the Physical Model<a name="5"></a></h2><p>Define the Physical Model</p><pre class="codeinput">Xmodel=Model(<span class="string">'Xinput'</span>,Xinput,<span class="string">'Xevaluator'</span>,Xevaluator);
+</pre><h2>Check feasibility of the optimization preoblem<a name="6"></a></h2><p>The EesignOfExperiment analysis can be used to see if a feasible solution is present in the bounds set for the Design Varaibles Define a user defined DOE object. We evaluate the model at the lower and upper bounds of the design variable plus the current values. Therefore for each design variable we have 3 values and a total of 9 model evaluations are required. The evaluation points are defined by means of the MdeoFactor matrix defined between -1 and 1.</p><pre class="codeinput">MdoeFactors=[-1 -1;
+             0 -1;
+             1 -1;
+            -1  0;
+             0  0;
+             1  0;
+            -1  1;
+             0  1;
+             1  1];
+<span class="comment">% When the flag Lusecurrentvalues is set to true the current values of the design</span>
+<span class="comment">% variables is used in corresponcence of the MdoeFactors=0.</span>
+
+Xdoe=DesignOfExperiments(<span class="string">'Sdesigntype'</span>,<span class="string">'UserDefined'</span>,<span class="keyword">...</span>
+    <span class="string">'Mdoefactors'</span>,MdoeFactors,<span class="string">'Lusecurrentvalues'</span>,true);
+
+<span class="comment">% Show summary of the design of experimemts</span>
+display(Xdoe)
+
+<span class="comment">% and now, evaluate the model at the points defined by the DesignOfExperiment</span>
+XoutDoe=Xdoe.apply(Xmodel);
+</pre><pre class="codeoutput">===================================================================
+ DesignOfExperiment Object  -   Description: 
+===================================================================
+* Type of design of experiment : UserDefined
+* Central composite design     : faced
+* Perturbation parameter       : 1
+* Current values of the DesignVariable used
+</pre><pre class="codeoutput">Error using ==&gt; Mio.runScript at 37
+ The user define function can not be evaluate! 
+ Please check your function 
+ Undefined function or method 'mtimes' for input arguments of type 'cell'.
+
+Error in ==&gt; Mio.run at 182
+        [XsimOut Poutput]=runScript(Xmio,Psamples);
+
+Error in ==&gt; Evaluator.apply at 124
+                XSimOutTmp=Xobj.CXsolvers{n}.run(PinputMio);
+
+Error in ==&gt; Model.apply at 17
+Xout = apply(Xmdl.Xevaluator,Pinput);
+
+Error in ==&gt; DesignOfExperiments.apply at 51
+    Xout = apply(Xtarget,Xinput);
+
+Error in ==&gt; TutorialCantileverBeamOptimization at 75
+XoutDoe=Xdoe.apply(Xmodel);
+</pre><h2>Show the quantify of interest<a name="7"></a></h2><pre class="codeinput">Cnames={<span class="string">'h'</span> <span class="string">'b'</span> <span class="string">'w'</span>};
+Mdoe=XoutDoe.getValues(<span class="string">'Cnames'</span>,Cnames);
+
+<span class="comment">% Show results</span>
+
+fprintf(<span class="string">'%10s | %10s | %10s | %10s\n-------------------------------------------------\n'</span>,Cnames{:}, <span class="string">'Solution status'</span>)
+
+<span class="keyword">for</span> n=1:size(Mdoe,1)
+    <span class="keyword">if</span> Mdoe(n,3)&lt;MaxW.value
+        fprintf(<span class="string">'%10.3e | %10.3e | %10.3e | %10s\n'</span>,Mdoe(n,:),<span class="string">'Feasible Solution'</span>)
+    <span class="keyword">else</span>
+        fprintf(<span class="string">'%10.3e | %10.3e | %10.3e | %10s\n'</span>,Mdoe(n,:),<span class="string">'Uneasible Solution'</span>)
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% There are 3 feasible solutions and this means the the opimization problem is</span>
+<span class="comment">% well define. Now we have to identify the oprimal solution.</span>
+</pre><h2>Define the Objective Funtion<a name="8"></a></h2><p>The aim of this optimization is to minimaze the weight of the beam. The weight can be easely computed using a matlab script.</p><pre class="codeinput">Xobjfun   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).BeamWeight=Tinput(n).rho*Tinput(n).b*Tinput(n).h*Tinput(n).L;end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'BeamWeight'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'rho'</span> <span class="string">'b'</span> <span class="string">'h'</span> <span class="string">'L'</span>});
+</pre><h2>Create (inequality) constraint<a name="9"></a></h2><p>The maximum displacement of the beam tip</p><pre class="codeinput">XconMaxStress   = Constraint(<span class="string">'Sdescription'</span>,<span class="string">'constraint'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).Constraint=Tinput(n).w-Tinput(n).MaxW; end'</span>,<span class="keyword">...</span>
+    <span class="string">'CoutputNames'</span>,{<span class="string">'Constraint'</span>},<span class="keyword">...</span>
+    <span class="string">'CinputNames'</span>,{<span class="string">'w'</span> <span class="string">'MaxW'</span> },<span class="keyword">...</span>
+    <span class="string">'Linequality'</span>,true);
+</pre><h2>Create object OptimizationProblem<a name="10"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>,Xobjfun,<span class="string">'CXconstraint'</span>,{XconMaxStress},<span class="string">'Xmodel'</span>,Xmodel);
+
+<span class="comment">% Define Optimizers</span>
+Xsqp=SequentialQuadraticProgramming(<span class="string">'finitedifferenceperturbation'</span>,0.01);
+Xcobyla=Cobyla;
+Xga=GeneticAlgorithms(<span class="string">'Smutationfcn'</span>,<span class="string">'mutationadaptfeasible'</span>,<span class="string">'NmaxIterations'</span>,10, <span class="keyword">...</span>
+    <span class="string">'NPopulationSize'</span>,10);
+</pre><h2>Perform optimization<a name="11"></a></h2><pre class="codeinput"><span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(542727)
+
+<span class="comment">% We start with the Sequential Quadratic Programming method.</span>
+Xoptimum1=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xsqp);
+<span class="comment">% Show results of the optimization</span>
+display(Xoptimum1)
+
+<span class="comment">% Now we optimize the problem using Cobyla</span>
+Xoptimum2=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xcobyla);
+<span class="comment">% Show results of the optimization</span>
+display(Xoptimum2)
+
+<span class="comment">% Now we optimize the problem using Genetic Algorithms</span>
+Xoptimum3=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xga);
+<span class="comment">% Show results of the optimization</span>
+display(Xoptimum3)
+</pre><h2>Compare Optimizarion results<a name="12"></a></h2><pre class="codeinput">Cnames={<span class="string">'SQP'</span>,<span class="string">'COBYLA'</span>,<span class="string">'GA'</span>};
+Sformat=<span class="string">'%10.3e | %10.3e | %10.3e |  %10s\n'</span>;
+<span class="comment">% Show results</span>
+
+fprintf(<span class="string">'%10s | %10s | %10s | %10s\n-------------------------------------------------\n'</span>,Cnames{:}, <span class="string">'Property'</span>)
+
+Voptimim(1)=Xoptimum1.XobjectiveFunction.Mdata(end);
+Voptimim(2)=Xoptimum2.XobjectiveFunction.Mdata(end);
+Voptimim(3)=Xoptimum3.XobjectiveFunction.Mdata(end);
+
+fprintf(Sformat,Voptimim,<span class="string">'Objective Function'</span>)
+
+Vev(1)=Xoptimum1.NevaluationsObjectiveFunction;
+Vev(2)=Xoptimum2.NevaluationsObjectiveFunction;
+Vev(3)=Xoptimum3.NevaluationsObjectiveFunction;
+
+fprintf(Sformat,Vev,<span class="string">'Number evaluations'</span>)
+
+Vdv1(1)=Xoptimum1.XdesignVariable.Mdata(1,end);
+Vdv1(2)=Xoptimum2.XdesignVariable.Mdata(1,end);
+Vdv1(3)=Xoptimum3.XdesignVariable.Mdata(1,end);
+
+fprintf(Sformat,Vdv1,<span class="string">'Design Variable b'</span>)
+
+Vdv2(1)=Xoptimum1.XdesignVariable.Mdata(2,end);
+Vdv2(2)=Xoptimum2.XdesignVariable.Mdata(2,end);
+Vdv2(3)=Xoptimum3.XdesignVariable.Mdata(2,end);
+
+fprintf(Sformat,Vdv2,<span class="string">'Design Variable h'</span>)
+
+Vcon(1)=Xoptimum1.Xconstrains.Mdata(end);
+Vcon(2)=Xoptimum2.Xconstrains(1).Mdata(end);
+Vcon(3)=Xoptimum3.Xconstrains.Mdata(1,end);
+
+fprintf(Sformat,Vcon,<span class="string">'Constaint'</span>)
+</pre><h2>Validate Solutions<a name="13"></a></h2><pre class="codeinput">Vreference=[ 1.5627e-04   2.6385e-05   9.9860e-04];
+assert(max(Vreference-Voptimim)&lt;1e-4, <span class="string">'Tutorial:TutorialCantileverBeamOptimization'</span>,<span class="keyword">...</span>
+    <span class="string">'Solutions do not match reference values'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TutorialCantileverBeam: Optimization
+% The documentation and the problem description of this example is available on
+% the User Manual -> Tutorials -> Cantilever_Beam
+%
+%
+% See Also http://mechanik.uibk.ac.at/wiki/index.php/Cantilever_Beam
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+% Set verbosity level to 2
+CossanX.setVerbosityLevel(2);
+%% Preparation of the Input
+% The optimization analysis requires the definition of Design Variables (i.e.
+% the variables that define new configurations)  
+b=DesignVariable('value',0.12,'lowerBound',0.01,'upperBound',0.50,'Sdescription','Beam width');
+h=DesignVariable('value',0.54,'lowerBound',0.02,'upperBound',1,'Sdescription','Beam Heigth');
+
+% In this example we do not use random variables and we only use Parameters
+L=Parameter('value',1.8,'Sdescription','Beam Length');
+MaxW=Parameter('value',0.001,'Sdescription','Maximum allowed displacement');
+P=Parameter('value',10000,'Sdescription','Load');
+rho=Parameter('value',600,'Sdescription','density');
+E=Parameter('value',10e9,'Sdescription','Young''s modulus');
+% Definition of the Function
+I=Function('Sdescription','Moment of Inertia','Sexpression','<&b&>.*<&h&>.^3/12');
+
+%% Prepare Input Object
+% The above prepared objects can be added to an Input Object
+Xinput=Input('CXmembers',{L b P h rho E I MaxW},...
+    'CSmembers',{'L' 'b' 'P' 'h' 'rho' 'E' 'I' 'MaxW'});
+% Show summary of the Input Object
+display(Xinput)
+%% Preparation of the Evaluator
+% Use of a matlab script to compute the Beam displacement
+Sfolder=fileparts(mfilename('fullpath'));% returns the current folder
+Xmio=Mio('Spath',fullfile(Sfolder,'MatlabModel'),'Sfile','tipDisplacement.m',...
+    'Cinputnames',{'I' 'b' 'L' 'h' 'rho' 'P'}, ...
+    'Coutputnames',{'w'});
+% Add the MIO object to an Evaluator object
+Xevaluator=Evaluator('CXmembers',{Xmio},'CSmembers',{'Xmio'});
+
+%% Preparation of the Physical Model
+% Define the Physical Model
+Xmodel=Model('Xinput',Xinput,'Xevaluator',Xevaluator);
+
+%% Check feasibility of the optimization preoblem
+% The EesignOfExperiment analysis can be used to see if a feasible solution is
+% present in the bounds set for the Design Varaibles 
+% Define a user defined DOE object. 
+% We evaluate the model at the lower and upper bounds of the design variable
+% plus the current values. Therefore for each design variable we have 3 values
+% and a total of 9 model evaluations are required.
+% The evaluation points are defined by means of the MdeoFactor matrix defined
+% between -1 and 1. 
+MdoeFactors=[-1 -1; 
+             0 -1; 
+             1 -1; 
+            -1  0; 
+             0  0; 
+             1  0; 
+            -1  1; 
+             0  1;
+             1  1];
+% When the flag Lusecurrentvalues is set to true the current values of the design
+% variables is used in corresponcence of the MdoeFactors=0.
+         
+Xdoe=DesignOfExperiments('Sdesigntype','UserDefined',...
+    'Mdoefactors',MdoeFactors,'Lusecurrentvalues',true);
+
+% Show summary of the design of experimemts 
+display(Xdoe)
+
+% and now, evaluate the model at the points defined by the DesignOfExperiment 
+XoutDoe=Xdoe.apply(Xmodel);
+
+%% Show the quantify of interest
+Cnames={'h' 'b' 'w'};
+Mdoe=XoutDoe.getValues('Cnames',Cnames);
+
+% Show results
+
+fprintf('%10s | %10s | %10s | %10s\nREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-\n',Cnames{:}, 'Solution status')
+
+for n=1:size(Mdoe,1)
+    if Mdoe(n,3)<MaxW.value
+        fprintf('%10.3e | %10.3e | %10.3e | %10s\n',Mdoe(n,:),'Feasible Solution')
+    else
+        fprintf('%10.3e | %10.3e | %10.3e | %10s\n',Mdoe(n,:),'Uneasible Solution')
+
+    end
+end
+
+% There are 3 feasible solutions and this means the the opimization problem is
+% well define. Now we have to identify the oprimal solution.
+
+
+%% Define the Objective Funtion
+% The aim of this optimization is to minimaze the weight of the beam. The weight
+% can be easely computed using a matlab script.  
+Xobjfun   = ObjectiveFunction('Sdescription','objective function', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).BeamWeight=Tinput(n).rho*Tinput(n).b*Tinput(n).h*Tinput(n).L;end',...
+    'CoutputNames',{'BeamWeight'},...
+    'CinputNames',{'rho' 'b' 'h' 'L'});
+
+%% Create (inequality) constraint
+% The maximum displacement of the beam tip 
+XconMaxStress   = Constraint('Sdescription','constraint', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).Constraint=Tinput(n).w-Tinput(n).MaxW; end',...
+    'CoutputNames',{'Constraint'},...
+    'CinputNames',{'w' 'MaxW' },...
+    'Linequality',true);
+
+%% Create object OptimizationProblem
+Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+    'XobjectiveFunction',Xobjfun,'CXconstraint',{XconMaxStress},'Xmodel',Xmodel);
+
+% Define Optimizers
+Xsqp=SequentialQuadraticProgramming('finitedifferenceperturbation',0.01);
+Xcobyla=Cobyla;
+Xga=GeneticAlgorithms('Smutationfcn','mutationadaptfeasible','NmaxIterations',10, ...
+    'NPopulationSize',10);
+
+
+%% Perform optimization
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(542727)
+
+% We start with the Sequential Quadratic Programming method.
+Xoptimum1=Xop.optimize('Xoptimizer',Xsqp);
+% Show results of the optimization
+display(Xoptimum1)
+
+% Now we optimize the problem using Cobyla
+Xoptimum2=Xop.optimize('Xoptimizer',Xcobyla);
+% Show results of the optimization
+display(Xoptimum2)
+
+% Now we optimize the problem using Genetic Algorithms
+Xoptimum3=Xop.optimize('Xoptimizer',Xga);
+% Show results of the optimization
+display(Xoptimum3)
+
+
+%% Compare Optimizarion results
+Cnames={'SQP','COBYLA','GA'};
+Sformat='%10.3e | %10.3e | %10.3e |  %10s\n';
+% Show results
+
+fprintf('%10s | %10s | %10s | %10s\nREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-\n',Cnames{:}, 'Property')
+
+Voptimim(1)=Xoptimum1.XobjectiveFunction.Mdata(end);
+Voptimim(2)=Xoptimum2.XobjectiveFunction.Mdata(end);
+Voptimim(3)=Xoptimum3.XobjectiveFunction.Mdata(end);
+
+fprintf(Sformat,Voptimim,'Objective Function')
+
+Vev(1)=Xoptimum1.NevaluationsObjectiveFunction;
+Vev(2)=Xoptimum2.NevaluationsObjectiveFunction;
+Vev(3)=Xoptimum3.NevaluationsObjectiveFunction;
+
+fprintf(Sformat,Vev,'Number evaluations')
+
+Vdv1(1)=Xoptimum1.XdesignVariable.Mdata(1,end);
+Vdv1(2)=Xoptimum2.XdesignVariable.Mdata(1,end);
+Vdv1(3)=Xoptimum3.XdesignVariable.Mdata(1,end);
+
+fprintf(Sformat,Vdv1,'Design Variable b')
+
+Vdv2(1)=Xoptimum1.XdesignVariable.Mdata(2,end);
+Vdv2(2)=Xoptimum2.XdesignVariable.Mdata(2,end);
+Vdv2(3)=Xoptimum3.XdesignVariable.Mdata(2,end);
+
+fprintf(Sformat,Vdv2,'Design Variable h')
+
+Vcon(1)=Xoptimum1.Xconstrains.Mdata(end);
+Vcon(2)=Xoptimum2.Xconstrains(1).Mdata(end);
+Vcon(3)=Xoptimum3.Xconstrains.Mdata(1,end);
+
+fprintf(Sformat,Vcon,'Constaint')
+
+%% Validate Solutions
+Vreference=[ 1.5627e-04   2.6385e-05   9.9860e-04];
+assert(max(Vreference-Voptimim)<1e-4, 'Tutorial:TutorialCantileverBeamOptimization',...
+    'Solutions do not match reference values')
+
+##### SOURCE END #####
+--></body></html>

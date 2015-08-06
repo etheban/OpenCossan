@@ -1,0 +1,286 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialUserDefRandomVariable</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialUserDefRandomVariable.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">TUTORIALUSERDEFRANDOMVARIABLE</a></li><li><a href="#2">providing realizations of the distribution</a></li><li><a href="#3">providing points at which the cdf value is known</a></li><li><a href="#4">providing points at which the pdf value is known</a></li><li><a href="#5">cdfas an input</a></li><li><a href="#6">evalpdf</a></li><li><a href="#7">different mappings</a></li><li><a href="#8">sample</a></li><li><a href="#9">adding UserDefRandomVariable to RVset</a></li><li><a href="#10">reference solution</a></li><li><a href="#11">Close figures</a></li></ul></div><h2>TUTORIALUSERDEFRANDOMVARIABLE<a name="1"></a></h2><pre> This tutorial shows how to create a UserDefRandomVariable object</pre><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@UserDefRandomVariable">http://mechanik.uibk.ac.at/wiki/index.php/@UserDefRandomVariable</a></p><p><img src="TutorialUserDefRandomVariable_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialUserDefRandomVariable_eq30863.png" alt="$Author:~Pierre~Beaurepaire$"></p><pre class="codeinput"><span class="comment">%set random stream</span>
+CossanX.resetRandomNumberGenerator(31415)
+</pre><h2>providing realizations of the distribution<a name="2"></a></h2><pre class="codeinput">f1=figure;
+nsamples=10000;
+x = -2.9:0.1:2.9;
+y = randn(nsamples,1);
+n_elements = histc(y,x);
+c_elements = cumsum(n_elements)/nsamples;
+bar(gca(f1),x,c_elements,<span class="string">'BarWidth'</span>,1);
+hold(gca(f1));
+Xrv1=UserDefRandomVariable(<span class="string">'Vdata'</span>,y);
+<span class="comment">% Plot CDF</span>
+plot(gca(f1),Xrv1.Vsupport,Xrv1.Vcdf,<span class="string">'r'</span>)
+
+<span class="comment">% Plot PDF</span>
+f2=figure;
+plot(gca(f2),Xrv1.Vsupport,Xrv1.Vpdf,<span class="string">'r'</span>)
+</pre><pre class="codeoutput">Current plot held
+</pre><img vspace="5" hspace="5" src="TutorialUserDefRandomVariable_01.png" alt=""> <img vspace="5" hspace="5" src="TutorialUserDefRandomVariable_02.png" alt=""> <h2>providing points at which the cdf value is known<a name="3"></a></h2><pre class="codeinput">x=-5:.001:5;
+Xrv2=UserDefRandomVariable(<span class="string">'Vcdf'</span>,normcdf(x),<span class="string">'Vdata'</span>,x);
+plot(gca(f2),Xrv2.Vsupport,Xrv2.Vpdf,<span class="string">'r'</span>)
+</pre><pre class="codeoutput">Warning: Omitting lower tail because of insufficient or constant data. 
+Warning: Omitting upper tail because of insufficient or constant data. 
+</pre><img vspace="5" hspace="5" src="TutorialUserDefRandomVariable_03.png" alt=""> <h2>providing points at which the pdf value is known<a name="4"></a></h2><pre class="codeinput">x=-5:.001:5;
+Xrv3=UserDefRandomVariable(<span class="string">'Vpdf'</span>,normpdf(x),<span class="string">'Vdata'</span>,x);
+plot(gca(f2),Xrv3.Vsupport,Xrv3.Vpdf,<span class="string">'r'</span>)
+</pre><img vspace="5" hspace="5" src="TutorialUserDefRandomVariable_04.png" alt=""> <h2>cdfas an input<a name="5"></a></h2><pre class="codeinput">Xfun = Function(<span class="string">'Sexpression'</span>,<span class="string">'normcdf(&lt;&amp;xsb&amp;&gt;)'</span>);
+x=-5:.001:5;
+
+Xrv4=UserDefRandomVariable(<span class="string">'Xcdf'</span>,Xfun',<span class="string">'Vdata'</span>,x,<span class="string">'Vtails'</span>,[1e-3, 1-1e-3]);
+</pre><pre class="codeoutput">Error using ==&gt; paretotails.paretotails&gt;init at 177
+Error calling CDFFUN function '@(x)buildcdf1(x,Xobj.Xfunction)'.
+
+Error in ==&gt; paretotails.paretotails&gt;paretotails.paretotails at 77
+        [lo,up,X,F,pLower,pUpper,qLower,qUpper] = init(x,pLower,pUpper,cdfFunc);
+
+Error in ==&gt; UserDefRandomVariable.cdfun at 13
+    Xobj.empirical_distribution =  paretotails(Xobj.Vdata,min([Xobj.Vtails]),max([Xobj.Vtails]),@(x)buildcdf1(x,Xobj.Xfunction));warning on
+
+Error in ==&gt; UserDefRandomVariable.UserDefRandomVariable&gt;UserDefRandomVariable.UserDefRandomVariable at 138
+                    Xobj=cdfun(Xobj);
+
+Error in ==&gt; TutorialUserDefRandomVariable at 47
+Xrv4=UserDefRandomVariable('Xcdf',Xfun','Vdata',x,'Vtails',[1e-3, 1-1e-3]);
+
+Caused by:
+    Error using ==&gt; Function.evaluate at 121
+    The function returns an output of 10001 elements while the input contains only 1 values</pre><h2>evalpdf<a name="6"></a></h2><p>evaluates the pdf of the random variable at input points matrix of values</p><pre class="codeinput">Vpdf01 = evalpdf(Xrv1,randn(3,3));
+
+<span class="comment">% array of values</span>
+Vpdf02 = evalpdf(Xrv1,0:.2:4);
+</pre><h2>different mappings<a name="7"></a></h2><pre class="codeinput">Vout1 = physical2cdf(Xrv4, [0 .1;.3 .2]); <span class="comment">%physical space to the cdf space</span>
+
+Vout2 = RandomVariable.cdf2stdnorm(0:.1:1);<span class="comment">%cdf space to the stdnorm space</span>
+
+Vout3 = cdf2physical(Xrv1, [0 0.1 0.5]);<span class="comment">%cdf space to the physica space</span>
+
+Vout4 = RandomVariable.stdnorm2cdf(-3:3);<span class="comment">%stdnorm space to the cdf space</span>
+
+Vout5 = map2stdnorm(Xrv1,[0.1 1 2]);<span class="comment">%physical space to the stdnorm space</span>
+</pre><h2>sample<a name="8"></a></h2><p>generate one sample from the random variable</p><pre class="codeinput">s=sample(Xrv1);
+
+<span class="comment">% extract 5 samples from Xrv1</span>
+Vs1=sample(Xrv1,<span class="string">'Nsamples'</span>, 5);
+
+<span class="comment">% extract 100 samples from Xrv1, in a 10x10 matrix</span>
+Vs2=sample(Xrv1,<span class="string">'Vsamples'</span>, [2 3]);
+</pre><h2>adding UserDefRandomVariable to RVset<a name="9"></a></h2><pre class="codeinput">XrvRef = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,0,<span class="string">'std'</span>,1); <span class="comment">%Gaussian random variable, to have mixed RVs in a RVset</span>
+
+Xrs = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xrv1'</span>,<span class="string">'Xrv2'</span>,<span class="string">'Xrv3'</span>,<span class="string">'XrvRef'</span>});
+</pre><h2>reference solution<a name="10"></a></h2><p>chi-square test to see if samples are indeed accoring to the target distribution</p><pre class="codeinput">x = sample(Xrv1,<span class="string">'Nsamples'</span>, 500);
+h = chi2gof(x);
+<span class="keyword">if</span> h==0
+    CossanX.cossanDisp(<span class="string">'The 1st random variable past the chi-2 test'</span>)
+<span class="keyword">end</span>
+
+x = sample(Xrv2,<span class="string">'Nsamples'</span>, 500);
+h = chi2gof(x);
+<span class="keyword">if</span> h==0
+    CossanX.cossanDisp(<span class="string">'The 2nd random variable past the chi-2 test'</span>)
+<span class="keyword">end</span>
+
+x = sample(Xrv3,<span class="string">'Nsamples'</span>, 500);
+h = chi2gof(x);
+<span class="keyword">if</span> h==0
+    CossanX.cossanDisp(<span class="string">'The 3rd random variable past the chi-2 test'</span>)
+<span class="keyword">end</span>
+
+x = sample(Xrv4,<span class="string">'Nsamples'</span>, 500);
+h = chi2gof(x);
+<span class="keyword">if</span> h==0
+    CossanX.cossanDisp(<span class="string">'The 4th random variable past the chi-2 test'</span>)
+<span class="keyword">end</span>
+</pre><h2>Close figures<a name="11"></a></h2><pre class="codeinput">close(f1)
+close(f2)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALUSERDEFRANDOMVARIABLE
+%
+%   This tutorial shows how to create a UserDefRandomVariable object
+%
+% See Also: 
+% http://mechanik.uibk.ac.at/wiki/index.php/@UserDefRandomVariable
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Pierre~Beaurepaire$ 
+
+%set random stream
+CossanX.resetRandomNumberGenerator(31415)
+
+%% providing realizations of the distribution
+f1=figure;
+nsamples=10000;
+x = -2.9:0.1:2.9;
+y = randn(nsamples,1);
+n_elements = histc(y,x);
+c_elements = cumsum(n_elements)/nsamples;
+bar(gca(f1),x,c_elements,'BarWidth',1);
+hold(gca(f1));
+Xrv1=UserDefRandomVariable('Vdata',y);
+% Plot CDF
+plot(gca(f1),Xrv1.Vsupport,Xrv1.Vcdf,'r')
+
+% Plot PDF
+f2=figure;
+plot(gca(f2),Xrv1.Vsupport,Xrv1.Vpdf,'r')
+
+%% providing points at which the cdf value is known
+
+x=-5:.001:5;
+Xrv2=UserDefRandomVariable('Vcdf',normcdf(x),'Vdata',x);
+plot(gca(f2),Xrv2.Vsupport,Xrv2.Vpdf,'r')
+
+ %% providing points at which the pdf value is known
+x=-5:.001:5;
+Xrv3=UserDefRandomVariable('Vpdf',normpdf(x),'Vdata',x);
+plot(gca(f2),Xrv3.Vsupport,Xrv3.Vpdf,'r')
+
+
+%% cdfas an input
+Xfun = Function('Sexpression','normcdf(<&xsb&>)');
+x=-5:.001:5;
+
+Xrv4=UserDefRandomVariable('Xcdf',Xfun','Vdata',x,'Vtails',[1e-3, 1-1e-3]);
+
+
+
+%% evalpdf
+% evaluates the pdf of the random variable at input points
+% matrix of values
+Vpdf01 = evalpdf(Xrv1,randn(3,3));
+
+% array of values
+Vpdf02 = evalpdf(Xrv1,0:.2:4);
+
+
+%% different mappings
+
+
+Vout1 = physical2cdf(Xrv4, [0 .1;.3 .2]); %physical space to the cdf space
+
+Vout2 = RandomVariable.cdf2stdnorm(0:.1:1);%cdf space to the stdnorm space
+
+Vout3 = cdf2physical(Xrv1, [0 0.1 0.5]);%cdf space to the physica space
+
+Vout4 = RandomVariable.stdnorm2cdf(-3:3);%stdnorm space to the cdf space
+
+Vout5 = map2stdnorm(Xrv1,[0.1 1 2]);%physical space to the stdnorm space
+
+
+
+%% sample
+% generate one sample from the random variable
+s=sample(Xrv1);
+
+% extract 5 samples from Xrv1
+Vs1=sample(Xrv1,'Nsamples', 5);
+
+% extract 100 samples from Xrv1, in a 10x10 matrix
+Vs2=sample(Xrv1,'Vsamples', [2 3]);
+
+
+
+%% adding UserDefRandomVariable to RVset
+XrvRef = RandomVariable('Sdistribution','normal','mean',0,'std',1); %Gaussian random variable, to have mixed RVs in a RVset
+
+Xrs = RandomVariableSet('Cmembers',{'Xrv1','Xrv2','Xrv3','XrvRef'});
+
+%% reference solution
+% chi-square test to see if samples are indeed accoring to the target
+% distribution
+x = sample(Xrv1,'Nsamples', 500);
+h = chi2gof(x);
+if h==0
+    CossanX.cossanDisp('The 1st random variable past the chi-2 test')
+end
+
+x = sample(Xrv2,'Nsamples', 500);
+h = chi2gof(x);
+if h==0
+    CossanX.cossanDisp('The 2nd random variable past the chi-2 test')
+end
+
+x = sample(Xrv3,'Nsamples', 500);
+h = chi2gof(x);
+if h==0
+    CossanX.cossanDisp('The 3rd random variable past the chi-2 test')
+end
+
+x = sample(Xrv4,'Nsamples', 500);
+h = chi2gof(x);
+if h==0
+    CossanX.cossanDisp('The 4th random variable past the chi-2 test')
+end
+
+%% Close figures
+close(f1)
+close(f2)
+
+##### SOURCE END #####
+--></body></html>

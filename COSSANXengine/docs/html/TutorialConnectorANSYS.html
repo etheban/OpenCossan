@@ -1,0 +1,220 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialConnectorANSYS</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialConnectorANSYS.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Tutorial of the connector with ANSYS</a></li><li><a href="#2">Definition of Inputs</a></li><li><a href="#3">Create the Injector</a></li><li><a href="#4">Define extractor object</a></li><li><a href="#5">Define the connector</a></li><li><a href="#6">Construct the Model</a></li><li><a href="#7">Monte Carlo simulation</a></li><li><a href="#8">Perform Analysis</a></li><li><a href="#9">Close Figures</a></li></ul></div><h2>Tutorial of the connector with ANSYS<a name="1"></a></h2><p>FE CODE: ANSYS TODO: Include a short description of this tutorial</p><pre>Copyright 1993-2011, COSSAN Working Group
+University of Innsbruck, Austria</pre><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Connector">http://mechanik.uibk.ac.at/wiki/index.php/@Connector</a></p><pre class="codeinput"><span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(51125)
+</pre><h2>Definition of Inputs<a name="2"></a></h2><p>Definition of the  Random Variables</p><pre class="codeinput">x1_diam1  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,25,<span class="string">'std'</span>,5);      <span class="comment">%outer diameter - 1</span>
+x2_diam2  = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,12.5,<span class="string">'std'</span>,2.5);       <span class="comment">%outer diameter - 2</span>
+
+<span class="comment">% Definition of Set of RandomVariable's</span>
+Cmems       = {<span class="string">'x1_diam1'</span>; <span class="string">'x2_diam2'</span>};
+Xrvs        = RandomVariableSet(<span class="string">'Cmembers'</span>,Cmems,<span class="string">'CXmembers'</span>,{x1_diam1 x2_diam2});
+
+<span class="comment">% Definition of the Input</span>
+Xin=Input;
+Xin=add(Xin,Xrvs);
+</pre><h2>Create the Injector<a name="3"></a></h2><pre class="codeinput">SfilePath=fullfile(CossanX.getCossanRoot, <span class="keyword">...</span>
+    <span class="string">'examples'</span>,<span class="string">'Tutorials'</span>,<span class="string">'Connector'</span>,<span class="string">'ANSYS'</span>);
+
+Xi=Injector(<span class="string">'Stype'</span>,<span class="string">'scan'</span>,<span class="string">'Sscanfilepath'</span>,SfilePath,<span class="keyword">...</span>
+    <span class="string">'Sscanfilename'</span>,<span class="string">'bike1.cossan'</span>,<span class="string">'Sfile'</span>,<span class="string">'bike1.txt'</span>);
+</pre><pre class="codeoutput">Error using ==&gt; Injector.Injector&gt;Injector.Injector at 159
+The file to be scanned /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Tutorials/Connector/ANSYS/bike1.cossan does not exist: 
+
+Error in ==&gt; TutorialConnectorANSYS at 34
+Xi=Injector('Stype','scan','Sscanfilepath',SfilePath,...
+</pre><h2>Define extractor object<a name="4"></a></h2><pre class="codeinput">Xresp = Response(    <span class="string">'Sname'</span>, <span class="string">'Load'</span>, <span class="keyword">...</span>
+    <span class="string">'Sfieldformat'</span>, <span class="string">'%8f%*'</span>, <span class="keyword">...</span>
+    <span class="string">'Clookoutfor'</span>,{<span class="string">'THE FOLLOWING DEGREE OF FREEDOM RESULTS ARE IN THE GLOBAL COORDINATE SYSTEM'</span>,<span class="string">'THE FOLLOWING DEGREE OF FREEDOM RESULTS ARE IN THE GLOBAL COORDINATE SYSTEM'</span>;}, <span class="keyword">...</span>
+    <span class="string">'Svarname'</span>,<span class="string">''</span>, <span class="keyword">...</span>
+    <span class="string">'Ncolnum'</span>,10, <span class="keyword">...</span>
+    <span class="string">'Nrownum'</span>,4);
+
+Xe=Extractor(<span class="string">'Sdescription'</span>,<span class="string">'Extractor for BLABLABLA'</span>, <span class="keyword">...</span>
+    <span class="string">'Srelativepath'</span>,SfilePath, <span class="keyword">...</span><span class="comment"> % this is the directory where the input and output are contained</span>
+    <span class="string">'Sfile'</span>,<span class="string">'bike1.out'</span>, <span class="keyword">...</span>
+    <span class="string">'Xresponse'</span>,Xresp);
+</pre><h2>Define the connector<a name="5"></a></h2><p>Create connector for ansys</p><pre class="codeinput">Xc=Connector(<span class="string">'SpredefinedType'</span>,<span class="string">'ansys'</span>,<span class="string">'Sworkingdirectory'</span>,<span class="string">'/tmp'</span>,<span class="keyword">...</span>
+    <span class="string">'Smaininputfile'</span>,<span class="string">'bike1.txt'</span>,<span class="keyword">...</span>
+    <span class="string">'Smaininputpath'</span>,SfilePath,<span class="keyword">...</span>
+    <span class="string">'Soutputfile'</span>,<span class="string">'bike1.out'</span>);
+
+<span class="comment">% Add injector</span>
+Xc=add(Xc,Xi);
+
+<span class="comment">% Add extractor to the connector</span>
+Xc=add(Xc,Xe);
+</pre><h2>Construct the Model<a name="6"></a></h2><p>Define the evaluator</p><pre class="codeinput">Xev=Evaluator(<span class="string">'Xconnector'</span>,Xc);
+<span class="comment">% Define the model</span>
+Xm  = Model(<span class="string">'Xinput'</span>,Xin,<span class="string">'Xevaluator'</span>,Xev,<span class="string">'Sdesc'</span>,<span class="string">'Testing ANSYS'</span>);
+</pre><h2>Monte Carlo simulation<a name="7"></a></h2><p>Estimation with MCS</p><pre class="codeinput">Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,5,<span class="string">'Nbatches'</span>,1);
+</pre><h2>Perform Analysis<a name="8"></a></h2><pre class="codeinput">Xout1 = Xmc.apply(Xm);
+Vout1=Xout1.getValues(<span class="string">'Sname'</span>,<span class="string">'Load'</span>);
+<span class="comment">% Plot Results</span>
+f1=figure;
+fah=gca(f1);
+plot(fah,Vout1,<span class="string">'*'</span>);
+</pre><h2>Close Figures<a name="9"></a></h2><pre class="codeinput">close(f1)
+
+<span class="comment">% Validate Solution</span>
+<span class="comment">% TODO: Add reference solution</span>
+Vreference=[]';
+assert(max(abs(Vout1-Vreference))&lt;1e-6,<span class="keyword">...</span>
+    <span class="string">'CossanX:Tutorials:CantileverBeam'</span>,<span class="string">'Reference Solution does not match.'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial of the connector with ANSYS
+%
+% FE CODE: ANSYS
+% TODO: Include a short description of this tutorial
+%
+%  Copyright 1993-2011, COSSAN Working Group
+%  University of Innsbruck, Austria
+%
+% See Also: 
+% http://mechanik.uibk.ac.at/wiki/index.php/@Connector
+
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(51125)
+
+%% Definition of Inputs 
+% Definition of the  Random Variables
+x1_diam1  = RandomVariable('Sdistribution','normal','mean',25,'std',5);      %outer diameter - 1
+x2_diam2  = RandomVariable('Sdistribution','normal','mean',12.5,'std',2.5);       %outer diameter - 2
+
+% Definition of Set of RandomVariable's
+Cmems       = {'x1_diam1'; 'x2_diam2'};
+Xrvs        = RandomVariableSet('Cmembers',Cmems,'CXmembers',{x1_diam1 x2_diam2});
+
+% Definition of the Input
+Xin=Input;
+Xin=add(Xin,Xrvs);
+
+%% Create the Injector
+SfilePath=fullfile(CossanX.getCossanRoot, ...
+    'examples','Tutorials','Connector','ANSYS');
+
+Xi=Injector('Stype','scan','Sscanfilepath',SfilePath,...
+    'Sscanfilename','bike1.cossan','Sfile','bike1.txt');
+
+%% Define extractor object
+Xresp = Response(    'Sname', 'Load', ...
+    'Sfieldformat', '%8f%*', ...
+    'Clookoutfor',{'THE FOLLOWING DEGREE OF FREEDOM RESULTS ARE IN THE GLOBAL COORDINATE SYSTEM','THE FOLLOWING DEGREE OF FREEDOM RESULTS ARE IN THE GLOBAL COORDINATE SYSTEM';}, ...
+    'Svarname','', ...
+    'Ncolnum',10, ...
+    'Nrownum',4);
+
+Xe=Extractor('Sdescription','Extractor for BLABLABLA', ...
+    'Srelativepath',SfilePath, ... % this is the directory where the input and output are contained
+    'Sfile','bike1.out', ...
+    'Xresponse',Xresp);
+
+%% Define the connector
+% Create connector for ansys
+Xc=Connector('SpredefinedType','ansys','Sworkingdirectory','/tmp',...
+    'Smaininputfile','bike1.txt',...
+    'Smaininputpath',SfilePath,...
+    'Soutputfile','bike1.out');
+
+% Add injector
+Xc=add(Xc,Xi);
+
+% Add extractor to the connector
+Xc=add(Xc,Xe);
+
+
+%% Construct the Model
+% Define the evaluator 
+Xev=Evaluator('Xconnector',Xc);
+% Define the model
+Xm  = Model('Xinput',Xin,'Xevaluator',Xev,'Sdesc','Testing ANSYS');
+
+%% Monte Carlo simulation
+% Estimation with MCS
+Xmc=MonteCarlo('Nsamples',5,'Nbatches',1);
+
+%% Perform Analysis
+Xout1 = Xmc.apply(Xm);
+Vout1=Xout1.getValues('Sname','Load');
+% Plot Results
+f1=figure;
+fah=gca(f1);
+plot(fah,Vout1,'*');
+%% Close Figures
+close(f1)
+
+% Validate Solution
+% TODO: Add reference solution
+Vreference=[]';
+assert(max(abs(Vout1-Vreference))<1e-6,...
+    'CossanX:Tutorials:CantileverBeam','Reference Solution does not match.')
+
+##### SOURCE END #####
+--></body></html>

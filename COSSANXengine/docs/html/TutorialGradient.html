@@ -1,0 +1,234 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for the Gradient object</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialGradient.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for the Gradient object</h1><!--introduction--><p>This tutorial is based on the Model tutorial for the definition of the inputs, the mio object and the physical model.</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Gradient">http://mechanik.uibk.ac.at/wiki/index.php/@Gradient</a></p><p><img src="TutorialGradient_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialGradient_eq56854.png" alt="$Author: Edoardo-Patelli$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Define a Model</a></li><li><a href="#2">Construct the Model</a></li><li><a href="#3">Compute the Gradient of the model</a></li></ul></div><h2>Define a Model<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Construct a Mio object</span>
+Xm=Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+                <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).out1=2+Tinput(j).RV1^2+5*Tinput(j).RV2^2+0.01*Tinput(j).RV4^2; end'</span>, <span class="keyword">...</span>
+                <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+				<span class="string">'Lfunction'</span>,false, <span class="keyword">...</span>
+                <span class="string">'Cinputnames'</span>,{<span class="string">'RV1'</span> <span class="string">'RV2'</span> <span class="string">'RV3'</span> <span class="string">'RV4'</span>}, <span class="string">'Coutputnames'</span>,{<span class="string">'out1'</span>}); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+
+<span class="comment">% Construct the Evaluator</span>
+Xeval1 = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'fist Evaluator'</span>);
+
+<span class="comment">% Define an Input</span>
+<span class="comment">% Define RVs</span>
+RV1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,1,<span class="string">'std'</span>,1);  <span class="comment">%#ok&lt;SNASGU&gt;</span>
+RV2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,1,<span class="string">'std'</span>,1);  <span class="comment">%#ok&lt;SNASGU&gt;</span>
+RV3=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,1,<span class="string">'std'</span>,1);  <span class="comment">%#ok&lt;SNASGU&gt;</span>
+RV4=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,1,<span class="string">'std'</span>,1);  <span class="comment">%#ok&lt;SNASGU&gt;</span>
+<span class="comment">% Define the RVset</span>
+Xrvs1=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>, <span class="string">'RV2'</span>, <span class="string">'RV3'</span>, <span class="string">'RV4'</span>});
+<span class="comment">% Define Xinput</span>
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'Gradient Tutorial Input'</span>);
+Xin = add(Xin,Xrvs1);
+</pre><h2>Construct the Model<a name="2"></a></h2><pre class="codeinput">Xmdl=Model(<span class="string">'Cmembers'</span>,{<span class="string">'Xin'</span>,<span class="string">'Xeval1'</span>});
+
+<span class="comment">% Show Model details</span>
+display(Xmdl)
+</pre><pre class="codeoutput"> Model Object  -  Description: 
+</pre><h2>Compute the Gradient of the model<a name="3"></a></h2><p>Around the origin in standard normal space</p><pre class="codeinput"><span class="comment">% In order compute the gradient the static method gradient of the</span>
+<span class="comment">% Sensitivity toolbox must be invoked</span>
+<span class="comment">%</span>
+Xg=Sensitivity.gradientMonteCarlo(<span class="string">'Xtarget'</span>,Xmdl);
+display(Xg)
+
+<span class="comment">% The Xtarget object must contain the quantity of interest</span>
+<span class="comment">% If Xtarget provides more then 1 output the optional parameter Coutputname</span>
+<span class="comment">% can be used to define the quantity of interest.</span>
+
+Xg=Sensitivity.gradientMonteCarlo(<span class="string">'Xtarget'</span>,Xmdl,<span class="string">'Coutputname'</span>,{<span class="string">'out1'</span>});
+
+<span class="comment">% If teh simulation at the reference point is available the gradient can be computed reusing</span>
+<span class="comment">% this sample.</span>
+<span class="comment">% An Samples object containing the samples and the corresponding value of</span>
+<span class="comment">% the quantity of interest have to be passed as optional arguments.</span>
+
+Xg=Sensitivity.gradientFiniteDifferences(<span class="string">'Xtarget'</span>,Xmdl,<span class="string">'perturbation'</span>,1e-8);
+display(Xg)
+
+<span class="comment">% Use reference point defined in the Samples Object</span>
+Xin=Xin.sample(<span class="string">'Nsamples'</span>,1);
+Xs=Xin.Xsamples;
+Xout=Xmdl.apply(Xs);
+
+Xg=Sensitivity.gradientFiniteDifferences(<span class="string">'Xtarget'</span>,Xmdl,<span class="string">'Xsamples'</span>,Xs,<span class="string">'FunctionValue'</span>,Xout.Tvalues.out1);
+<span class="comment">% The gradient output contains</span>
+display(Xg)
+
+Xg=Sensitivity.gradientMonteCarlo(<span class="string">'Xtarget'</span>,Xmdl,<span class="string">'Xsamples'</span>,Xs);
+<span class="comment">% The gradient output contains</span>
+display(Xg)
+
+Xg2=Sensitivity.gradientFiniteDifferences(<span class="string">'Xtarget'</span>,Xmdl);
+display(Xg2)
+
+<span class="comment">% Add components to the same figure</span>
+h1=Xg2.plotComponents(<span class="string">'Stitle'</span>,<span class="string">'my title'</span>,<span class="string">'Scolor'</span>,<span class="string">'m'</span>,<span class="string">'Nmaxcomponents'</span>,3);
+
+<span class="comment">% Close figure</span>
+close(h1)
+</pre><pre class="codeoutput"> Gradient Object  -  Name: Xg
+* Function Name: out1
+ Gradient Object  -  Name: Xg
+* Function Name: out1
+ Gradient Object  -  Name: Xg
+* Function Name: out1
+ Gradient Object  -  Name: Xg
+* Function Name: out1
+ Gradient Object  -  Name: Xg2
+* Function Name: out1
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the Gradient object 
+% 
+%
+% This tutorial is based on the Model tutorial for the definition of the 
+% inputs, the mio object and the physical model.
+% 
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@Gradient
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli$ 
+
+%% Define a Model 
+
+% Construct a Mio object
+Xm=Mio('Sdescription', 'Performance function', ...
+                'Sscript','for j=1:length(Tinput), Toutput(j).out1=2+Tinput(j).RV1^2+5*Tinput(j).RV2^2+0.01*Tinput(j).RV4^2; end', ...
+                'Liostructure',true,...
+				'Lfunction',false, ...
+                'Cinputnames',{'RV1' 'RV2' 'RV3' 'RV4'}, 'Coutputnames',{'out1'}); % This flag specify if the .m file is a script or a function. 
+
+% Construct the Evaluator
+Xeval1 = Evaluator('Xmio',Xm,'Sdescription','fist Evaluator');
+
+% Define an Input
+% Define RVs
+RV1=RandomVariable('Sdistribution','normal', 'mean',1,'std',1);  %#ok<SNASGU>
+RV2=RandomVariable('Sdistribution','normal', 'mean',1,'std',1);  %#ok<SNASGU>
+RV3=RandomVariable('Sdistribution','normal', 'mean',1,'std',1);  %#ok<SNASGU>
+RV4=RandomVariable('Sdistribution','normal', 'mean',1,'std',1);  %#ok<SNASGU>
+% Define the RVset
+Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2', 'RV3', 'RV4'}); 
+% Define Xinput
+Xin = Input('Sdescription','Gradient Tutorial Input');
+Xin = add(Xin,Xrvs1);
+
+%%  Construct the Model
+Xmdl=Model('Cmembers',{'Xin','Xeval1'});
+
+% Show Model details
+display(Xmdl)
+
+%% Compute the Gradient of the model 
+% Around the origin in standard normal space
+
+% In order compute the gradient the static method gradient of the
+% Sensitivity toolbox must be invoked
+% 
+Xg=Sensitivity.gradientMonteCarlo('Xtarget',Xmdl);
+display(Xg)
+
+% The Xtarget object must contain the quantity of interest
+% If Xtarget provides more then 1 output the optional parameter Coutputname 
+% can be used to define the quantity of interest.
+
+Xg=Sensitivity.gradientMonteCarlo('Xtarget',Xmdl,'Coutputname',{'out1'});
+
+% If teh simulation at the reference point is available the gradient can be computed reusing
+% this sample.
+% An Samples object containing the samples and the corresponding value of
+% the quantity of interest have to be passed as optional arguments.
+
+Xg=Sensitivity.gradientFiniteDifferences('Xtarget',Xmdl,'perturbation',1e-8);
+display(Xg)
+
+% Use reference point defined in the Samples Object
+Xin=Xin.sample('Nsamples',1);
+Xs=Xin.Xsamples;
+Xout=Xmdl.apply(Xs);
+
+Xg=Sensitivity.gradientFiniteDifferences('Xtarget',Xmdl,'Xsamples',Xs,'FunctionValue',Xout.Tvalues.out1);
+% The gradient output contains 
+display(Xg)
+
+Xg=Sensitivity.gradientMonteCarlo('Xtarget',Xmdl,'Xsamples',Xs);
+% The gradient output contains 
+display(Xg)
+
+Xg2=Sensitivity.gradientFiniteDifferences('Xtarget',Xmdl);
+display(Xg2)
+
+% Add components to the same figure
+h1=Xg2.plotComponents('Stitle','my title','Scolor','m','Nmaxcomponents',3);
+
+% Close figure
+close(h1)
+
+
+
+##### SOURCE END #####
+--></body></html>

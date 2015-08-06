@@ -1,0 +1,154 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for the PunchExtractor class</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialPunchExtractor.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for the PunchExtractor class</h1><!--introduction--><p>PunchExtractor tutorial Please refer to the specific tutorials for the other objects available in [COSSANEngine/examples/Tutorials]</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@PunchExtractor">http://mechanik.uibk.ac.at/wiki/index.php/@PunchExtractor</a></p><pre>Copyright 1993-2011, COSSAN Working Group
+University of Innsbruck, Austria</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Using PunchExtractor</a></li></ul></div><h2>Using PunchExtractor<a name="1"></a></h2><p>PunchExtractor is a class specifically programmed in order to read DOF info from NASTRAN (in NASTRAN the dof info can be output in this format) NOTE: punch files have the .pch extension</p><pre class="codeinput">Sdirectory = fullfile(CossanX.getCossanRoot,<span class="string">'examples'</span>,<span class="string">'Unit_test'</span>,<span class="string">'Connectors'</span>,<span class="string">'PunchExtractor'</span>);
+
+Xpch = PunchExtractor(<span class="string">'Sdescription'</span>, <span class="string">'PunchExtractor Tutorial'</span>,<span class="keyword">...</span>
+                      <span class="string">'Sfile'</span>,<span class="string">'BEAM1_DOFS.PCH'</span>,<span class="string">'Sworkingdirectory'</span>,Sdirectory,<span class="keyword">...</span><span class="comment">.</span>
+                      <span class="string">'Soutputname'</span>,<span class="string">'dofs'</span>);
+
+Tout = extract(Xpch);
+
+<span class="comment">% observe that the DOF info is stored in a matrix with two columns:</span>
+<span class="comment">% first column   = Node ID</span>
+<span class="comment">% second columns = DOF no</span>
+display(Tout);
+display(Tout.dofs(1:12,:));
+
+<span class="comment">% validate the results</span>
+Vreference=[2 1;2 2;2 3;2 5;2 6];
+assert(max(abs(double(Tout.dofs(2,:))-double(Vreference(2,:))))&lt;1e-6,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialPunchExtractor'</span>,<span class="string">'Reference Solution does not match.'</span>)
+
+assert(max(abs(double(Tout.dofs(4,:))-double(Vreference(4,:))))&lt;1e-6,<span class="keyword">...</span>
+   <span class="string">'CossanX:Tutorials:TutorialPunchExtractor'</span>,<span class="string">'Reference Solution does not match.'</span>)
+</pre><pre class="codeoutput">[SFEM.PunchExtractor] /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Unit_test/Connectors/PunchExtractor/BEAM1_DOFS.PCH opened successfully
+[SFEM.PunchExtractor] Completed reading 45 DOFs from /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Unit_test/Connectors/PunchExtractor/BEAM1_DOFS.PCH
+
+Tout = 
+
+    dofs: [45x2 int32]
+
+
+ans =
+
+           2           1
+           2           2
+           2           3
+           2           5
+           2           6
+           3           1
+           3           2
+           3           3
+           3           5
+           3           6
+           4           1
+           4           2
+
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the PunchExtractor class
+%
+% PunchExtractor tutorial
+% Please refer to the specific tutorials for the other objects available in
+% [COSSANEngine/examples/Tutorials]
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@PunchExtractor
+%
+%
+%  Copyright 1993-2011, COSSAN Working Group
+%  University of Innsbruck, Austria
+
+%% Using PunchExtractor
+%
+% PunchExtractor is a class specifically programmed in order to read
+% DOF info from NASTRAN (in NASTRAN the dof info can be output in this format)
+% NOTE: punch files have the .pch extension 
+
+Sdirectory = fullfile(CossanX.getCossanRoot,'examples','Unit_test','Connectors','PunchExtractor');
+
+Xpch = PunchExtractor('Sdescription', 'PunchExtractor Tutorial',...
+                      'Sfile','BEAM1_DOFS.PCH','Sworkingdirectory',Sdirectory,....
+                      'Soutputname','dofs');
+
+Tout = extract(Xpch);
+
+% observe that the DOF info is stored in a matrix with two columns:
+% first column   = Node ID
+% second columns = DOF no
+display(Tout);
+display(Tout.dofs(1:12,:));
+
+% validate the results
+Vreference=[2 1;2 2;2 3;2 5;2 6];
+assert(max(abs(double(Tout.dofs(2,:))-double(Vreference(2,:))))<1e-6,...
+   'CossanX:Tutorials:TutorialPunchExtractor','Reference Solution does not match.')
+
+assert(max(abs(double(Tout.dofs(4,:))-double(Vreference(4,:))))<1e-6,...
+   'CossanX:Tutorials:TutorialPunchExtractor','Reference Solution does not match.')
+
+##### SOURCE END #####
+--></body></html>

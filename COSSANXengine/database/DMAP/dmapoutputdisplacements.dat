@@ -1,0 +1,14 @@
+
+$***************************************************************************
+$ This DMAP routine will output the Displacement vector
+$ 
+$ Format   = op4
+$ DOF set  = A-SET (Analysis Set) 
+$ Analysis = SOL101
+$
+$***************************************************************************
+
+COMPILE STATRS  $
+ALTER 'EQUIVX.*UL' $
+output4 UL,,,,///23//TRUE/   $
+EXIT  $

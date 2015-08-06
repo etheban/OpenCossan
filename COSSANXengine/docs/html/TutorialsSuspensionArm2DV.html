@@ -1,0 +1,433 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialsSuspensionArm2DV</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-04-14"><meta name="DC.source" content="TutorialsSuspensionArm2DV.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Inputs</a></li><li><a href="#3">Injector</a></li><li><a href="#4">Extractor</a></li><li><a href="#5">Connector</a></li><li><a href="#6">Mio</a></li><li><a href="#7">Evaluator</a></li><li><a href="#8">Model</a></li><li><a href="#9">Create objective function</a></li><li><a href="#10">Create non linear inequality constraint</a></li><li><a href="#11">define the 1st optimization problem</a></li><li><a href="#12">Create optimizer</a></li><li><a href="#13">define the 2nd optimization problem</a></li><li><a href="#14">Create optimizer</a></li><li><a href="#15">define the 3rd optimization problem</a></li><li><a href="#16">Create optimizer</a></li><li><a href="#17">Create optimizer</a></li><li><a href="#18">define the 5th optimization problem</a></li><li><a href="#19">Create optimizer</a></li><li><a href="#20">define the 6th optimization problem</a></li><li><a href="#21">Create optimizer</a></li></ul></div><pre class="codeinput"><span class="comment">%*********************************************************************</span>
+<span class="comment">%</span>
+<span class="comment">%   Example of shape optimization of a mechanical component</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%   The weight of the component is minimized</span>
+<span class="comment">%</span>
+<span class="comment">%   The constraint is the fatigue life of the structure</span>
+<span class="comment">%   The maximum damage is estimated using Miner's rule after 750,000 cycles</span>
+<span class="comment">%   This example uses Ansys as a finite element solver and as post</span>
+<span class="comment">%   processor to compute Miner's damage</span>
+<span class="comment">%   In this study, 2 design variables are considered</span>
+<span class="comment">%</span>
+<span class="comment">%**************************************************************************</span>
+
+
+<span class="keyword">global</span> COSSANX
+CossanX.setVerbosityLevel(0)
+<span class="comment">% disable the database in order to avoid writting hundreds of megabytes of</span>
+<span class="comment">% files</span>
+COSSANX.XdatabaseDriver =[];
+
+<span class="comment">% Retrieve the directory where this tutorial is stored</span>
+StutorialPath = fileparts(which(<span class="string">'TutorialsSuspensionArm2DV.m'</span>));
+<span class="comment">% Copy the tutorial files in a working directory. The FE input files can be</span>
+<span class="comment">% written or created in this directory.</span>
+copyfile([StutorialPath <span class="string">'/*'</span>],<span class="keyword">...</span>
+    fullfile(CossanX.getCossanWorkingPath,<span class="string">'TutorialWorkingDir'</span>),<span class="string">'f'</span>);
+</pre><h2>Inputs<a name="2"></a></h2><p>creation of the inputs t1, t2, t5, t6, t7 are the thickness of the flanges that will not be varied in thia study</p><pre class="codeinput">t1  = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'t1'</span>,<span class="string">'value'</span>,25);
+t2  = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'t2'</span>,<span class="string">'value'</span>,20);
+t5  = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'t5'</span>,<span class="string">'value'</span>,22);
+t6  = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'t6'</span>,<span class="string">'value'</span>,20);
+t7  = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'t7'</span>,<span class="string">'value'</span>,25);
+
+
+<span class="comment">% t3 and t4 are the design variables of this study</span>
+<span class="comment">% they represent the thickness of the flange which are the biggest</span>
+<span class="comment">% influence on the maximum damage</span>
+t3  = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 1'</span>,<span class="string">'value'</span>,33,<span class="string">'lowerBound'</span>,0);
+t4  = DesignVariable(<span class="string">'Sdescription'</span>,<span class="string">'design variable 1'</span>,<span class="string">'value'</span>,30,<span class="string">'lowerBound'</span>,0);
+
+<span class="comment">%adding the parameters and design variables an Input object</span>
+Xin         = Input;
+Xin         = add(Xin,t1);
+Xin         = add(Xin,t2);
+Xin         = add(Xin,t3);
+Xin         = add(Xin,t4);
+Xin         = add(Xin,t5);
+Xin         = add(Xin,t6);
+Xin         = add(Xin,t7);
+</pre><h2>Injector<a name="3"></a></h2><p>creation of the injector</p><pre class="codeinput">Xi  = injector(<span class="keyword">...</span>
+    <span class="string">'Sscanfilename'</span>,<span class="string">'suspension_arm_FL.cossan'</span>,<span class="keyword">...</span><span class="comment"> %file containing the identifiers</span>
+    <span class="string">'Sfile'</span>,<span class="string">'suspension_arm_FL.inp'</span><span class="keyword">...</span><span class="comment">             %file to be created at injection</span>
+    );
+</pre><h2>Extractor<a name="4"></a></h2><pre class="codeinput"><span class="comment">%response objects</span>
+<span class="comment">%response object for the damage in all the nodes</span>
+XrespDam = Response(<span class="string">'Sname'</span>, <span class="string">'DamageAll'</span>, <span class="keyword">...</span><span class="comment"> %name given to the field</span>
+             <span class="string">'Sfieldformat'</span>, <span class="string">'%5f'</span>, <span class="keyword">...</span>
+             <span class="string">'Ncolnum'</span>,29, <span class="keyword">...</span><span class="comment"> % column index</span>
+             <span class="string">'Nrownum'</span>,1, <span class="keyword">...</span><span class="comment">  % row index</span>
+             <span class="string">'Nrepeat'</span>,7960);  <span class="comment">% number of values to extract (3980 nodes, 2 load cases)</span>
+
+<span class="comment">%response object for the mass</span>
+XrespMass = Response(<span class="string">'Sname'</span>, <span class="string">'mass'</span>, <span class="keyword">...</span><span class="comment"> %name given to the field</span>
+             <span class="string">'Sfieldformat'</span>, <span class="string">'%5f'</span>, <span class="keyword">...</span>
+             <span class="string">'Clookoutfor'</span>,{<span class="string">'TOTAL MASS'</span>}, <span class="keyword">...</span><span class="comment"> % regular expression to seek in the output file</span>
+             <span class="string">'Ncolnum'</span>,16, <span class="keyword">...</span><span class="comment"> % column index</span>
+             <span class="string">'Nrownum'</span>,0 <span class="keyword">...</span><span class="comment"> % row index</span>
+             );
+
+<span class="comment">%Extractor for the damage</span>
+XeDam=Extractor(<span class="string">'Srelativepath'</span>,<span class="string">'./'</span>, <span class="keyword">...</span>
+             <span class="string">'Sfile'</span>,<span class="string">'suspension_arm_FL.dam'</span>,<span class="keyword">...</span>
+             <span class="string">'Xresponse'</span>,XrespDam );
+
+<span class="comment">%Extractor for the mass</span>
+XeMass=Extractor(<span class="string">'Srelativepath'</span>,<span class="string">'./'</span>, <span class="keyword">...</span>
+             <span class="string">'Sfile'</span>,<span class="string">'suspension_arm_FL.out'</span>,<span class="keyword">...</span>
+             <span class="string">'Xresponse'</span>,XrespMass);
+</pre><h2>Connector<a name="5"></a></h2><pre class="codeinput">Xc = Connector(<span class="keyword">...</span>
+    <span class="string">'Ssolverbinary'</span>,[pwd <span class="string">'/run_ansys.sh'</span>],<span class="keyword">...</span>
+    <span class="string">'Sexecmd'</span>,<span class="string">'%Ssolverbinary %Smaininputfile '</span>,<span class="keyword">...</span>
+    <span class="string">'Sworkingdirectory'</span>,<span class="string">'/tmp/'</span>,<span class="keyword">...</span>
+    <span class="string">'Smaininputpath'</span>,pwd,<span class="string">'Lkeepsimulationfiles'</span>,false,<span class="keyword">...</span>
+    <span class="string">'Smaininputfile'</span>,<span class="string">'suspension_arm_FL'</span>,<span class="keyword">...</span>
+    <span class="string">'Caddfiles'</span>,{<span class="string">'suspension_arm_FL.inp'</span>});
+Xc = Xc.add(Xi);
+Xc = Xc.add(XeDam);
+Xc = Xc.add(XeMass);
+</pre><h2>Mio<a name="6"></a></h2><p>script computing the total, maximum damge</p><pre class="codeinput">Xm  = Mio(<span class="string">'Sdescription'</span>,<span class="string">'getmaxdam'</span>, <span class="keyword">...</span>
+    <span class="string">'Spath'</span>,<span class="string">'./'</span>,<span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for i=1:length(Tinput), Toutput(i).maxDamage     = max(Tinput(i).DamageAll(1:3980)+Tinput(i).DamageAll(3981:7960)), end'</span>,<span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false,<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'t1'</span>,<span class="string">'t2'</span>,<span class="string">'t3'</span>,<span class="string">'t4'</span>,<span class="string">'t5'</span>,<span class="string">'t6'</span>,<span class="string">'t7'</span>,<span class="string">'DamageAll'</span>,<span class="string">'mass'</span>},<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'maxDamage'</span>});
+</pre><h2>Evaluator<a name="7"></a></h2><pre class="codeinput">Xev=Evaluator(<span class="string">'CXmembers'</span>,{Xc,Xm});
+</pre><h2>Model<a name="8"></a></h2><pre class="codeinput">Xm  = Model(<span class="string">'Xinput'</span>,Xin,<span class="string">'Xevaluator'</span>,Xev);
+</pre><h2>Create objective function<a name="9"></a></h2><pre class="codeinput">Xofun1   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Toutput), Toutput(n).obj=Tinput(n).mass; end'</span>,<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'t1'</span>,<span class="string">'t2'</span>,<span class="string">'t3'</span>,<span class="string">'t4'</span>,<span class="string">'t5'</span>,<span class="string">'t6'</span>,<span class="string">'t7'</span>,<span class="string">'DamageAll'</span>,<span class="string">'mass'</span>,<span class="string">'maxDamage'</span>},<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'obj'</span>});
+</pre><h2>Create non linear inequality constraint<a name="10"></a></h2><pre class="codeinput">Xcon   = Constraint(<span class="string">'Sdescription'</span>,<span class="string">'non linear inequality constraint'</span>, <span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).Con1=Tinput(n).maxDamage-1;end'</span>,<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'Con1'</span>},<span class="string">'Cinputnames'</span>,{<span class="string">'t1'</span>,<span class="string">'t2'</span>,<span class="string">'t3'</span>,<span class="string">'t4'</span>,<span class="string">'t5'</span>,<span class="string">'t6'</span>,<span class="string">'t7'</span>,<span class="string">'DamageAll'</span>,<span class="string">'mass'</span>,<span class="string">'maxDamage'</span>},<span class="keyword">...</span>
+    <span class="string">'Linequality'</span>,true);
+</pre><h2>define the 1st optimization problem<a name="11"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+    <span class="string">'Xmodel'</span>,Xm,<span class="string">'VinitialSolution'</span>,[45 45], <span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>,Xofun1,<span class="string">'Xconstraint'</span>,Xcon);
+</pre><h2>Create optimizer<a name="12"></a></h2><pre class="codeinput">Xcob    = Cobyla;
+Xoptimum1=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xcob);
+
+plot2designvariables
+plot(Xoptimum1.XdesignVariable.Mdata(1,:),Xoptimum1.XdesignVariable.Mdata(2,:))
+</pre>
+<img vspace="5" hspace="5" src="TutorialsSuspensionArm2DV_01.png" alt=""> <h2>define the 2nd optimization problem<a name="13"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+    <span class="string">'Xmodel'</span>,Xm,<span class="string">'VinitialSolution'</span>,[30 30], <span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>,Xofun1,<span class="string">'Xconstraint'</span>,Xcon);
+</pre><h2>Create optimizer<a name="14"></a></h2><pre class="codeinput">Xcob    = Cobyla(<span class="string">'NmaxIterations'</span>,5);
+Xoptimum2=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xcob);
+
+plot2designvariables
+plot(Xoptimum2.XdesignVariable.Mdata(1,:),Xoptimum2.XdesignVariable.Mdata(2,:))
+</pre>
+<img vspace="5" hspace="5" src="TutorialsSuspensionArm2DV_02.png" alt=""> <h2>define the 3rd optimization problem<a name="15"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+    <span class="string">'Xmodel'</span>,Xm,<span class="string">'VinitialSolution'</span>,[15 30], <span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>,Xofun1,<span class="string">'Xconstraint'</span>,Xcon);
+</pre><h2>Create optimizer<a name="16"></a></h2><pre class="codeinput">Xcob    = Cobyla;
+Xoptimum3=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xcob);
+
+plot2designvariables
+plot(Xoptimum3.XdesignVariable.Mdata(1,:),Xoptimum3.XdesignVariable.Mdata(2,:))
+</pre>
+<img vspace="5" hspace="5" src="TutorialsSuspensionArm2DV_03.png" alt=""> <h2>Create optimizer<a name="17"></a></h2><pre class="codeinput">Xcob    = SequentialQuadraticProgramming;
+Xoptimum4=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xcob);
+
+plot2designvariables
+plot(Xoptimum4.XdesignVariable.Mdata(1,:),Xoptimum4.XdesignVariable.Mdata(2,:))
+</pre>
+<img vspace="5" hspace="5" src="TutorialsSuspensionArm2DV_04.png" alt=""> <h2>define the 5th optimization problem<a name="18"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+    <span class="string">'Xmodel'</span>,Xm,<span class="string">'VinitialSolution'</span>,[30 30], <span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>,Xofun1,<span class="string">'Xconstraint'</span>,Xcon);
+</pre><h2>Create optimizer<a name="19"></a></h2><pre class="codeinput">Xcob    = SequentialQuadraticProgramming;
+Xoptimum5=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xcob);
+
+plot2designvariables
+plot(Xoptimum5.XdesignVariable.Mdata(1,:),Xoptimum5.XdesignVariable.Mdata(2,:))
+</pre>
+<img vspace="5" hspace="5" src="TutorialsSuspensionArm2DV_05.png" alt=""> <h2>define the 6th optimization problem<a name="20"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+    <span class="string">'Xmodel'</span>,Xm,<span class="string">'VinitialSolution'</span>,[15 30], <span class="keyword">...</span>
+    <span class="string">'XobjectiveFunction'</span>,Xofun1,<span class="string">'Xconstraint'</span>,Xcon);
+</pre><h2>Create optimizer<a name="21"></a></h2><pre class="codeinput">Xcob    = SequentialQuadraticProgramming;
+Xoptimum6=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xcob);
+
+plot2designvariables
+plot(Xoptimum6.XdesignVariable.Mdata(1,:),Xoptimum6.XdesignVariable.Mdata(2,:))
+
+
+
+save <span class="string">Optimization_2_design_variables</span> <span class="string">Xoptimum3</span> <span class="string">Xoptimum2</span> <span class="string">Xoptimum1</span> <span class="string">Xoptimum4</span> <span class="string">Xoptimum5</span> <span class="string">Xoptimum6</span>
+</pre>
+<img vspace="5" hspace="5" src="TutorialsSuspensionArm2DV_06.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%*********************************************************************
+%
+%   Example of shape optimization of a mechanical component
+%
+%
+%   The weight of the component is minimized
+%
+%   The constraint is the fatigue life of the structure
+%   The maximum damage is estimated using Miner's rule after 750,000 cycles
+%   This example uses Ansys as a finite element solver and as post
+%   processor to compute Miner's damage
+%   In this study, 2 design variables are considered
+%
+%**************************************************************************
+
+
+global COSSANX
+CossanX.setVerbosityLevel(0)
+% disable the database in order to avoid writting hundreds of megabytes of
+% files
+COSSANX.XdatabaseDriver =[];
+
+% Retrieve the directory where this tutorial is stored
+StutorialPath = fileparts(which('TutorialsSuspensionArm2DV.m'));
+% Copy the tutorial files in a working directory. The FE input files can be
+% written or created in this directory.
+copyfile([StutorialPath '/*'],...
+    fullfile(CossanX.getCossanWorkingPath,'TutorialWorkingDir'),'f');
+
+%%   Inputs
+% creation of the inputs
+% t1, t2, t5, t6, t7 are the thickness of the flanges that will not be
+% varied in thia study
+t1  = Parameter('Sdescription','t1','value',25);
+t2  = Parameter('Sdescription','t2','value',20);
+t5  = Parameter('Sdescription','t5','value',22);
+t6  = Parameter('Sdescription','t6','value',20);
+t7  = Parameter('Sdescription','t7','value',25);
+
+
+% t3 and t4 are the design variables of this study
+% they represent the thickness of the flange which are the biggest
+% influence on the maximum damage
+t3  = DesignVariable('Sdescription','design variable 1','value',33,'lowerBound',0);
+t4  = DesignVariable('Sdescription','design variable 1','value',30,'lowerBound',0);
+
+%adding the parameters and design variables an Input object
+Xin         = Input;
+Xin         = add(Xin,t1);
+Xin         = add(Xin,t2);
+Xin         = add(Xin,t3);
+Xin         = add(Xin,t4);
+Xin         = add(Xin,t5);
+Xin         = add(Xin,t6);
+Xin         = add(Xin,t7);
+
+
+%%   Injector
+% creation of the injector
+Xi  = injector(...
+    'Sscanfilename','suspension_arm_FL.cossan',... %file containing the identifiers
+    'Sfile','suspension_arm_FL.inp'...             %file to be created at injection
+    );
+
+%% Extractor
+%response objects
+%response object for the damage in all the nodes
+XrespDam = Response('Sname', 'DamageAll', ... %name given to the field
+             'Sfieldformat', '%5f', ...
+             'Ncolnum',29, ... % column index
+             'Nrownum',1, ...  % row index
+             'Nrepeat',7960);  % number of values to extract (3980 nodes, 2 load cases)
+
+%response object for the mass
+XrespMass = Response('Sname', 'mass', ... %name given to the field
+             'Sfieldformat', '%5f', ...
+             'Clookoutfor',{'TOTAL MASS'}, ... % regular expression to seek in the output file
+             'Ncolnum',16, ... % column index
+             'Nrownum',0 ... % row index
+             );
+
+%Extractor for the damage
+XeDam=Extractor('Srelativepath','./', ...
+             'Sfile','suspension_arm_FL.dam',...
+             'Xresponse',XrespDam );
+                      
+%Extractor for the mass
+XeMass=Extractor('Srelativepath','./', ...
+             'Sfile','suspension_arm_FL.out',...
+             'Xresponse',XrespMass);
+
+%% Connector
+Xc = Connector(...
+    'Ssolverbinary',[pwd '/run_ansys.sh'],...
+    'Sexecmd','%Ssolverbinary %Smaininputfile ',...
+    'Sworkingdirectory','/tmp/',...
+    'Smaininputpath',pwd,'Lkeepsimulationfiles',false,...
+    'Smaininputfile','suspension_arm_FL',...
+    'Caddfiles',{'suspension_arm_FL.inp'}); 
+Xc = Xc.add(Xi);
+Xc = Xc.add(XeDam);
+Xc = Xc.add(XeMass);
+%% Mio
+% script computing the total, maximum damge
+Xm  = Mio('Sdescription','getmaxdam', ...
+    'Spath','./',...
+    'Sscript','for i=1:length(Tinput), Toutput(i).maxDamage     = max(Tinput(i).DamageAll(1:3980)+Tinput(i).DamageAll(3981:7960)), end',...
+    'Liostructure',true,...
+    'Lfunction',false,...
+    'Cinputnames',{'t1','t2','t3','t4','t5','t6','t7','DamageAll','mass'},...
+    'Coutputnames',{'maxDamage'});
+%% Evaluator
+Xev=Evaluator('CXmembers',{Xc,Xm});
+
+%% Model
+Xm  = Model('Xinput',Xin,'Xevaluator',Xev);
+
+%%  Create objective function
+Xofun1   = ObjectiveFunction('Sdescription','objective function', ...
+    'Sscript','for n=1:length(Toutput), Toutput(n).obj=Tinput(n).mass; end',...
+    'Cinputnames',{'t1','t2','t3','t4','t5','t6','t7','DamageAll','mass','maxDamage'},...
+    'Coutputnames',{'obj'});
+
+%% Create non linear inequality constraint
+Xcon   = Constraint('Sdescription','non linear inequality constraint', ...
+    'Sscript','for n=1:length(Tinput),Toutput(n).Con1=Tinput(n).maxDamage-1;end',...
+    'Coutputnames',{'Con1'},'Cinputnames',{'t1','t2','t3','t4','t5','t6','t7','DamageAll','mass','maxDamage'},...
+    'Linequality',true);
+
+%% define the 1st optimization problem
+Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+    'Xmodel',Xm,'VinitialSolution',[45 45], ...
+    'XobjectiveFunction',Xofun1,'Xconstraint',Xcon);
+
+%% Create optimizer
+Xcob    = Cobyla;
+Xoptimum1=Xop.optimize('Xoptimizer',Xcob);
+
+plot2designvariables
+plot(Xoptimum1.XdesignVariable.Mdata(1,:),Xoptimum1.XdesignVariable.Mdata(2,:))
+
+
+%% define the 2nd optimization problem
+Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+    'Xmodel',Xm,'VinitialSolution',[30 30], ...
+    'XobjectiveFunction',Xofun1,'Xconstraint',Xcon);
+
+%% Create optimizer
+Xcob    = Cobyla('NmaxIterations',5);
+Xoptimum2=Xop.optimize('Xoptimizer',Xcob);
+
+plot2designvariables
+plot(Xoptimum2.XdesignVariable.Mdata(1,:),Xoptimum2.XdesignVariable.Mdata(2,:))
+
+%% define the 3rd optimization problem
+Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+    'Xmodel',Xm,'VinitialSolution',[15 30], ...
+    'XobjectiveFunction',Xofun1,'Xconstraint',Xcon);
+
+%% Create optimizer
+Xcob    = Cobyla;
+Xoptimum3=Xop.optimize('Xoptimizer',Xcob);
+
+plot2designvariables
+plot(Xoptimum3.XdesignVariable.Mdata(1,:),Xoptimum3.XdesignVariable.Mdata(2,:))
+
+
+%% Create optimizer
+Xcob    = SequentialQuadraticProgramming;
+Xoptimum4=Xop.optimize('Xoptimizer',Xcob);
+
+plot2designvariables
+plot(Xoptimum4.XdesignVariable.Mdata(1,:),Xoptimum4.XdesignVariable.Mdata(2,:))
+
+
+%% define the 5th optimization problem
+Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+    'Xmodel',Xm,'VinitialSolution',[30 30], ...
+    'XobjectiveFunction',Xofun1,'Xconstraint',Xcon);
+
+%% Create optimizer
+Xcob    = SequentialQuadraticProgramming;
+Xoptimum5=Xop.optimize('Xoptimizer',Xcob);
+
+plot2designvariables
+plot(Xoptimum5.XdesignVariable.Mdata(1,:),Xoptimum5.XdesignVariable.Mdata(2,:))
+
+%% define the 6th optimization problem
+Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+    'Xmodel',Xm,'VinitialSolution',[15 30], ...
+    'XobjectiveFunction',Xofun1,'Xconstraint',Xcon);
+
+%% Create optimizer
+Xcob    = SequentialQuadraticProgramming;
+Xoptimum6=Xop.optimize('Xoptimizer',Xcob);
+
+plot2designvariables
+plot(Xoptimum6.XdesignVariable.Mdata(1,:),Xoptimum6.XdesignVariable.Mdata(2,:))
+
+
+
+save Optimization_2_design_variables Xoptimum3 Xoptimum2 Xoptimum1 Xoptimum4 Xoptimum5 Xoptimum6
+
+##### SOURCE END #####
+--></body></html>

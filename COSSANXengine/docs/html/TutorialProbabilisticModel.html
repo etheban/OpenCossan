@@ -1,0 +1,205 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial for the ProbabilisticModel object</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialProbabilisticModel.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial for the ProbabilisticModel object</h1><!--introduction--><p>The tutorial shows how to define a ProbabilisticModel and to exaluate the failure probability associeted to it.</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@ProbabilisticModel">http://mechanik.uibk.ac.at/wiki/index.php/@ProbabilisticModel</a></p><p><img src="TutorialProbabilisticModel_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialProbabilisticModel_eq39615.png" alt="$Author: Edoardo-Patelli~and~Barbara-Goller$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Overview</a></li><li><a href="#2">Define the required object</a></li><li><a href="#3">Define an Input</a></li><li><a href="#4">Define a PerformanceFunction</a></li><li><a href="#5">Construct the Model</a></li><li><a href="#6">Now we can construct our first ProbabilisticModel</a></li><li><a href="#7">Analysis</a></li></ul></div><h2>Overview<a name="1"></a></h2><p>The ProbabilisticModel requires a Model (i.e. Physical Model) and a PerformaceFunction The Model is defined used a matlab function (see Mio Tutorial)</p><h2>Define the required object<a name="2"></a></h2><p>Construct a Mio object</p><pre class="codeinput">Xm=Mio(<span class="string">'Sdescription'</span>, <span class="string">'Performance function'</span>, <span class="keyword">...</span>
+                <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Pout(j).out1=sqrt(Tinput(j).RV1^2+Tinput(j).RV2^2); end'</span>, <span class="keyword">...</span>
+                <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+                <span class="string">'Coutputnames'</span>,{<span class="string">'out1'</span>},<span class="string">'Cinputnames'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>},<span class="keyword">...</span>
+				<span class="string">'Lfunction'</span>,false); <span class="comment">% This flag specify if the .m file is a script or a function.</span>
+<span class="comment">% Construct the Evaluator</span>
+Xeval1 = Evaluator(<span class="string">'Xmio'</span>,Xm,<span class="string">'Sdescription'</span>,<span class="string">'fist Evaluator'</span>);
+
+<span class="comment">% In order to be able to construct our Model an Input object must be</span>
+<span class="comment">% defined</span>
+</pre><h2>Define an Input<a name="3"></a></h2><p>Define RVs</p><pre class="codeinput">RV1=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);  <span class="comment">%#ok&lt;SNASGU&gt;</span>
+RV2=RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,0,<span class="string">'std'</span>,1);   <span class="comment">%#ok&lt;SNASGU&gt;</span>
+<span class="comment">% Define the RVset</span>
+Xrvs1=RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>, <span class="string">'RV2'</span>});
+<span class="comment">% Define Xinput</span>
+Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'Input satellite_inp'</span>,<span class="string">'CSmembers'</span>,{<span class="string">'Xrvs1'</span>},<span class="string">'CXmembers'</span>,{Xrvs1});
+</pre><h2>Define a PerformanceFunction<a name="4"></a></h2><pre class="codeinput">Xpar=Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Define Capacity'</span>,<span class="string">'value'</span>,0);
+Xin = Xin.add(Xpar);
+Xin = sample(Xin,<span class="string">'Nsamples'</span>,10);
+
+Xperfun=PerformanceFunction(<span class="string">'Scapacity'</span>,<span class="string">'Xpar'</span>,<span class="string">'Sdemand'</span>,<span class="string">'out1'</span>,<span class="string">'Soutputname'</span>,<span class="string">'Vg1'</span>);
+</pre><h2>Construct the Model<a name="5"></a></h2><pre class="codeinput">Xmdl=Model(<span class="string">'Cmembers'</span>,{<span class="string">'Xin'</span>,<span class="string">'Xeval1'</span>});
+</pre><h2>Now we can construct our first ProbabilisticModel<a name="6"></a></h2><pre class="codeinput">Xpm=ProbabilisticModel(<span class="string">'Sdescription'</span>,<span class="string">'my first Prob.Model'</span>,<span class="keyword">...</span>
+    <span class="string">'CXperformanceFunction'</span>,{Xperfun},<span class="string">'CXmodel'</span>,{Xmdl});
+display(Xpm)
+</pre><pre class="codeoutput">ProbabilisticModel Object  -  Description: my first Prob.Model
+</pre><h2>Analysis<a name="7"></a></h2><p>Deterministic Analysis</p><pre class="codeinput">XsimOut=Xpm.deterministicAnalysis;
+display(XsimOut)
+
+
+<span class="comment">% The ProbabilisticModel can also be constructed passing the object by</span>
+<span class="comment">% references</span>
+
+Xpm=ProbabilisticModel(<span class="string">'Sdescription'</span>,<span class="string">'my first Prob.Model'</span>,<span class="string">'Xmodel'</span>,Xmdl,<span class="string">'XperformanceFunction'</span>,Xperfun);
+display(Xpm)
+
+<span class="comment">% Let now evaluate the ProbabilisticModel</span>
+
+Xout=Xpm.apply(Xin);
+
+<span class="comment">% The SimulationData will contains 10 model evaluation and 10 performance</span>
+<span class="comment">% function evaluation</span>
+
+<span class="comment">% If you want compute the Failure probability the method pf must be applied</span>
+<span class="comment">% a Simulation object is required</span>
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,1000);
+Xpf=Xpm.pf(Xmc);
+<span class="comment">% see turorial of Failure Probability</span>
+display(Xpf)
+</pre><pre class="codeoutput"> SimulationData Object  -   Description:  - apply(@evaluator) - deterministicAnalysis(@ProbabilisticModel)
+ProbabilisticModel Object  -  Description: my first Prob.Model
+FailureProbability Object  -  Description: 
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the ProbabilisticModel object 
+%
+% The tutorial shows how to define a ProbabilisticModel and to exaluate the 
+% failure probability associeted to it.
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@ProbabilisticModel
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author: Edoardo-Patelli~and~Barbara-Goller$ 
+
+
+%% Overview
+% The ProbabilisticModel requires a Model (i.e. Physical Model) and a
+% PerformaceFunction
+% The Model is defined used a matlab function (see Mio Tutorial)
+
+%% Define the required object
+% Construct a Mio object
+Xm=Mio('Sdescription', 'Performance function', ...
+                'Sscript','for j=1:length(Tinput), Pout(j).out1=sqrt(Tinput(j).RV1^2+Tinput(j).RV2^2); end', ...
+                'Liostructure',true,...
+                'Coutputnames',{'out1'},'Cinputnames',{'RV1','RV2'},...
+				'Lfunction',false); % This flag specify if the .m file is a script or a function. 
+% Construct the Evaluator
+Xeval1 = Evaluator('Xmio',Xm,'Sdescription','fist Evaluator');
+
+% In order to be able to construct our Model an Input object must be
+% defined
+
+%% Define an Input
+% Define RVs
+RV1=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);  %#ok<SNASGU>
+RV2=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);   %#ok<SNASGU>
+% Define the RVset
+Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'});  
+% Define Xinput
+Xin = Input('Sdescription','Input satellite_inp','CSmembers',{'Xrvs1'},'CXmembers',{Xrvs1});
+
+
+%% Define a PerformanceFunction 
+Xpar=Parameter('Sdescription','Define Capacity','value',0);
+Xin = Xin.add(Xpar);
+Xin = sample(Xin,'Nsamples',10);
+
+Xperfun=PerformanceFunction('Scapacity','Xpar','Sdemand','out1','Soutputname','Vg1');
+
+%%  Construct the Model
+Xmdl=Model('Cmembers',{'Xin','Xeval1'}); 
+
+%% Now we can construct our first ProbabilisticModel
+Xpm=ProbabilisticModel('Sdescription','my first Prob.Model',...
+    'CXperformanceFunction',{Xperfun},'CXmodel',{Xmdl});
+display(Xpm)
+
+
+%% Analysis
+% Deterministic Analysis
+XsimOut=Xpm.deterministicAnalysis;
+display(XsimOut)
+
+
+% The ProbabilisticModel can also be constructed passing the object by
+% references
+
+Xpm=ProbabilisticModel('Sdescription','my first Prob.Model','Xmodel',Xmdl,'XperformanceFunction',Xperfun);
+display(Xpm)
+
+% Let now evaluate the ProbabilisticModel
+
+Xout=Xpm.apply(Xin); 
+
+% The SimulationData will contains 10 model evaluation and 10 performance
+% function evaluation
+
+% If you want compute the Failure probability the method pf must be applied
+% a Simulation object is required
+Xmc=MonteCarlo('Nsamples',1000);
+Xpf=Xpm.pf(Xmc); 
+% see turorial of Failure Probability 
+display(Xpf)
+
+
+
+
+##### SOURCE END #####
+--></body></html>

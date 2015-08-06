@@ -1,0 +1,143 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialFracture</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialFracture.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Data related to Fracture object</a></li><li><a href="#3">evaluate</a></li></ul></div><pre class="codeinput"><span class="comment">%*********************************************************************</span>
+<span class="comment">%</span>
+<span class="comment">%   Example on how to use Fatigue and Fracture objects</span>
+<span class="comment">%   Fracture is a subclass of Mio and shares various attributes and methods</span>
+<span class="comment">%   with the mother class</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%   This tutorial shows the usage of the methods in the class Fracture.</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%**************************************************************************</span>
+</pre><h2>Data related to Fracture object<a name="2"></a></h2><pre class="codeinput"><span class="comment">% Definition of the Fracture object. It takes as an inpout the outputs</span>
+<span class="comment">% of the evaluator which determines the stress intensity factor, The</span>
+<span class="comment">% outputs of this is &lt;0 if fracture does not occur, and &gt;0 if fracture has</span>
+<span class="comment">% occured</span>
+Xf = Fracture(<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'sif'</span>,<span class="string">'Kic'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+    <span class="string">'Spath'</span>,<span class="string">'./'</span>,<span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).fract= Tinput(j).sif-Tinput(j).Kic; end'</span>, <span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'fract'</span>},<span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false);
+</pre><h2>evaluate<a name="3"></a></h2><p>creation of a structure</p><pre class="codeinput">Tstruct(1).sif = 30e6;
+Tstruct(1).Kic = 20e6;
+<span class="comment">%</span>
+Tstruct(2).sif = 30e6;
+Tstruct(2).Kic = 40e6;
+
+<span class="comment">% evaluate</span>
+resu = Xf.evaluate(Tstruct);
+</pre><pre class="codeoutput">Error using ==&gt; evaluate
+Method 'evaluate' is not defined for class 'Fracture' or is removed from MATLAB's search path.
+
+Error in ==&gt; TutorialFracture at 38
+resu = Xf.evaluate(Tstruct);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%*********************************************************************
+%
+%   Example on how to use Fatigue and Fracture objects
+%   Fracture is a subclass of Mio and shares various attributes and methods
+%   with the mother class
+%
+%
+%   This tutorial shows the usage of the methods in the class Fracture. 
+%
+%
+%**************************************************************************
+
+%% Data related to Fracture object
+
+% Definition of the Fracture object. It takes as an inpout the outputs
+% of the evaluator which determines the stress intensity factor, The
+% outputs of this is <0 if fracture does not occur, and >0 if fracture has
+% occured
+Xf = Fracture('Liomatrix',false,...
+    'Cinputnames',{'sif','Kic'},... % Define the inputs
+    'Spath','./',...
+    'Sscript','for j=1:length(Tinput), Toutput(j).fract= Tinput(j).sif-Tinput(j).Kic; end', ...
+    'Coutputnames',{'fract'},...
+    'Liostructure',true,...
+    'Lfunction',false);
+
+
+%% evaluate
+% creation of a structure
+
+Tstruct(1).sif = 30e6;
+Tstruct(1).Kic = 20e6;
+% 
+Tstruct(2).sif = 30e6;
+Tstruct(2).Kic = 40e6;
+
+% evaluate
+resu = Xf.evaluate(Tstruct);
+
+##### SOURCE END #####
+--></body></html>

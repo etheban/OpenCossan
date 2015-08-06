@@ -1,0 +1,663 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALRANDOMVARIABLE</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialRandomVariable.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALRANDOMVARIABLE</h1><!--introduction--><p>This tutorial shows the how to use and create a random variable object</p><p>See Also:  <a href="http://mechanik.uibk.ac.at/wiki/index.php/@RandomVariable">http://mechanik.uibk.ac.at/wiki/index.php/@RandomVariable</a></p><p><img src="TutorialRandomVariable_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialRandomVariable_eq30863.png" alt="$Author:~Pierre~Beaurepaire$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Constructor</a></li><li><a href="#2">Exponential Distribution</a></li><li><a href="#3">Gamma Distribution</a></li><li><a href="#4">normal distribitions</a></li><li><a href="#5">Lognormal</a></li><li><a href="#6">Rayleigh</a></li><li><a href="#7">SMALL-I</a></li><li><a href="#8">LARGE-I</a></li><li><a href="#9">GUMBEL</a></li><li><a href="#10">WEIBULL</a></li><li><a href="#11">BETA</a></li><li><a href="#12">GAMMA</a></li><li><a href="#13">F-distribution</a></li><li><a href="#14">Student's distribution</a></li><li><a href="#15">LOGISTIC</a></li><li><a href="#16">GENERALIZED PARETO</a></li><li><a href="#17">UNIFORM</a></li><li><a href="#18">discrete uniform distributions</a></li><li><a href="#19">Poisson distribution</a></li><li><a href="#20">Binomial distribution</a></li><li><a href="#21">Geometric distribution</a></li><li><a href="#22">Hypergeometric</a></li><li><a href="#23">evalpdf</a></li><li><a href="#24">sample</a></li><li><a href="#25">different mappings</a></li><li><a href="#26">transform a random variable into a DesignVariable</a></li><li><a href="#27">Close figure</a></li></ul></div><h2>Constructor<a name="1"></a></h2><p>general aspect: distributions can be defined using the moments, parameters or realizations of the distribution</p><pre class="codeinput">Xrv1    = RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'rv 1'</span>,<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="keyword">...</span>
+            <span class="string">'mean'</span>,10,<span class="string">'std'</span>,2);
+
+<span class="comment">% Show details of Xrv1</span>
+display(Xrv1)
+
+<span class="comment">% Show attributes of the RandomVariable object</span>
+<span class="comment">% CoV of the RandomVariable</span>
+disp(Xrv1.CoV)
+ <span class="comment">% mean of the RandomVariable</span>
+disp(Xrv1.mean)
+<span class="comment">% standard deviation of the RandomVariable</span>
+disp(Xrv1.std)
+<span class="comment">% cell array of parameters  of the RandomVariable</span>
+disp(Xrv1.Cpar)
+<span class="comment">% lower Bound of the RandomVariable</span>
+disp(Xrv1.lowerBound)
+<span class="comment">% upper Bound of the RandomVariable</span>
+disp(Xrv1.upperBound)
+<span class="comment">% distribution type of the RandomVariable</span>
+disp(Xrv1.Sdistribution)
+
+f1=figure;
+</pre><pre class="codeoutput"> RandomVariable Object - Description: rv 1
+     Distribution: NORMAL
+     2.000000000000000e-01
+
+    10
+
+     2
+
+    []    []
+    []    []
+    []    []
+    []    []
+
+  -Inf
+
+   Inf
+
+NORMAL
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_01.png" alt=""> <h2>Exponential Distribution<a name="2"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'rv 2'</span>,<span class="string">'Sdistribution'</span>,<span class="string">'exponential'</span>,<span class="keyword">...</span><span class="comment">                                            % distribution name</span>
+            <span class="string">'parameter1'</span>,1);
+<span class="comment">% Show details of Xrv2</span>
+display(Xrv)
+
+MX=Xrv2.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: rv 2
+     Distribution: exponential
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_02.png" alt=""> <h2>Gamma Distribution<a name="3"></a></h2><pre class="codeinput">Xrv = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'GAMMA'</span>,<span class="string">'Vdata'</span>,[1 5 6 3 1 20],<span class="string">'Vfrequency'</span>,[1 5 6 3 1 2.2],<span class="string">'Vcensoring'</span>,[1 1 0 1 1 0],<span class="string">'confidencelevel'</span>,.1);
+<span class="comment">% Show details of</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: GAMMA
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_03.png" alt=""> <h2>normal distribitions<a name="4"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'rv 1'</span>,<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="keyword">...</span>
+            <span class="string">'mean'</span>,10,<span class="string">'cov'</span>,2);
+
+<span class="comment">% Show details</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: rv 1
+     Distribution: NORMAL
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_04.png" alt=""> <h2>Lognormal<a name="5"></a></h2><pre class="codeinput">Xrv5    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'lognormal'</span>, <span class="string">'mean'</span>,1,<span class="string">'cov'</span>,2);
+<span class="comment">% Show details of Xrv5</span>
+display(Xrv5)
+
+<span class="comment">% Generate and show realization</span>
+MX=Xrv5.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv5.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: LOGNORMAL
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_05.png" alt=""> <h2>Rayleigh<a name="6"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'rayleigh'</span>, <span class="string">'parameter1'</span>, 1);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: RAYLEIGH
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_06.png" alt=""> <h2>SMALL-I<a name="7"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'small-i'</span>, <span class="string">'mean'</span>,1,<span class="string">'std'</span>,2);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: SMALL-I
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_07.png" alt=""> <h2>LARGE-I<a name="8"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'large-i'</span>, <span class="string">'mean'</span>,1,<span class="string">'std'</span>,2);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: LARGE-I
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_08.png" alt=""> <h2>GUMBEL<a name="9"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'gumbel'</span>, <span class="string">'mean'</span>,1,<span class="string">'std'</span>,2);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: LARGE-I
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_09.png" alt=""> <h2>WEIBULL<a name="10"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'weibull'</span>,<span class="string">'Cpar'</span>,{<span class="string">'par1'</span>, 1; <span class="string">'par2'</span>,2.});
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: WEIBULL
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_10.png" alt=""> <h2>BETA<a name="11"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'beta'</span>,<span class="string">'parameter1'</span>,2,<span class="string">'parameter2'</span>,2);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: BETA
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_11.png" alt=""> <h2>GAMMA<a name="12"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'gamma'</span>, <span class="string">'mean'</span>,1,<span class="string">'cov'</span>,2);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: GAMMA
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_12.png" alt=""> <h2>F-distribution<a name="13"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'f'</span>,<span class="string">'parameter1'</span>,2,<span class="string">'parameter2'</span>,2);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: F
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_13.png" alt=""> <h2>Student's distribution<a name="14"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'t'</span>, <span class="string">'parameter1'</span>, 1);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: STUDENT
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_14.png" alt=""> <h2>LOGISTIC<a name="15"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'logistic'</span>, <span class="string">'mean'</span>,1,<span class="string">'cov'</span>,2);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: LOGISTIC
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_15.png" alt=""> <h2>GENERALIZED PARETO<a name="16"></a></h2><pre class="codeinput">Xrv   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'GENERALIZEDPARETO'</span>,<span class="string">'par1'</span>,12,<span class="string">'par2'</span>,1,<span class="string">'par3'</span>,1);
+
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: GENERALIZEDPARETO
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_16.png" alt=""> <h2>UNIFORM<a name="17"></a></h2><pre class="codeinput">Xrv    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'lowerbound'</span>,0,<span class="string">'upperbound'</span>,1);
+
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: UNIFORM
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_17.png" alt=""> <h2>discrete uniform distributions<a name="18"></a></h2><pre class="codeinput">Xrv  =RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'unid'</span>,<span class="string">'lowerbound'</span>,-2,<span class="string">'upperbound'</span>,4);
+
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: unid
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_18.png" alt=""> <h2>Poisson distribution<a name="19"></a></h2><pre class="codeinput">Xrv  =RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'poisson'</span>,<span class="string">'par1'</span>,12);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: poisson
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_19.png" alt=""> <h2>Binomial distribution<a name="20"></a></h2><pre class="codeinput">Xrv  =RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'binomial'</span>,<span class="string">'par1'</span>,12,<span class="string">'par2'</span>,.6);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: binomial
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_20.png" alt=""> <h2>Geometric distribution<a name="21"></a></h2><pre class="codeinput">Xrv  =RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'geometric'</span>,<span class="string">'par1'</span>,.3);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: geometric
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_21.png" alt=""> <h2>Hypergeometric<a name="22"></a></h2><pre class="codeinput">Xrv  =RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'hypergeometric'</span>,<span class="string">'par1'</span>,20,<span class="string">'par2'</span>,9,<span class="string">'par3'</span>,10);
+<span class="comment">% Show details of the random variable</span>
+display(Xrv)
+<span class="comment">% Generate and show realization</span>
+MX=Xrv.sample(<span class="string">'Nsamples'</span>,1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+</pre><pre class="codeoutput"> RandomVariable Object - Description: 
+     Distribution: hypergeometric
+</pre><img vspace="5" hspace="5" src="TutorialRandomVariable_22.png" alt=""> <h2>evalpdf<a name="23"></a></h2><p>evaluates the pdf of the random variable at input points matrix of values</p><pre class="codeinput">Vpdf01 = evalpdf(Xrv1,randn(3,3));
+
+<span class="comment">% array of values</span>
+Vpdf02 = evalpdf(Xrv1,[0:.2:4]);
+</pre><h2>sample<a name="24"></a></h2><pre class="codeinput"><span class="comment">% generate one sample from the random variable</span>
+sample(Xrv1)
+
+<span class="comment">% extract 5 samples from Xrv1</span>
+sample(Xrv1,<span class="string">'Nsamples'</span>, 5)
+
+<span class="comment">% extract 100 samples from Xrv1, in a 10x10 matrix</span>
+sample(Xrv1,<span class="string">'Vsamples'</span>, [10 10])
+</pre><pre class="codeoutput">
+ans =
+
+     8.970025542410410e+00
+
+
+ans =
+
+     1.044321264509276e+01
+     7.118815354866637e+00
+     1.138196374373937e+01
+     8.666720710954097e+00
+     1.285195662469526e+01
+
+
+ans =
+
+  Columns 1 through 4
+
+     7.086040452061295e+00     4.872432352755050e+00     1.424236215107128e+01     7.909942648777788e+00
+     9.793269349013595e+00     1.032644616871589e+01     1.070717655445476e+01     6.848433351138897e+00
+     1.132414649491394e+01     8.994888909545171e+00     9.278034835494076e+00     1.242494622876323e+01
+     8.479421418605314e+00     1.072491790285228e+01     6.532373422429798e+00     1.184771906533668e+01
+     1.122850831220022e+01     7.455473852304134e+00     1.223816763368469e+01     1.057809994527589e+01
+     9.662925707229032e+00     1.075443464714692e+01     7.977576435498454e+00     1.200570926544961e+01
+     3.715241037653633e+00     1.083324706243241e+01     8.798722279248096e+00     1.113382917714373e+01
+     7.093272536073089e+00     1.123031618539769e+01     1.221408651930456e+01     1.163762256845724e+01
+     1.077148395786978e+01     8.407287329762559e+00     1.254265115233097e+01     9.766564680059574e+00
+     7.940918969104240e+00     1.218920538075762e+01     1.393177659007299e+01     9.271335632154395e+00
+
+  Columns 5 through 8
+
+     3.826302351620220e+00     8.736698490504827e+00     9.892470584584219e+00     8.484631236472026e+00
+     1.130952814268722e+01     1.049660458619086e+01     9.864319412751376e+00     8.360267557810156e+00
+     9.740271752048454e+00     9.192615273716385e+00     9.632410377367213e+00     7.046902422749932e+00
+     9.668166983573954e+00     8.954969974573123e+00     8.266596906866177e+00     1.210113251042213e+01
+     7.207642854683113e+00     1.085422344502194e+01     1.169009716287161e+01     8.906510349486853e+00
+     9.499735477560231e+00     1.048643817635174e+01     1.070674084599390e+01     6.520757068420805e+00
+     9.263208811028798e+00     1.022068556827574e+01     1.009984880130445e+01     1.369536467328400e+01
+     7.020650559213848e+00     9.990584643153777e+00     1.048339637846892e+01     1.095731398539212e+01
+     9.131184532305472e+00     9.094977195902466e+00     1.345865079944315e+01     9.609738471175996e+00
+     1.029672185000189e+01     9.014290517743987e+00     9.281047043174281e+00     1.163461080156551e+01
+
+  Columns 9 through 10
+
+     1.253915390746771e+01     8.372850661072395e+00
+     1.283967463838368e+01     7.375735219289857e+00
+     1.110353643096799e+01     1.052381490653886e+01
+     6.728489904093557e+00     1.142959467802812e+01
+     8.354383783374821e+00     1.123053965559393e+01
+     8.926713281383407e+00     1.248860275490982e+01
+     1.304398178890341e+01     1.143421962206091e+01
+     1.152485580211421e+01     1.205676265597247e+01
+     1.306277481306079e+01     1.043964853922852e+01
+     9.504156918603261e+00     1.215178808315643e+01
+
+</pre><h2>different mappings<a name="25"></a></h2><pre class="codeinput"><span class="comment">%physical space to the cdf space</span>
+Vout1 = physical2cdf(Xrv5, [0 .1;.3 .2]);
+<span class="comment">%cdf space to the stdnorm space</span>
+Vout2 = RandomVariable.cdf2stdnorm(0:.1:1);
+<span class="comment">%cdf space to the physica space</span>
+Vout3 = cdf2physical(Xrv1, [0 0.1 0.5]);
+<span class="comment">%stdnorm space to the cdf space</span>
+Vout4 = RandomVariable.stdnorm2cdf(-3:3);
+<span class="comment">%physical space to the stdnorm space</span>
+Vout5 = map2stdnorm(Xrv1,[0.1 1 2]);
+</pre><h2>transform a random variable into a DesignVariable<a name="26"></a></h2><pre class="codeinput">Xdv = Xrv1.randomVariable2designVariable;
+display(Xdv)
+</pre><pre class="codeoutput">DesignVariable Object - Description: 
+ Current Value          : 10
+ Lower Bound : -Inf
+ Upper Bound : Inf
+</pre><h2>Close figure<a name="27"></a></h2><pre class="codeinput">close(f1)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALRANDOMVARIABLE
+% This tutorial shows the how to use and create a random variable object
+%
+% See Also:  http://mechanik.uibk.ac.at/wiki/index.php/@RandomVariable
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Pierre~Beaurepaire$ 
+
+%% Constructor
+% general aspect:
+% distributions can be defined using the moments, parameters or realizations
+% of the distribution
+Xrv1    = RandomVariable('Sdescription','rv 1','Sdistribution','normal',...
+            'mean',10,'std',2);     
+        
+% Show details of Xrv1        
+display(Xrv1)     
+
+% Show attributes of the RandomVariable object
+% CoV of the RandomVariable
+disp(Xrv1.CoV) 
+ % mean of the RandomVariable
+disp(Xrv1.mean)
+% standard deviation of the RandomVariable
+disp(Xrv1.std)
+% cell array of parameters  of the RandomVariable
+disp(Xrv1.Cpar)
+% lower Bound of the RandomVariable
+disp(Xrv1.lowerBound) 
+% upper Bound of the RandomVariable
+disp(Xrv1.upperBound)
+% distribution type of the RandomVariable
+disp(Xrv1.Sdistribution) 
+
+f1=figure;
+%% Exponential Distribution
+Xrv    = RandomVariable('Sdescription','rv 2','Sdistribution','exponential',...                                            % distribution name
+            'parameter1',1);
+% Show details of Xrv2        
+display(Xrv)    
+
+MX=Xrv2.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% Gamma Distribution       
+Xrv = RandomVariable('Sdistribution','GAMMA','Vdata',[1 5 6 3 1 20],'Vfrequency',[1 5 6 3 1 2.2],'Vcensoring',[1 1 0 1 1 0],'confidencelevel',.1);
+% Show details of      
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% normal distribitions
+Xrv    = RandomVariable('Sdescription','rv 1','Sdistribution','normal',...
+            'mean',10,'cov',2);  
+ 
+% Show details        
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% Lognormal
+Xrv5    = RandomVariable('Sdistribution','lognormal', 'mean',1,'cov',2); 
+% Show details of Xrv5       
+display(Xrv5) 
+
+% Generate and show realization
+MX=Xrv5.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv5.Sdistribution)
+
+%% Rayleigh
+Xrv    = RandomVariable('Sdistribution','rayleigh', 'parameter1', 1); 
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% SMALL-I
+Xrv    = RandomVariable('Sdistribution','small-i', 'mean',1,'std',2);
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% LARGE-I
+Xrv    = RandomVariable('Sdistribution','large-i', 'mean',1,'std',2);
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% GUMBEL
+Xrv    = RandomVariable('Sdistribution','gumbel', 'mean',1,'std',2);
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% WEIBULL
+Xrv    = RandomVariable('Sdistribution','weibull','Cpar',{'par1', 1; 'par2',2.});
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% BETA
+Xrv    = RandomVariable('Sdistribution','beta','parameter1',2,'parameter2',2);
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% GAMMA
+Xrv    = RandomVariable('Sdistribution','gamma', 'mean',1,'cov',2); 
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% F-distribution
+Xrv    = RandomVariable('Sdistribution','f','parameter1',2,'parameter2',2);
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% Student's distribution
+Xrv    = RandomVariable('Sdistribution','t', 'parameter1', 1); 
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% LOGISTIC
+Xrv    = RandomVariable('Sdistribution','logistic', 'mean',1,'cov',2); 
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% GENERALIZED PARETO
+Xrv   = RandomVariable('Sdistribution','GENERALIZEDPARETO','par1',12,'par2',1,'par3',1);
+
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% UNIFORM
+Xrv    = RandomVariable('Sdistribution','uniform','lowerbound',0,'upperbound',1);
+
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+
+%% discrete uniform distributions
+Xrv  =RandomVariable('Sdistribution','unid','lowerbound',-2,'upperbound',4);
+
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% Poisson distribution
+Xrv  =RandomVariable('Sdistribution','poisson','par1',12);
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% Binomial distribution
+Xrv  =RandomVariable('Sdistribution','binomial','par1',12,'par2',.6);
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% Geometric distribution
+Xrv  =RandomVariable('Sdistribution','geometric','par1',.3);
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+%% Hypergeometric
+Xrv  =RandomVariable('Sdistribution','hypergeometric','par1',20,'par2',9,'par3',10);
+% Show details of the random variable       
+display(Xrv) 
+% Generate and show realization
+MX=Xrv.sample('Nsamples',1000);
+hist(gca(f1),MX,100)
+title(gca(f1),Xrv.Sdistribution)
+
+
+
+%% evalpdf
+% evaluates the pdf of the random variable at input points
+% matrix of values
+Vpdf01 = evalpdf(Xrv1,randn(3,3));
+
+% array of values
+Vpdf02 = evalpdf(Xrv1,[0:.2:4]);
+
+%% sample
+
+% generate one sample from the random variable
+sample(Xrv1)
+
+% extract 5 samples from Xrv1
+sample(Xrv1,'Nsamples', 5)
+
+% extract 100 samples from Xrv1, in a 10x10 matrix
+sample(Xrv1,'Vsamples', [10 10])
+
+%% different mappings
+%physical space to the cdf space
+Vout1 = physical2cdf(Xrv5, [0 .1;.3 .2]); 
+%cdf space to the stdnorm space
+Vout2 = RandomVariable.cdf2stdnorm(0:.1:1);
+%cdf space to the physica space
+Vout3 = cdf2physical(Xrv1, [0 0.1 0.5]);
+%stdnorm space to the cdf space
+Vout4 = RandomVariable.stdnorm2cdf(-3:3);
+%physical space to the stdnorm space
+Vout5 = map2stdnorm(Xrv1,[0.1 1 2]);
+
+%% transform a random variable into a DesignVariable
+Xdv = Xrv1.randomVariable2designVariable;
+display(Xdv)
+
+%% Close figure
+close(f1)
+
+##### SOURCE END #####
+--></body></html>

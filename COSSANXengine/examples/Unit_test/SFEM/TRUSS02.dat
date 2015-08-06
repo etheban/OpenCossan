@@ -1,0 +1,77 @@
+$ NASTRAN input file created by the MD Patran R2.1 input file translator
+$  on November  30, 2009 at 19:03:02.
+$ Direct Text Input for Nastran System Cell Section
+$ Direct Text Input for File Management Section
+$ Linear Static Analysis, Database
+SOL 103
+$ Direct Text Input for Executive Control
+CEND
+TITLE = MD Nastran job created on 30-Nov-09 at 19:01:11
+ECHO = NONE
+$ Direct Text Input for Global Case Control Data
+SUBCASE 1
+$ Subcase name : Default
+   SUBTITLE=Default
+   METHOD = 1
+   SPC = 2
+   DISPLACEMENT(SORT1,REAL)=ALL
+
+BEGIN BULK
+EIGRL    1                       10       0 
+
+$ Direct Text Input for Bulk Data
+$ Elements and Element Properties for region : prop_1
+PROD     1       1      5.25
+$ Pset: "prop_1" will be imported as: "prod.1"
+CROD     1       1       1       2
+CROD     2       1       2       4
+CROD     3       1       4       6
+CROD     4       1       6       7
+$ Elements and Element Properties for region : prop_2
+PROD     2       2      5.25
+$ Pset: "prop_2" will be imported as: "prod.2"
+CROD     5       2       2       3
+CROD     6       2       3       4
+CROD     7       2       4       5
+CROD     8       2       5       6
+$ Elements and Element Properties for region : prop_3
+PROD     3       3      5.25
+$ Pset: "prop_3" will be imported as: "prod.3"
+CROD     9       3       1       3
+CROD     10      3       3       5
+CROD     11      3       5       7
+$ Referenced Material Records
+$ Material Record : mat_1
+$ Description of Material : Date: 30-Nov-09           Time: 18:39:21
+MAT1  ,  1   , <cossan name="RVKEE1" format="%10.4e" original="1.76+6" />    ,   ,    .3 
+$ Material Record : mat_2
+$ Description of Material : Date: 30-Nov-09           Time: 18:39:21
+MAT1     2      1.76+6          .3
+$ Material Record : mat_3
+$ Description of Material : Date: 30-Nov-09           Time: 18:39:21
+MAT1     3      1.76+6          .3
+$ Nodes of the Entire Model
+GRID     1               0.      0.      0.
+GRID     2              144.    72.      0.
+GRID     3              192.     0.      0.
+GRID     4              288.    144.     0.
+GRID     5              384.     0.      0.
+GRID     6              432.    72.      0.
+GRID     7              576.     0.      0.
+$ Loads for Load Case : Default
+SPCADD   2       1       3       4
+$ Displacement Constraints of Load Set : permanent_constraint
+SPC1     1       3456    1       THRU    7
+$ Displacement Constraints of Load Set : pin
+SPC1     3       12      1
+$ Displacement Constraints of Load Set : roller
+SPC1     4       2       7
+$ Point mass
+CONM2,1,2,,<cossan name="RVM1" format="%10.4e" original="10." />
+CONM2,2,3,,<cossan name="RVM1" format="%10.4e" original="10." />
+CONM2,3,4,,<cossan name="RVM1" format="%10.4e" original="10." />
+CONM2,4,5,,<cossan name="RVM1" format="%10.4e" original="10." />
+CONM2,5,6,,<cossan name="RVM1" format="%10.4e" original="10." />
+CONM2,6,7,,<cossan name="RVM1" format="%10.4e" original="10." />
+$ Referenced Coordinate Frames
+ENDDATA 613d2622

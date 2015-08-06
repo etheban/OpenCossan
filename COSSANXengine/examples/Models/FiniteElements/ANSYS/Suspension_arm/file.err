@@ -1,0 +1,1524 @@
+/COM,ANSYS RELEASE 12.0.1  UP20090415       16:57:49    09/17/2010
+
+ *** WARNING ***                         CP =       0.520   TIME= 16:57:51
+ Quadrilateral element 3061 has a pair of opposite edges that are 78.2   
+ degrees away from being parallel.  This exceeds the warning limit of    
+ 70 degrees.                                                             
+
+ *** WARNING ***                         CP =       0.520   TIME= 16:57:51
+ Quadrilateral element 3089 has a pair of opposite edges that are 74.08  
+ degrees away from being parallel.  This exceeds the warning limit of    
+ 70 degrees.                                                             
+
+ *** WARNING ***                         CP =       0.770   TIME= 16:57:51
+ Quadrilateral element 1564 has a pair of opposite edges that are 83.26  
+ degrees away from being parallel.  This exceeds the warning limit of    
+ 70 degrees.                                                             
+
+ *** WARNING ***                         CP =       0.880   TIME= 16:57:51
+ An inactive degree of freedom label (UZ) was found on the D command.    
+ The current degree of freedom set is: UX UY                             
+  This degree of freedom will be ignored.                                
+
+ *** WARNING ***                         CP =       0.880   TIME= 16:57:51
+ No valid degree of freedom labels were input.  The D command is         
+ ignored.                                                                
+
+ *** WARNING ***                         CP =       0.890   TIME= 16:57:51
+ Previous testing revealed that 3 of the 3594 selected elements violate  
+ shape warning limits.  To review warning messages, please see the       
+ output or error file, or issue the CHECK command.                       
+
+ *** WARNING ***                         CP =       0.890   TIME= 16:57:51
+ A check of your model data produced 1 warnings.                         
+
+ *** WARNING ***                         CP =       0.900   TIME= 16:57:52
+ Previous testing revealed that 3 of the 3594 selected elements violate  
+ shape warning limits.  To review warning messages, please see the       
+ output or error file, or issue the CHECK command.                       
+
+ *** WARNING ***                         CP =       0.900   TIME= 16:57:52
+ A check of your model data produced 1 warnings.                         
+
+ *** ERROR ***                           CP =       0.900   TIME= 16:57:52
+ *DO loop index same as outer index I.                                   
+
+ *** ERROR ***                           CP =       0.900   TIME= 16:57:52
+ An error occurred while attempting to open the results file file.rst.   
+
+ *** ERROR ***                           CP =       0.900   TIME= 16:57:52
+ No results file available.                                              
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 1.  The FSNODE command is ignored.      
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 2.  The FSNODE command is ignored.      
+
+ *** WARNING ***                         CP =       0.930   TIME= 16:57:52
+ WHILE PROCESSING FILE BASED INPUT (/INPUT OR MACRO) AN ERROR HAS        
+ OCCURRED.  SHOULD INPUT PROCESSING BE SUSPENDED?                        
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 3.  The FSNODE command is ignored.      
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 4.  The FSNODE command is ignored.      
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 5.  The FSNODE command is ignored.      
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 6.  The FSNODE command is ignored.      
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 7.  The FSNODE command is ignored.      
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 8.  The FSNODE command is ignored.      
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 9.  The FSNODE command is ignored.      
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 10.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 11.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 12.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 13.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 14.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 15.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 16.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 17.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 18.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 19.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 20.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 21.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 22.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 23.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 24.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 25.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 26.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 27.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 28.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 29.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 30.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 31.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 32.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 33.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 34.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.930   TIME= 16:57:52
+ Stresses not available for node 35.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 36.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 37.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 38.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 39.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 40.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 41.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 42.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 43.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 44.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 45.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 46.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 47.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 48.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 49.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 50.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 51.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 52.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 53.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 54.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 55.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 56.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 57.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 58.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 59.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 60.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 61.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 62.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 63.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 64.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 65.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 66.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 67.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 68.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 69.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 70.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 71.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 72.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 73.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 74.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 75.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 76.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 77.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 78.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 79.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 80.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 81.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 82.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 83.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 84.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 85.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 86.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 87.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 88.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 89.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 90.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 91.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 92.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 93.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 94.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 95.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 96.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 97.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 98.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 99.  The FSNODE command is ignored.     
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 100.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 101.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 102.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 103.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 104.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.940   TIME= 16:57:52
+ Stresses not available for node 105.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 106.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 107.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 108.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 109.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 110.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 111.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 112.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 113.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 114.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 115.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 116.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 117.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 118.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 119.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 120.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 121.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 122.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 123.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 124.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 125.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 126.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 127.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 128.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 129.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 130.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 131.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 132.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 133.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 134.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 135.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 136.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 137.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 138.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 139.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 140.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 141.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 142.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 143.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 144.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 145.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 146.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 147.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 148.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 149.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 150.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 151.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 152.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 153.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 154.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 155.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 156.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 157.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 158.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 159.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 160.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 161.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 162.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 163.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 164.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 165.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 166.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 167.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 168.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 169.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.950   TIME= 16:57:52
+ Stresses not available for node 170.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.960   TIME= 16:57:52
+ Stresses not available for node 171.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.960   TIME= 16:57:52
+ Stresses not available for node 172.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.960   TIME= 16:57:52
+ Stresses not available for node 173.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.960   TIME= 16:57:52
+ Stresses not available for node 174.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 175.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 176.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 177.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 178.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 179.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 180.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 181.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 182.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 183.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 184.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 185.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 186.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 187.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 188.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 189.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 190.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 191.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 192.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 193.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 194.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 195.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 196.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 197.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 198.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 199.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 200.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 201.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 202.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 203.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 204.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 205.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 206.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 207.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 208.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 209.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 210.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 211.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 212.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 213.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 214.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 215.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 216.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 217.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 218.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 219.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 220.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 221.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 222.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 223.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 224.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 225.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 226.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 227.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 228.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.970   TIME= 16:57:52
+ Stresses not available for node 229.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 230.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 231.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 232.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 233.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 234.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 235.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 236.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 237.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 238.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 239.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 240.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 241.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 242.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 243.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 244.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 245.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 246.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 247.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 248.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 249.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 250.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 251.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 252.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 253.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 254.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 255.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 256.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 257.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 258.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 259.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 260.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 261.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 262.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 263.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 264.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 265.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 266.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 267.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 268.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 269.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 270.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 271.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 272.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 273.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 274.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 275.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 276.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 277.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 278.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 279.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 280.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.980   TIME= 16:57:52
+ Stresses not available for node 281.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 282.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 283.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 284.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 285.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 286.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 287.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 288.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 289.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 290.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       0.990   TIME= 16:57:52
+ Stresses not available for node 291.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 292.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 293.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 294.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 295.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 296.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 297.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 298.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 299.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 300.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 301.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 302.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 303.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 304.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 305.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 306.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 307.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 308.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 309.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 310.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 311.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 312.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 313.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 314.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 315.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 316.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 317.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 318.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 319.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 320.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 321.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 322.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 323.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 324.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 325.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 326.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 327.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 328.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 329.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 330.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 331.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 332.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 333.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 334.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 335.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 336.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 337.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 338.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 339.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 340.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 341.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 342.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 343.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 344.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 345.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 346.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 347.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 348.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 349.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 350.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 351.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 352.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 353.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 354.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 355.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 356.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 357.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 358.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 359.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 360.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 361.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 362.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 363.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 364.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 365.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 366.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 367.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 368.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 369.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 370.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 371.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 372.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 373.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 374.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 375.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 376.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 377.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 378.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 379.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 380.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 381.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 382.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 383.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 384.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 385.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 386.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 387.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 388.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 389.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 390.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.000   TIME= 16:57:52
+ Stresses not available for node 391.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 392.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 393.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 394.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 395.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 396.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 397.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 398.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 399.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 400.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 401.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 402.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 403.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 404.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 405.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 406.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 407.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 408.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 409.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 410.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 411.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 412.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 413.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 414.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 415.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 416.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 417.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 418.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 419.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 420.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 421.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 422.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.010   TIME= 16:57:52
+ Stresses not available for node 423.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 424.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 425.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 426.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 427.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 428.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 429.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 430.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 431.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 432.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 433.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 434.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 435.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 436.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 437.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 438.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 439.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 440.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.020   TIME= 16:57:52
+ Stresses not available for node 441.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 442.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 443.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 444.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 445.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 446.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 447.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 448.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 449.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 450.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 451.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 452.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 453.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 454.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 455.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 456.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 457.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 458.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 459.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 460.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 461.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 462.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 463.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 464.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 465.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 466.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 467.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 468.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 469.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 470.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 471.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 472.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 473.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 474.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 475.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 476.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 477.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 478.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 479.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 480.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 481.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 482.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 483.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 484.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 485.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 486.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 487.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 488.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 489.  The FSNODE command is ignored.    
+
+ *** ERROR ***                           CP =       1.030   TIME= 16:57:52
+ Stresses not available for node 490.  The FSNODE command is ignored.    

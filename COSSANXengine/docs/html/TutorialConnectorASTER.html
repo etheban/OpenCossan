@@ -1,0 +1,222 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialConnectorASTER</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialConnectorASTER.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Tutorial for the connector using code_aster</a></li><li><a href="#2">TODO: add cells</a></li><li><a href="#3">1. Create the Injector</a></li><li><a href="#4">Extractor</a></li><li><a href="#5">Construct the connector</a></li><li><a href="#6">run the connector</a></li><li><a href="#7">Close Figures</a></li></ul></div><h2>Tutorial for the connector using code_aster<a name="1"></a></h2><p>TODO: Add description TODO: which kind of example is? What is the model??????</p><pre>Copyright 1993-2011, COSSAN Working Group
+University of Innsbruck, Austria</pre><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@Connector">http://mechanik.uibk.ac.at/wiki/index.php/@Connector</a></p><pre class="codeinput"><span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
+<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
+CossanX.resetRandomNumberGenerator(51125)
+</pre><h2>TODO: add cells<a name="2"></a></h2><pre class="codeinput">Xrv1    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,210e9,<span class="string">'std'</span>,210e8);
+Xrv2    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>,<span class="string">'mean'</span>,8e-3,<span class="string">'std'</span>,8e-4);
+
+
+Xrvs    = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'E'</span>,<span class="string">'leng1'</span>,<span class="string">'leng2'</span>,<span class="string">'leng3'</span>,<span class="string">'leng4'</span>}<span class="keyword">...</span>
+    ,<span class="string">'Xrv'</span>,[Xrv1,Xrv2,Xrv2,Xrv2,Xrv2]);
+
+Xin     = Input(); <span class="comment">% FIXME: Write resonable input ???????????</span>
+Xin     = add(Xin,Xrvs);
+
+<span class="comment">% Xin=sample(Xin,'nsamples',Nsamples);</span>
+</pre><h2>1. Create the Injector<a name="3"></a></h2><pre class="codeinput"><span class="comment">% Xi=injector('Stype','scan','Spath','~/workspace/COSSAN-X/COSSANXengine/examples/Tutorials/connector/aster/','Sscanfilename','Cas.cossan','Sfile','Cas.comm');</span>
+
+<span class="comment">% TODO: using files in a subfolder ASTER</span>
+Xi=Injector(<span class="string">'Srelativepath'</span>,<span class="string">'./'</span>,<span class="string">'Sscanfilename'</span>,<span class="string">'Cas.cossan'</span>,<span class="string">'Sfile'</span>,<span class="string">'Cas.comm'</span>);
+</pre><pre class="codeoutput">Error using ==&gt; Injector.Injector&gt;Injector.Injector at 159
+The file to be scanned ./Cas.cossan does not exist: 
+
+Error in ==&gt; TutorialConnectorASTER at 33
+Xi=Injector('Srelativepath','./','Sscanfilename','Cas.cossan','Sfile','Cas.comm');
+</pre><h2>Extractor<a name="4"></a></h2><pre class="codeinput"><span class="comment">%  Build response</span>
+Xresp_sif = Response(<span class="string">'Sname'</span>,<span class="string">'OUT1'</span>, <span class="keyword">...</span>
+             <span class="string">'Sfieldformat'</span>, <span class="string">'%12e'</span>, <span class="keyword">...</span>
+             <span class="string">'Clookoutfor'</span>, { <span class="string">'K1'</span>;}, <span class="keyword">...</span>
+             <span class="string">'Ncolnum'</span>,41, <span class="keyword">...</span>
+             <span class="string">'Nrownum'</span>,1 );
+<span class="comment">%  Build extractor</span>
+Xe=Extractor( <span class="string">'Xresponse'</span>,Xresp_sif, <span class="keyword">...</span>
+             <span class="string">'Sdescription'</span>,<span class="string">'Extractor for the plate'</span>, <span class="keyword">...</span>
+             <span class="string">'Srelativepath'</span>,<span class="string">'./'</span>, <span class="keyword">...</span>
+             <span class="string">'Sfile'</span>,<span class="string">'Cas.resu'</span> <span class="keyword">...</span>
+             );
+</pre><h2>Construct the connector<a name="5"></a></h2><pre class="codeinput"><span class="comment">% create the connector</span>
+Xc= Connector(<span class="string">'SpredefinedType'</span>,<span class="string">'aster'</span>,<span class="string">'Smaininputfile'</span>,<span class="string">'Cas'</span>,<span class="keyword">...</span>
+    <span class="string">'Smaininputpath'</span>,fullfile(COSSANX.ScossanRoot,<span class="string">'examples/Tutorials/Connector/aster'</span>),<span class="keyword">...</span>
+    <span class="string">'Soutputfile'</span>,<span class="string">'Cas.resu'</span>,<span class="string">'Sworkingdirectory'</span>,<span class="string">'/tmp'</span>,<span class="keyword">...</span>
+    <span class="string">'Lkeepsimfiles'</span>,false);
+
+Xc=add(Xc,Xi);
+Xc=add(Xc,Xe);
+</pre><h2>run the connector<a name="6"></a></h2><pre class="codeinput">Xjm = JobManagerInterface(<span class="string">'Stype'</span>,<span class="string">'GridEngine'</span>);
+
+Xeval = Evaluator(<span class="string">'Xconnector'</span>,Xc,<span class="string">'XJobManagerInterface'</span>,Xjm,<span class="string">'CSqueues'</span>,{<span class="string">'pizzas64.q'</span>});
+<span class="comment">% create Model</span>
+Xm = Model(<span class="string">'Xinput'</span>,Xin,<span class="string">'Xevaluator'</span>, Xeval);
+<span class="comment">% Monte Carlo simulation</span>
+Xmc = Montecarlo(<span class="string">'Nsamples'</span>,3);
+Xo = Xmc.apply(Xm);
+
+Vout=Xout1.getValues(<span class="string">'Sname'</span>,<span class="string">'Load'</span>);
+
+<span class="comment">% Plot Results</span>
+f1=figure;
+fah=gca(f1);
+plot(fah,Vout,<span class="string">'*'</span>);
+</pre><h2>Close Figures<a name="7"></a></h2><pre class="codeinput">close(f1)
+
+<span class="comment">% Validate Solution</span>
+<span class="comment">% TODO: Add reference solution</span>
+Vreference=[]';
+assert(max(abs(Vout-Vreference))&lt;1e-6,<span class="keyword">...</span>
+    <span class="string">'CossanX:Tutorials:TutorialConnectorASTER'</span>,<span class="string">'Reference Solution does not match.'</span>)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial for the connector using code_aster
+% TODO: Add description
+% TODO: which kind of example is? What is the model??????
+%
+%  Copyright 1993-2011, COSSAN Working Group
+%  University of Innsbruck, Austria
+%
+% See Also: 
+% http://mechanik.uibk.ac.at/wiki/index.php/@Connector
+
+% Reset the random number generator in order to obtain always the same results.
+% DO NOT CHANGE THE VALUES OF THE SEED
+CossanX.resetRandomNumberGenerator(51125)
+
+%% TODO: add cells
+Xrv1    = RandomVariable('Sdistribution','normal','mean',210e9,'std',210e8);
+Xrv2    = RandomVariable('Sdistribution','normal','mean',8e-3,'std',8e-4);
+
+
+Xrvs    = RandomVariableSet('Cmembers',{'E','leng1','leng2','leng3','leng4'}...
+    ,'Xrv',[Xrv1,Xrv2,Xrv2,Xrv2,Xrv2]);
+
+Xin     = Input(); % FIXME: Write resonable input ???????????
+Xin     = add(Xin,Xrvs);
+
+% Xin=sample(Xin,'nsamples',Nsamples);
+
+%% 1. Create the Injector
+
+% Xi=injector('Stype','scan','Spath','~/workspace/COSSAN-X/COSSANXengine/examples/Tutorials/connector/aster/','Sscanfilename','Cas.cossan','Sfile','Cas.comm');
+
+% TODO: using files in a subfolder ASTER
+Xi=Injector('Srelativepath','./','Sscanfilename','Cas.cossan','Sfile','Cas.comm');
+
+%% Extractor
+
+
+%  Build response
+Xresp_sif = Response('Sname','OUT1', ...
+             'Sfieldformat', '%12e', ...
+             'Clookoutfor', { 'K1';}, ...
+             'Ncolnum',41, ...
+             'Nrownum',1 );
+%  Build extractor
+Xe=Extractor( 'Xresponse',Xresp_sif, ...
+             'Sdescription','Extractor for the plate', ...
+             'Srelativepath','./', ...
+             'Sfile','Cas.resu' ...
+             );
+%%  Construct the connector
+
+% create the connector
+Xc= Connector('SpredefinedType','aster','Smaininputfile','Cas',...
+    'Smaininputpath',fullfile(COSSANX.ScossanRoot,'examples/Tutorials/Connector/aster'),...
+    'Soutputfile','Cas.resu','Sworkingdirectory','/tmp',...
+    'Lkeepsimfiles',false);
+
+Xc=add(Xc,Xi);
+Xc=add(Xc,Xe);
+%% run the connector
+
+Xjm = JobManagerInterface('Stype','GridEngine');
+
+Xeval = Evaluator('Xconnector',Xc,'XJobManagerInterface',Xjm,'CSqueues',{'pizzas64.q'});
+% create Model
+Xm = Model('Xinput',Xin,'Xevaluator', Xeval);
+% Monte Carlo simulation
+Xmc = Montecarlo('Nsamples',3);
+Xo = Xmc.apply(Xm);
+
+Vout=Xout1.getValues('Sname','Load');
+
+% Plot Results
+f1=figure;
+fah=gca(f1);
+plot(fah,Vout,'*');
+%% Close Figures
+close(f1)
+
+% Validate Solution
+% TODO: Add reference solution
+Vreference=[]';
+assert(max(abs(Vout-Vreference))<1e-6,...
+    'CossanX:Tutorials:TutorialConnectorASTER','Reference Solution does not match.')
+
+
+
+##### SOURCE END #####
+--></body></html>

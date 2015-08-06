@@ -1,0 +1,695 @@
+1
+
+   Abaqus Version 6.7-3                                     DATE 19-Jan-2011   TIME 15:26:53
+   For use at EDV Zentrum Uni Innsbruck under license from ABAQUS, Inc.
+
+
+
+                            Abaqus has been developed by:
+ 
+                                  ABAQUS, Inc.
+                                Rising Sun Mills
+                               166 Valley Street
+                         Providence, RI 02909-2499, USA
+ 
+
+
+                   Available for internal use at EDV Zentrum Uni Innsbruck. 
+                   The ABAQUS Online Support System is accessible through
+                   the "My ABAQUS" section of the ABAQUS Home Page at
+                   http://www.abaqus.com.
+
+                   Support policies for academic licenses are described on
+                   the ABAQUS web site at
+                   http://www.abaqus.com/products/products_academic.html.
+ 
+                        On machine c810-cl11 
+                        you are authorized to run
+                        Abaqus/Standard until 30-Apr-2011
+
+                        Your site id is: 16UINNS 
+
+
+ 
+                    For assistance or any other information you may
+                    obtain contact information for your local office
+                    from the world wide web at:
+
+                      http://www.simulia.com/about/locations.html
+
+ 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                *                                                         * 
+                *                   *****************                     * 
+                *                   *  N O T I C E  *                     * 
+                *                   *****************                     * 
+                *                                                         * 
+                *                                                         * 
+                *                 Abaqus Version 6.7-3                    * 
+                *                                                         * 
+                *          BUILD ID: 2007_08_06-15.53.37 79879            * 
+                *                                                         * 
+                *                                                         * 
+                *  Please make sure you are using version 6.7 manuals     * 
+                *  plus the notes accompanying this release.              * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *   This program may not be used for commercial purposes  * 
+                *           without payment of a commercial fee.          * 
+                *                                                         * 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+
+ 
+
+
+
+     PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   *******************************************************
+
+
+     END PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   ***********************************************************
+
+
+
+
+     OPTIONS BEING PROCESSED
+   ***************************
+
+
+  *Heading
+  *Node
+  *Element, type=B31
+  *Nset, nset=ASSEMBLY_PART-1-1__PICKEDSET2
+  *Nset, nset=ASSEMBLY_PART-1-1__PICKEDSET3
+  *Elset, elset=ASSEMBLY_PART-1-1__PICKEDSET2
+  *Elset, elset=ASSEMBLY_PART-1-1__PICKEDSET3
+  *Nset, nset=ASSEMBLY_SET-1
+  *Nset, nset=ASSEMBLY__PICKEDSET5
+  *Nset, nset=ASSEMBLY__PICKEDSET6
+  *material, name=MATERIAL-1
+  *elastic
+  *beamgeneralsection, elset=ASSEMBLY_PART-1-1__PICKEDSET3, poisson=0.3, section=GENERAL
+  *boundary
+  *boundary
+  *beamgeneralsection, elset=ASSEMBLY_PART-1-1__PICKEDSET3, poisson=0.3, section=GENERAL
+  *output, field
+  *output, field, variable=PRESELECT
+  *output, history, variable=PRESELECT
+  *elementoutput, directions=YES
+  *output, field
+  *output, field, variable=PRESELECT
+  *output, history, variable=PRESELECT
+  *elementoutput, directions=YES
+  *output, field
+  *output, field, variable=PRESELECT
+  *output, history, variable=PRESELECT
+  *elementoutput, directions=YES
+  *Step, name=Step-1
+  *output, field
+  *output, field, variable=PRESELECT
+  *output, history, variable=PRESELECT
+  *Step, name=Step-1
+  *Step, name=Step-1
+  *static
+  *output, field
+  *elementoutput, directions=YES
+
+ ***WARNING: OUTPUT REQUEST HP IS NOT AVAILABLE FOR ELEMENT TYPE B31 ASSOCIATED 
+             WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST P IS NOT AVAILABLE FOR ELEMENT TYPE B31 ASSOCIATED 
+             WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST TRNOR IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST TRSHR IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: STRAIN OUTPUT REQUEST LE IS NOT VALID FOR SOME ELEMENTS IN THIS 
+             ANALYSIS. THIS REQUEST IS SWITCHED TO THE STRAIN MEASURE, E.
+
+ ***WARNING: STRAIN OUTPUT REQUEST NE IS NOT VALID FOR SOME ELEMENTS IN THIS 
+             ANALYSIS. THIS REQUEST IS SWITCHED TO THE STRAIN MEASURE, E.
+
+ ***WARNING: OUTPUT REQUEST ALPHA IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST CTSHR IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST DAMAGEC IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST DAMAGEFC IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST DAMAGEFT IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST DAMAGEMC IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST DAMAGEMT IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST DAMAGESHR IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST DAMAGET IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST E IS NOT AVAILABLE FOR ELEMENT TYPE B31 UNLESS 
+             *SECTION POINTS IS SPECIFIED AS PART OF THE *BEAM GENERAL SECTION 
+             DEFINITION
+
+ ***WARNING: OUTPUT REQUEST EE IS NOT AVAILABLE FOR ELEMENT TYPE B31 ASSOCIATED 
+             WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST ER IS NOT AVAILABLE FOR ELEMENT TYPE B31 ASSOCIATED 
+             WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST IE IS NOT AVAILABLE FOR ELEMENT TYPE B31 ASSOCIATED 
+             WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST MISESMAX IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST PE IS NOT AVAILABLE FOR ELEMENT TYPE B31 ASSOCIATED 
+             WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST PEEQ IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST PEEQMAX IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST PEEQT IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST PEMAG IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST PEQC IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST PS IS NOT AVAILABLE FOR ELEMENT TYPE B31 ASSOCIATED 
+             WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST S IS NOT AVAILABLE FOR ELEMENT TYPE B31 UNLESS 
+             *SECTION POINTS IS SPECIFIED AS PART OF THE *BEAM GENERAL SECTION 
+             DEFINITION
+
+ ***WARNING: OUTPUT REQUEST SALPHA IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST SDEG IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST SEE IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST SEP IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST SEPE IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST SPE IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST THE IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST TSHR IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST VE IS NOT AVAILABLE FOR ELEMENT TYPE B31 ASSOCIATED 
+             WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST VEEQ IS NOT AVAILABLE FOR ELEMENT TYPE B31 
+             ASSOCIATED WITH A *BEAM GENERAL SECTION DEFINITION
+
+ ***WARNING: OUTPUT REQUEST VS IS NOT AVAILABLE FOR ELEMENT TYPE B31 ASSOCIATED 
+             WITH A *BEAM GENERAL SECTION DEFINITION
+  *output, field, variable=PRESELECT
+  *output, history, variable=PRESELECT
+  *elprint
+
+ ***WARNING: OUTPUT REQUEST S11 IS NOT AVAILABLE FOR ELEMENT TYPE B31 UNLESS 
+             *SECTION POINTS IS SPECIFIED AS PART OF THE *BEAM GENERAL SECTION 
+             DEFINITION
+
+ ***WARNING: OUTPUT REQUEST S12 IS NOT AVAILABLE FOR ELEMENT TYPE B31 UNLESS 
+             *SECTION POINTS IS SPECIFIED AS PART OF THE *BEAM GENERAL SECTION 
+             DEFINITION
+  *elfile
+
+ ***WARNING: OUTPUT REQUEST S IS NOT AVAILABLE FOR ELEMENT TYPE B31 UNLESS 
+             *SECTION POINTS IS SPECIFIED AS PART OF THE *BEAM GENERAL SECTION 
+             DEFINITION
+  *endstep
+  *boundary
+  *boundary
+  *Step, name=Step-1
+  *static
+  *cload
+  *output, field
+  *nodeoutput
+
+ ***WARNING: OUTPUT REQUEST V IS NOT AVAILABLE FOR THIS TYPE OF ANALYSIS
+
+ ***WARNING: OUTPUT REQUEST VF IS NOT AVAILABLE FOR THIS TYPE OF ANALYSIS
+
+ ***WARNING: OUTPUT REQUEST VR IS NOT AVAILABLE FOR THIS TYPE OF ANALYSIS
+
+ ***WARNING: OUTPUT REQUEST VT IS NOT AVAILABLE FOR THIS TYPE OF ANALYSIS
+  *output, field, variable=PRESELECT
+  *output, history, variable=PRESELECT
+  *nodeprint
+  *nodefile
+  *endstep
+
+
+                              E L E M E N T,   N O D E,   A N D   S U R F A C E   M A P S
+
+
+Assembly name: ASSEMBLY
+Number of instances: 1
+
+ASSEMBLY LEVEL
+  node sets:
+    SET-1:
+      instance name: PART-1-1
+      number of nodes: 1
+      nodes: 
+        31
+
+
+
+  element sets:
+  Surfaces:
+
+INSTANCE LEVEL
+  node sets:
+    Instance name: PART-1-1
+
+  element sets:
+    Instance name: PART-1-1
+
+  Surfaces:
+
+GLOBAL TO LOCAL NODE AND ELEMENT MAPS
+  Global     Local      
+  node       node       
+  number     number     
+                        Instance name                                   
+   1          1         PART-1-1                                        
+   2          2         PART-1-1                                        
+   3          3         PART-1-1                                        
+   4          4         PART-1-1                                        
+   5          5         PART-1-1                                        
+   6          6         PART-1-1                                        
+   7          7         PART-1-1                                        
+   8          8         PART-1-1                                        
+   9          9         PART-1-1                                        
+   10         10        PART-1-1                                        
+   11         11        PART-1-1                                        
+   12         12        PART-1-1                                        
+   13         13        PART-1-1                                        
+   14         14        PART-1-1                                        
+   15         15        PART-1-1                                        
+   16         16        PART-1-1                                        
+   17         17        PART-1-1                                        
+   18         18        PART-1-1                                        
+   19         19        PART-1-1                                        
+   20         20        PART-1-1                                        
+   21         21        PART-1-1                                        
+   22         22        PART-1-1                                        
+   23         23        PART-1-1                                        
+   24         24        PART-1-1                                        
+   25         25        PART-1-1                                        
+   26         26        PART-1-1                                        
+   27         27        PART-1-1                                        
+   28         28        PART-1-1                                        
+   29         29        PART-1-1                                        
+   30         30        PART-1-1                                        
+   31         31        PART-1-1                                        
+   32         32        PART-1-1                                        
+   33         33        PART-1-1                                        
+   34         34        PART-1-1                                        
+   35         35        PART-1-1                                        
+   36         36        PART-1-1                                        
+   37         37        PART-1-1                                        
+   38         38        PART-1-1                                        
+   39         39        PART-1-1                                        
+   40         40        PART-1-1                                        
+   41         41        PART-1-1                                        
+
+  Global     Local      
+  element    element    
+  number     number     
+                        Instance name                                   
+   1          1         PART-1-1                                        
+   2          2         PART-1-1                                        
+   3          3         PART-1-1                                        
+   4          4         PART-1-1                                        
+   5          5         PART-1-1                                        
+   6          6         PART-1-1                                        
+   7          7         PART-1-1                                        
+   8          8         PART-1-1                                        
+   9          9         PART-1-1                                        
+   10         10        PART-1-1                                        
+   11         11        PART-1-1                                        
+   12         12        PART-1-1                                        
+   13         13        PART-1-1                                        
+   14         14        PART-1-1                                        
+   15         15        PART-1-1                                        
+   16         16        PART-1-1                                        
+   17         17        PART-1-1                                        
+   18         18        PART-1-1                                        
+   19         19        PART-1-1                                        
+   20         20        PART-1-1                                        
+   21         21        PART-1-1                                        
+   22         22        PART-1-1                                        
+   23         23        PART-1-1                                        
+   24         24        PART-1-1                                        
+   25         25        PART-1-1                                        
+   26         26        PART-1-1                                        
+   27         27        PART-1-1                                        
+   28         28        PART-1-1                                        
+   29         29        PART-1-1                                        
+   30         30        PART-1-1                                        
+   31         31        PART-1-1                                        
+   32         32        PART-1-1                                        
+   33         33        PART-1-1                                        
+   34         34        PART-1-1                                        
+   35         35        PART-1-1                                        
+   36         36        PART-1-1                                        
+   37         37        PART-1-1                                        
+   38         38        PART-1-1                                        
+   39         39        PART-1-1                                        
+   40         40        PART-1-1                                        
+
+LOCAL TO GLOBAL NODE AND ELEMENT MAPS
+                                                  Local      Global     
+                                                  node       node       
+                                                  number     number
+  Instance name
+  PART-1-1                                         1          1         
+  PART-1-1                                         2          2         
+  PART-1-1                                         3          3         
+  PART-1-1                                         4          4         
+  PART-1-1                                         5          5         
+  PART-1-1                                         6          6         
+  PART-1-1                                         7          7         
+  PART-1-1                                         8          8         
+  PART-1-1                                         9          9         
+  PART-1-1                                         10         10        
+  PART-1-1                                         11         11        
+  PART-1-1                                         12         12        
+  PART-1-1                                         13         13        
+  PART-1-1                                         14         14        
+  PART-1-1                                         15         15        
+  PART-1-1                                         16         16        
+  PART-1-1                                         17         17        
+  PART-1-1                                         18         18        
+  PART-1-1                                         19         19        
+  PART-1-1                                         20         20        
+  PART-1-1                                         21         21        
+  PART-1-1                                         22         22        
+  PART-1-1                                         23         23        
+  PART-1-1                                         24         24        
+  PART-1-1                                         25         25        
+  PART-1-1                                         26         26        
+  PART-1-1                                         27         27        
+  PART-1-1                                         28         28        
+  PART-1-1                                         29         29        
+  PART-1-1                                         30         30        
+  PART-1-1                                         31         31        
+  PART-1-1                                         32         32        
+  PART-1-1                                         33         33        
+  PART-1-1                                         34         34        
+  PART-1-1                                         35         35        
+  PART-1-1                                         36         36        
+  PART-1-1                                         37         37        
+  PART-1-1                                         38         38        
+  PART-1-1                                         39         39        
+  PART-1-1                                         40         40        
+  PART-1-1                                         41         41        
+
+                                                  Local      Global     
+                                                  element    element    
+                                                  number     number
+  Instance name
+  PART-1-1                                         1          1         
+  PART-1-1                                         2          2         
+  PART-1-1                                         3          3         
+  PART-1-1                                         4          4         
+  PART-1-1                                         5          5         
+  PART-1-1                                         6          6         
+  PART-1-1                                         7          7         
+  PART-1-1                                         8          8         
+  PART-1-1                                         9          9         
+  PART-1-1                                         10         10        
+  PART-1-1                                         11         11        
+  PART-1-1                                         12         12        
+  PART-1-1                                         13         13        
+  PART-1-1                                         14         14        
+  PART-1-1                                         15         15        
+  PART-1-1                                         16         16        
+  PART-1-1                                         17         17        
+  PART-1-1                                         18         18        
+  PART-1-1                                         19         19        
+  PART-1-1                                         20         20        
+  PART-1-1                                         21         21        
+  PART-1-1                                         22         22        
+  PART-1-1                                         23         23        
+  PART-1-1                                         24         24        
+  PART-1-1                                         25         25        
+  PART-1-1                                         26         26        
+  PART-1-1                                         27         27        
+  PART-1-1                                         28         28        
+  PART-1-1                                         29         29        
+  PART-1-1                                         30         30        
+  PART-1-1                                         31         31        
+  PART-1-1                                         32         32        
+  PART-1-1                                         33         33        
+  PART-1-1                                         34         34        
+  PART-1-1                                         35         35        
+  PART-1-1                                         36         36        
+  PART-1-1                                         37         37        
+  PART-1-1                                         38         38        
+  PART-1-1                                         39         39        
+  PART-1-1                                         40         40        
+
+
+
+
+                            P R O B L E M   S I Z E
+
+
+          NUMBER OF ELEMENTS IS                                    40
+          NUMBER OF NODES IS                                      121
+          NUMBER OF NODES DEFINED BY THE USER                      41
+          NUMBER OF INTERNAL NODES GENERATED BY THE PROGRAM        80
+          TOTAL NUMBER OF VARIABLES IN THE MODEL                  246
+          (DEGREES OF FREEDOM PLUS ANY LAGRANGE MULTIPLIER VARIABLES)
+
+
+
+                              END OF USER INPUT PROCESSING
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =  0.21000    
+       SYSTEM TIME (SEC)    =  4.00000E-02
+       TOTAL CPU TIME (SEC) =  0.25000    
+       WALLCLOCK TIME (SEC) =          0
+1
+
+   Abaqus Version 6.7-3                                     DATE 19-Jan-2011   TIME 15:26:54
+   For use at EDV Zentrum Uni Innsbruck under license from ABAQUS, Inc.
+
+                                                                                               STEP    1  INCREMENT    1
+                                                                                          TIME COMPLETED IN THIS STEP   0.00    
+
+
+                        S T E P       1     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                 1.00    
+          AND A TOTAL TIME PERIOD OF                            1.00    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-05
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                 1.00    
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+
+
+ STEP     1, INCREMENT          1, TIME INCREMENT=         0.100E+01, TOTAL TIME=         0.100E+01
+ REORDERING OF EQUATIONS TO MINIMIZE WAVEFRONT HAS CHANGED THE MEMORY AND DISK ESTIMATES TO:
+  
+                   M E M O R Y   A N D   D I S K   E S T I M A T E
+  
+           SUMMARY FOR CURRENT NODE ORDERING
+          (NOTE THAT IF NODE ORDERING CHANGES THE SIZE ESTIMATES FOR THE STEPS WILL CHANGE)
+  
+  
+           STEP   MAXIMUM DOF     FLOATING PT    MINIMUM MEMORY      MEMORY TO      REQUIRED DISKSPACE
+                  WAVEFRONT       OPERATIONS       REQUIRED        MINIMIZE I/O
+                                PER ITERATION     (MBYTES)           (MBYTES)          (KBYTES)
+  
+             1          18         4.86E+04          3.13               3.87             58.01
+          ----    ---------      ------------    -------------     -------------      -------------
+           MAX          18         4.86E+04          3.13               3.87             58.01
+  
+  
+          THE TABLE ABOVE PROVIDES A STEP BY STEP SUMMARY OF SOME BASIC SIZING INFORMATION
+          FOR THE PROBLEM. SOME FURTHER DESCRIPTION OF THE PARAMETERS GIVEN FOLLOWS:
+  
+          (1) MAXIMUM DOF WAVEFRONT - SIZE OF THE BIGGEST FRONT IN THE EQUATION SOLVER.
+              PROVIDES A BASIC SIZING OF THE MOST MEMORY INTENSIVE SEGMENT OF SOLVER.
+          (2) FLOATING POINT OPERATIONS PER ITERATION - MEASURE OF THE NUMBER OF FLOATING
+              POINT OPERATIONS REQUIRED FOR A SINGLE SOLVER PASS. ON A GIVEN PLATFORM
+              THE TIME REQUIRED FOR A SOLVER PASS WILL BE ROUGHLY A LINEAR FUNCTION
+              OF THIS VALUE.
+              NOTE - EXCEPT FOR THE FIRST STEP, THE VALUE IN THIS TABLE DOES NOT INCLUDE
+                     ADDITIONAL FLOATING POINT OPERATIONS THAT ARE REQUIRED IN MULTIPLE LOAD
+                     CASE STEPS WHEN CONSTRAINTS CHANGE FROM LOAD CASE TO LOAD CASE.  THIS
+                     SITUATION CAUSES A REORDERING TO BE PERFORMED, AT WHICH TIME AN UPPER
+                     BOUND ON THE NUMBER OF ADDITIONAL FLOATING POINT OPERATIONS WILL BE
+                     CALCULATED AND INCLUDED UNDER THE ESTIMATE SUMMARIES FOR THE RELEVANT
+                     STEPS (SEE NOTE BELOW ON REORDERING).
+          (3) MINIMUM MEMORY REQUIRED - MINIMUM POSSIBLE MEMORY VALUE FOR standard_memory
+              THAT ENABLES Abaqus TO SOLVE THE PROBLEM. USE OF MEMORY WILL BE MINIMIZED BY
+              WRITING AS MUCH INFORMATION AS POSSIBLE TO DISK WHICH WILL INCREASE I/O TIME.
+          (4) MEMORY TO MINIMIZE I/O - VALUE OF standard_memory THAT ALLOWS Abaqus TO KEEP
+              ALL SIGNIFICANT SCRATCH FILES IN MEMORY. THIS WILL MINIMIZE I/O TIME FOR THE USER
+              WITH ACCESS TO A LARGE AMOUNT OF MEMORY.
+          (5) REQUIRED DISKSPACE - AMOUNT OF DISK REQUIRED FOR SCRATCH FILES. THESE WILL BE
+              DELETED AT THE END OF THE ANALYSIS.
+  
+  
+           NOTE - WHENEVER POSSIBLE THE USER SHOULD SET standard_memory TO BE LESS THAN THE
+          PHYSICAL MEMORY ON THE MACHINE. UNLESS NECESSARY USERS SHOULD NOT MAKE USE
+          OF VIRTUAL MEMORY EVEN IN AN ATTEMPT TO KEEP SCRATCH FILES IN MEMORY.
+  
+           NOTE - IF A REORDERING IS PERFORMED (THIS WILL ONLY GENERALLY BE DONE FOR FINITE-
+          SLIDING CONTACT PROBLEMS), THE SIZE ESTIMATES DONE AT THIS TIME WILL NO LONGER 
+          BE VALID. THE ESTIMATES WILL BE REDONE IN THE EVENT OF A REORDERING AND A NEW 
+          SUMMARY WILL BE PRINTED FOR THE REMAINING STEPS.
+  
+  
+  
+           S I Z E   E S T I M A T E S   F O R   C U R R E N T   S T E P
+  
+          NUMBER OF EQUATIONS                        246
+          MAX DOF WAVEFRONT                          18
+          FLOATING POINT OPS PER SOLVER ITERATION    4.86E+04
+          MEMORY USED FOR STEP                     256.00 MBYTES
+  
+  
+           ESTIMATED FILE SIZES
+  
+           FILE           KWORDS           KBYTES
+  
+          .fct             3.345           26.133
+          .nck             0.480            3.750
+          .opr             3.600           28.125
+          -------        -------          -------
+           TOTAL           7.425           58.008
+  
+
+
+                                INCREMENT     1 SUMMARY
+
+
+ TIME INCREMENT COMPLETED   1.00    ,  FRACTION OF STEP COMPLETED   1.00    
+ STEP TIME COMPLETED        1.00    ,  TOTAL TIME COMPLETED         1.00    
+
+
+
+
+                                       N O D E   O U T P U T
+
+  
+  
+  
+   THE FOLLOWING TABLE IS PRINTED FOR ALL NODES
+  
+       NODE FOOT-   U1          U2          U3          UR1         UR2         UR3      
+            NOTE
+  
+          1       0.000       0.000       0.000       0.000       0.000      8.4168E-05 
+          2       0.000      2.1217E-04   0.000       0.000       0.000      8.4000E-05 
+          3       0.000      4.2349E-04   0.000       0.000       0.000      8.3495E-05 
+          4       0.000      6.3313E-04   0.000       0.000       0.000      8.2653E-05 
+          5       0.000      8.4025E-04   0.000       0.000       0.000      8.1475E-05 
+          6       0.000      1.0440E-03   0.000       0.000       0.000      7.9960E-05 
+          7       0.000      1.2435E-03   0.000       0.000       0.000      7.8108E-05 
+          8       0.000      1.4380E-03   0.000       0.000       0.000      7.5920E-05 
+          9       0.000      1.6266E-03   0.000       0.000       0.000      7.3395E-05 
+         10       0.000      1.8085E-03   0.000       0.000       0.000      7.0533E-05 
+         11       0.000      1.9828E-03   0.000       0.000       0.000      6.7335E-05 
+         12       0.000      2.1487E-03   0.000       0.000       0.000      6.3800E-05 
+         13       0.000      2.3053E-03   0.000       0.000       0.000      5.9928E-05 
+         14       0.000      2.4518E-03   0.000       0.000       0.000      5.5719E-05 
+         15       0.000      2.5874E-03   0.000       0.000       0.000      5.1174E-05 
+         16       0.000      2.7111E-03   0.000       0.000       0.000      4.6293E-05 
+         17       0.000      2.8223E-03   0.000       0.000       0.000      4.1074E-05 
+         18       0.000      2.9200E-03   0.000       0.000       0.000      3.5519E-05 
+         19       0.000      3.0034E-03   0.000       0.000       0.000      2.9627E-05 
+         20       0.000      3.0716E-03   0.000       0.000       0.000      2.3399E-05 
+         21       0.000      3.1239E-03   0.000       0.000       0.000      1.6834E-05 
+         22       0.000      3.1593E-03   0.000       0.000       0.000      9.9319E-06 
+         23       0.000      3.1770E-03   0.000       0.000       0.000      2.6934E-06 
+         24       0.000      3.1762E-03   0.000       0.000       0.000     -4.8818E-06 
+         25       0.000      3.1561E-03   0.000       0.000       0.000     -1.2794E-05 
+         26       0.000      3.1158E-03   0.000       0.000       0.000     -2.1042E-05 
+         27       0.000      3.0544E-03   0.000       0.000       0.000     -2.9627E-05 
+         28       0.000      2.9711E-03   0.000       0.000       0.000     -3.8549E-05 
+         29       0.000      2.8651E-03   0.000       0.000       0.000     -4.7808E-05 
+         30       0.000      2.7356E-03   0.000       0.000       0.000     -5.7403E-05 
+         31       0.000      2.5816E-03   0.000       0.000       0.000     -6.7335E-05 
+         32       0.000      2.3954E-03   0.000       0.000       0.000     -7.6930E-05 
+         33       0.000      2.1865E-03   0.000       0.000       0.000     -8.5515E-05 
+         34       0.000      1.9574E-03   0.000       0.000       0.000     -9.3090E-05 
+         35       0.000      1.7106E-03   0.000       0.000       0.000     -9.9655E-05 
+         36       0.000      1.4486E-03   0.000       0.000       0.000     -1.0521E-04 
+         37       0.000      1.1740E-03   0.000       0.000       0.000     -1.0976E-04 
+         38       0.000      8.8937E-04   0.000       0.000       0.000     -1.1329E-04 
+         39       0.000      5.9712E-04   0.000       0.000       0.000     -1.1582E-04 
+         40       0.000      2.9982E-04   0.000       0.000       0.000     -1.1733E-04 
+         41       0.000       0.000       0.000       0.000       0.000     -1.1784E-04 
+
+ MAXIMUM          0.000      3.1770E-03   0.000       0.000       0.000      8.4168E-05
+ AT NODE                 1          23           1           1           1           1
+
+ MINIMUM          0.000       0.000       0.000       0.000       0.000     -1.1784E-04
+ AT NODE                 1           1           1           1           1          41
+
+
+          THE ANALYSIS HAS BEEN COMPLETED
+
+
+
+                              ANALYSIS COMPLETE
+                              WITH    46 WARNING MESSAGES ON THE DAT FILE
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =  0.15000    
+       SYSTEM TIME (SEC)    =  5.00000E-02
+       TOTAL CPU TIME (SEC) =  0.20000    
+       WALLCLOCK TIME (SEC) =          0

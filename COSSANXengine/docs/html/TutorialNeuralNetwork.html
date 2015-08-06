@@ -1,0 +1,226 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialNeuralNetwork</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialNeuralNetwork.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Data on model</a></li><li><a href="#3">Evaluator</a></li><li><a href="#4">Construction and Training of Neural network</a></li><li><a href="#5">Apply trained Neural network meta-model</a></li></ul></div><pre class="codeinput"><span class="comment">%   Example on Neural Network</span>
+<span class="comment">%</span>
+<span class="comment">%   A meta model for the displacement at the tip of a cantilever beam is created</span>
+<span class="comment">%</span>
+<span class="comment">% TODO: add comments</span>
+</pre><h2>Data on model<a name="2"></a></h2><pre> Here, 4 input parameters (namely load, length of the beam, second
+ moment of inertia of cross section of beam and Young's modulus) of the
+ cantilever beam model are defined</pre><pre class="codeinput">Xin = Input(<span class="string">'Sdescription'</span>,<span class="string">'input parameters of cantilever beam model'</span>);
+XP = RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'load at tip of beam'</span>,<span class="keyword">...</span>
+    <span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'par1'</span>,0.5e6,<span class="string">'par2'</span>,1.5e6);
+Xh = RandomVariable(<span class="string">'Sdescription'</span>,<span class="string">'height of cross section of beam'</span>,<span class="keyword">...</span>
+    <span class="string">'Sdistribution'</span>,<span class="string">'uniform'</span>,<span class="string">'par1'</span>,0.2,<span class="string">'par2'</span>,0.3);
+Xrvset      = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Xh'</span>,<span class="string">'XP'</span>});
+Xin         = add(Xin,Xrvset);
+XL = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'length of beam'</span>,<span class="string">'value'</span>,1);
+Xin = add(Xin,XL);
+XI = Function(<span class="string">'Sdescription'</span>,<span class="string">'second moment of inertia of beam'</span>,<span class="keyword">...</span>
+    <span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;Xh&amp;&gt;.^4/12'</span>);
+Xin = add(Xin,XI);
+XE  = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Young''s modulus of beam'</span>,<span class="string">'value'</span>,2e11);
+Xin = add(Xin,XE);
+
+<span class="comment">% this parameters are used in the test computation of pf</span>
+Xthreshold1 = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Define threshold'</span>,<span class="string">'value'</span>,0.016);
+Xin = add(Xin,Xthreshold1);
+Xthreshold2 = Parameter(<span class="string">'Sdescription'</span>,<span class="string">'Define threshold'</span>,<span class="string">'value'</span>,0.017);
+Xin = add(Xin,Xthreshold2);
+</pre><h2>Evaluator<a name="3"></a></h2><pre> An evaluator based on a mio script is defined. This evaluator
+ calculates the displacement at the tip of a cantilever beam, i.e.
+ displacement = load * length^3 / (3 * Young's modulus * Inertia)</pre><pre class="codeinput"><span class="comment">%2.1. Definition of MIO object and construction of evaluator</span>
+Xmio = Mio(<span class="string">'Sdescription'</span>,<span class="string">'displacement at tip of cantilever beam'</span>, <span class="keyword">...</span>
+        <span class="string">'SScript'</span>,<span class="string">'for i=1:length(Tinput),    Toutput(i).disp  = Tinput(i).XP*Tinput(1).XL^3/(3*Tinput(1).XE*Tinput(i).XI);end'</span>,<span class="keyword">...</span>
+        <span class="string">'Cinputnames'</span>,{<span class="string">'XP'</span>,<span class="string">'XL'</span>,<span class="string">'XE'</span>,<span class="string">'XI'</span>},<span class="keyword">...</span>
+        <span class="string">'Coutputnames'</span>,{<span class="string">'disp'</span>},<span class="keyword">...</span>
+        <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+        <span class="string">'Lfunction'</span>,false);
+<span class="comment">%2.2. Add MIO to evaluator</span>
+Xev = Evaluator(<span class="string">'Sdescription'</span>,<span class="string">'displacement at tip of cantilever beam'</span>,<span class="string">'XMio'</span>,Xmio);
+<span class="comment">%2.3. Add Evaluator to a model</span>
+Xmod = Model(<span class="string">'XEvaluator'</span>,Xev,<span class="string">'Xinput'</span>,Xin);
+</pre><h2>Construction and Training of Neural network<a name="4"></a></h2><pre> In this step, the response surface model is created</pre><pre class="codeinput">Xnn = NeuralNetwork(<span class="string">'Sdescription'</span>,<span class="string">'Neural network of tip displacement of cantilever beam'</span>,<span class="keyword">...</span>
+    <span class="string">'Stype'</span>,<span class="string">'HyperbolicTangent'</span>,<span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'disp'</span>},<span class="keyword">...</span><span class="comment">  %response to be extracted from full model</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'XP'</span> <span class="string">'Xh'</span>},<span class="keyword">...</span>
+    <span class="string">'Xfullmodel'</span>,Xmod,<span class="keyword">...</span>
+    <span class="string">'Vnnodes'</span>,[2, 3, 1],<span class="keyword">...</span>
+    <span class="string">'Vnormminmax'</span>,[-0.8 0.8]);
+
+Xmc=LatinHypercubeSampling(<span class="string">'Nsamples'</span>,200);
+Xnn = Xnn.calibrate(<span class="string">'XSimulator'</span>,Xmc);
+
+Xmc=MonteCarlo(<span class="string">'Nsamples'</span>,40);
+Xnn = Xnn.validate(<span class="string">'XSimulator'</span>,Xmc);
+</pre><pre class="codeoutput">Error using ==&gt; Mio.runScript at 48
+ The user define script can not be evaluate!  Please check your script 
+Undefined function or method 'mtimes' for input arguments of type 'cell'.
+
+Error in ==&gt; Mio.run at 182
+        [XsimOut Poutput]=runScript(Xmio,Psamples);
+
+Error in ==&gt; Evaluator.apply at 124
+                XSimOutTmp=Xobj.CXsolvers{n}.run(PinputMio);
+
+Error in ==&gt; Model.apply at 17
+Xout = apply(Xmdl.Xevaluator,Pinput);
+
+Error in ==&gt; MetaModel.calibrate at 97
+    Xobj.XcalibrationOutput = apply(Xobj.XFullmodel,Xobj.XcalibrationInput);
+
+Error in ==&gt; TutorialNeuralNetwork at 61
+Xnn = Xnn.calibrate('XSimulator',Xmc);
+</pre><h2>Apply trained Neural network meta-model<a name="5"></a></h2><p>the accuracy of the neural network is tested by computing the failure probability of the tip-loaded beam. This result is compared with the real model</p><pre class="codeinput">Xpf = PerformanceFunction(<span class="string">'Sdemand'</span>,<span class="string">'disp'</span>,<span class="string">'Scapacity'</span>,<span class="string">'Xthreshold1'</span>,<span class="string">'SoutputName'</span>,<span class="string">'Vg'</span>);
+Xpm_real = ProbabilisticModel(<span class="string">'XModel'</span>,Xmod,<span class="string">'XPerformanceFunction'</span>,Xpf);
+Xpm_metamodel = ProbabilisticModel(<span class="string">'XModel'</span>,Xnn,<span class="string">'XPerformanceFunction'</span>,Xpf);
+
+Xmc=MonteCarlo(<span class="string">'Sdescription'</span>,<span class="string">'Mio evaluation'</span>,<span class="string">'Nsamples'</span>,1000,<span class="string">'Nbatches'</span>,1);
+Xo_real = Xpm_real.pf(Xmc)
+Xmc=MonteCarlo(<span class="string">'Sdescription'</span>,<span class="string">'NN evaluation'</span>,<span class="string">'Nsamples'</span>,1000,<span class="string">'Nbatches'</span>,1);
+Xo_metamodel = Xpm_metamodel.pf(Xmc)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%   Example on Neural Network 
+%
+%   A meta model for the displacement at the tip of a cantilever beam is created
+%
+% TODO: add comments 
+
+%%    Data on model
+%   Here, 4 input parameters (namely load, length of the beam, second
+%   moment of inertia of cross section of beam and Young's modulus) of the
+%   cantilever beam model are defined
+Xin = Input('Sdescription','input parameters of cantilever beam model');
+XP = RandomVariable('Sdescription','load at tip of beam',...
+    'Sdistribution','uniform','par1',0.5e6,'par2',1.5e6);
+Xh = RandomVariable('Sdescription','height of cross section of beam',...
+    'Sdistribution','uniform','par1',0.2,'par2',0.3);
+Xrvset      = RandomVariableSet('Cmembers',{'Xh','XP'});
+Xin         = add(Xin,Xrvset);
+XL = Parameter('Sdescription','length of beam','value',1);
+Xin = add(Xin,XL);
+XI = Function('Sdescription','second moment of inertia of beam',...
+    'Sexpression','<&Xh&>.^4/12');
+Xin = add(Xin,XI);
+XE  = Parameter('Sdescription','Young''s modulus of beam','value',2e11);
+Xin = add(Xin,XE);
+
+% this parameters are used in the test computation of pf
+Xthreshold1 = Parameter('Sdescription','Define threshold','value',0.016);
+Xin = add(Xin,Xthreshold1);
+Xthreshold2 = Parameter('Sdescription','Define threshold','value',0.017);
+Xin = add(Xin,Xthreshold2);
+
+%%    Evaluator
+%   An evaluator based on a mio script is defined. This evaluator
+%   calculates the displacement at the tip of a cantilever beam, i.e.
+%   displacement = load * length^3 / (3 * Young's modulus * Inertia)
+% 
+%2.1. Definition of MIO object and construction of evaluator
+Xmio = Mio('Sdescription','displacement at tip of cantilever beam', ...
+        'SScript','for i=1:length(Tinput),    Toutput(i).disp  = Tinput(i).XP*Tinput(1).XL^3/(3*Tinput(1).XE*Tinput(i).XI);end',...
+        'Cinputnames',{'XP','XL','XE','XI'},...
+        'Coutputnames',{'disp'},...
+        'Liostructure',true,...
+        'Lfunction',false);
+%2.2. Add MIO to evaluator
+Xev = Evaluator('Sdescription','displacement at tip of cantilever beam','XMio',Xmio);
+%2.3. Add Evaluator to a model
+Xmod = Model('XEvaluator',Xev,'Xinput',Xin);
+
+
+%%    Construction and Training of Neural network
+%   In this step, the response surface model is created
+Xnn = NeuralNetwork('Sdescription','Neural network of tip displacement of cantilever beam',...
+    'Stype','HyperbolicTangent',...
+    'Coutputnames',{'disp'},...  %response to be extracted from full model
+    'Cinputnames',{'XP' 'Xh'},...
+    'Xfullmodel',Xmod,...
+    'Vnnodes',[2, 3, 1],...
+    'Vnormminmax',[-0.8 0.8]);
+
+Xmc=LatinHypercubeSampling('Nsamples',200);
+Xnn = Xnn.calibrate('XSimulator',Xmc);
+
+Xmc=MonteCarlo('Nsamples',40);
+Xnn = Xnn.validate('XSimulator',Xmc);
+
+%%  Apply trained Neural network meta-model
+% the accuracy of the neural network is tested by computing the failure
+% probability of the tip-loaded beam. This result is compared with the
+% real model
+Xpf = PerformanceFunction('Sdemand','disp','Scapacity','Xthreshold1','SoutputName','Vg');
+Xpm_real = ProbabilisticModel('XModel',Xmod,'XPerformanceFunction',Xpf);
+Xpm_metamodel = ProbabilisticModel('XModel',Xnn,'XPerformanceFunction',Xpf);
+
+Xmc=MonteCarlo('Sdescription','Mio evaluation','Nsamples',1000,'Nbatches',1);
+Xo_real = Xpm_real.pf(Xmc)
+Xmc=MonteCarlo('Sdescription','NN evaluation','Nsamples',1000,'Nbatches',1);
+Xo_metamodel = Xpm_metamodel.pf(Xmc)
+
+##### SOURCE END #####
+--></body></html>

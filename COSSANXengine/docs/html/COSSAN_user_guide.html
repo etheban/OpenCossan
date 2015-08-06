@@ -1,0 +1,162 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>COSSAN-X Toolbox User Guide</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-02-23"><meta name="DC.source" content="COSSAN_user_guide.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>COSSAN-X Toolbox User Guide</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">What is "COSSAN-X"?</a></li><li><a href="#2">Overview of the features of COSSAN-X %%</a></li><li><a href="#3">Interaction with 3rd party software</a></li><li><a href="#4">See also</a></li></ul></div><h2>What is "COSSAN-X"?<a name="1"></a></h2><p>COSSAN is a general purpose software package for stochastic and reliability analysis taking into account the uncertainties associated to geometric, material and loading parameters. COSSAN-X, which is the latest version of COSSAN, provides in this regard an efficient approach to integrate third-party (deterministic) software (e.g. Finite Element solvers), efficient numeric algorithms (e.g. Line Sampling) and High Performance Computing . Although nowadays FE codes are quite sophisticated in terms of geometrical and mechanical modelling capabilities, they usually neglect the important issue of inherent uncertainties. Stochastic methods, on the other hand, offer a much more realistic approach for the analysis and design of structural systems. For these reasons, it is crucial to link deterministic FE codes with the advanced tools of stochastic analysis.</p><p>The software offers the most advanced and recent algorithms for the rational quantification and propagation of uncertainties. Furthermore, since stochastic methods are in general computationally demanding, the resort of high performance computing is required in order to reduce the execution time (wall clock time) of the analysis. In this regard, the implementations available in COSSAN-X are coupled with the parallel computing features in order to be able to analyse realistic problems within feasible computational times. As a result, COSSAN-X has evolved as the all-in-one package software for the practitioners to perform Uncertainty Quantification (UQ), Simulation-based Reliability Analysis, Sensitivity Analysis, Meta-Modelling, Stochastic Finite Elements Analysis (SFEM), and Reliability-Based Optimization (RBO) .</p><h2>Overview of the features of COSSAN-X %%<a name="2"></a></h2><p>All-in-one package for your real-life engineering problems covering a wide range from uncertainty management to reliability assessment, from optimizing designs to sensitivity analysis, model validation and much more. Easy modeling of uncertainties using 16 continous and 6 discrete distribution types, as well as user defined distributions, Gaussian Mixture Distribution and the possibility to define stochastic processes. A wide list of the most robust and efficient algorithms implemented within each toolbox. Interaction with Oracle Grid Engine and extendible to other job managers for distributing the workload on heterogeneous grids.</p><h2>Interaction with 3rd party software<a name="3"></a></h2><p>Despite to the continous research and progress achieved in the computational stochastic mechanics field, surprisingly the developed methods and tools in this regard are not being recognized or appreciated enough by the industry and practitioners. This in fact has been one of the driving motivations behind the development of COSSAN-X, namely to strengthen the bridge between the industry and academic researchers, since nowadays the popularity of any method used on real applications is very much dependent on the availability of efficient software, which facilitate the use of these methods without an extensive training. In other words, it is crucial that the tools of stochastic analysis are offered to the industry within a easy-to-use general purpose software, so that these algorithms are actually used for practical applications and its remedies can be recognized by the authorities.</p><p>The foreseen methodology in order to achieve this goal is to provide the industry with the general purpose user-friendly software, which can interact with the 3rd party deterministic FE solvers. The advantages in this case are twofold: (i) to make ample use of the advanced solution and visualization capabilities of the commercial 3rd party FE software, (ii) to offer the industry the tools of the stochastic analysis in a platform, which they are already familiar with.</p><p><b>Interaction methods</b></p><p>From the point of interaction with 3rd party software, the methods can be classified into two groups, namely intrusive and non-intrusive methods, respectively. On one hand, non-intrusive methods refer to those, where 3rd party programs can be used in a black-box fashion, i.e. no modification is required on the 3rd party program. The intrusive methods, on the other hand, require calculations with system matrices. Therefore, these matrices have to be accessed in the deterministic solver. This may require advanced knowledge or even modifications on the solver side. Consequently, the implementation of this class of methods is more involved.</p><p><b>Manipulation of Input/Output files</b></p><p>COSSAN-X allows to interact with the any type of solver. The Input and Output files are manipulated using the so called Injector and Extractor objects.</p><h2>See also<a name="4"></a></h2><p>Plese see the complete <a href="http://mechanik.uibk.ac.at/wiki/index.php/Category:User_Manual">user manual</a>.</p><p>For more information about Cossan visit out <a href="http://mechanik.uibk.ac.at">Web Site</a></p><pre class="codeinput"><span class="comment">% Copyright 2011 COSSAN-X, University of Innsbruck, Austria, EU.</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% COSSAN-X Toolbox User Guide
+%
+%% What is "COSSAN-X"?
+%
+% COSSAN is a general purpose software package for stochastic and reliability
+% analysis taking into account the uncertainties associated to geometric,
+% material and loading parameters. COSSAN-X, which is the latest version of
+% COSSAN, provides in this regard an efficient approach to integrate third-party
+% (deterministic) software (e.g. Finite Element solvers), efficient numeric
+% algorithms (e.g. Line Sampling) and High Performance Computing . Although
+% nowadays FE codes are quite sophisticated in terms of geometrical and
+% mechanical modelling capabilities, they usually neglect the important issue of
+% inherent uncertainties. Stochastic methods, on the other hand, offer a much
+% more realistic approach for the analysis and design of structural systems. For
+% these reasons, it is crucial to link deterministic FE codes with the advanced
+% tools of stochastic analysis.           
+%
+% The software offers the most advanced and recent algorithms for the rational
+% quantification and propagation of uncertainties. Furthermore, since stochastic
+% methods are in general computationally demanding, the resort of high
+% performance computing is required in order to reduce the execution time (wall
+% clock time) of the analysis. In this regard, the implementations available in
+% COSSAN-X are coupled with the parallel computing features in order to be able
+% to analyse realistic problems within feasible computational times. As a
+% result, COSSAN-X has evolved as the all-in-one package software for the
+% practitioners to perform Uncertainty Quantification (UQ), Simulation-based
+% Reliability Analysis, Sensitivity Analysis, Meta-Modelling, Stochastic Finite
+% Elements Analysis (SFEM), and Reliability-Based Optimization (RBO) .          
+%
+%% Overview of the features of COSSAN-X %%
+% 
+% All-in-one package for your real-life engineering problems covering a wide
+% range from uncertainty management to reliability assessment, from optimizing
+% designs to sensitivity analysis, model validation and much more.
+% Easy modeling of uncertainties using 16 continous and 6 discrete distribution
+% types, as well as user defined distributions, Gaussian Mixture Distribution
+% and the possibility to define stochastic processes.  
+% A wide list of the most robust and efficient algorithms implemented within
+% each toolbox. 
+% Interaction with Oracle Grid Engine and extendible to other job managers for
+% distributing the workload on heterogeneous grids.
+%
+%% Interaction with 3rd party software
+%
+% Despite to the continous research and progress achieved in the computational
+% stochastic mechanics field, surprisingly the developed methods and tools in
+% this regard are not being recognized or appreciated enough by the industry and
+% practitioners. This in fact has been one of the driving motivations behind the
+% development of COSSAN-X, namely to strengthen the bridge between the industry
+% and academic researchers, since nowadays the popularity of any method used on
+% real applications is very much dependent on the availability of efficient
+% software, which facilitate the use of these methods without an extensive
+% training. In other words, it is crucial that the tools of stochastic analysis
+% are offered to the industry within a easy-to-use general purpose software, so
+% that these algorithms are actually used for practical applications and its
+% remedies can be recognized by the authorities.           
+%
+% The foreseen methodology in order to achieve this goal is to provide the
+% industry with the general purpose user-friendly software, which can interact
+% with the 3rd party deterministic FE solvers. The advantages in this case are
+% twofold: (i) to make ample use of the advanced solution and visualization
+% capabilities of the commercial 3rd party FE software, (ii) to offer the
+% industry the tools of the stochastic analysis in a platform, which they are
+% already familiar with.      
+%
+% *Interaction methods*
+%
+% From the point of interaction with 3rd party software, the methods can be
+% classified into two groups, namely intrusive and non-intrusive methods,
+% respectively. On one hand, non-intrusive methods refer to those, where 3rd
+% party programs can be used in a black-box fashion, i.e. no modification is
+% required on the 3rd party program. The intrusive methods, on the other hand,
+% require calculations with system matrices. Therefore, these matrices have to
+% be accessed in the deterministic solver. This may require advanced knowledge
+% or even modifications on the solver side. Consequently, the implementation of
+% this class of methods is more involved.         
+% 
+% *Manipulation of Input/Output files*
+%
+% COSSAN-X allows to interact with the any type of solver. The Input and Output
+% files are manipulated using the so called Injector and Extractor objects. 
+%
+%% See also
+% Plese see the complete 
+% <http://mechanik.uibk.ac.at/wiki/index.php/Category:User_Manual user manual>.
+%
+% For more information about Cossan visit out 
+% <http://mechanik.uibk.ac.at Web Site>
+
+
+% Copyright 2011 COSSAN-X, University of Innsbruck, Austria, EU.
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,161 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial Small Satellite - Create the NASTRAN model</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialSmallSatelliteModal.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial Small Satellite - Create the NASTRAN model</h1><!--introduction--><p>This tutorial shows how to perform SFEM analysis using Perturbation method.</p><p>Description of deterministic model:</p><p>Tutorial satellite model is constructed in NASTRAN (~5000 DOFs). Modal analysis is performed on the structure, where the variation in the 2nd natural frequency is sought.</p><p>Description of probabilistic model:</p><p>The uncertainties in the Young's modulus and density are modeled using independent normal RV's.</p><p>See also <a href="http://mechanik.uibk.ac.at/wiki/index.php/">http://mechanik.uibk.ac.at/wiki/index.php/</a></p><p>Copyright 1990-2011 Cossan Working Group</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create the input</a></li><li><a href="#2">Construct the Model</a></li></ul></div><h2>Create the input<a name="1"></a></h2><pre class="codeinput"><span class="comment">% define the RVs</span>
+Evert   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e6,<span class="string">'cov'</span>,0.15);
+Ehor    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e6,<span class="string">'cov'</span>,0.15);
+Ecyl    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e6,<span class="string">'cov'</span>,0.15);
+Enozzle = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e6,<span class="string">'cov'</span>,0.15);
+
+Dvert   = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,2700e-6,<span class="string">'cov'</span>,0.1);
+Dhor    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,2700e-6,<span class="string">'cov'</span>,0.1);
+Dcyl    = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,2700e-6,<span class="string">'cov'</span>,0.1);
+Dnozzle = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,2700e-6,<span class="string">'cov'</span>,0.1);
+
+Xrvs = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'Evert'</span>,<span class="string">'Ehor'</span>,<span class="string">'Ecyl'</span>,<span class="string">'Enozzle'</span>,<span class="keyword">...</span>
+                                     <span class="string">'Dvert'</span>,<span class="string">'Dhor'</span>,<span class="string">'Dcyl'</span>,<span class="string">'Dnozzle'</span>});
+Xinp = Input(<span class="string">'Sdescription'</span>,<span class="string">'Xinput object'</span>);
+Xinp = add(Xinp,Xrvs);
+</pre><h2>Construct the Model<a name="2"></a></h2><pre class="codeinput">Sdirectory = fileparts(which(<span class="string">'TutorialSmallSatelliteModal'</span>));
+Xinj       = Injector(<span class="string">'Sscanfilepath'</span>,fullfile(Sdirectory,<span class="string">'FEinputFiles'</span>),<span class="string">'Sscanfilename'</span>,<span class="string">'Modal.cossan'</span>,<span class="keyword">...</span>
+                      <span class="string">'Sfile'</span>,<span class="string">'Modal.inp'</span>);
+Xcon       = Connector(<span class="string">'SpredefinedType'</span>,<span class="string">'nastran_x86_64'</span>,<span class="keyword">...</span>
+                     <span class="string">'SmaininputPath'</span>,fullfile(Sdirectory,<span class="string">'FEinputFiles'</span>),<span class="keyword">...</span>
+                     <span class="string">'Smaininputfile'</span>,<span class="string">'Modal.dat'</span>);
+Xcon       = add(Xcon,Xinj);
+Xeval      = Evaluator(<span class="string">'Xconnector'</span>,Xcon,<span class="string">'CSmembers'</span>,{<span class="string">'Xcon'</span>});
+Xmodel     = Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xinp);
+
+display(Xmodel);
+</pre><pre class="codeoutput">[COSSAN-X.Injector.createByScan] File to be scanned: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Tutorials/SmallSatellite/FEinputFiles/Modal.cossan
+[COSSAN-X.Injector.createByScan] Close File to be scanned: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Tutorials/SmallSatellite/FEinputFiles/Modal.cossan
+EOF found after 2009 lines
+Add Injector Object to Connector
+===================================================================
+ Model Object  -  Description: 
+===================================================================
+Required Inputs :  Evert; Ehor; Ecyl; Enozzle; Dvert; Dhor; Dcyl; Dnozzle;
+Provided Outputs :  
+The Model contains 1 solvers
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial Small Satellite - Create the NASTRAN model
+%
+% This tutorial shows how to perform SFEM analysis using Perturbation
+% method. 
+%
+% Description of deterministic model:
+%
+% Tutorial satellite model is constructed in NASTRAN (~5000 DOFs). Modal
+% analysis is performed on the structure, where the variation in the
+% 2nd natural frequency is sought.
+%
+% Description of probabilistic model:
+%
+% The uncertainties in the Young's modulus and density are 
+% modeled using independent normal RV's.  
+%
+% See also http://mechanik.uibk.ac.at/wiki/index.php/
+%
+% Copyright 1990-2011 Cossan Working Group
+% $Revision: 1 $  $Date: 2011/02/28 $
+
+%% Create the input
+
+% define the RVs
+Evert   = RandomVariable('Sdistribution','normal', 'mean',7e6,'cov',0.15);    
+Ehor    = RandomVariable('Sdistribution','normal', 'mean',7e6,'cov',0.15);
+Ecyl    = RandomVariable('Sdistribution','normal', 'mean',7e6,'cov',0.15); 
+Enozzle = RandomVariable('Sdistribution','normal', 'mean',7e6,'cov',0.15);
+
+Dvert   = RandomVariable('Sdistribution','normal', 'mean',2700e-6,'cov',0.1); 
+Dhor    = RandomVariable('Sdistribution','normal', 'mean',2700e-6,'cov',0.1); 
+Dcyl    = RandomVariable('Sdistribution','normal', 'mean',2700e-6,'cov',0.1);    
+Dnozzle = RandomVariable('Sdistribution','normal', 'mean',2700e-6,'cov',0.1);   
+
+Xrvs = RandomVariableSet('Cmembers',{'Evert','Ehor','Ecyl','Enozzle',...
+                                     'Dvert','Dhor','Dcyl','Dnozzle'}); 
+Xinp = Input('Sdescription','Xinput object');       
+Xinp = add(Xinp,Xrvs);
+
+%% Construct the Model
+
+Sdirectory = fileparts(which('TutorialSmallSatelliteModal'));
+Xinj       = Injector('Sscanfilepath',fullfile(Sdirectory,'FEinputFiles'),'Sscanfilename','Modal.cossan',...
+                      'Sfile','Modal.inp');
+Xcon       = Connector('SpredefinedType','nastran_x86_64',...
+                     'SmaininputPath',fullfile(Sdirectory,'FEinputFiles'),...
+                     'Smaininputfile','Modal.dat');
+Xcon       = add(Xcon,Xinj);
+Xeval      = Evaluator('Xconnector',Xcon,'CSmembers',{'Xcon'});
+Xmodel     = Model('Xevaluator',Xeval,'Xinput',Xinp);
+
+display(Xmodel);
+
+
+
+
+##### SOURCE END #####
+--></body></html>

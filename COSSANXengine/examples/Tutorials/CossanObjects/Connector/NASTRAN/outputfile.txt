@@ -1,0 +1,8 @@
+% this is the first line
+
+10  11              % first value to extract
+20  21              % second value to extract
+
+
+10 11 12 13 % first value to extract
+% last line

@@ -1,0 +1,265 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TutorialFatigueFracture</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialFatigueFracture.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Definition of inputs</a></li><li><a href="#3">Data related to FatigueFracture object</a></li><li><a href="#4">reference solution</a></li></ul></div><pre class="codeinput"><span class="comment">%*********************************************************************</span>
+<span class="comment">%</span>
+<span class="comment">%   Example on how to use Fatigue and Fracture objects</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%   This tutorial shows the usage of the methods in the class</span>
+<span class="comment">%   FatigueFracture.</span>
+<span class="comment">%</span>
+<span class="comment">%   The propagation of an edge crack in a semi-infinite plate is</span>
+<span class="comment">%   investigated</span>
+<span class="comment">%</span>
+<span class="comment">%**************************************************************************</span>
+<span class="keyword">global</span> COSSANX
+CossanX.setVerbosityLevel(1)
+</pre><h2>Definition of inputs<a name="2"></a></h2><pre class="codeinput">Xin  = Input();
+
+<span class="comment">% Initial length of the cracks</span>
+a=Parameter(<span class="string">'value'</span>,1e-3);
+Xin = add(Xin,a);
+
+<span class="comment">% Coefficient C in Paris equation</span>
+C=Parameter(<span class="string">'value'</span>,2.5e-23);
+Xin = add(Xin,C);
+
+<span class="comment">% Fracture toughness</span>
+Kic=Parameter(<span class="string">'value'</span>,3e7);
+Xin = add(Xin,Kic);
+
+<span class="comment">% Coefficient m in Paris equation</span>
+m=Parameter(<span class="string">'value'</span>,2);
+Xin = add(Xin,m);
+
+<span class="comment">% Maximum applied stress</span>
+smax=Parameter(<span class="string">'value'</span>,100e6);
+Xin = add(Xin,smax);
+
+<span class="comment">% Minimum applied stress is zero and not defined here</span>
+</pre><h2>Data related to FatigueFracture object<a name="3"></a></h2><p>definition of an Evaluator. This is the ''main'' input of the FatigueFracture object. It estimates the maximum value of stress intensity factor and its variation over one cycle</p><pre class="codeinput">Sscript1 = [<span class="keyword">...</span>
+<span class="string">'Cdummy=num2cell(zeros(length(Tinput),1));'</span><span class="keyword">...</span>
+<span class="string">'Toutput=struct(''sif'',Cdummy);'</span><span class="keyword">...</span>
+<span class="string">'for i=1:length(Tinput),'</span><span class="keyword">...</span>
+<span class="string">'smax = Tinput(i).smax;'</span><span class="keyword">...</span>
+<span class="string">'a = Tinput(i).a;'</span><span class="keyword">...</span>
+<span class="string">'Toutput(i).sif   = 1.12 * smax * sqrt(pi*a);'</span><span class="keyword">...</span>
+<span class="string">'end'</span><span class="keyword">...</span>
+];
+
+Xm  = Mio(<span class="string">'Liostructure'</span>,true,<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'a'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+    <span class="string">'Sscript'</span>,Sscript1,<span class="keyword">...</span><span class="comment"> % external file</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'sif'</span>}); <span class="comment">% Define the outputs</span>
+Xe      = Evaluator(<span class="string">'Xmio'</span>,Xm);     <span class="comment">% Define the evaluator</span>
+
+<span class="comment">% Definition of the CrackGrowth object. It takes as an inpout the outputs</span>
+<span class="comment">% of the evaluator which determines the stress intensity factor, The</span>
+<span class="comment">% outputs of this objects are the variations of the crack length over one</span>
+<span class="comment">% cycle</span>
+
+Sscript2 = [<span class="keyword">...</span>
+<span class="string">'Cdummy=num2cell(zeros(length(Tinput),1));'</span><span class="keyword">...</span>
+<span class="string">'Toutput=struct(''dadn'',Cdummy);'</span><span class="keyword">...</span>
+<span class="string">'for i=1:length(Tinput),   Toutput(i).dadn = Tinput.C*(Tinput(i).sif)^ Tinput(i).m;end'</span><span class="keyword">...</span>
+];
+
+Xcg = CrackGrowth(<span class="string">'Liostructure'</span>,true,<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'sif'</span>,<span class="string">'m'</span>,<span class="string">'C'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+    <span class="string">'Sscript'</span>,Sscript2,<span class="keyword">...</span><span class="comment"> % external file</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'dadn'</span>});
+
+<span class="comment">% Definition of the Fracture object. It takes as an inpout the outputs</span>
+<span class="comment">% of the evaluator which determines the stress intensity factor, The</span>
+<span class="comment">% outputs of this is &lt;0 if fracture does not occur, and &gt;0 if fracture has</span>
+<span class="comment">% occured</span>
+Xf = Fracture(<span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+    <span class="string">'Cinputnames'</span>,{<span class="string">'sif'</span>,<span class="string">'Kic'</span>},<span class="keyword">...</span><span class="comment"> % Define the inputs</span>
+    <span class="string">'Spath'</span>,[CossanX.getCossanRoot <span class="string">'/examples/Tutorials/FatigueFracture/'</span>],<span class="keyword">...</span>
+    <span class="string">'Sscript'</span>,<span class="string">'for j=1:length(Tinput), Toutput(j).fract= Tinput(j).sif-Tinput(j).Kic; end'</span>, <span class="keyword">...</span>
+    <span class="string">'Coutputnames'</span>,{<span class="string">'fract'</span>},<span class="keyword">...</span>
+    <span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
+    <span class="string">'Lfunction'</span>,false);
+
+<span class="comment">% Defining the FatigueFracture object</span>
+Xff = FatigueFracture(<span class="string">'Xevaluator'</span>,Xe,<span class="string">'Ccrack'</span>,{<span class="string">'a'</span>},<span class="keyword">...</span>
+    <span class="string">'Xcrackgrowth'</span>,Xcg ,<span class="string">'Xfracture'</span>,Xf,<span class="string">'Cinputnames'</span>,Xin.Cnames); <span class="comment">% Fracture</span>
+
+<span class="comment">% execution of the problem</span>
+[Xo,Xffo] =Xff.apply( Xin.getStructure);
+</pre><pre class="codeoutput">Error using ==&gt; apply
+Method 'apply' is not defined for class 'FatigueFracture' or is removed from MATLAB's search path.
+
+Error in ==&gt; TutorialFatigueFracture at 94
+[Xo,Xffo] =Xff.apply( Xin.getStructure);
+</pre><h2>reference solution<a name="4"></a></h2><pre class="codeinput">Ref = 1/(1.12^2*2.5e-23*pi*(100e6)^2)*log(1/(pi*1e-3)*(3e7/(1.12*100e6))^2);
+
+CossanX.cossanDisp([<span class="string">'Error in the approximation: '</span> num2str(100*(Xo.Tvalues.FatigueLife - Ref)/Ref) <span class="string">'%'</span>])
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%*********************************************************************
+%
+%   Example on how to use Fatigue and Fracture objects
+%
+%
+%   This tutorial shows the usage of the methods in the class
+%   FatigueFracture. 
+%
+%   The propagation of an edge crack in a semi-infinite plate is
+%   investigated
+%
+%**************************************************************************
+global COSSANX
+CossanX.setVerbosityLevel(1)
+%% Definition of inputs
+
+Xin  = Input();
+
+% Initial length of the cracks
+a=Parameter('value',1e-3);
+Xin = add(Xin,a);
+
+% Coefficient C in Paris equation
+C=Parameter('value',2.5e-23);
+Xin = add(Xin,C);
+
+% Fracture toughness
+Kic=Parameter('value',3e7);
+Xin = add(Xin,Kic);
+
+% Coefficient m in Paris equation
+m=Parameter('value',2);
+Xin = add(Xin,m);
+
+% Maximum applied stress
+smax=Parameter('value',100e6);
+Xin = add(Xin,smax);
+
+% Minimum applied stress is zero and not defined here
+
+%% Data related to FatigueFracture object
+% definition of an Evaluator. This is the ''main'' input of the 
+% FatigueFracture object. It estimates the maximum value of stress
+% intensity factor and its variation over one cycle
+Sscript1 = [...
+'Cdummy=num2cell(zeros(length(Tinput),1));'...
+'Toutput=struct(''sif'',Cdummy);'...
+'for i=1:length(Tinput),'...
+'smax = Tinput(i).smax;'...
+'a = Tinput(i).a;'...
+'Toutput(i).sif   = 1.12 * smax * sqrt(pi*a);'...
+'end'...
+];
+
+Xm  = Mio('Liostructure',true,'Liomatrix',false,...
+    'Cinputnames',{'a'},... % Define the inputs
+    'Sscript',Sscript1,... % external file
+    'Coutputnames',{'sif'}); % Define the outputs
+Xe      = Evaluator('Xmio',Xm);     % Define the evaluator
+
+% Definition of the CrackGrowth object. It takes as an inpout the outputs
+% of the evaluator which determines the stress intensity factor, The
+% outputs of this objects are the variations of the crack length over one
+% cycle
+
+Sscript2 = [...
+'Cdummy=num2cell(zeros(length(Tinput),1));'...
+'Toutput=struct(''dadn'',Cdummy);'...
+'for i=1:length(Tinput),   Toutput(i).dadn = Tinput.C*(Tinput(i).sif)^ Tinput(i).m;end'...
+];
+
+Xcg = CrackGrowth('Liostructure',true,'Liomatrix',false,...
+    'Cinputnames',{'sif','m','C'},... % Define the inputs
+    'Sscript',Sscript2,... % external file
+    'Coutputnames',{'dadn'});
+
+% Definition of the Fracture object. It takes as an inpout the outputs
+% of the evaluator which determines the stress intensity factor, The
+% outputs of this is <0 if fracture does not occur, and >0 if fracture has
+% occured
+Xf = Fracture('Liomatrix',false,...
+    'Cinputnames',{'sif','Kic'},... % Define the inputs
+    'Spath',[CossanX.getCossanRoot '/examples/Tutorials/FatigueFracture/'],...
+    'Sscript','for j=1:length(Tinput), Toutput(j).fract= Tinput(j).sif-Tinput(j).Kic; end', ...
+    'Coutputnames',{'fract'},...
+    'Liostructure',true,...
+    'Lfunction',false);
+
+% Defining the FatigueFracture object
+Xff = FatigueFracture('Xevaluator',Xe,'Ccrack',{'a'},...
+    'Xcrackgrowth',Xcg ,'Xfracture',Xf,'Cinputnames',Xin.Cnames); % Fracture
+
+% execution of the problem
+[Xo,Xffo] =Xff.apply( Xin.getStructure);
+
+%% reference solution
+
+Ref = 1/(1.12^2*2.5e-23*pi*(100e6)^2)*log(1/(pi*1e-3)*(3e7/(1.12*100e6))^2);
+
+CossanX.cossanDisp(['Error in the approximation: ' num2str(100*(Xo.Tvalues.FatigueLife - Ref)/Ref) '%'])
+
+##### SOURCE END #####
+--></body></html>

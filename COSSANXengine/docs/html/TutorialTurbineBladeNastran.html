@@ -1,0 +1,139 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tutorial Turbine Blade - Creating the NASTRAN model</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialTurbineBladeNastran.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Tutorial Turbine Blade - Creating the NASTRAN model</h1><!--introduction--><p>See also <a href="http://mechanik.uibk.ac.at/wiki/">http://mechanik.uibk.ac.at/wiki/</a></p><p>Copyright 1990-2011 Cossan Working Group</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Create the input</a></li><li><a href="#2">Construct the Injector</a></li><li><a href="#3">Define Connector</a></li><li><a href="#4">Define Model</a></li></ul></div><h2>Create the input<a name="1"></a></h2><pre class="codeinput"><span class="comment">% define the RVs</span>
+RV1 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e7,<span class="string">'std'</span>,7e6);
+RV2 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e7,<span class="string">'std'</span>,7e6);
+RV3 = RandomVariable(<span class="string">'Sdistribution'</span>,<span class="string">'normal'</span>, <span class="string">'mean'</span>,7e7,<span class="string">'std'</span>,7e6);
+
+Xrvs = RandomVariableSet(<span class="string">'Cmembers'</span>,{<span class="string">'RV1'</span>,<span class="string">'RV2'</span>,<span class="string">'RV3'</span>});
+Xinp = Input(<span class="string">'Sdescription'</span>,<span class="string">'Xinput object'</span>);
+Xinp = add(Xinp,Xrvs);
+</pre><h2>Construct the Injector<a name="2"></a></h2><pre class="codeinput">Sdirectory = fileparts(which(<span class="string">'TutorialTurbineBladeNastran.m'</span>));
+Xinj       = Injector(<span class="string">'Sscanfilepath'</span>,fullfile(Sdirectory,<span class="string">'FEinputFiles'</span>),<span class="keyword">...</span>
+                      <span class="string">'Sscanfilename'</span>,<span class="string">'Nastran.cossan'</span>,<span class="string">'Sfile'</span>,<span class="string">'Nastran.inp'</span>);
+</pre><pre class="codeoutput">[COSSAN-X.Injector.createByScan] File to be scanned: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Tutorials/TurbineBlade/FEinputFiles/Nastran.cossan
+[COSSAN-X.Injector.createByScan] Close File to be scanned: /home/ep/workspace/COSSAN-X_SVN/COSSANXengine/examples/Tutorials/TurbineBlade/FEinputFiles/Nastran.cossan
+EOF found after 23310 lines
+</pre><h2>Define Connector<a name="3"></a></h2><pre class="codeinput">Xcon = Connector(<span class="string">'Spredefinedtype'</span>,<span class="string">'nastran_x86_64'</span>,<span class="keyword">...</span>
+                 <span class="string">'SmaininputPath'</span>,fullfile(Sdirectory,<span class="string">'FEinputFiles'</span>),<span class="keyword">...</span>
+                 <span class="string">'Smaininputfile'</span>,<span class="string">'Nastran.inp'</span>);
+Xcon = add(Xcon,Xinj);
+</pre><pre class="codeoutput">Add Injector Object to Connector
+</pre><h2>Define Model<a name="4"></a></h2><pre class="codeinput">Xeval  = Evaluator(<span class="string">'Xconnector'</span>,Xcon);
+Xmodel = Model(<span class="string">'Xevaluator'</span>,Xeval,<span class="string">'Xinput'</span>,Xinp);
+
+display(Xmodel);
+</pre><pre class="codeoutput">===================================================================
+ Model Object  -  Description: 
+===================================================================
+Required Inputs :  RV1; RV2; RV3;
+Provided Outputs :  
+The Model contains 1 solvers
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tutorial Turbine Blade - Creating the NASTRAN model
+%
+% See also http://mechanik.uibk.ac.at/wiki/
+%
+% Copyright 1990-2011 Cossan Working Group
+% $Revision: 1 $  $Date: 2011/02/22 $
+
+
+%% Create the input
+
+% define the RVs
+RV1 = RandomVariable('Sdistribution','normal', 'mean',7e7,'std',7e6);    
+RV2 = RandomVariable('Sdistribution','normal', 'mean',7e7,'std',7e6); 
+RV3 = RandomVariable('Sdistribution','normal', 'mean',7e7,'std',7e6);       
+
+Xrvs = RandomVariableSet('Cmembers',{'RV1','RV2','RV3'}); 
+Xinp = Input('Sdescription','Xinput object');       
+Xinp = add(Xinp,Xrvs);
+
+%% Construct the Injector
+
+Sdirectory = fileparts(which('TutorialTurbineBladeNastran.m'));
+Xinj       = Injector('Sscanfilepath',fullfile(Sdirectory,'FEinputFiles'),...
+                      'Sscanfilename','Nastran.cossan','Sfile','Nastran.inp');
+
+%% Define Connector
+
+Xcon = Connector('Spredefinedtype','nastran_x86_64',...
+                 'SmaininputPath',fullfile(Sdirectory,'FEinputFiles'),...
+                 'Smaininputfile','Nastran.inp');
+Xcon = add(Xcon,Xinj);
+
+%% Define Model
+
+Xeval  = Evaluator('Xconnector',Xcon);
+Xmodel = Model('Xevaluator',Xeval,'Xinput',Xinp);
+
+display(Xmodel);
+
+
+
+##### SOURCE END #####
+--></body></html>

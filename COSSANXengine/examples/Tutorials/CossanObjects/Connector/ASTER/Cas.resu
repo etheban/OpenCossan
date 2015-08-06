@@ -1,0 +1,169 @@
+                                         -- CODE_ASTER -- VERSION D'EXPLOITATION  9.04    --
+
+                                                   COPYRIGHT  EDF-R&D 1991 - 2008
+
+                                               EXECUTION DU : LU-05-OCTO-2009 11:40:22
+
+                                                   PLATE-FORME : C810-CL2        
+
+                                                NB MAX PROC OpenMP:   1             
+
+                                                     SYSTEME : LINUX           
+
+                                                       CPU : I686            
+
+   
+   !----------------------------------------------------------------!
+   ! <A> <MED_10>                                                   !
+   !                                                                !
+   !                                                                !
+   !   -> Le nom de groupe numéro 1 de la famille FAM_5_top1-2      !
+   !      est contient des caractères interdits.                    !
+   !      Le groupe "top1-2" est renommé en "top1_2".               !
+   !                                                                !
+   !                                                                !
+   !                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette !
+   ! alarme, vous pouvez obtenir des résultats inattendus !         !
+   !----------------------------------------------------------------!
+   
+   
+   !--------------------------------------------------------------------------------------------!
+   ! <A> <PREPOST5_4>                                                                           !
+   !                                                                                            !
+   !                                                                                            !
+   ! Champ inexistant DEGE_ELNO_DEPL numero d'ordre 1 pour le calcul de l'option DEGE_NOEU_DEPL !
+   !                                                                                            !
+   !                                                                                            !
+   !                                                                                            !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette                             !
+   ! alarme, vous pouvez obtenir des résultats inattendus !                                     !
+   !--------------------------------------------------------------------------------------------!
+   
+   
+   !----------------------------------------------------------------!
+   ! <A> <POSTRELE_41>                                              !
+   !                                                                !
+   !                                                                !
+   !  champ inexistant nom_cham: DEPL_ABSOLU  nume_ordre: 1         !
+   !                                                                !
+   !                                                                !
+   !                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette !
+   ! alarme, vous pouvez obtenir des résultats inattendus !         !
+   !----------------------------------------------------------------!
+   
+   
+   !----------------------------------------------------------------!
+   ! <A> <POSTRELE_41>                                              !
+   !                                                                !
+   !                                                                !
+   !  champ inexistant nom_cham: DEPL_ABSOLU  nume_ordre: 1         !
+   !                                                                !
+   !                                                                !
+   !                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette !
+   ! alarme, vous pouvez obtenir des résultats inattendus !         !
+   !----------------------------------------------------------------!
+   
+   
+   !--------------------------------------------------------------------------------!
+   ! <A> <CALCULEL5_48>                                                             !
+   !                                                                                !
+   !                                                                                !
+   !  PROJ_CHAMP (ou LIAISON_MAIL) :                                                !
+   !  Certains noeuds ont été projetés sur des mailles un peu distantes             !
+   !  (la distance à la maille est supérieure à 1/10ième du diamètre de la maille)  !
+   !  Le noeud projeté le plus loin est le noeud: N1                                !
+   !  Il a été projeté à la distance 0.008611                                       !
+   !                                                                                !
+   !                                                                                !
+   !                                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette                 !
+   ! alarme, vous pouvez obtenir des résultats inattendus !                         !
+   !--------------------------------------------------------------------------------!
+   
+   
+   !--------------------------------------------------------------------------------!
+   ! <A> <CALCULEL5_48>                                                             !
+   !                                                                                !
+   !                                                                                !
+   !  PROJ_CHAMP (ou LIAISON_MAIL) :                                                !
+   !  Certains noeuds ont été projetés sur des mailles un peu distantes             !
+   !  (la distance à la maille est supérieure à 1/10ième du diamètre de la maille)  !
+   !  Le noeud projeté le plus loin est le noeud: N3                                !
+   !  Il a été projeté à la distance 0.003009                                       !
+   !                                                                                !
+   !                                                                                !
+   !                                                                                !
+   ! Ceci est une alarme. Si vous ne comprenez pas le sens de cette                 !
+   ! alarme, vous pouvez obtenir des résultats inattendus !                         !
+   !--------------------------------------------------------------------------------!
+   
+#
+#--------------------------------------------------------------------------------
+#
+#ASTER  9.04.00 CONCEPT sif3 CALCULE LE 05/10/2009 A 11:40:42 DE TYPE            
+#TABLE_SDASTER                                                                   
+ NUME_ORDRE   INST         G            K1           K2           G_IRWIN     
+            1  1.00000E+00  1.15204E+03  1.70605E+07  6.34451E+03  1.26438E+03
+
+
+   !-----------------------------------------------------------------------!
+   !   Liste des alarmes émises lors de l'exécution du calcul.             !
+   !                                                                       !
+   !   Les alarmes que vous avez choisies d'ignorer sont précédées de (*). !
+   !   Nombre d'occurrences pour chacune des alarmes :                     !
+   !          CALCULEL5_48         émise    2 fois                         !
+   !          MED_10               émise    1 fois                         !
+   !          POSTRELE_41          émise    2 fois                         !
+   !          PREPOST5_4           émise    1 fois                         !
+   !-----------------------------------------------------------------------!
+
+ <I> <FIN> FERMETURE DE LA BASE "GLOBALE" EFFECTUEE.
+ <I> <FIN> ARRET NORMAL DANS "FIN" PAR APPEL A "JEFINI".
+
+ ********************************************************************************
+ * COMMAND                  :       USER :     SYSTEM :   USER+SYS :    ELAPSED *
+ ********************************************************************************
+ * init (jdc)               :       2.59 :       0.25 :       2.84 :       5.22 *
+ *  . compile               :       0.00 :       0.00 :       0.00 :       0.00 *
+ *  . exec_compile          :       0.47 :       0.05 :       0.52 :       0.93 *
+ *  . report                :       0.04 :       0.00 :       0.04 :       0.07 *
+ *  . build                 :       0.00 :       0.00 :       0.00 :       0.00 *
+ * DEBUT                    :       0.04 :       0.04 :       0.08 :       0.13 *
+ * LIRE_MAILLAGE            :       0.07 :       0.00 :       0.07 :       0.10 *
+ * DEFI_GROUP               :       0.00 :       0.00 :       0.00 :       0.01 *
+ * AFFE_MODELE              :       0.02 :       0.00 :       0.02 :       0.03 *
+ * DEFI_MATERIAU            :       0.01 :       0.00 :       0.01 :       0.00 *
+ * AFFE_MATERIAU            :       0.00 :       0.00 :       0.00 :       0.01 *
+ * FORMULE                  :       0.00 :       0.00 :       0.00 :       0.00 *
+ * FORMULE                  :       0.00 :       0.00 :       0.00 :       0.00 *
+ * FORMULE                  :       0.01 :       0.00 :       0.01 :       0.00 *
+ * FORMULE                  :       0.00 :       0.00 :       0.00 :       0.00 *
+ * DEFI_FISS_XFEM           :       0.72 :       0.01 :       0.73 :       1.53 *
+ * DEFI_FISS_XFEM           :       0.70 :       0.01 :       0.71 :       1.02 *
+ * MODI_MODELE_XFEM         :       1.01 :       0.02 :       1.03 :       1.97 *
+ * AFFE_CHAR_MECA           :       0.19 :       0.00 :       0.19 :       0.27 *
+ * AFFE_CHAR_MECA           :       0.02 :       0.00 :       0.02 :       0.02 *
+ * DEFI_LIST_REEL           :       0.00 :       0.00 :       0.00 :       0.00 *
+ * STAT_NON_LINE            :       3.63 :       0.13 :       3.76 :       7.45 *
+ * POST_MAIL_XFEM           :       0.25 :       0.00 :       0.25 :       0.71 *
+ * AFFE_MODELE              :       0.02 :       0.00 :       0.02 :       0.06 *
+ * POST_CHAM_XFEM           :       0.30 :       0.01 :       0.31 :       0.87 *
+ * CALC_ELEM                :       0.23 :       0.00 :       0.23 :       0.67 *
+ * CALC_NO                  :       0.12 :       0.00 :       0.12 :       0.30 *
+ * IMPR_RESU                :       0.20 :       0.01 :       0.21 :       0.62 *
+ * POST_K1_K2_K3            :       0.78 :       0.01 :       0.79 :       2.21 *
+ * CALC_G                   :       0.23 :       0.00 :       0.23 :       0.65 *
+ * CALC_G                   :       0.23 :       0.00 :       0.23 :       0.66 *
+ * CALC_G                   :       0.24 :       0.01 :       0.25 :       0.68 *
+ * CALC_G                   :       0.23 :       0.00 :       0.23 :       0.65 *
+ * IMPR_TABLE               :       0.04 :       0.00 :       0.04 :       0.10 *
+ * FIN                      :       0.04 :       0.08 :       0.12 :       0.36 *
+ *  . part Superviseur      :       3.14 :       0.29 :       3.43 :       6.69 *
+ *  . part Fortran          :       8.79 :       0.29 :       9.08 :      19.66 *
+ ********************************************************************************
+ * TOTAL_JOB                :      11.93 :       0.58 :      12.51 :      26.38 *
+ ********************************************************************************
+

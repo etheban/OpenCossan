@@ -1,0 +1,206 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>TUTORIALCOVARIANCEFUNCTION</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-05-18"><meta name="DC.source" content="TutorialCovarianceFunction.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>TUTORIALCOVARIANCEFUNCTION</h1><!--introduction--><p>In this tutorial it is shown how to construct a CovarianceFunction and how to evaluate the value for different time instances</p><p>See Also: <a href="http://mechanik.uibk.ac.at/wiki/index.php/@CovarianceFunction">http://mechanik.uibk.ac.at/wiki/index.php/@CovarianceFunction</a></p><p><img src="TutorialCovarianceFunction_eq06293.png" alt="$Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$"> <img src="TutorialCovarianceFunction_eq60638.png" alt="$Author:~Barbara~Goller$"></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Define script for defining an exponential covariance matrix (for 1D-stochastic process)</a></li><li><a href="#2">Define CovarianceFunction object</a></li><li><a href="#3">Evaluate the values of the covariance function for time lags between 0 and 4</a></li><li><a href="#4">Visualize and validate results</a></li><li><a href="#5">Define script for defining an exponential covariance matrix (for 2D-stochastic process)</a></li><li><a href="#6">Define CovarianceFunction object</a></li><li><a href="#7">Visualize and validate results</a></li><li><a href="#8">end of tutorial - close figures</a></li></ul></div><h2>Define script for defining an exponential covariance matrix (for 1D-stochastic process)<a name="1"></a></h2><pre class="codeinput">Sscript1 = [<span class="string">'sigma = 1; b = 0.5;'</span> ,<span class="keyword">...</span><span class="comment"> % standard deviation and correlation length</span>
+            <span class="string">'for i=1:length(Tinput)'</span>, <span class="keyword">...</span><span class="comment"> % define for each entry of the covariance matrix the respective value</span>
+            <span class="string">'    Toutput(i).fcov = sigma^2*exp(-1/b*abs(Tinput(i).t2-Tinput(i).t1));'</span> ,<span class="keyword">...</span><span class="comment"> %exponential covariance function</span>
+            <span class="string">'end'</span>];
+</pre><h2>Define CovarianceFunction object<a name="2"></a></h2><pre class="codeinput">Xcovfun1  = CovarianceFunction(<span class="string">'Sdescription'</span>,<span class="string">'covariance function'</span>, <span class="keyword">...</span>
+          <span class="string">'Lfunction'</span>,false, <span class="keyword">...</span>
+          <span class="string">'Liostructure'</span>,true, <span class="keyword">...</span><span class="comment"> % input and output are structures</span>
+          <span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'t1'</span>,<span class="string">'t2'</span>},<span class="keyword">...</span><span class="comment"> % names of inputs</span>
+          <span class="string">'Sscript'</span>,Sscript1,<span class="keyword">...</span><span class="comment"> % script with 1D exponential function</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fcov'</span>}); <span class="comment">% name of output</span>
+</pre><h2>Evaluate the values of the covariance function for time lags between 0 and 4<a name="3"></a></h2><pre class="codeinput">timesteps = linspace(0,4,100);
+Vcov1 =  Xcovfun1.evaluate([zeros(1, 100); timesteps]);
+</pre><h2>Visualize and validate results<a name="4"></a></h2><pre class="codeinput">f1=figure;
+plot(timesteps,Vcov1)
+xlabel(<span class="string">'\Delta t'</span>)
+ylabel(<span class="string">'covariance'</span>)
+
+assert(all(all(abs(Vcov1(1:10)'-[1.0000, 0.9224, 0.8508, 0.7847, 0.7238, <span class="keyword">...</span>
+                         0.6676, 0.6158, 0.5680, 0.5239, 0.4832])&lt;1e-4)), <span class="keyword">...</span>
+                         <span class="string">'CossanX:Tutorials:TutorialCovarianceFunction'</span>, <span class="keyword">...</span>
+                         <span class="string">'Reference Solution does not match.'</span>)
+</pre><img vspace="5" hspace="5" src="TutorialCovarianceFunction_01.png" alt=""> <h2>Define script for defining an exponential covariance matrix (for 2D-stochastic process)<a name="5"></a></h2><pre class="codeinput">Sscript2 = [<span class="string">'sigma = 1; b = 1.0;'</span> ,<span class="keyword">...</span><span class="comment"> % standard deviation and correlation length</span>
+            <span class="string">'for i=1:length(Tinput)'</span>, <span class="keyword">...</span><span class="comment"> % define for each entry of the covariance matrix the respective value</span>
+            <span class="string">'    Toutput(i).fcov = sigma^2*exp(-1/b*sqrt(transpose(Tinput(i).x2-Tinput(i).x1)*(Tinput(i).x2-Tinput(i).x1)));'</span> ,<span class="keyword">...</span><span class="comment"> %exponential covariance function</span>
+            <span class="string">'end'</span>];
+</pre><h2>Define CovarianceFunction object<a name="6"></a></h2><pre class="codeinput">Xcovfun2  = CovarianceFunction(<span class="string">'Sdescription'</span>,<span class="string">'covariance function'</span>, <span class="keyword">...</span>
+          <span class="string">'Lfunction'</span>,false, <span class="keyword">...</span>
+          <span class="string">'Liostructure'</span>,true, <span class="keyword">...</span><span class="comment"> % input and output are structures</span>
+          <span class="string">'Liomatrix'</span>,false,<span class="keyword">...</span>
+          <span class="string">'Cinputnames'</span>,{<span class="string">'x1'</span>,<span class="string">'x2'</span>},<span class="keyword">...</span><span class="comment"> % names of inputs</span>
+          <span class="string">'Sscript'</span>,Sscript2,<span class="keyword">...</span><span class="comment"> % script with 1D exponential function</span>
+          <span class="string">'Coutputnames'</span>,{<span class="string">'fcov'</span>}); <span class="comment">% name of output</span>
+</pre><h2>Visualize and validate results<a name="7"></a></h2><pre class="codeinput">coordinates = meshgrid(linspace(0,4,100),linspace(0,4,100));
+xcoordinates = coordinates(:)';
+ycoordinates = repmat(linspace(0,4,100),1,100);
+Vcov2 =  Xcovfun2.evaluate([zeros(2, 10000);xcoordinates;ycoordinates]);
+f2 = figure;
+plot3(xcoordinates,ycoordinates,Vcov2,<span class="string">'.'</span>)
+grid <span class="string">on</span>
+xlabel(<span class="string">'\Delta x'</span>)
+ylabel(<span class="string">'\Delta y'</span>)
+zlabel(<span class="string">'covariance'</span>)
+
+assert(all(all(abs(Vcov2(1:10)'-[1.0000, 0.9604, 0.9224, 0.8858, 0.8508,<span class="keyword">...</span>
+                                 0.8171, 0.7847, 0.7536, 0.7238, 0.6951])&lt;1e-4)), <span class="keyword">...</span>
+                         <span class="string">'CossanX:Tutorials:TutorialCovarianceFunction'</span>, <span class="keyword">...</span>
+                         <span class="string">'Reference Solution does not match.'</span>)
+</pre><img vspace="5" hspace="5" src="TutorialCovarianceFunction_02.png" alt=""> <h2>end of tutorial - close figures<a name="8"></a></h2><pre class="codeinput">close(f1)
+close(f2)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% TUTORIALCOVARIANCEFUNCTION
+%
+% In this tutorial it is shown how to construct a CovarianceFunction and
+% how to evaluate the value for different time instances
+%
+%
+% See Also: http://mechanik.uibk.ac.at/wiki/index.php/@CovarianceFunction
+%
+% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Author:~Barbara~Goller$ 
+
+%% Define script for defining an exponential covariance matrix (for 1D-stochastic process)
+
+Sscript1 = ['sigma = 1; b = 0.5;' ,... % standard deviation and correlation length
+            'for i=1:length(Tinput)', ... % define for each entry of the covariance matrix the respective value
+            '    Toutput(i).fcov = sigma^2*exp(-1/b*abs(Tinput(i).t2-Tinput(i).t1));' ,... %exponential covariance function
+            'end'];
+        
+%% Define CovarianceFunction object  
+
+Xcovfun1  = CovarianceFunction('Sdescription','covariance function', ...
+          'Lfunction',false, ... 
+          'Liostructure',true, ... % input and output are structures
+          'Liomatrix',false,...
+          'Cinputnames',{'t1','t2'},... % names of inputs 
+          'Sscript',Sscript1,... % script with 1D exponential function
+          'Coutputnames',{'fcov'}); % name of output
+
+%% Evaluate the values of the covariance function for time lags between 0 and 4
+
+timesteps = linspace(0,4,100);
+Vcov1 =  Xcovfun1.evaluate([zeros(1, 100); timesteps]);
+
+%% Visualize and validate results
+
+f1=figure;
+plot(timesteps,Vcov1)
+xlabel('\Delta t')
+ylabel('covariance')
+
+assert(all(all(abs(Vcov1(1:10)'-[1.0000, 0.9224, 0.8508, 0.7847, 0.7238, ...
+                         0.6676, 0.6158, 0.5680, 0.5239, 0.4832])<1e-4)), ...
+                         'CossanX:Tutorials:TutorialCovarianceFunction', ...
+                         'Reference Solution does not match.')
+
+%% Define script for defining an exponential covariance matrix (for 2D-stochastic process)
+
+Sscript2 = ['sigma = 1; b = 1.0;' ,... % standard deviation and correlation length
+            'for i=1:length(Tinput)', ... % define for each entry of the covariance matrix the respective value
+            '    Toutput(i).fcov = sigma^2*exp(-1/b*sqrt(transpose(Tinput(i).x2-Tinput(i).x1)*(Tinput(i).x2-Tinput(i).x1)));' ,... %exponential covariance function
+            'end'];
+        
+%% Define CovarianceFunction object  
+
+Xcovfun2  = CovarianceFunction('Sdescription','covariance function', ...
+          'Lfunction',false, ... 
+          'Liostructure',true, ... % input and output are structures
+          'Liomatrix',false,...
+          'Cinputnames',{'x1','x2'},... % names of inputs 
+          'Sscript',Sscript2,... % script with 1D exponential function
+          'Coutputnames',{'fcov'}); % name of output
+
+      
+%% Visualize and validate results
+
+coordinates = meshgrid(linspace(0,4,100),linspace(0,4,100));
+xcoordinates = coordinates(:)';
+ycoordinates = repmat(linspace(0,4,100),1,100);
+Vcov2 =  Xcovfun2.evaluate([zeros(2, 10000);xcoordinates;ycoordinates]);
+f2 = figure;
+plot3(xcoordinates,ycoordinates,Vcov2,'.')
+grid on
+xlabel('\Delta x')
+ylabel('\Delta y')
+zlabel('covariance')
+
+assert(all(all(abs(Vcov2(1:10)'-[1.0000, 0.9604, 0.9224, 0.8858, 0.8508,...
+                                 0.8171, 0.7847, 0.7536, 0.7238, 0.6951])<1e-4)), ...
+                         'CossanX:Tutorials:TutorialCovarianceFunction', ...
+                         'Reference Solution does not match.') 
+
+%% end of tutorial - close figures
+
+close(f1)
+close(f2)     
+ 
+
+##### SOURCE END #####
+--></body></html>
