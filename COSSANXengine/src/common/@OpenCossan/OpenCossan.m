@@ -34,7 +34,6 @@ classdef OpenCossan < handle
         SmcrPath               % Define the path of the Matlab Compiler Runtime
         SmatlabPath            % Define the path of the Matlab installation
         NverboseLevel=3        % Verbosity level
-        Lchecks=true           % if false no checks are performed during analysis
         SdiaryFileName = 'CossanLog.txt' % Filename of the log file
         Xanalysis              % Analysis object
         XdatabaseDriver        % DataBaseDriver
@@ -198,9 +197,10 @@ classdef OpenCossan < handle
                             'please provide an object of SSHConnection after the property name %s',varargin{k})
                         Xobj.XdatabaseDriver = varargin{k+1};
                     case {'ssshuser','ssshhost','ssshprivatekey',...
+                            'skeypassword',...
                             'ssshpassword','sremoteworkingpath',...
                             'sremoteworkfolder','sremotemcrpath',...
-                            'sremotecossanroot','sremoteexternalpath'},...
+                            'sremotecossanroot','sremoteexternalpath'}
                         CsshArguments{end+1} = varargin{k}; %#ok<*AGROW>
                         CsshArguments{end+1} = varargin{k+1}; 
                         % ANALYSIS OBJECT
@@ -221,8 +221,6 @@ classdef OpenCossan < handle
                         Xobj.Xanalysis = varargin{k+1}{1};
                      case {'liscossanx'}  
                         Xobj.LisCossanX=varargin{k+1};
-                    case {'lchecks'}
-                        Xobj.Lchecks=varargin{k+1};
                     otherwise
                         error('openCOSSAN:OpenCossan',...
                             'The property name %s is not valid',varargin{k})
@@ -418,7 +416,6 @@ classdef OpenCossan < handle
                 SpathToolbox=fullfile(Xobj.SexternalPath,'src','spinterp_v5.1.1','spinit.m');
                 
                 if exist(SpathToolbox,'file')
-                    
                     run(SpathToolbox);
                 else
                     warning('openCOSSAN:OpenCossan', ...
@@ -435,7 +432,7 @@ classdef OpenCossan < handle
                 end
             end
             
-            %% Set path for the matlab SFEM database files
+            %% Set path for the matlab database files
             if isempty(Xobj.SmatlabDatabasePath)
                 if isdeployed
                     Xobj.SmatlabDatabasePath=fullfile(Xobj.SexternalPath,'SFEM','database');
@@ -448,10 +445,9 @@ classdef OpenCossan < handle
                     
                     Xobj.SmatlabDatabasePath=[Xobj.ScossanRoot filesep 'database'];
                     
-                    Sfile=fullfile(Xobj.SmatlabDatabasePath,'initializeSFEMdatabase');
-                    
-                    if exist(Sfile,'file') 
-                        disp('Initialize SFEM database')                        
+                    if exist(fullfile(Xobj.SmatlabDatabasePath),'dir')
+                        disp('Initialize SFEM database')
+                        Sfile=fullfile(Xobj.SmatlabDatabasePath,'initializeSFEMdatabase');
                         disp(Sfile)
                         run(Sfile)
                     else
@@ -587,7 +583,6 @@ classdef OpenCossan < handle
         XrandomStream=getRandomStream; % Return the random stream stored in the Analysis
         Xobj=getSSHConnection;
         Nlevel=getVerbosityLevel;
-  
         
         % Set methods
         setAnalysisName(SanalysisName); % Define Analysis Name
@@ -694,16 +689,6 @@ classdef OpenCossan < handle
         
         function Lstatus=isKilled
             Lstatus= exist(fullfile(OpenCossan.getCossanWorkingPath,OpenCossan.getKillFilename),'file');
-        end
-        
-        function Lchecks=getChecks
-            global OPENCOSSAN
-            Lchecks= OPENCOSSAN.Lchecks;
-        end
-        
-        function setChecks(Lchecks)
-            global OPENCOSSAN
-            OPENCOSSAN.Lchecks=Lchecks;
         end
                 
     end

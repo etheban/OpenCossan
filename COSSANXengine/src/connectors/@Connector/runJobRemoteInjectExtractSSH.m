@@ -86,7 +86,7 @@ Xjob.Smaininputpath = Xobj.Smaininputpath; %set the main input path
 % Each batch have an unique name identified by the Sfoldername plus the
 % current simulation number
 % TODO: we should use the object ANALYSIS
-Xjob.Sfoldername = Xobj.SfolderTimeStamp;
+Xjob.Sfoldername = Xobj.SfolderTimeStamp; 
 Xjob.Sexecmd = ['./' Xobj.SconnectorScriptName]; % set the execution command to the connector wrapper script
 
 % the connector wrapper script needs as inputs the external path and the path of the MCR
@@ -247,8 +247,14 @@ for ijob=1:Njobs
     % copy back from remote host the simulation folder with SSH
     SremoteDirName=fullfileunix(Xssh.SremoteWorkFolder,SsimulationFolderName);
     
-    Xssh.getDir('SremoteDirName',SremoteDirName, ...
-        'SlocalDestinationDir',OpenCossan.getCossanWorkingPath,'Loverwrite',true);
+    if Xobj.LkeepSimulationFiles
+        Xssh.getDir('SremoteDirName',SremoteDirName, ...
+            'SlocalDestinationDir',OpenCossan.getCossanWorkingPath,'Loverwrite',true);
+    else
+        % copy only the ConnectorOutput.mat file
+        Xssh.getFile('SremoteFileName',fullfileunix(SremoteDirName,Xobj.matlabOutputName),...
+            'SlocalDestinationFolder',fullfile(OpenCossan.getCossanWorkingPath,SsimulationFolderName));
+    end
     
     % remove the folder on the remote host
     Xssh.issueCommand(['rm -fr ' SremoteDirName]);
@@ -264,18 +270,28 @@ for ijob=1:Njobs
     end
     
     if Lread
-        if ~Ldatabase && ~Xobj.LkeepSimulationFiles
-            try
-                delete(fullfile(OpenCossan.getCossanWorkingPath,[Xjob.SjobScriptName num2str(ijob) '.sh']));
-            catch ME
-                OpenCossan.cossanDisp(['The job script ' Xjob.SjobScriptName '_'  num2str(ijob) '.sh can not be removed' ],2)
-            end
-            % Clean the directory
-            Scleanfolder=fullfile(OpenCossan.getCossanWorkingPath,[Xjob.Sfoldername Xjob.SbatchIdentification num2str(ijob)]);
-            try
-                rmdir(Scleanfolder,'s');
-            catch ME
-                OpenCossan.cossanDisp(['The folder ' Scleanfolder ' can not be removed' ],2)
+        if Ldatabase
+            % dir only the _sim_1 subfolder to retrieve the name of the
+            % folders used for the remote inject/extract
+            % TODO: WHAT IS THAT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            Tdir = dir(fullfile(OpenCossan.getCossanWorkingPath,....
+                [Xjob.Sfoldername '_sim_' num2str(ijob)],...
+                [Xjob.Sfoldername(1:9) '*_sim_1']));
+            CfolderNames{ijob} = Tdir.name(1:15);
+        else
+            if ~Xobj.LkeepSimulationFiles
+                try
+                    delete(fullfile(OpenCossan.getCossanWorkingPath,[Xjob.SjobScriptName num2str(ijob) '.sh']));
+                catch ME
+                    OpenCossan.cossanDisp(['The job script ' Xjob.SjobScriptName '_'  num2str(ijob) '.sh can not be removed' ],2)
+                end
+                % Clean the directory
+                Scleanfolder=fullfile(OpenCossan.getCossanWorkingPath,[Xjob.Sfoldername Xjob.SbatchIdentification num2str(ijob)]);
+                try
+                    rmdir(Scleanfolder,'s');
+                catch ME
+                    OpenCossan.cossanDisp(['The folder ' Scleanfolder ' can not be removed' ],2)
+                end
             end
         end
         
@@ -291,20 +307,20 @@ if Ldatabase
         SsimulationFolderName=[Xjob.Sfoldername Xjob.SbatchIdentification num2str(ijob)];
         % move the compressed folder out of the "block" folder
         for isample = Vstart(ijob):Vend(ijob)
-            Ssource = fullfile(OpenCossan.getCossanWorkingPath,...
+            Ssource = fullfile(Xobj.Smaininputpath,...
                 SsimulationFolderName,...
-                ['simulation_' num2str(isample - Vstart(ijob) +1) '_of_' num2str(Vend(ijob)-Vstart(ijob)+1)]);
-            Sdestination = fullfile(OpenCossan.getCossanWorkingPath,...
-                [Xjob.Sfoldername Xjob.SbatchIdentification num2str(isample) '.tgz']);
+                [CfolderNames{ijob} '_sim_' num2str(isample - Vstart(ijob) +1) ]);
+            Sdestination = fullfile(Xobj.Smaininputpath,...
+                [Xjob.Sfoldername '_sim_' num2str(isample) '.tgz']);
             tar(Sdestination,Ssource);
         end
         try
-            delete(fullfile(OpenCossan.getCossanWorkingPath,[Xjob.SjobScriptName num2str(ijob) '.sh']));
+            delete(fullfile(Xobj.Smaininputpath,[Xjob.Sjobscriptname num2str(ijob) '.sh']));
         catch ME
-            OpenCossan.cossanDisp(['The job script ' Xjob.SjobScriptName '_'  num2str(ijob) '.sh can not be removed' ],2)
+            OpenCossan.cossanDisp(['The job script ' Xjob.Sjobscriptname '_'  num2str(ijob) '.sh can not be removed' ],2)
         end
         % Clean the directory
-        Scleanfolder=fullfile(OpenCossan.getCossanWorkingPath,[Xjob.Sfoldername Xjob.SbatchIdentification num2str(ijob)]);
+        Scleanfolder=fullfile(Xobj.Smaininputpath,[Xjob.Sfoldername '_sim_' num2str(ijob)]);
         try
             rmdir(Scleanfolder,'s');
         catch ME
@@ -337,7 +353,7 @@ if Ldatabase
         XSimData = (SimulationData('Tvalues',PinputALL(isample)));
         XSimData = XSimData.merge(SimulationData('Tvalues',Tout(isample)));
         
-        SsimulationZip = fullfile(OpenCossan.getCossanWorkingPath,[Xjob.Sfoldername Xjob.SbatchIdentification num2str(isample) '.tgz']);
+        SsimulationZip = fullfile(Xobj.Smaininputpath,[Xjob.Sfoldername '_sim_' num2str(isample) '.tgz']);
         %% Add record
         insertRecord(OpenCossan.getDatabaseDriver,'StableType','Solver',...
             'Nid',getNextPrimaryID(OpenCossan.getDatabaseDriver,'Solver'),...
