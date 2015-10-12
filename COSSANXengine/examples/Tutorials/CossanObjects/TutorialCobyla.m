@@ -90,5 +90,6 @@ OpenCossan.cossanDisp('f(1.0,1.0) = 2.0');
 
 %% Validate solution
 Vreference=[ 9.9084e-01; 1.0092e+00];
-Mdata = [Xoptimum.XdesignVariable(1).Vdata; Xoptimum.XdesignVariable(2).Vdata];
+Xdv1 = Xoptimum.XdesignVariable(1); Xdv2 = Xoptimum.XdesignVariable(2);
+Mdata = [Xdv1.Vdata; Xdv2.Vdata];
 assert(max(Vreference-Mdata(:,end))<1e-4,'openCOSSAN:Tutorial:TutorialCobyla','Reference Solution not identified')

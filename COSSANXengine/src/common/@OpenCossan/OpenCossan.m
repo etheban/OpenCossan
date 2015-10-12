@@ -34,6 +34,7 @@ classdef OpenCossan < handle
         SmcrPath               % Define the path of the Matlab Compiler Runtime
         SmatlabPath            % Define the path of the Matlab installation
         NverboseLevel=3        % Verbosity level
+        Lchecks=true           % if false no checks are performed during analysis
         SdiaryFileName = 'CossanLog.txt' % Filename of the log file
         Xanalysis              % Analysis object
         XdatabaseDriver        % DataBaseDriver
@@ -691,6 +692,15 @@ classdef OpenCossan < handle
             Lstatus= exist(fullfile(OpenCossan.getCossanWorkingPath,OpenCossan.getKillFilename),'file');
         end
                 
+        function Lchecks=getChecks
+            global OPENCOSSAN
+            Lchecks= OPENCOSSAN.Lchecks;
+        end
+        
+        function setChecks(Lchecks)
+            global OPENCOSSAN
+            OPENCOSSAN.Lchecks=Lchecks;
+        end        
     end
     
 end

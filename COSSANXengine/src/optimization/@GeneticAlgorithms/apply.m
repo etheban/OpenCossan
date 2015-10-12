@@ -203,8 +203,10 @@ end
 
 %% Add the final values of the Genetic Algorithms to the Optimum object
 % Be sure that the best results is always stored in the final population
-VsolRep=repmat(Vsol,XoptGlobal.XdesignVariable(1).Nsamples,1);
-VfvalRep=repmat(Vfval,XoptGlobal.XdesignVariable(1).Nsamples,1);
+Xtmp = XoptGlobal.XdesignVariable(1);
+Nsamples = Xtmp.Nsamples;
+VsolRep=repmat(Vsol,Nsamples,1);
+VfvalRep=repmat(Vfval,Nsamples,1);
 
 for n = 1:Xop.NdesignVariables
     XoptGlobal.XdesignVariable(n)=addData(XoptGlobal.XdesignVariable(n), ...
