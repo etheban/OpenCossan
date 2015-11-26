@@ -14,7 +14,7 @@ Xobj.McdfsValues=zeros(size(Xobj.Mcdfs));
 
 
 for j=1:size(Xobj.MdataSet,2) % loop over the variables
-    [Xobj.McdfsValues(:,j) Xobj.Mcdfs(:,j)]=ecdf(Msamples(:,j));
+    [Xobj.McdfsValues(:,j), Xobj.Mcdfs(:,j)]=ecdf(Msamples(:,j));
     Xobj.Mcdfs(1,j)=min(Msamples(:,j))-10*Vvar(j);
     Xobj.Hcdf{j} = @(y)interp1(Xobj.Mcdfs(:,j),Xobj.McdfsValues(:,j),y,'linear');
     Xobj.Hicdf{j} = @(y)interp1(Xobj.McdfsValues(:,j),Xobj.Mcdfs(:,j),y,'linear');
