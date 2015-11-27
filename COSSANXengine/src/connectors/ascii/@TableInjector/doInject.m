@@ -33,10 +33,13 @@ for n=1:Xobj.Nvariable
             % specified index
             Mcoord = Tinput.(Xobj.Cinputnames{n}).Mcoord;
             Vdata = Tinput.(Xobj.Cinputnames{n}).Vdata;
-            if ~isempty(Xobj.Vindices)
-                Mdata = [Mcoord(:,Xobj.Vindices); Vdata(Xobj.Vindices)];
-            else
+            if Xobj.LinjectCoordinates
                 Mdata = [Mcoord; Vdata];
+            else
+                Mdata = Vdata;
+            end
+            if ~isempty(Xobj.Vindices)
+                Mdata = Mdata(:,Xobj.Vindices); 
             end
         case {'double','single','logical'}
             Mdata = [Mdata Tinput.(Xobj.Cinputnames{n})];

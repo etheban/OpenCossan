@@ -32,6 +32,7 @@ classdef TableInjector < Injector
     properties
         Cheaderlines         % headerlines
         Vindices             % indices of the dataseries 
+        LinjectCoordinates = true  % specify if you want to inject the coordinates of the Dataseries in the table
     end
         
     methods
@@ -98,6 +99,8 @@ classdef TableInjector < Injector
                         Xobj.Cinputnames=varargin{k+1};
                     case {'vindices'}
                         Xobj.Vindices=varargin{k+1};
+                    case {'linjectcoordinates'}
+                        Xobj.LinjectCoordinates=varargin{k+1};
                     case {'sworkingdirectory'}
                         Xobj.Sworkingdirectory=varargin{k+1};
                         if not(strcmp(Xobj.Sscanfilepath(end),filesep))
