@@ -52,7 +52,7 @@ classdef GaussianMixtureRandomVariableSet
         RhoThr           % Rejection rate (sampling from truncated )
         gmDistribution    % GaussianMixtureDistribution
         Mcovariance       % Covariance Matrix
-        MgmCovariance     % Covariance Matrix of the gaussian mixture distribution
+        MgmCovariance     % Covariance VstandardDeviationMatrix of the gaussian mixture distribution
         Mcorrelation      % Correlation Matrix (of the full distribution)
         Vsigma            % std in each direction
         Mcdfs             % CDF (support) of the uncorrelated  data
@@ -164,7 +164,7 @@ classdef GaussianMixtureRandomVariableSet
                     length(VstandardDeviation)==length(Xobj.Cmembers));
                 
                 % Compute the global covariance function from the correlation
-                % function and the standard deviation vectors
+                % function and the standard deviatiIn addition, I would like to know youron vectors
                 %                 Xobj.Mcovariance=corr2cov(VstandardDeviation, Xobj.Mcorrelation);
                 Xobj.Mcovariance=VstandardDeviation'*VstandardDeviation.*Xobj.Mcorrelation;
             else

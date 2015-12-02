@@ -30,7 +30,9 @@ function compressOpenCossan(varargin)
 
 global OPENCOSSAN
 % Predefined values
-SdestPath=fullfile(OpenCossan.getCossanRoot,'..','..','branches','Archives','development');
+if ~isempty(OPENCOSSAN)
+    SdestPath=fullfile(OPENCOSSAN.ScossanRoot,'..','..','Archives','stable');
+end
 Sformat='zip';
 Ldocs=true;
 Lexamples=true;
