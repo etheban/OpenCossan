@@ -8,3 +8,19 @@ nmake install
 
 Obviously, the destination dir should be changed automatically to match the cossan external path as initialized from OpenCossan.
 Be sure to have the correct VCREDIST that corresponds to the compiler and architecture you used.
+
+---------------------------------------------
+Windows 10 64 bit
+---------------------------------------------
+It is better to use gcc in windows!!!
+First, follow this guide to install MSYS and gcc 64bit.
+http://ascend4.org/Setting_up_a_MinGW-w64_build_environment
+Follow it until "MinGW 32-bit compilers (optional)"
+
+Then, start MSYS and give the commands
+cd e:
+cd OpenCossan/OpenSourceSoftware/src/FANN-2.2.0-Source
+cmake . -DCMAKE_INSTALL_PREFIX=/E/OpenCossan/OpenSourceSoftware/dist/Windows/10.0.10586/win64 -DCMAKE_BUILD_TYPE="Release" -G "MSYS Makefiles"
+
+You need to rename the files .dll.a in the destination folder to .lib for compatibility with Matlab mex in windows.
+Also, the file libfann.lib should be copied to mex src folder (I have to understand how to set the search path for the .lib)
