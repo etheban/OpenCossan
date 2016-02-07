@@ -350,7 +350,7 @@ Sfilename=fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.Inst
 if exist(Sfilename,'file')
     set(handles.textInformation,'String','Updating the App')
 else
-    set(handles.textInformation,'String','Please downlod the app first')
+    set(handles.textInformation,'String','Please download the app first')
 end
 
 guidata(hObject,handles)
@@ -509,7 +509,7 @@ handles.OpenCossanData.ServerSVNInfoFileExamples='svn_OpenCossanExamples.zip.xml
 handles.OpenCossanData.ServerSVNInfoFileDocs='svn_OpenCossanDocs.zip.xml';
 handles.OpenCossanData.ServerSVNInfoFileAddOns='svn_OpenCossanAddOns.zip.xml';
 handles.OpenCossanData.ServerSVNInfoFileApp='svn_OpenCossanApp.mlappinstall.xml';
-handles.OpenCossanData.URL='https://cossan.cfd.liv.ac.uk/svn/OpenCossan/branches/Archives/development/';
+handles.OpenCossanData.URL='https://cossan.co.uk/svn/OpenCossan/branches/Archives/stable/';
 
 %Get revision for the COSSAN APP. I am assuming that when the CossanAPP is
 % used for the first time it is up-to-date 

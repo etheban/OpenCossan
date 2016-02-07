@@ -1,9 +1,9 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="827340387" file="/home/epatelli/workspace/OpenCossan/trunk/COSSANXengine/Apps/OpenCossanApp.prj" location="/home/epatelli/workspace/OpenCossan/trunk/COSSANXengine/Apps" name="OpenCossanApp" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="141582840" file="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps/OpenCossanApp.prj" location="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps" name="OpenCossanApp" target="target.mlapps" target-name="Package App">
     <param.appname>OpenCossanApp</param.appname>
-    <param.authnamewatermark>Edoardo Patelli &amp; Quentin Huchet</param.authnamewatermark>
+    <param.authnamewatermark>Edoardo Patelli</param.authnamewatermark>
     <param.email>info@cossan.co.uk</param.email>
-    <param.company>University of Liverpool</param.company>
+    <param.company>Cossan Working Group</param.company>
     <param.icon>${PROJECT_ROOT}/OpenCossanApp_resources/icon_24.png</param.icon>
     <param.icons>
       <file>${PROJECT_ROOT}/OpenCossanApp_resources/icon_48.png</file>
@@ -17,21 +17,22 @@ The software offers the most advanced and recent algorithms for the rational qua
 OpenCossan is an all-in-one package software for the practitioners to perform Uncertainty Quantification, Simulation-based Reliability Analysis, Sensitivity Analysis, Meta-Modelling, Stochastic Finite Elements Analysis, and Robust Design and Reliability-Based Optimization.
 
 See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.description>
-    <param.screenshot>${PROJECT_ROOT}/OpenCossanIcon.png</param.screenshot>
-    <param.version>1.4.3</param.version>
+    <param.screenshot>${PROJECT_ROOT}/OpenCossanIcon2.png</param.screenshot>
+    <param.version>1.4.4</param.version>
     <param.products.name>
       <item>MATLAB</item>
     </param.products.name>
     <param.products.id>
-      <item>'1'</item>
+      <item>1</item>
     </param.products.id>
     <param.products.version>
-      <item>8.4</item>
+      <item>9.0</item>
     </param.products.version>
     <param.platforms />
-    <param.output>/home/epatelli/workspace/OpenCossan/branches/Archives/development/OpenCossanApp.mlappinstall</param.output>
+    <param.output>/home/epatelli/workspace/OpenCossan/branches/Archives/stable</param.output>
     <param.guid>4bb5813a-dfe1-4aec-bf52-54f75f13141e</param.guid>
     <unset>
+      <param.authnamewatermark />
       <param.platforms />
     </unset>
     <fileset.main>
@@ -45,36 +46,36 @@ See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.de
     </fileset.resources>
     <fileset.package />
     <build-deliverables>
-      <file location="/home/epatelli/workspace/OpenCossan/branches/Archives/development" name="OpenCossanApp.mlappinstall" optional="false">/home/epatelli/workspace/OpenCossan/branches/Archives/development/OpenCossanApp.mlappinstall</file>
+      <file location="/home/epatelli/workspace/OpenCossan/branches/Archives" name="stable" optional="false">/home/epatelli/workspace/OpenCossan/branches/Archives/stable</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>/usr/local/MATLAB/R2014b</root>
+      <root>/usr/local/MATLAB/R2016a</root>
       <toolboxes>
-        <toolbox name="matlabhdlcoder" />
         <toolbox name="fixedpoint" />
-        <toolbox name="embeddedcoder" />
         <toolbox name="matlabcoder" />
+        <toolbox name="matlabhdlcoder" />
+        <toolbox name="embeddedcoder" />
       </toolboxes>
-      <toolbox>
-        <matlabhdlcoder>
-          <enabled>true</enabled>
-        </matlabhdlcoder>
-      </toolbox>
       <toolbox>
         <fixedpoint>
           <enabled>true</enabled>
         </fixedpoint>
       </toolbox>
       <toolbox>
-        <embeddedcoder>
-          <enabled>true</enabled>
-        </embeddedcoder>
-      </toolbox>
-      <toolbox>
         <matlabcoder>
           <enabled>true</enabled>
         </matlabcoder>
+      </toolbox>
+      <toolbox>
+        <matlabhdlcoder>
+          <enabled>true</enabled>
+        </matlabhdlcoder>
+      </toolbox>
+      <toolbox>
+        <embeddedcoder>
+          <enabled>true</enabled>
+        </embeddedcoder>
       </toolbox>
     </matlab>
     <platform>
@@ -86,7 +87,7 @@ See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.de
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>3.19.1-201.fc21.x86_64</osver>
+      <osver>4.3.4-300.fc23.x86_64</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>
