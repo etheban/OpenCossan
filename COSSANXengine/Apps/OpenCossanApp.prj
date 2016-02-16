@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="141582840" file="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps/OpenCossanApp.prj" location="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps" name="OpenCossanApp" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="4128160478" file="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps/OpenCossanApp.prj" location="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps" name="OpenCossanApp" target="target.mlapps" target-name="Package App">
     <param.appname>OpenCossanApp</param.appname>
     <param.authnamewatermark>Edoardo Patelli</param.authnamewatermark>
     <param.email>info@cossan.co.uk</param.email>
@@ -18,7 +18,7 @@ OpenCossan is an all-in-one package software for the practitioners to perform Un
 
 See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.description>
     <param.screenshot>${PROJECT_ROOT}/OpenCossanIcon2.png</param.screenshot>
-    <param.version>1.4.4</param.version>
+    <param.version>1.5</param.version>
     <param.products.name>
       <item>MATLAB</item>
     </param.products.name>
@@ -87,7 +87,7 @@ See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.de
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>4.3.4-300.fc23.x86_64</osver>
+      <osver>4.3.5-300.fc23.x86_64</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>
