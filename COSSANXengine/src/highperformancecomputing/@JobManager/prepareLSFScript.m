@@ -66,18 +66,14 @@ fprintf(Nfid,'%s\n','#BSUB -N');         % suppress job report in output redirec
 fprintf(Nfid,'%s\n','START_DIR=`pwd` ');
 
 %% create subfolder and copy input files
-if ~isempty(Xobj.Sfoldername) && ~isempty(Xobj.Sworkingdirectory)
-    % if there is ssh connection, the files have been already copyed to the
-    % remote host in the remote working directory
-    fprintf(Nfid,'%s\n',['mkdir -p ' fullfileunix(Xobj.Sworkingdirectory,Xobj.Sfoldername) ';']);
+if ~isempty(Xobj.Sfoldername) 
     if ~OpenCossan.hasSSHConnection
-        fprintf(Nfid,'%s\n',['cp ' fullfileunix(OpenCossan.getCossanWorkingPath,Xobj.Sfoldername)...
-            ' ' Xobj.Sworkingdirectory ' -R;']);
+        % change directory to the job work folder
+        fprintf(Nfid,'%s\n',['cd ' fullfileunix(Xobj.Sworkingdirectory,Xobj.Sfoldername) ';']);
     else
-        fprintf(Nfid,'%s\n',['cp ' fullfileunix(Xssh.SremoteWorkFolder,Xobj.Sfoldername)...
-            ' ' Xobj.Sworkingdirectory ' -R;']);
+        % change directory to the job work folder on the cluster
+        fprintf(Nfid,'%s\n',['cd ' fullfileunix(Xssh.SremoteWorkFolder ,Xobj.Sfoldername) ';']);
     end
-    fprintf(Nfid,'%s\n',['cd ' fullfileunix(Xobj.Sworkingdirectory,Xobj.Sfoldername) ';']);
 end
 
 fprintf(Nfid,'%s\n','echo Script execution started; date');
