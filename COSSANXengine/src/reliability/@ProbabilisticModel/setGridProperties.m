@@ -1,6 +1,10 @@
 function Xobj = setGridProperties(Xobj,varargin)
 %setGridProperties This method is used to add Grid support to the model
-
+%
+% THIS FUNCTION SHOULD ONLY BE USED BY COSSAN-X
+% The second setting for the grid will be ignored since they refer to the
+% PerformanceFunction
+%
 % ==================================================================
 % COSSAN-X - The next generation of the computational stochastic analysis
 % University of Innsbruck, Copyright 1993-2011 IfM
@@ -39,72 +43,71 @@ for k=1:2:length(varargin),
     end
 end
 
-Nevaluators=length(Xobj.Xevaluator.CXsolvers);
-
+Nevaluators=length(Xobj.Xmodel.Xevaluator.CXsolvers);
 
 if exist('CevaluatorNames','var')
     for n=1:Nevaluators
         if ~strcmp(CevaluatorNames{n},Xobj.Xevaluator.CSnames{n})
             warning('openCOSSAN:Model:setGridProperties', ...
                 ['Name of the evaluator required %s does not correspond to the name' ...
-                ' present in the evaluator %s'],CevaluatorNames{n},Xobj.Xevaluator.CSnames{n})
+                ' present in the evaluator %s'],CevaluatorNames{n},Xobj.Xmodel.Xevaluator.CSnames{n})
         end
     end
 end
 
 % Set JobManagerInterface
 if exist('Xjmi','var')
-    Xobj.Xevaluator.XjobInterface=Xjmi;
+    Xobj.Xmodel.Xevaluator.XjobInterface=Xjmi;
 end
 
 % Set Hostnames
 if exist('CShosts','var')
-    assert(length(CShosts)==Nevaluators, ...
+    assert(length(CShosts)==Nevaluators+1, ...
         'openCOSSAN:Model:setGridProperties', ...
-        'Length of CShost is %i and must be %i',length(CShosts),Nevaluators)
-    Xobj.Xevaluator.CShostnames=CShosts;
+        'Length of CShost is %i and must be %i',length(CShosts),Nevaluators+1)
+    Xobj.Xmodel.Xevaluator.CShostnames=CShosts(1:end-1);
 end
 
 % Set Queues
 if exist('CSqueues','var')
-    assert(length(CSqueues)==Nevaluators, ...
+    assert(length(CSqueues)==Nevaluators+1, ...
         'openCOSSAN:Model:setGridProperties', ...
-        'Length of CSqueues is %i and must be %i',length(CSqueues),Nevaluators)
+        'Length of CSqueues is %i and must be %i',length(CSqueues),Nevaluators+1)
     
-    Xobj.Xevaluator.CSqueues=CSqueues;
+    Xobj.Xmodel.Xevaluator.CSqueues=CSqueues(1:end-1);
 end
 
 % Set Paralel Environments
 if exist('CSparallelEnvironments','var')
-    assert(length(CSparallelEnvironments)==Nevaluators, ...
+    assert(length(CSparallelEnvironments)==Nevaluators+1, ...
         'openCOSSAN:Model:setGridProperties', ...
-        'Length of CSparallelEnvironments is %i and must be %i',length(CSparallelEnvironments),Nevaluators)
+        'Length of CSparallelEnvironments is %i and must be %i',length(CSparallelEnvironments),Nevaluators+1)
     
-    Xobj.Xevaluator.CSparallelEnvironments=CSparallelEnvironments;
+    Xobj.Xmodel.Xevaluator.CSparallelEnvironments=CSparallelEnvironments(1:end-1);
 end
 
 % Set number of slots
 if exist('Vslots','var')
-    assert(length(Vslots)==Nevaluators, ...
-        'openCOSSAN:Model:setGridProperties', ...
-        'Length of Vslots is %i and must be %i',length(Vslots),Nevaluators)
+    assert(length(Vslots)==Nevaluators+1, ...
+        'openCOSSAN:Model:setGridProperties', ...varargout=Reliability_anal.setGridProperties('Vconcurrent',[1 1])
+        'Length of Vslots is %i and must be %i',length(Vslots),Nevaluators+1)
     
-    Xobj.Xevaluator.Vslots=Vslots;
+    Xobj.Xmodel.Xevaluator.Vslots=Vslots(1:end-1);
 end
 
 % Set Concurrent jobs
 if exist('Vconcurrent','var')
-    assert(length(Vconcurrent)==Nevaluators, ...
+    assert(length(Vconcurrent)==Nevaluators+1, ...
         'openCOSSAN:Model:setGridProperties', ...
-        'Length of Vconcurrent is %i and must be %i',length(Vconcurrent),Nevaluators)
+        'Length of Vconcurrent is %i and must be %i',length(Vconcurrent),Nevaluators+1)
     
-    Xobj.Xevaluator.Vconcurrent=Vconcurrent;
+    Xobj.Xmodel.Xevaluator.Vconcurrent=Vconcurrent(1:end-1);
 end
 
 if exist('LremoteInjectExtract','var')
-    Xobj.Xevaluator.LremoteInjectExtract = LremoteInjectExtract;
+    Xobj.Xmodel.Xevaluator.LremoteInjectExtract = LremoteInjectExtract;
 end
 
-
+varargout=Reliability_anal.setGridProperties('Vconcurrent',[1 1])
 end
 
