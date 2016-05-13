@@ -1,116 +1,92 @@
-%% Example script for the connector
+%% Example script for the connector using a CATHENA files
 %
-% input file name <cossan root>/COSSANXengine/examples/Tutorials/Connector/ABAQUS/2D_Truss.inp
-% output file name <cossan root>/COSSANXengine/examples/Tutorials/Connector/ABAQUS/2D_Truss.dat'
+% CATHENA is called using the following command:
+% <path to cathena executable> input.inp 
 %
-% FE CODE: Abaqus
+% input file name <cossan root>/COSSANXengine/examples/Tutorials/Connector/CATHENA/PipeBlowdown.txt
+% output file name <cossan root>/COSSANXengine/examples/Tutorials/Connector/CATHENA/example1_output.dat'
 %
-%  Copyright 1993-2011, COSSAN Working Group
-%  University of Innsbruck, Austria
+% SOLVER CODE: CATHENA
+%
+%  Copyright 1993-2016, COSSAN Working Group
+%  Edoardo Patelli, 
 %
 % See Also: 
-% http://cossan.cfd.liv.ac.uk/wiki/index.php/@Connector
+% http://cossan.co.uk/wiki/index.php/@Connector
 
+%% BE SURE OpenCOSSAN has been initialised
 
 % Reset the random number generator in order to obtain always the same results.
 % DO NOT CHANGE THE VALUES OF THE SEED
 OpenCossan.resetRandomNumberGenerator(51125)
 
-%% Tutorial Connector: ABAQUS
-% This tutorial shows how to use a Connector the the FE solver ABAQUS. The
-% predefined Connector options for the University of Innsbruck shared
-% installation of Abaqus are used. Additionally, the FE solver is executed
-% remotely on the cluster of the Institute of Engineering Mechanics.
+%% Tutorial Connector: CATHENA
+% This tutorial shows how to use a Connector to link the solver CATHENA to
+% OpenCOSSAN. The predefined Connector uses the input/output files in
+% <cossan root>/COSSANXengine/examples/Tutorials/Connector/CATHENA. 
+% A "fake" solver is created "cat3_5drev2.exe.sh". The shell script does
+% NOT run the analysis and it should be replaced with the real solver.  
+%
+
+% In this examples 3 quantities are connected with OpenCOSSAN
+% (ReservoirPressure, InitialPressure and InitialTemperature)
+%
+ReservoirPressure=Parameter('value',1.013E5);
+InitialPressure=RandomVariable('Sdistribution','normal','mean',7,'cov',0.1);
+InitialTemperature=RandomVariable('Sdistribution','uniform','lowerBound',200,'upperBound',300)
+
+RVSET=RandomVariableSet('CSmembers',{'InitialPressure' 'InitialTemperature'});
+Xinput=Input('CSmembers',{'RVSET' 'ReservoirPressure'},'CXmembers',{RVSET ReservoirPressure});
+%
+% The outputs are collected from a file (edwards_press.dat) 
 
 %% Create the Injector
-% An injector to the file with the identifiers 2D_Truss.cossan is here
-% created. 
+% An injector is screated by scanning the file PipeBlowdown.inp.cossan containing 3 indentifiers
 Sfolder=fileparts(mfilename('fullpath'));% returns the current folder
-SfilePath=fullfile(Sfolder,'Connector','ABAQUS');
+SfilePath=fullfile(Sfolder,'Connector','CATHENA');
 
 Xinj = Injector('Sscanfilepath',SfilePath,...
-    'Sscanfilename','2D_Truss.cossan',...
-    'Sfile','2D_Truss.inp');
+                'Sscanfilename','PipeBlowdown.inp.cossan',...
+                'Sfile','PipeBlowdown.inp');
+            
+% Show the content of the identifier
+display(Xinj)             
 
-%%  Build Extractor
-% An extractor to the ASCII outptu file 2D_Truss.dat is here created. Two
-% responses are defined.
-Xresp1 = Response('Sname', 'OUT1', ...
-    'Sfieldformat', '%10e', ...
-    'Clookoutfor',{'E L E M E N T   O U T P U T'}, ...
-    'Ncolnum',24, ...
-    'Nrownum',19);
+%% Output files
+% The output is collected from the file edwards_press.dat 
+% Since the data are written in a table format is convinient to use the
+% method TableExtractor 
+%
+% Let assume we are interested on the first and 5 colum of the table. 
+%
+% same folder that contains the input file. 
+Xte1=TableExtractor('Sdescription','Extractor for the tutorial CATHENA', ...
+                'Sdelimiter','\t', ... % A tab format
+                'Luseload',true,... 
+              'LextractColumns',true, ...
+             'Srelativepath','./', ... % relative path to the Sworkingdirectory where result file is located
+             'Sfile','edwards_press.dat'); % response to be extracted as defined above
 
-Xresp2 = Response('Sname', 'OUT2', ...
-    'Sfieldformat', '%10e', ...
-    'Clookoutfor',{'N O D E   O U T P U T'}, ...
-    'Ncolnum',30, ...
-    'Nrownum',10);
-
-Xe=Extractor('Sdescription','Extractor for 2D_Truss', ...
-    'Sfile','2D_Truss.dat', ...
-    'Xresponse',[Xresp1 Xresp2]);
-    
 
 %% Construct the connector
-Xc = Connector('Stype','abaqus',... FE solver identification
-    'Ssolverbinary','/usr/software/Abaqus/Commands/abq6111',... Solver binary
-    'Sexeflags','interactive ask_delete=off',... execution flags
-    'Smaininputfile','2D_Truss.inp',... main input file
+Xc = Connector('Stype','cathena',... solver identification
+    'Ssolverbinary','SfilePath/cat3_5drev2.exe.sh',... Solver binary
+    'Sexeflags','',... execution flags
+    'Smaininputfile','PipeBlowdown.inp',... main input file
     'Smaininputpath',SfilePath,... absolute path to the original main input file
-    'Sexecmd','%Ssolverbinary %Sexeflags job=%Smaininputfile ',... construction of the execution command
-    'SerrorFileExtension','dat',... extension of the file with the indication of a successfull solver execution
-    'SerrorString','***ERROR',... string identifying a failed solver execution
-    'Sworkingdirectory','/tmp',... execution directory of the solver
+    'Sexecmd','%Ssolverbinary %Smaininputfile %Sexeflags',... construction of the execution command
     'LkeepSimulationFiles',false,... 
-    'CXmembers',{Xe Xinj}); % objects included in the Connector
+    'CXmembers',{Xinj Xte1}); % objects included in the Connector
 
-%%  Define the Inputs object required for the analysis
-% The input quantities used in this tutorial are here introduced
+%% Define the model
 
-% Create random variables.
-XEmod = RandomVariable('Sdistribution','normal','mean',2.1E+11,'std',2.1E+10);
-Xnu = RandomVariable('Sdistribution','normal','mean',0.3,'std',0.03);
-XP = RandomVariable('Sdistribution','normal','mean',10000,'std',1000);
-
-% Add the RandomVariable objects to a RandomVariableSet object
-Xrvset = RandomVariableSet('Cmembers',{'XEmod','XP','Xnu'},'CXrv',{XEmod,XP,Xnu});
-
-% Add the RandomVariableSet object to an Input object
-Xi = Input;
-Xi = add(Xi,Xrvset);
-
-%% Monte Carlo Simulation
-% A Monte Carlo simulation with 6 sample is then executed.
-
-%% Definition of a JobManagerInterface
-% JobManagerInterface is used to specify how to connect to a cluster (i.e.,
-% running Oracle GridEngine). 
-
-Xjmi = JobManagerInterface('Sdescription','Oracle Grid Engine ',...
-    'SsubmitJob','qsub',... Job submission command
-    'SdeleteJob','qdel',... Job deletion command
-    'SqueryJob','qstat -s a  -xml',... Job status query (must return xml format)
-    'SqueryGrid','qhost -q -xml');% Hosts status query (must return xml format)
-
-%% Definition of an Evaluator
-% An evaluator is used to collect various solvers together. The solver then
-% computes the output quantities for all the samples. When a
-% JobManagerInterface object is included in the Evaluator constructor, the
-% solvers are executed on remote machines of a cluster. 
-
-Xeval = Evaluator('CXmembers',{Xc},... Members of the evaluator (one or more solvers)
-    'XjobManagerInterface',Xjmi,... JobManagerInterface object
-    'Csqueues',{'all.q'},... Queue name
-    'Nconcurrent',3,... Number of concurrent solver execution
-    'LremoteInjectExtract',true);% Flag whether the Inject and Extract should be execute on the remote machines
-
-%% Additional object definition
-% To run a simulation, it is necessary to create a Model (union of an
-% Evaluator and an Input object) and set the simulation properties.
+Xeval = Evaluator('CXmembers',{Xc}); % Members of the evaluator (one or more solvers)
 
 % Create the Model
-Xm = Model('Xinput',Xi,'Xevaluator', Xeval);
+Xm = Model('Xinput',Xinput,'Xevaluator', Xeval);
+
+% Test the model performing a deterministic analysis
+Xout=Xm.deterministicAnalysis;
 
 % Set Simulation properties
 Xmc = MonteCarlo('Nsamples',6);
