@@ -17,7 +17,7 @@ classdef Extractor
         Xresponse               % Array of Response objects
     end
     
-    properties (Dependent=true,Access = protected)        
+    properties (Dependent=true)        
         Nresponse               % Number of responses extracted
         Coutputnames            % Names of the extracted quantities of interest
     end
@@ -153,8 +153,7 @@ classdef Extractor
         end % Nresponse get method
         
         function Coutputnames = get.Coutputnames(Xobj)
-            if isempty(Xobj.Soutputname)
-                
+            if isempty(Xobj.Soutputname)                
                 Coutputnames = cell(Xobj.Nresponse,1);
                 for ires=1:Xobj.Nresponse
                     Coutputnames{ires}=Xobj.Xresponse(ires).Sname;
