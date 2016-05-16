@@ -1,4 +1,4 @@
-function display(Xe)
+function display(Xobj)
 %DISPLAY  Displays the object extractor
 %   
 %
@@ -8,23 +8,17 @@ function display(Xe)
 
 %% 1.   Output to Screen
 % 1.1.   Name and description
-OpenCossan.cossanDisp(' ');
-OpenCossan.cossanDisp('===================================================================',1);
-OpenCossan.cossanDisp([' Extractor Object  -  Name: ' inputname(1)],1);
-OpenCossan.cossanDisp([' Description: ' Xe.Sdescription ] ,1);
-OpenCossan.cossanDisp('===================================================================',1);
+OpenCossan.cossanDisp(' ',3);
+OpenCossan.cossanDisp('===================================================================',2);
+OpenCossan.cossanDisp([ class(Xobj) ' Object  -  Description: ' Xobj.Sdescription],1);
+OpenCossan.cossanDisp('===================================================================',2);
 % 1.2.   main paramenters
-OpenCossan.cossanDisp(' ',1);
-OpenCossan.cossanDisp([' Number of responses: ' num2str(Xe.Nresponse) ],1);
-OpenCossan.cossanDisp([' ASCII file: ' Xe.Srelativepath Xe.Sfile ],1);
+OpenCossan.cossanDisp(['* '  num2str(Xobj.Nresponse) ' responses'],3)
+OpenCossan.cossanDisp(['* ASCII file: ' Xobj.Srelativepath Xobj.Sfile],3) 
+
 % 1.3.  Response details
-for i=1:length(Xe.Coutputnames)
-    OpenCossan.cossanDisp('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ',1);
-    OpenCossan.cossanDisp([' Response #' num2str(i) ],1) ;
-    OpenCossan.cossanDisp([' Output Name: ' Xe.Coutputnames{i} ],1) ;
-    if ~isempty(Xe.Xresponse)
-        display(Xe.Xresponse(i));
-    end
+for i=1:length(Xobj.Coutputnames)
+    OpenCossan.cossanDisp(['** Response #' num2str(i) ', Output Name: ' Xobj.Coutputnames{i} ],1) ;
 end
 
 

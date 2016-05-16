@@ -17,7 +17,7 @@ classdef Extractor
         Xresponse               % Array of Response objects
     end
     
-    properties (Dependent=true)
+    properties (Dependent=true,Access = protected)        
         Nresponse               % Number of responses extracted
         Coutputnames            % Names of the extracted quantities of interest
     end

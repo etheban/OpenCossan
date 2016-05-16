@@ -1,84 +1,56 @@
 function Xobj=computeCDF(Xobj)
 % This private function is used to compute the CDF of UNCORRELATED samples
 
+% Author: Edoardo Patelli
+% Institute for Risk and Uncertainty, University of Liverpool, UK
+% email address: openengine@cossan.co.uk
+% Website: http://www.cossan.co.uk
+
+% =====================================================================
+% This file is part of openCOSSAN.  The open general purpose matlab
+% toolbox for numerical analysis, risk and uncertainty quantification.
+%
+% openCOSSAN is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License.
+%
+% openCOSSAN is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+%  You should have received a copy of the GNU General Public License
+%  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
+% =====================================================================
 
 % Compute experimental correlation
 Msamples=Xobj.generatePhysicalSamples(Xobj.NsamplesMapping);
-Xobj.Mcorrelation = corr(Msamples); 
+Xobj.Mcorrelation = corr(Msamples);
 Xobj.Vsigma=std(Msamples);
 Mcov = cov(Msamples);
 Vvar=diag(Mcov);
 % Preallocate Memory
 Xobj.Mcdfs=zeros(Xobj.NsamplesMapping+1,Xobj.Nrv); % CDF of the uncorrelated  data
-Xobj.McdfsValues=zeros(size(Xobj.Mcdfs)); 
+Xobj.McdfsValues=zeros(size(Xobj.Mcdfs));
 
 
 for j=1:size(Xobj.MdataSet,2) % loop over the variables
     [Xobj.McdfsValues(:,j), Xobj.Mcdfs(:,j)]=ecdf(Msamples(:,j));
     Xobj.Mcdfs(1,j)=min(Msamples(:,j))-10*Vvar(j);
-    Xobj.Hcdf{j} = @(y)interp1(Xobj.Mcdfs(:,j),Xobj.McdfsValues(:,j),y,'linear');
-    Xobj.Hicdf{j} = @(y)interp1(Xobj.McdfsValues(:,j),Xobj.Mcdfs(:,j),y,'linear');
-end
 
-return
-
-% Preallocate Memory
-Xobj.Mcdfs=zeros(Xobj.NcdfPoints,Xobj.Nrv); % CDF of the uncorrelated  data
-Xobj.McdfsValues=zeros(size(Xobj.Mcdfs));   % Values of the CDFs of the uncorrelated data
-
-% VYmin=min(Xobj.MYuncorrelatedDataSet,[],1);
-% VYmax=max(Xobj.MYuncorrelatedDataSet,[],1);
-
-VYmin=min(Xobj.MdataSet,[],1);
-VYmax=max(Xobj.MdataSet,[],1);
-
-if Xobj.gmDistribution.SharedCov
-    Vsigma=sqrt(diag(Xobj.gmDistribution.Sigma));
-    Msigma=repmat(Vsigma,1,Xobj.Ncomponents);
-else
-    Msigma=zeros(Xobj.Nrv,Xobj.Ncomponents);
-    for icmp=1:Xobj.Ncomponents
-        Msigma(:,icmp)=sqrt(diag(Xobj.gmDistribution.Sigma(:,:,icmp)));        
-    end
-    Vsigma=max(Msigma,[],2);
-end
-
-
-for j=1:size(Xobj.MdataSet,2) % loop over the variables
-    % Compute the point where the cdf is computed
-    
-    Xobj.Mcdfs(:,j) = [VYmin(j)-10*Vsigma(j) ...
-                      linspace(VYmin(j)-4*Vsigma(j),VYmax(j)+4*Vsigma(j),Xobj.NcdfPoints-2) ...
-                      VYmax(j)+10*Vsigma(j)];
-    
-    for k=1:Xobj.NcdfPoints % loop over the points
-        for icmp=1:Xobj.Ncomponents % loop over the gaussian distribution
-%             Xobj.McdfsValues(k,j)=Xobj.McdfsValues(k,j)+ ...
-%                     Xobj.gmDistribution.PComponents(icmp)* ...
-%                     normcdf(Xobj.Mcdfs(k,j),Xobj.MYuncorrelatedDataSet(icmp,j),1);
-                
-            Xobj.McdfsValues(k,j)=Xobj.McdfsValues(k,j)+ ...
-                    Xobj.gmDistribution.PComponents(icmp)* ...
-                    normcdf(Xobj.Mcdfs(k,j),Xobj.gmDistribution.mu(icmp,j),Msigma(j,icmp));   
-                
-                
-            %         if Msorted(k,j)<Xobj.MYsortedDataSet(k,j)
-            %             U=U+normcdf(Vx(j),Xobj.MYsortedDataSet(k,j),Xobj.VsigmaYspace(j))
-            %         else
-            %             break
-            %         end
-        end
-    end
-    
-   % Xobj.McdfsValues(end,j)=1;
-    
     %% Peacewise linear interpolation
     % This piecewise linear function provides a nonparametric estimate of the CDF
     % that is continuous and symmetric.  Evaluating it at points other than the
     % original data is just a matter of linear interpolation, and it can be
     % convenient to define an anonymous function to do that.
-    Xobj.Hcdf{j} = @(y)interp1(Xobj.Mcdfs(:,j),Xobj.McdfsValues(:,j),y,'linear');
-    Xobj.Hicdf{j} = @(y)interp1(Xobj.McdfsValues(:,j),Xobj.Mcdfs(:,j),y,'linear');
+    
+    % due to a Matlab bug introduced in R2015b the handle function need to
+    % be initialised
+    mcdfs = Xobj.Mcdfs(:, j);
+    mcdfsValues = Xobj.McdfsValues(:, j);
+    
+    Xobj.Hcdf{j} = @(y)interp1(mcdfs, mcdfsValues, y, 'linear');
+    Xobj.Hicdf{j} = @(y)interp1(mcdfsValues, mcdfs, y, 'linear');
 end
 
-
+return
