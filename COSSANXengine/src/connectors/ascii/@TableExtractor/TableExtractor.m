@@ -29,12 +29,8 @@ classdef TableExtractor < Extractor
     properties
         Sdelimiter           % delimiter between columns
         Nheaderlines=0       % number of lines to skip from beginning of file
-        Ncolumns=0           % number of column to skip from beginning of row
-        LextractColumns=true  % extract single columns from table
         CcolumnPosition={}    % identify columns to extract 
         ClinePosition={}      % identify lines to extract
-        Nbegin=1              % beginning of column/line
-        Nend                  % ending of column/line
         NcoordinateColumn     % extract coordinates from the specified column
         SheaderIdentifier     % Character used to define the header
     end
@@ -108,16 +104,10 @@ classdef TableExtractor < Extractor
                         for n=1:length(varargin{iVopt + 1})
                             Xobj.Xresponse(n).Sname=varargin{iVopt + 1}{n};  
                         end
-                    case 'ncolumns'
-                        Xobj.Ncolumns=varargin{iVopt+1};
                     case 'ccolumnposition'
                         Xobj.CcolumnPosition = varargin{iVopt + 1};
                     case 'clineposition'
                         Xobj.ClinePosition = varargin{iVopt + 1};
-                    case 'nbegin'
-                        Xobj.Nbegin = varargin{iVopt + 1};
-                    case 'nend'
-                        Xobj.Nend = varargin{iVopt + 1};
                     case 'ncoordinatecolumn'
                         Xobj.NcoordinateColumn=varargin{iVopt + 1};
                     otherwise
