@@ -59,6 +59,8 @@ classdef JobManagerInterface
                         Xobj.SqueryJob = varargin{k+1};
                     case 'squerygrid'
                         Xobj.SqueryGrid = varargin{k+1};
+                    case 'squeryqueues'
+                        Xobj.SqueryQueues = varargin{k+1};
                     case 'squerype'
                         Xobj.SqueryPE = varargin{k+1};
                     case 'smcrpreexec'
