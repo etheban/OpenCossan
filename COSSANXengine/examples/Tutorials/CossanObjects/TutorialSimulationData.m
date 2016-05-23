@@ -4,9 +4,9 @@
 % how to use it
 %
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@SimulationData
+% See Also: http://cossan.co.uk/wiki/index.php/@SimulationData
 %
-% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Copyright~1993-2016,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author: Edoardo-Patelli~and~Barbara-Goller$ 
 
 % Reset the random number generator in order to always obtain the same results.

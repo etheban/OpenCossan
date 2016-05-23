@@ -7,7 +7,7 @@ classdef Response
     
     properties
         Sname = ''             % Name of the associate COSSAN output
-        Sfieldformat = '%10e'  % Format string '%' +  Maximum field width + conversion character (see fscanf for more information)
+        Sfieldformat = '%e'    % Format string '%' +  Maximum field width + conversion character (see fscanf for more information)
         Clookoutfor = {}       % if present define the string to be searched inside the ASCII file in order to define the relative position
         Svarname = ''          % if present Vcolnum and Vrownum are relative respect to the variable present in Svarname
         Sregexpression = ''    % Regular expression

@@ -1,15 +1,22 @@
 classdef UTTutorialCantileverBeamMatlabReliabilityAnalysis < matlab.unittest.TestCase                          %Enter Script name after UT
     
     properties
-        TestNum     = 10;                                         %Enter Test Number
-        PreTest     = {'TutorialCantileverBeamMatlab'};                                     %Enter the names of any scripts that need to be run
-                                                                %prior to performing the test into a cell array.
-        Name        = 'TutorialCantileverBeamMatlabReliabilityAnalysis';                                       %Enter the name of the script to be tested.
+        %Enter Test Number
+        TestNum     = 10;       
+        % Enter the names of any scripts that need to be run  prior to
+        % performing the test into a cell array. 
+        PreTest     = {'TutorialCantileverBeamMatlab'}; 
+        % Enter the name of the script to be tested.
+        Name        = 'TutorialCantileverBeamMatlabReliabilityAnalysis';   
+        % Enter Variable Names into cell array created
         VName       = {'XfailireProbMC.pfhat' 'XfailireProbLHS.pfhat'...
-                            'XfailireProbLS.pfhat' 'XfailireProbLS2.pfhat'};                                     %Enter Variable Names into cell array
-        Expected    = {0.0738 0.083 0.06683 0.07267};                                     %Enter the expected results into cell array
-        Tolerance   = {eps eps 0.000001 0.0001};                                     %Enter the given tolerances into cell array
-        NumOfTests  = 4;                                         %Enter the number of tests being performed (no. of variables)
+                       'XfailireProbLS.pfhat' 'XfailireProbLS2.pfhat'};    
+        % Enter the expected results into cell array
+        Expected    = {0.0738 0.083 0.06683 0.07267};      
+        % Enter the given tolerances into cell array
+        Tolerance   = {eps eps 0.000001 0.0001};    
+        %Enter the number of tests being performed (no. of variables)
+        NumOfTests  = 4;                                        
         
         Actual      = [];
         ErrorPC     = [];

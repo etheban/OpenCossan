@@ -1,7 +1,7 @@
 function compressOpenCossan(varargin)
 %EXPORTOPENCOSSAN
 % This function export as compressed file OpenCossan
-% Optional input
+% Optional inputs:
 %
 % 'SdestinationFolder'
 % 'Sformat': zip (default) or tar

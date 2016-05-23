@@ -12,18 +12,24 @@ classdef UnitTestRandomVariables <matlab.unittest.TestCase
             testCase.assertEqual(teststdnorm.std, 15);
         end
         function testRandomVariable(testCase) %test that the command fails when std is not greater than zero
-            testCase.verifyError(@()RandomVariable('Sdistribution','normal','mean',15,'std',0),'openCOSSAN:RandomVariable:RandomVariable')
-            testCase.verifyError(@()RandomVariable('Sdistribution','normal','mean',15,'std',-2),'openCOSSAN:RandomVariable:RandomVariable')
+            testCase.verifyError(@()RandomVariable('Sdistribution','normal','mean',15,'std',0),...
+                'openCOSSAN:RandomVariable:RandomVariable')
+            testCase.verifyError(@()RandomVariable('Sdistribution','normal','mean',15,'std',-2),...
+                'openCOSSAN:RandomVariable:RandomVariable')
         end
-        function testRandomVariableCov(testCase) %test that the RandomVariable fails when std is not greater than zero
-            testCase.verifyError(@()RandomVariable('Sdistribution','normal','mean',15,'cov',0),'openCOSSAN:RandomVariable:RandomVariable')
-            testCase.verifyError(@()RandomVariable('Sdistribution','normal','mean',15,'cov',-2),'openCOSSAN:RandomVariable:RandomVariable')
+        function testRandomVariableCov(testCase) %test that the RandomVariable fails when std is not greater than zero 
+            testCase.verifyError(@()RandomVariable('Sdistribution','normal','mean',15,'cov',0),...
+                'openCOSSAN:RandomVariable:RandomVariable')
+            testCase.verifyError(@()RandomVariable('Sdistribution','normal','mean',15,'cov',-2),...
+                'openCOSSAN:RandomVariable:RandomVariable')
         end
-        function testRandomVariableNormalMeanstdFail(testCase) %test that the command fails as incorrect parameters set
-            testCase.verifyError(@()RandomVariable('Sdistribution','normal','meanstd',100,'std',10),'openCOSSAN:RandomVariable:RandomVariable')
+        function testRandomVariableNormalMeanstdFail(testCase) %test that the command fails as incorrect parameters set 
+            testCase.verifyError(@()RandomVariable('Sdistribution','normal','meanstd',100,'std',10),...
+                'openCOSSAN:RandomVariable:RandomVariable')
         end
-        function testRandomVariableNormalzzdFail(testCase) %test that the command fails as incorrect parameters set
-            testCase.verifyError(@()RandomVariable('Sdistribution','normalzz','mean',100,'std',10),'openCOSSAN:RandomVariable:checkDistribution')
+        function testRandomVariableNormalzzdFail(testCase) %test that the command fails as incorrect parameters set 
+            testCase.verifyError(@()RandomVariable('Sdistribution','normalzz','mean',100,'std',10),...
+                'openCOSSAN:RandomVariable:checkDistribution')
         end
         function testRandomVariableLogNormal(testCase) %test that a random variable is created with lognormal distribution with specified mean and std
             teststdlog = RandomVariable('Sdistribution','lognormal','mean',100,'std',0.10);

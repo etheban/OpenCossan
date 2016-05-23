@@ -1,9 +1,15 @@
 %% Tutorial for the TableExtractor
 %
 % This tutorial shows how a time- or frequency dependent output (i.e.
-% table-valued output) is extracted from a ASCII result file
+% table-valued output) is extracted from a ASCII result file.
 % 
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@TableExtractor
+% The files needs to have one of the following extension 
+%
+%   .txt, .dat, .csv:  for delimited text file.
+%
+%   .xls, .xlsx, .xlsb, .xlsm, .xltm, .xltx, .ods:  for Spreadsheet file.
+% 
+% See Also: http://cossan.co.uk/wiki/index.php/@TableExtractor
 %
 %
 % $Copyright~2006-2016,~COSSAN~Working~Group$
@@ -119,3 +125,25 @@ Tout.OutColMultiColumns.Mdata
 Tout.OutCol4.Mdata
 Tout.OutCol4.Mcoord
 
+%% Example using OpenSees results
+
+%% Extract 1 variable spanning multiple columns and specified lines with coordinate
+SrelativePath=fullfile('Connector','OpenSees');
+
+Xte1=TableExtractor('Coutputnames',{'disp_history1','disp_history2','disp_history3'}, ...
+    'NcoordinateColumn',1, ... % Define the column containing the coordinate 
+    'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
+    'Sfile','th_Node_DefoShape_Dsp.out.txt',...  
+    'CcolumnPosition',{2,3,4}, ...
+    'Sdelimiter',' '); 
+
+[Tout, LsuccessfullExtract]=Xte1.extract;
+
+% Additional example
+Xte2=TableExtractor('Coutputnames',{'damper_force_history1','damper_force_history2','damper_force_history3'}, ...
+    'NcoordinateColumn',1, ... % Define the column containing the coordinate 
+    'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
+    'Sfile','Truss_forc.out.txt',...  
+    'CcolumnPosition',{2,3,4}); 
+
+[Tout, LsuccessfullExtract]=Xte2.extract;

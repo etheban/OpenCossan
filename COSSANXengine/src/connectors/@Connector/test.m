@@ -28,10 +28,10 @@ Sdiagnostic{1}=['Connector diagnostic tool for the object ' inputname(1) ];
 OpenCossan.cossanDisp(Sdiagnostic,1);
 
 % testing working directory
-Sdiagnostic{end+1}=['Testing the working directory: ' Xconnector.Sworkingdirectory];
+Sdiagnostic{end+1}=['Testing the working directory: ' OpenCossan.getCossanWorkingPath];
 OpenCossan.cossanDisp(Sdiagnostic{end},1);
 
-if not(exist(Xconnector.Sworkingdirectory,'dir')),
+if not(exist(OpenCossan.getCossanWorkingPath,'dir')),
     Sdiagnostic{end+1}=' F A I L E D';
     Lstatus=false;
 else

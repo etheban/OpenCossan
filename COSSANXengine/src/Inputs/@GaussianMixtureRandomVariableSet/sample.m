@@ -1,5 +1,6 @@
 function Xsample = sample(Xobj,varargin)
-%SAMPLE  samples of a set of random variables
+%SAMPLE Generate realisations from a GaussianMixtureRandomVariableSet.
+%
 %  SAMPLE(Xobj,Nsamples) creates a Samples object contining Nsamples
 %  realizations. The samples are created according the distribution defined
 %  in the GaussianRandomVariable object
@@ -7,7 +8,8 @@ function Xsample = sample(Xobj,varargin)
 %  OPTIONAL ARGUMENT
 %    - Nsamples: the number of sample to compute. If unspecified, one
 %      sample is computed.
-% See also: https://cossan.co.uk/wiki/index.php/@OpenCossan
+% See also:
+% https://cossan.co.uk/wiki/index.php/sample@GaussianMixtureRandomVariableSet
 %
 % Author: Silvia Tolo, Matteo Broggi, Edoardo Patelli
 % Institute for Risk and Uncertainty, University of Liverpool, UK
@@ -34,9 +36,25 @@ function Xsample = sample(Xobj,varargin)
 
 
 %% Process arguments
+
 if nargin==0
     Nsamples = 1;
+elseif length(varargin)==1
+    Nsamples = varargin{1};
+else
+    for k=1:2:length(varargin)
+        switch lower(varargin{k})
+            case {'nsample','nsamples'} % Define the number of samples
+                Nsamples = varargin{k+1};
+            otherwise
+                error('openCOSSAN:GaussianMixtureRandomVariableSet:WrongInput',...
+                    'Option %s not implemented',varargin{k})
+        end
+    end
 end
+
+
+
 
 if isempty(Xobj.Mcoeff)||isempty(Xobj.Vconstraints)
     %% No bounds defined: use method random of gmdistribution class
