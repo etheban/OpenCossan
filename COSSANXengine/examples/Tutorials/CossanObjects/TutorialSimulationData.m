@@ -216,4 +216,15 @@ Mdata8 = [-0.3233    0.2433    0.5796
 assert(all(all(abs(Xout8.getValues('Cnames',Xout8.Cnames)-Mdata8)<1.e-4)),...
        'CossanX:Tutorials:TutorialSimulationData', ...
        'Reference Solution Xout8 does not match.');  
+   
+%% Get PDF and CDF of variables from the SimulationData
+[Vedges,Vpdf]=Xout1.getPdf('Sname','add1');
+% Specify number of bins;
+[Vedges,Vpdf]=Xout1.getPdf('Sname','add1','Nbins',10)
+% Compute the pdf for all the variable. It is necessary to pass a vector
+% that defines the edges of the bins (Vedges).
+% The length of Vedges is 1+length(Vpdf)
+[Vedges,Vpdf]=Xout1.getPdf('Vedges',Vedges)
+
+[Vedges,Cpdf]=Xout1.getPdf('Sname','add1')
         

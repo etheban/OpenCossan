@@ -185,6 +185,9 @@ classdef SimulationData
         
         h=plotData(Xobj,varargin);  % plot variables
         
+        [Vsupport,Vpdf]=getPdf(Xobj,varargin); % Compute the PDF 
+        [Vsupport,Cpdf]=getCdf(Xobj,varargin); % Compute the empirical CDF from samples
+        
         function Cnames = get.Cnames(Xobj)
             if isempty(Xobj.Tvalues)
                 Cnames={};
