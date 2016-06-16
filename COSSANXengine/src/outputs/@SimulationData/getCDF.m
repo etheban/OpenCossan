@@ -1,4 +1,4 @@
-function [Vsupport,Vcdf] = getCdf(Xobj,varargin)
+function [Vsupport,Vcdf] = getCDF(Xobj,varargin)
 %GETPDF This method computes the empirical CDF of the samples stored in the SimulationData object.
 %
 %  USAGE: [Vsupport,Vcdf]=XsimulationData.getCDF(varargin)

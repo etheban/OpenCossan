@@ -1,4 +1,4 @@
-function [Vedges,Vpdf] = getPdf(Xobj,varargin)
+function [Vedges,Vpdf] = getPDF(Xobj,varargin)
 %GETPDF This method computes the empirical PDF of the samples stored in the SimulationData object.
 %
 %  USAGE: [Vsupport,Vpdf]=XsimulationData.getPDF(varargin)
