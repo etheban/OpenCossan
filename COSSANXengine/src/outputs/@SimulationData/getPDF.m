@@ -1,4 +1,4 @@
-function [Vedges,Vpdf] = getPDF(Xobj,varargin)
+function [VedgesOUT,Vpdf] = getPDF(Xobj,varargin)
 %GETPDF This method computes the empirical PDF of the samples stored in the SimulationData object.
 %
 %  USAGE: [Vsupport,Vpdf]=XsimulationData.getPDF(varargin)
@@ -34,8 +34,7 @@ function [Vedges,Vpdf] = getPDF(Xobj,varargin)
 %% Set default values
 Nbins=[];
 CrequestedVariables=Xobj.Cnames; %
-Vedges=[];
-
+VedgesIN=[];
 % Process input arguments
 OpenCossan.validateCossanInputs(varargin{:});
 
@@ -48,7 +47,7 @@ for k=1:2:length(varargin)
         case 'cnames'
             CrequestedVariables=varargin{k+1};
         case 'vedges'
-            Vedges=varargin{k+1};
+            VedgesIN=varargin{k+1};
         otherwise
             error('openCOSSAN:SimulationData:getPDF',...
                 'PropertyName %s is not a valid input argument',varargin{k});
@@ -64,22 +63,28 @@ assert(all(ismember(CrequestedVariables,Xobj.Cnames)),...
 %% Get Values
 Mvalues=Xobj.getValues('Cnames',CrequestedVariables);
 Nvariables=length(CrequestedVariables);
+
 %% Evaluate PDF
-if ~isempty(Vedges)
-    Vpdf=zeros(length(Vedges)-1,Nvariables);
-    for j=1:Nvariables
-        [Vpdf(:,j)] = histcounts(Mvalues(:,j),Vedges,'Normalization', 'probability');
-    end
-else
-    assert(Nvariables==1,'openCOSSAN:outputs:SimulationData:getPDF:wrongInput',...
-        ['Only the PDF of one variable can be computed.\nProvide define the bin edges with ',...
-        'a vector Vsupport if you want to get the PDF of more variables'])
+if isempty(VedgesIN)
+    
     if isempty(Nbins)
-        [Vpdf,Vedges] = histcounts(Mvalues,'Normalization', 'probability');
-    else
-        [Vpdf,Vedges] = histcounts(Mvalues,Nbins,'Normalization', 'probability');
+        [~,VedgesOUT] = histcounts(Mvalues,'Normalization', 'probability');
+        Nbins=length(VedgesOUT);
     end
+    VedgesOUT=zeros(Nbins+1,Nvariables);
+    Vpdf=zeros(Nbins,Nvariables);
+    for j=1:Nvariables
+        [Vpdf(:,j),VedgesOUT(:,j)] = histcounts(Mvalues,Nbins,'Normalization', 'probability');
+    end
+
+else
+    Vpdf=zeros(length(VedgesIN)-1,Nvariables);
+    for j=1:Nvariables
+        [Vpdf(:,j)] = histcounts(Mvalues(:,j),VedgesIN,'Normalization', 'probability');
+    end
+    VedgesOUT=repmat(VedgesIN,1,Nvariables);
 end
+
 
 
 

@@ -1,4 +1,4 @@
-function [Vsupport Vpdf] = getPdf(Xobj,varargin)
+function [Vsupport, Vpdf] = getPdf(Xobj,varargin)
 %GETPDF This method computes the empirical PDF of the RandomVariable object.
 %
 %  USAGE: [Vsupport,Vpdf]=XrandomVariable.getPDF(varargin)

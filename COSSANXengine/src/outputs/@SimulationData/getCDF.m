@@ -36,7 +36,7 @@ Nbins=[];
 CrequestedVariables=Xobj.Cnames; %
 
 try
-    [Vsupport,Vpdf]=Xobj.getPdf(varargin{:});
+    [Vsupport,Vpdf]=Xobj.getPDF(varargin{:});
 catch exception
     throwAsCaller(exception)
 end
