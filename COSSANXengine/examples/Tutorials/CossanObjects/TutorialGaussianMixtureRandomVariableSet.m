@@ -153,7 +153,7 @@ figure
 scatterhist(MX(:,1),MX(:,2))
 title('Example #4 Using Ncomponents')
 
-%% Using Standard defiation for each components
+%% Using Standard deviation for each components
 Xg = GaussianMixtureRandomVariableSet('Cmembers',{'Xrv1','Xrv2'},...
     'VstandardDeviation',[4 5],'Mcorrelation',[1 0.2; 0.2 1],'Mdataset',X);
 
@@ -161,6 +161,17 @@ MX=Xg.gmDistribution.random(100000);
 figure
 scatterhist(MX(:,1),MX(:,2))
 title('Example #5 Using Correlations and standard deviations')
+
+%% Use GaussianMixtureRandomVariableSet with bounds
+Xg = GaussianMixtureRandomVariableSet('Cmembers',{'Xrv1','Xrv2'},...
+    'VstandardDeviation',[4 5],'Mcorrelation',[1 0.2; 0.2 1],'Mdataset',X,...
+    'Vconstraints',zeros(2,1),'Mcoeff',1*eye(2),'Lrejection',true);
+
+Xsamples=Xg.sample(100000);
+MX=Xsamples.MsamplesPhysicalSpace;
+figure
+scatterhist(MX(:,1),MX(:,2))
+title('Example #6 Using constraints')
 
 %% Other methods
 % The GaussianMixtureRandomVariableSet is an extension of the RandomVariableSet

@@ -226,5 +226,9 @@ assert(all(all(abs(Xout8.getValues('Cnames',Xout8.Cnames)-Mdata8)<1.e-4)),...
 % The length of Vedges is 1+length(Vpdf)
 [Vedges,Vpdf]=Xout1.getPDF('Vedges',Vedges)
 
+% Get the Pdf of all variable without defining the bins and edges.
+% The number of bins are determined automatically by the first variable
+[Vedges,Vpdf]=Xout1.getPDF
+
 [Vedges,Cpdf]=Xout1.getCDF('Sname','add1')
         
