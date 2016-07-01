@@ -74,9 +74,13 @@ end
 
 %% Do import
 if ~isempty(Xobj.Nheaderlines)
-   Textract = readtable(Sfile,'HeaderLines',Xobj.Nheaderlines);
+   Textract = readtable(Sfile,'HeaderLines',Xobj.Nheaderlines,...
+       ... just comment the following line to revert to comma separated values
+       'Delimiter',' ','ReadVariableNames',false); % TODO (mda): The delimiter type has to be present in the object otherwise it assumes that is a comma!
 else
-   Textract = readtable(Sfile);
+   Textract = readtable(Sfile,...
+       ... just comment the following line to revert to comma separated values
+       'Delimiter',' ','ReadVariableNames',false); % TODO (mda): The delimiter type has to be present in the object otherwise it assumes that is a comma!
 end
 
 for n=1:length(Xobj.Coutputnames)
