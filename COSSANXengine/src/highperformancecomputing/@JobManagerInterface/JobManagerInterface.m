@@ -93,6 +93,10 @@ classdef JobManagerInterface
                 end
             end
 
+%             if isempty(Xobj.SqueryQueues) && strcmpi(Xobj.SsubmitJob,'bsub') 
+%                 % quick fix to have lsf working, to be removed after gui fix
+%                 Xobj.SqueryQueues = 'bqueues -l';
+%             end
         end
         
         display(Xobj)
