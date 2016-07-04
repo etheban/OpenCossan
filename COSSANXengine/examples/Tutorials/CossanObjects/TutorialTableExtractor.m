@@ -134,7 +134,7 @@ Xte1=TableExtractor('Coutputnames',{'disp_history1','disp_history2','disp_histor
     'NcoordinateColumn',1, ... % Define the column containing the coordinate 
     'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
     'Sfile','th_Node_DefoShape_Dsp.out.txt',...  
-    'CcolumnPosition',{2,3,4}, ...
+    'CcolumnPosition',{Tout2,3,4}, ...
     'Sdelimiter',' '); 
 
 [Tout, LsuccessfullExtract]=Xte1.extract;
@@ -143,7 +143,9 @@ Xte1=TableExtractor('Coutputnames',{'disp_history1','disp_history2','disp_histor
 Xte2=TableExtractor('Coutputnames',{'damper_force_history1','damper_force_history2','damper_force_history3'}, ...
     'NcoordinateColumn',1, ... % Define the column containing the coordinate 
     'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
-    'Sfile','Truss_forc.out.txt',...  
+    'Sfile','Truss_Forc.out.txt',...  
     'CcolumnPosition',{2,3,4}); 
 
 [Tout, LsuccessfullExtract]=Xte2.extract;
+
+Tout.damper_force_history1.plot
