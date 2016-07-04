@@ -134,7 +134,7 @@ Xte1=TableExtractor('Coutputnames',{'disp_history1','disp_history2','disp_histor
     'NcoordinateColumn',1, ... % Define the column containing the coordinate 
     'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
     'Sfile','th_Node_DefoShape_Dsp.out.txt',...  
-    'CcolumnPosition',{Tout2,3,4}, ...
+    'CcolumnPosition',{2,3,4}, ...
     'Sdelimiter',' '); 
 
 [Tout, LsuccessfullExtract]=Xte1.extract;
@@ -149,3 +149,34 @@ Xte2=TableExtractor('Coutputnames',{'damper_force_history1','damper_force_histor
 [Tout, LsuccessfullExtract]=Xte2.extract;
 
 Tout.damper_force_history1.plot
+
+%% Advance features
+% It is possible to pass some advanced feautures but usually they are not
+% required
+% When reading delimited text files, you can specify any of the name-value
+% pair arguments listed here: Sformat, Sdelimiter,  Also, if you specify the 'Format' name-value
+% pair argument, you can specify any of the name-value pair arguments
+% accepted by the textscan function.   
+%
+%  Format of the columns in the file, specified as the comma-separated pair
+%  consisting of 'Format' and a string of one or more conversion
+%  specifiers. The conversion specifiers are the same as the specifiers
+%  accepted by the textscan function.  
+%
+% Specifying the format can significantly improve speed for some large
+% files. If you do not specify a value for Format, then readtable uses %q
+% to interpret nonnumeric columns. The %q specifier reads a string and
+% omits double quotation marks (") if appropriate.   
+% By default, the variables created are either double or cell array of
+% strings, depending on the data. If the entire column is numeric,
+% variables are imported asdouble. If any element in a column is not
+% numeric, the variables are imported as cell arrays of strings.   
+
+Xte2=TableExtractor('Coutputnames',{'damper_force_history1','damper_force_history2','damper_force_history3'}, ...
+    'NcoordinateColumn',1, ... % Define the column containing the coordinate 
+    'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
+    'Sfile','Truss_Forc.out.txt',...  
+    'CcolumnPosition',{2,3,4}, ...
+    'Sdelimiter',' ');
+
+[Tout, LsuccessfullExtract]=Xte2.extract;
