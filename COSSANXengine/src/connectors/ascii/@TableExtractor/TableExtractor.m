@@ -28,6 +28,7 @@ classdef TableExtractor < Extractor
     
     properties
         Sdelimiter           % delimiter between columns
+        Sformat              % user defined format
         Nheaderlines=0       % number of lines to skip from beginning of file
         CcolumnPosition={}    % identify columns to extract 
         ClinePosition={}      % identify lines to extract
@@ -85,6 +86,8 @@ classdef TableExtractor < Extractor
                         Xobj.Nheaderlines = varargin{iVopt + 1};
                     case 'sdelimiter'
                         Xobj.Sdelimiter = varargin{iVopt + 1};
+                    case 'sformat'
+                        Xobj.Sformat = varargin{iVopt + 1};
                     case 'sheaderidentifier'
                         Xobj.SheaderIdentifier = varargin{iVopt + 1};
                     case 'soutputname'                                               

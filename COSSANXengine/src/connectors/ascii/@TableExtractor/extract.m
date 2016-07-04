@@ -72,16 +72,26 @@ if ~isempty(Xobj.SheaderIdentifier)
     fclose(fileID);
 end
 
-%% Do import
+% Prepare optional parameters
+Carguments={};
+
 if ~isempty(Xobj.Nheaderlines)
-   Textract = readtable(Sfile,'HeaderLines',Xobj.Nheaderlines,...
-       ... just comment the following line to revert to comma separated values
-       'Delimiter',' ','ReadVariableNames',false); % TODO (mda): The delimiter type has to be present in the object otherwise it assumes that is a comma!
-else
-   Textract = readtable(Sfile,...
-       ... just comment the following line to revert to comma separated values
-       'Delimiter',' ','ReadVariableNames',false); % TODO (mda): The delimiter type has to be present in the object otherwise it assumes that is a comma!
+   Carguments{end+1}='HeaderLines';
+   Carguments{end+1}=Xobj.Nheaderlines;
 end
+
+if ~isempty(Xobj.Sformat)
+   Carguments{end+1}='Format';
+   Carguments{end+1}=Xobj.Sformat;
+end
+
+if ~isempty(Xobj.Sdelimiter)
+   Carguments{end+1}='Delimiter';
+   Carguments{end+1}=Xobj.Sdelimiter;
+end
+    
+%% Do import
+Textract = readtable(Sfile,Carguments{:});
 
 for n=1:length(Xobj.Coutputnames)
     TableData=Textract(Xobj.ClinePosition{n},Xobj.CcolumnPosition{n});
