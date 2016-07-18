@@ -55,10 +55,19 @@ if isunix
     mex CFLAGS#"-D_GNU_SOURCE -fPIC -pthread -fexceptions -D_FILE_OFFSET_BITS=64 -Wall -fPIC -O3" -lm -lfann trainFann.c helperFann.o
     mex CFLAGS#"-D_GNU_SOURCE -fPIC -pthread -fexceptions -D_FILE_OFFSET_BITS=64 -Wall -fPIC -O3" -lm -lfann testFann.c helperFann.o
 elseif ispc
-    mex -lfann -c helperFann.c fann.lib
-    mex -lfann createFann.c helperFann.obj fann.lib
-    mex -lfann trainFann.c helperFann.obj fann.lib
-    mex -lfann testFann.c helperFann.obj fann.lib
+    % be sure that FANN has been compiled with the same compiler as used in mex
+    mextype=mex.getCompilerConfigurations('C');
+    if strcmpi(mextype.ShortName,'mingw64')
+        mex(['-I' getenv('INCLUDE')],'-lfann','-c','helperFann.c')
+        mex(['-I' getenv('INCLUDE')],['-L' getenv('LIB')],'-lfann','createFann.c','helperFann.obj')
+        mex(['-I' getenv('INCLUDE')],['-L' getenv('LIB')],'-lfann','trainFann.c','helperFann.obj')
+        mex(['-I' getenv('INCLUDE')],['-L' getenv('LIB')],'-lfann','testFann.c','helperFann.obj')
+    else
+        mex -lfann -c helperFann.c fann.lib
+        mex -lfann createFann.c helperFann.obj fann.lib
+        mex -lfann trainFann.c helperFann.obj fann.lib
+        mex -lfann testFann.c helperFann.obj fann.lib
+    end
 end
 
 movefile('*.mex*',fullfile(OpenCossan.getCossanRoot,'mex','bin'),'f')
