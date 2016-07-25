@@ -156,7 +156,7 @@ switch casestudy
         Xperfun=PerformanceFunction('Scapacity','Xpar','Sdemand','out1','Soutputname','Vg1');
         exactpf=1.8e-04; 
     otherwise
-        disp('other value');
+        error('Case-study number must be between 1 and 6');
 end
 
 
@@ -170,7 +170,7 @@ Xpm=ProbabilisticModel('Sdescription','my first Prob.Model',...
 display(Xpm)
 %%
 XRBIS = RadialBasedImportanceSampling('MVdirection',randn(5,2));
-Xpf = XRBIS.pf(Xpm);
+Xpf = XRBIS.computeFailureProbability(Xpm);
 display(Xpf)
 disp('Exact Pf value')
 disp(exactpf)

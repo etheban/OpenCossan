@@ -219,7 +219,7 @@ XextremeCase = ExtremeCase('Sdescription','', ...
     'MstandardDeviationCheckPoints',[-1,1;-1,1]...
     );
 %% Run the ExtremeCase analysis
-%OpenCossan.resetRandomNumberGenerator(51125) 
+OpenCossan.resetRandomNumberGenerator(51125) 
 % This will take a while
 Xextremes=XextremeCase.computeExtrema();
 display(Xextremes)
@@ -239,9 +239,9 @@ display(Xextremes)
 %     9.95e+09 1.54e+08];
 % [Xpf,Xld]=XextremeCase.validateOptima('Mvalues',Mvalues);
 %% Validate the optima (use interval endpoints)
-% Mvalues=[1.7986e+00 1.212e-01 2.41e-01...
-%     4950 3.95e+01 5.950,...
-%     1.005e+10 1.54e+08];
-% [Xpf,Xld]=XextremeCase.validateOptima('Mvalues',Mvalues);
+Mvalues=[1.7986e+00 1.212e-01 2.41e-01...
+    4950 3.95e+01 5.950,...
+    1.005e+10 1.54e+08];
+[Xpf,Xld]=XextremeCase.validateOptima('Mvalues',Mvalues);
 % %1.798595799633e+00 1.211798161464e-01 2.409928606079e-01 4.950009416804e+03 3.950306143370e+01 5.950169274502e+02 1.004868095530e+10 1.575536014592e+08
 %% Plot the results

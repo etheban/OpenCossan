@@ -25,15 +25,15 @@ Xrvs1           = RandomVariableSet(...
 %% evalpdf
 
 %evaluation of the pdf in the physical space
-[Vpdf01 Vpdfrv01] = evalpdf(Xrvs1,'mxsamples',[1 2 ]);
+[Vpdf01, Vpdfrv01] = evalpdf(Xrvs1,'MXsamples',[1 2]);
 %the number of columns of the input matrix must be equal to the number of
 %random variables in the set
 
 %evaluation of the pdf in the standard normal space
-[Vpdf02 Vpdfrv02] = evalpdf(Xrvs1,'musamples',[1 2;2 1]);
+[Vpdf02, Vpdfrv02] = evalpdf(Xrvs1,'MUsamples',[1 2;2 1]);
 
 %evaluation of the LOGARITM of the pdf in the standard normal space
-[Vpdf03 Vpdfrv03] = evalpdf(Xrvs1,'musamples',[1 2],'Llog',true);
+[Vpdf03, Vpdfrv03] = evalpdf(Xrvs1,'MUsamples',[1 2],'Llog',true);
 
 %% map2physical
 %converts the values (given as as an input) from the standard normal space

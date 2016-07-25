@@ -88,7 +88,7 @@ display(Xo)
 % In order to estimate the failure probability the method pf of the object ImportanceSampling should
 % be used
 Xlhs.Lsmooth=true;
-Xpf=Xpm.pf(Xlhs);
+Xpf=Xpm.computeFailureProbability(Xlhs);
 display(Xpf)
 
 
@@ -97,7 +97,7 @@ OpenCossan.resetRandomNumberGenerator(51125)
 
 % Change Flag of the generation of the samples
 Xlhs.Lsmooth=false;
-[Xpf Xo]=Xpm.pf(Xlhs);
+[Xpf, Xo]=Xpm.computeFailureProbability(Xlhs);
 display(Xpf)
 display(Xo)
 

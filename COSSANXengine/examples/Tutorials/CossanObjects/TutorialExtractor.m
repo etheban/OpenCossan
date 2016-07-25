@@ -10,12 +10,12 @@
 %  University of Innsbruck, Austria
 
 %% Create extractor
-SpathName=fullfile(OpenCossan.getCossanRoot,'examples','Tutorials','Extractor','NASTRAN');
+SpathName=fullfile(OpenCossan.getCossanRoot,'examples','Tutorials','CossanObjects','Connector','NASTRAN');
 
 % TODO: add mimimal comments
 Xresp1 = Response('Sname', 'Out1', ...
              'Sfieldformat', '%d%*', ...
-             'Clookoutfor','', ...
+             'Clookoutfor',{}, ...
              'Svarname','', ...
              'Ncolnum',1, ...
              'Nrownum',3, ...
@@ -30,7 +30,7 @@ Xe=Extractor('Sdescription','Extractor for the tutorial', ...
            
 %% Add responses 
 
-Xresp2 = Response('Sname','Out2','Sfieldformat','%3f%3f%3f%3f%*','Svarname','Out1','Nrownum',3);
+Xresp2 = Response('Sname','Out2','Sfieldformat','%3f%3f%3f%3f%*','Svarname','Out1','Nrownum',2);
 Xresp3 = Response('Sname','Out3','Sfieldformat','%3f','Nrownum',53);
 Xe=add(Xe,'Xresponse',Xresp2);      
 Xe=add(Xe,'Xresponse',Xresp3);   
@@ -41,12 +41,12 @@ display(Xe)
 Xe=remove(Xe,'Out3'); 
 display(Xe)
 
-%% now the extractor contains only 1 response.
+%% now the extractor contains only 2 responses.
 Tout=extract(Xe) %#ok<*NOPTS>
 
 % Validate output
 Vreference= [10 11 12 13];
-assert(max(abs(Tout.Out2-Vreference))<eps,...
+assert(max(abs(Tout.Out2.Vdata-Vreference))<eps,...
     'CossanX:Tutorials:TutorialEvaluator','Reference Solution does not match.')
 
 

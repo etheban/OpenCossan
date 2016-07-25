@@ -30,20 +30,17 @@ h2=XlsData.plotLines('Ldistance',false);
 close(h1);
 close(h2);
 
-
 %% Create LineSamplinOutput object manually
-% It is possible to create LineSamplingOutput invoking the constructor
-%´
-Xlso1 = LineSamplingOutput('Sperformancefunctionname','Xrv3','Vnumpointline',[2 3]);
+% It is possible to create LineSamplingOutput by invoking the constructor
 
+Xlso1 = LineSamplingOutput('SperformanceFunctionName','Xrv3','VnumPointLine',[1 3 5]);
 display(Xlso1)
 
-Xlso2 = LineSamplingOutput('Sperformancefunctionname','Xrv3','vnumpointline',[2 3 4 5; 1 2 3 6]);
-
+Xlso2 = LineSamplingOutput('SperformanceFunctionName','Xrv3','VnumPointLine',[2 4 6]);
+display(Xlso2)
 
 %% Merge Method
 % merging two linesamplingoutput objects
 
 XlsOUT=merge(Xlso1,Xlso2);
-
 display(XlsOUT)

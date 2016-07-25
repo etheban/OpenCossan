@@ -64,7 +64,7 @@ display(Xpf2)
 
 %% Test new subset algorithms
 Xss=SubSet('Nmaxlevels',6,'target_pf',0.1, ...
-    'Ninitialsamples',500, 'Nbatches',1,'VproposalVariance',[1]);
+    'Ninitialsamples',500, 'Nbatches',1,'VproposalStd',1);
 
 Xpf2=Xpm.computeFailureProbability(Xss);
 display(Xpf2)

@@ -138,6 +138,7 @@ SP4    = KL_terms(SP4,'NKL_terms',30,'LcovarianceAssemble',true);
 
 % Generate samples of the stochastic process and visualize them
 ds1 = SP4.sample('Nsamples',1000);
+f1 = figure;
 plot(ds1.Xdataseries(1,1).Vdata)
 
 % compare covariance matrix computed from samples and analytical one

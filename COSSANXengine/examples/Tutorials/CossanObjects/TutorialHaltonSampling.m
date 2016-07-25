@@ -106,7 +106,7 @@ display(Xo)
 
 % In order to estimate the failure probability the method pf of the
 % ProbabilisticModel object should be used
-Xpf=Xpm.pf(Xhs);
+Xpf=Xpm.computeFailureProbability(Xhs);
 display(Xpf)
 
 % Change Flag of the generation of the samples
@@ -114,7 +114,7 @@ Xhs.Nskip=25;
 
 % Set RandomNumber stream
 OpenCossan.resetRandomNumberGenerator(51125)
-[Xpf Xo]=Xpm.pf(Xhs);
+[Xpf, Xo]=Xpm.computeFailureProbability(Xhs);
 display(Xo)
 display(Xpf)
 

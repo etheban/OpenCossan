@@ -64,7 +64,7 @@ XmALLmatrix=Mio('Sdescription', 'Performance function', ...
         'Liostructure',false, ...
         'Liomatrix',true, ...
         'Coutputnames',{'outALL'},...
-        'Cinputnames',{'RV1' 'RV2' 'PAR1' 'PAR2'});	
+        'Cinputnames',{'RV1' 'RV2' 'Par1' 'Par2'});	
     
 XpfALL=PerformanceFunction('Xmio',XmALLmatrix);
 XpmALL=ProbabilisticModel('Xmodel',Xmdl,'XperformanceFunction',XpfALL);
@@ -79,8 +79,8 @@ Xmc=MonteCarlo('Nsamples',1e4,'Nbatches',1);
 % DO NOT CHANGE THE VALUES OF THE SEED
 OpenCossan.resetRandomNumberGenerator(51125)
 
-[XpfReference XsimData]=XpmALL.pf(Xmc);
-display(XpfReference)
+[XpfReference, XsimData] = XpmALL.computeFailureProbability(Xmc); 
+display(XpfReference);
 
 %% Plot evaluated points
 % Retrive values from the simulation data
@@ -163,7 +163,7 @@ plot(gca(h),VdpB(1),VdpB(2),'dk','MarkerSize',10)
 % Find designPoint using linear hypothesis 
 % It is not necessary to specify the cut-set since is already defined in
 % the FaultTree included in the SystemReliability object
-[~, XdpIntersection Vcoord] = Xsys.findLinearIntersection('tolerance',1e-2);
+[~, XdpIntersection, Vcoord] = Xsys.findLinearIntersection('tolerance',1e-2);
 % 
 display(XdpIntersection)
 
@@ -203,7 +203,7 @@ display(Xcs)
     % To begin with, the plain MonteCarlo simulation is used to estimate the failure
     % probability of the cutset 1-2
     Xmc=MonteCarlo('Nsamples',1e3);
-    [XpfSystemMCS XcsSystem XoutMC]=Xsys.pf('Xsimulations',Xmc,'VcutsetIndex',[1 2]);
+    [XpfSystemMCS, XcsSystem, XoutMC]=Xsys.pf('Xsimulations',Xmc,'VcutsetIndex',[1 2]);
     
     % Show results of the failure probability for the cut set 1-2
     display(XpfSystemMCS)

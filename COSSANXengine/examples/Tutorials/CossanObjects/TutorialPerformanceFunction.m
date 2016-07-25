@@ -40,7 +40,7 @@ Xout=SimulationData('Tvalues',Toutput);
 Xout2=Xpf.apply(Xout);
 
 % Show results
-Vg=Xout2.getValues('Sname',Xpf.Soutputname);
+Vg=Xout2.getValues('Sname',Xpf.Soutputname)
 
 % One more sample
 Toutput(3).variableA=11;
@@ -49,7 +49,7 @@ Xout=SimulationData('Tvalues',Toutput);
 Xout2=Xpf.apply(Xout);
 
 % Show results
-Vg=Xout2.getValues('Sname',Xpf.Soutputname);
+Vg=Xout2.getValues('Sname',Xpf.Soutputname)
 
 %% Construct User Defined Performance Function
 % A Mio object is used to define a PerformanceFunction

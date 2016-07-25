@@ -80,14 +80,12 @@ Xds2=Dataseries('Mcoord',1:10,'Mdata',rand(4,10),'Sindexname','index','Sindexuni
 
 % No names defined
 Xsamp7  = Samples('Xdataseries',[Xds1 Xds2]);
+display(Xsamp7)
 
-% No names defined
+% Define names
 Xsamp7  = Samples('Xdataseries',[Xds1 Xds2],'CnamesStochasticProcess',{'SP1' 'SP2'});
 display(Xsamp7)
 
 % Add samples to Input object
-% This should return an error since the variable names do not match
-Xinput=Input('Xsamples',Xsamp7,'CXmembers',{StochasticProcess StochasticProcess},'CSmembers',{'Stocaz' 'Stocaz'});
-
-
-
+Xinput=Input('Xsamples',Xsamp7,'CXmembers',{StochasticProcess StochasticProcess},'CSmembers',{'SP1' 'SP2'});
+display(Xinput)

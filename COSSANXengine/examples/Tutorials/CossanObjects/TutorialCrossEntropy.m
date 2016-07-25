@@ -55,5 +55,5 @@ OpenCossan.cossanDisp('f(-3.779310, -3.283186) = 0.0');
 OpenCossan.cossanDisp('f(3.584428, -1.848126) = 0.0');
 
 %% Validate solution
-Vreference=[3 0];
+Vreference=[3 2];
 assert(max(Vreference-Xoptimum.getOptimalDesign)<1e-3,'openCOSSAN:Tutorial:TutorialCrossEntropy','Reference Solution not identified')

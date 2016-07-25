@@ -45,13 +45,8 @@
 
 % TODO: Add description
 
-
-%% WARNING
-Sfolder=fileparts(mfilename('fullpath'));% returns the current folder
-
 %%  Create the Injector
-SfilePath= fullfile(Sfolder,'Connector','NASTRAN');
-
+SfilePath=fullfile(OpenCossan.getCossanRoot,'examples','Tutorials','CossanObjects','Connector','NASTRAN');
 %% Scan File with "IDENTIFIERS"
 % An indentifier is a XLM String Data Type containing variable decraration.
 % An example of IDENTIFIER is the following: 

@@ -58,5 +58,5 @@ display(Xgrad)
 % WARNING!!! The other of reference point should be consistent with the
 % order of the variable present in the model.
 XlsMC=LocalSensitivityMonteCarlo('Xmodel',Xmdl,'VreferencePoint',[0.5 0.4 0.2]);
-Xgrad = XlsMC.computeGradient;
+Xgrad = XlsMC.computeGradientStandardNormalSpace;
 display(Xgrad);

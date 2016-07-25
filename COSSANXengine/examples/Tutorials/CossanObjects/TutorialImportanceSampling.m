@@ -161,8 +161,8 @@ display(Xpf)
 Xis.Nbatches=1;
 Xis.Nsamples=20000;
 Xmc=MonteCarlo('Nsamples',1e5);
-XpfMC=pf(Xpm,Xmc);
-XpfIS=pf(Xpm,Xis);
+XpfMC=computeFailureProbability(Xpm,Xmc);
+XpfIS=computeFailureProbability(Xpm,Xis);
 
 display(XpfMC)
 display(XpfIS)

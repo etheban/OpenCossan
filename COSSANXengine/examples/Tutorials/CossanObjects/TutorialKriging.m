@@ -82,9 +82,9 @@ Xpm_real = ProbabilisticModel('XModel',Xmod,'XPerformanceFunction',Xpf);
 Xpm_metamodel = ProbabilisticModel('XModel',Xkriging,'XPerformanceFunction',Xpf);
 
 Xmc=MonteCarlo('Sdescription','Mio evaluation','Nsamples',1000,'Nbatches',1);
-Xo_real = Xpm_real.pf(Xmc)
+Xo_real = Xpm_real.computeFailureProbability(Xmc)
 Xmc=MonteCarlo('Sdescription','Kriging evaluation','Nsamples',1000,'Nbatches',1);
-Xo_metamodel = Xpm_metamodel.pf(Xmc)
+Xo_metamodel = Xpm_metamodel.computeFailureProbability(Xmc)
 
 %% Apply Kriging
 MXX1 = repmat(linspace(0.2,0.3,201)',1,201);

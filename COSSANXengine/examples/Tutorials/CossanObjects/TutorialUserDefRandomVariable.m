@@ -79,7 +79,7 @@ s=sample(Xrv1);
 % extract 5 samples from Xrv1
 Vs1=sample(Xrv1,'Nsamples', 5);
 
-% extract 100 samples from Xrv1, in a 10x10 matrix
+% extract 100 samples from Xrv1, in a 2x3 matrix
 Vs2=sample(Xrv1,'Vsamples', [2 3]);
 
 
@@ -95,25 +95,25 @@ Xrs = RandomVariableSet('Cmembers',{'Xrv1','Xrv2','Xrv3','XrvRef'});
 x = sample(Xrv1,'Nsamples', 500);
 h = chi2gof(x);
 if h==0
-    OpenCossan.cossanDisp('The 1st random variable past the chi-2 test')
+    OpenCossan.cossanDisp('The 1st random variable passed the chi-2 test')
 end
 
 x = sample(Xrv2,'Nsamples', 500);
 h = chi2gof(x);
 if h==0
-    OpenCossan.cossanDisp('The 2nd random variable past the chi-2 test')
+    OpenCossan.cossanDisp('The 2nd random variable passed the chi-2 test')
 end
 
 x = sample(Xrv3,'Nsamples', 500);
 h = chi2gof(x);
 if h==0
-    OpenCossan.cossanDisp('The 3rd random variable past the chi-2 test')
+    OpenCossan.cossanDisp('The 3rd random variable passed the chi-2 test')
 end
 
 x = sample(Xrv4,'Nsamples', 500);
 h = chi2gof(x);
 if h==0
-    OpenCossan.cossanDisp('The 4th random variable past the chi-2 test')
+    OpenCossan.cossanDisp('The 4th random variable passed the chi-2 test')
 end
 
 %% Close figures
