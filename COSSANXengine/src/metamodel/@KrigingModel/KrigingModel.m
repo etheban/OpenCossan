@@ -41,7 +41,7 @@ classdef KrigingModel < MetaModel
             
             %% Check that the DACE toolbox exist
             if ~isdeployed
-                SpathToolbox=fullfile(OpenCossan.getCossanExternalPath,'..','src','dace');
+                SpathToolbox=fullfile(OpenCossan.getCossanExternalPath,'src','dace');
                 
                 assert(logical(exist(SpathToolbox,'dir')),'openCOSSAN:Kriging', ...
                     'DACE toolbox not installed')
