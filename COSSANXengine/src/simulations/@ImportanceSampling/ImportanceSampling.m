@@ -154,7 +154,7 @@ classdef ImportanceSampling < Simulations
                         
                         Xobj = computeProposalDistribution(Xobj,Xdp);
                         
-                    case 'lcomputedesingpoint'
+                    case 'lcomputedesignpoint'
                         % The proposal distribution is computed
                         % from the design point that will be computed on
                         % real-time.
