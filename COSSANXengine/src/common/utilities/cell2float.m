@@ -49,7 +49,7 @@ function [M, Q] = cell2float(C, Filler, StopOnError)
 % 4.0 (jan 2010) 
 
 % check the inputs
-error(nargchk(1,3,nargin)) ;
+narginchk(1,3) ;
 
 % first input should be cell array
 if ~iscell(C), 

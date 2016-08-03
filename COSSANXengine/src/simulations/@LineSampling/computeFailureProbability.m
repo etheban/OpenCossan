@@ -135,8 +135,7 @@ while isempty(SexitFlag)
             
             distanceHyperplane = -Inf;
             OpenCossan.cossanDisp(strcat(...
-                'Intersection with the limit state function not found on Line: #',...
-                num2str(iLine)),2);
+                'Line: #',num2str(iLine),' all line in the negative domain. Try to reduce the value of Vset!'),2);
             
             % Store coordinates of the approximated limit state points
             VlineStatePoints = MorthHyperPlane(iLine,:)+...

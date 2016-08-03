@@ -73,7 +73,8 @@ if ~isempty(Xobj.SheaderIdentifier)
 end
 
 % Prepare optional parameters
-Carguments={};
+Carguments{1}='ReadVariableNames';
+Carguments{2}=false;
 
 if ~isempty(Xobj.Nheaderlines)
    Carguments{end+1}='HeaderLines';
