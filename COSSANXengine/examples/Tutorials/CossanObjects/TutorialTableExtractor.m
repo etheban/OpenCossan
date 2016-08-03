@@ -19,6 +19,13 @@
 % DO NOT CHANGE THE VALUES OF THE SEED
 OpenCossan.resetRandomNumberGenerator(51125)
 
+
+if verLessThan('matlab','R2016a')
+     Tver=ver('matlab');
+     error('OpenCOSSAN:TutorialTableExtractor:OlderMatlabVersion',...
+     'A Matlab version greater than R2016a is require. Your Matlab version is %s',Tver.Release);
+end
+
 %% Construct an empty object
 Xte=TableExtractor;
 % show summary of the object
