@@ -1,10 +1,12 @@
 function [VedgesOUT,Vpdf] = getPDF(Xobj,varargin)
 %GETPDF This method computes the empirical PDF of the samples stored in the SimulationData object.
 %
-%  USAGE: [Vsupport,Vpdf]=XsimulationData.getPDF(varargin)
+%  USAGE: [VedgesOUT,Vpdf]=XsimulationData.getPDF(varargin)
 %
-%  The method returns the vector of the support points (Vsupport) and the vector
-%  of values of the pdf (Vpdf).
+%  The method returns the vector of the support points, i.e. edges of the
+%  bar (VedgesOUT) and the vector of values of the pdf (Vpdf). 
+%
+%  VedgesOUT has the length of Vpdf plut 1
 %
 %  Valid input arguments: Nbins, Sname, Cnames, Vsuppport
 %

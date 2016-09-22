@@ -42,7 +42,7 @@ catch exception
 end
 
 %% Evaluate CDF
-Vcdf=cumsum(Vpdf,2);
+Vcdf=cumsum(Vpdf,1);
 
 
 
