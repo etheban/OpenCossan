@@ -6,7 +6,7 @@ function [VedgesOUT,Vpdf] = getPDF(Xobj,varargin)
 %  The method returns the vector of the support points, i.e. edges of the
 %  bar (VedgesOUT) and the vector of values of the pdf (Vpdf). 
 %
-%  VedgesOUT has the length of Vpdf plut 1
+%  VedgesOUT has the length of Vpdf plus 1
 %
 %  Valid input arguments: Nbins, Sname, Cnames, Vsuppport
 %
@@ -76,7 +76,7 @@ if isempty(VedgesIN)
     VedgesOUT=zeros(Nbins+1,Nvariables);
     Vpdf=zeros(Nbins,Nvariables);
     for j=1:Nvariables
-        [Vpdf(:,j),VedgesOUT(:,j)] = histcounts(Mvalues,Nbins,'Normalization', 'probability');
+        [Vpdf(:,j),VedgesOUT(:,j)] = histcounts(Mvalues(:,j),Nbins,'Normalization', 'probability');
     end
 
 else
