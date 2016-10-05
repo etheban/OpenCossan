@@ -44,7 +44,13 @@ switch Sext
 end
 
 Sfolder=userpath;
-Sfolder=Sfolder(1:end-1);
+
+    if verLessThan('matlab', '9.1')
+        % remove trailing ":" from the end of the string returned by userpath
+        % Not necessary for Matlab > R2016b
+        Sfolder=Sfolder(1:end-1);
+    end
+
 
 Sfilename=fullfile(Sfolder,'startup.m');
 % Check if a startup.m file exist
