@@ -96,9 +96,15 @@ else
         fprintf('*** Adding: %s\n',SextrasPath)
     end
     
-    SuserPath = userpath; % remove trailing ":" from the end of the string returned by userpath
-    savepath(fullfile(SuserPath(1:end-1),'pathdef.m')); %#ok<MCSVP>
+    SuserPath = userpath; 
     
+    if verLessThan('matlab', '9.1')
+        % remove trailing ":" from the end of the string returned by userpath
+        % Not necessary for Matlab > R2016b
+        SuserPath=SuserPath(1:end-1);
+    end
+        
+    savepath(fullfile(SuserPath,'pathdef.m')); %#ok<MCSVP>
     fprintf('** Done!!!\n')
     
 end
