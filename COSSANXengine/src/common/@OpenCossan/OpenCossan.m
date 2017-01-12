@@ -38,7 +38,7 @@ classdef OpenCossan < handle
         SdiaryFileName = 'CossanLog.txt' % Filename of the log file
         Xanalysis              % Analysis object
         XdatabaseDriver        % DataBaseDriver
-        XjobInterface          % JobInterface 
+        XjobInterface          % JobInterface
         XsshConnection         % SSHConnection Object for SSH connection and operations
     end
     
@@ -60,7 +60,7 @@ classdef OpenCossan < handle
             ['src' filesep 'common' filesep 'utilities' filesep 'PC_exp_functions'] ...
             ['src' filesep 'connectors'] ...
             ['src' filesep 'connectors' filesep 'matlab'] ...
-            ['src' filesep 'connectors' filesep 'ascii'] ...       
+            ['src' filesep 'connectors' filesep 'ascii'] ...
             ['src' filesep 'highperformancecomputing'] ...
             ['src' filesep 'inference'] ...
             ['src' filesep 'Inputs'] ...
@@ -135,6 +135,17 @@ classdef OpenCossan < handle
             %% Process inputs
             OpenCossan.validateCossanInputs(varargin{:})
             
+            %% Check Matlab version
+            if verLessThan('matlab', Xobj.SrequiredMatlabVersion)
+                warning('OpenCOSSAN:OpenCOSSAN:checkMatlabversion', ...
+                    ['A Matlab version %s or higher is required!!!!' ...
+                    '\nCurrent Matlab release is R%s\n\n',...
+                    'Please be aware that some features of OpenCossan may not function properly or this Matlab version!!!!\n'],...
+                    Xobj.SrequiredMatlabVersion,version)
+            else
+                disp(['Detected Matlab release R' version('-release')])
+            end
+            
             for k=1:2:length(varargin)
                 switch lower(varargin{k})
                     case {'scossanroot','scossanpath'}
@@ -183,8 +194,8 @@ classdef OpenCossan < handle
                         Xobj.XdatabaseDriver = varargin{k+1}{1};
                     case {'sdatabasename','susername','spassword',...
                             'sjdbcdriver','sdatabaseurl'}
-                        CdbArguments{end+1}=varargin{k};  
-                        CdbArguments{end+1}=varargin{k+1}; 
+                        CdbArguments{end+1}=varargin{k};
+                        CdbArguments{end+1}=varargin{k+1};
                         % ssh connection
                     case {'cxsshsonnection'}
                         assert(isa(varargin{k+1}{1},'SSHConnection'),...
@@ -202,13 +213,13 @@ classdef OpenCossan < handle
                             'sremoteworkfolder','sremotemcrpath',...
                             'sremotecossanroot','sremoteexternalpath'}
                         CsshArguments{end+1} = varargin{k}; %#ok<*AGROW>
-                        CsshArguments{end+1} = varargin{k+1}; 
+                        CsshArguments{end+1} = varargin{k+1};
                         % ANALYSIS OBJECT
                     case {'sprojectname','sanalysisname','sdescription',...
                             'xtimer','nseed','srandomnumberalgorithm',...
                             'sworkingpath','smainpath'}
-                        CanalysisArguments{end+1} = varargin{k}; 
-                        CanalysisArguments{end+1} = varargin{k+1}; 
+                        CanalysisArguments{end+1} = varargin{k};
+                        CanalysisArguments{end+1} = varargin{k+1};
                     case {'xanalysis'}
                         assert(isa(varargin{k+1},'Analysis'),...
                             'openCOSSAN:OpenCossan',...
@@ -219,7 +230,7 @@ classdef OpenCossan < handle
                             'openCOSSAN:OpenCossan',...
                             'please provide an object of Type Analysis after the property name %s',varargin{k})
                         Xobj.Xanalysis = varargin{k+1}{1};
-                     case {'liscossanx'}  
+                    case {'liscossanx'}
                         Xobj.LisCossanX=varargin{k+1};
                     otherwise
                         error('openCOSSAN:OpenCossan',...
@@ -239,6 +250,20 @@ classdef OpenCossan < handle
             %% Set path
             if ~isdeployed %&& isempty(OpenCossan.getCossanRoot)
                 
+                % Check if the toolbox is OpenCossan is installed as a
+                % Toolbox (AddOns)
+                if verLessThan('matlab', '9.0')
+                    LsetPath=1;
+                else
+                    toolboxes=matlab.addons.toolbox.installedToolboxes;
+                   
+                    if  any(arrayfun(@(x)strcmp(x.Name,'OpenCossan'),toolboxes))
+                        LsetPath=0;
+                    else
+                        LsetPath=1;
+                    end
+                end
+                
                 if ~exist('Sroot','var')
                     % Define the path of OpenCossan for pcode of OpenCossan
                     Sroot=Spath;
@@ -249,17 +274,19 @@ classdef OpenCossan < handle
                     strcat('Please define the installation path of ',...
                     'CossanEngine.\nPlease use the PropertyName: ScossanPath'))
                 
-                if strcmp(Status,'.m')
-                    OpenCossan.setPath('ScossanRoot',Sroot, ...
-                        'CsrcCossanPaths',Xobj.CsrcPathFolders, ...
-                        'CtutorialCossanPaths',Xobj.CtutorialsPathFolders, ...
-                        'CmexCossanPaths',Xobj.CmexPathFolders, ...
-                        'CdocsCossanPaths',Xobj.CdocsPathFolders);
-                else
-                    OpenCossan.setPath('ScossanRoot',Sroot, ...
-                        'CmexCossanPaths',Xobj.CmexPathFolders,...
-                        'CtutorialCossanPaths',Xobj.CtutorialsPathFolders, ...
-                        'CdocsCossanPaths',Xobj.CdocsPathFolders);
+                if LsetPath
+                    if strcmp(Status,'.m')
+                        OpenCossan.setPath('ScossanRoot',Sroot, ...
+                            'CsrcCossanPaths',Xobj.CsrcPathFolders, ...
+                            'CtutorialCossanPaths',Xobj.CtutorialsPathFolders, ...
+                            'CmexCossanPaths',Xobj.CmexPathFolders, ...
+                            'CdocsCossanPaths',Xobj.CdocsPathFolders);
+                    else
+                        OpenCossan.setPath('ScossanRoot',Sroot, ...
+                            'CmexCossanPaths',Xobj.CmexPathFolders,...
+                            'CtutorialCossanPaths',Xobj.CtutorialsPathFolders, ...
+                            'CdocsCossanPaths',Xobj.CdocsPathFolders);
+                    end
                 end
             else
                 
@@ -333,7 +360,7 @@ classdef OpenCossan < handle
             end
             COSSANincludePath=fullfile(Xobj.SexternalDistributionPath,'include');
             
-            Slookoutfor='OpenSourceSoftware';            
+            Slookoutfor='OpenSourceSoftware';
             
             if isunix
                 %% SET ENVIROMENT FOR LINUX/MAC MACHINES
@@ -519,16 +546,6 @@ classdef OpenCossan < handle
                 end
             end
             
-            %% Check Matlab version
-            if verLessThan('matlab', Xobj.SrequiredMatlabVersion)
-                warning('OpenCOSSAN:OpenCOSSAN:checkMatlabversion', ...
-                    ['A Matlab version %s or higher is required!!!!' ...
-                    '\nCurrent Matlab release is R%s\n\n',...
-                    'Please be aware that some features of OpenCossan may not function properly or this Matlab version!!!!\n'],...
-                    Xobj.SrequiredMatlabVersion,version)
-            else
-               disp(['Detected Matlab release R' version('-release')])
-            end
             
         end % of constructor method
         
@@ -553,7 +570,7 @@ classdef OpenCossan < handle
                 SincludePath=getenv('INCLUDE');
             end
         end
-
+        
     end
     
     %% Static Methods
@@ -690,7 +707,7 @@ classdef OpenCossan < handle
         function Lstatus=isKilled
             Lstatus= exist(fullfile(OpenCossan.getCossanWorkingPath,OpenCossan.getKillFilename),'file');
         end
-                
+        
         function Lchecks=getChecks
             global OPENCOSSAN
             Lchecks= OPENCOSSAN.Lchecks;
@@ -699,7 +716,7 @@ classdef OpenCossan < handle
         function setChecks(Lchecks)
             global OPENCOSSAN
             OPENCOSSAN.Lchecks=Lchecks;
-        end        
+        end
     end
     
 end

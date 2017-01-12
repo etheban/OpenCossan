@@ -21,7 +21,7 @@ function varargout = OpenCossanApp(varargin)
 % See also: GUIDE, GUIDATA, GUIHANDLES
 %
 % Author: Edoardo Patelli
-% Institute for Risk and Uncertainty, University of Liverpool, UK
+% OpenCOSSAN Copyright (C) 2017 Edoardo Patelli
 % email address: openengine@cossan.co.uk
 % Website: http://www.cossan.co.uk
 
@@ -45,7 +45,7 @@ function varargout = OpenCossanApp(varargin)
 
 % Edit the above text to modify the response to help OpenCossanApp
 
-% Last Modified by GUIDE v2.5 14-Jan-2015 16:39:00
+% Last Modified by GUIDE v2.5 11-Jan-2017 18:27:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -65,7 +65,6 @@ else
     gui_mainfcn(gui_State, varargin{:});
 end
 % End initialization code - DO NOT EDIT
-
 
 % --- Executes just before OpenCossanApp is made visible.
 function OpenCossanApp_OpeningFcn(hObject, eventdata, handles, varargin)
@@ -88,15 +87,19 @@ else
     handles.OpenCossanData.SAppPath=Sapps(mg).location;
 end
 
-% Always initialize variables (allows update)
-initializeVariables(hObject, eventdata, handles);    
+% Always initialize variables
+initializeVariables(hObject, eventdata, handles);
 handles=guidata(hObject);
 
 if exist(fullfile(handles.OpenCossanData.SAppPath,'OpenCossanData.mat'),'file')
     handles.OpenCossanData=load(fullfile(handles.OpenCossanData.SAppPath,'OpenCossanData.mat'));
     set(handles.textInformation,...
         'String',...
-        'Welcome back to OpenCossanApp')   
+        'Welcome back to OpenCossanApp')
+    
+    if handles.OpenCossanData.LicenseAgreement
+        set(handles.LicensePanel,'visible','off')
+    end
 end
 
 
@@ -107,27 +110,120 @@ catch
     set(handles.axesLogo,'Visible','off');
 end
 
-if strcmp(handles.OpenCossanData.SourcePath,'N/A')||strcmp(handles.OpenCossanData.InstallationPath,'N/A')
-   set(handles.pushbuttonManualInstall,'enable','off');
-end
-
-% Update (or initialize) display
+% install (or initialize) display
 set(handles.textInstallationPath,'string',handles.OpenCossanData.InstallationPath);
 set(handles.textSourcePath,'string',handles.OpenCossanData.SourcePath);
 set(handles.textOpenCossan,'string',handles.OpenCossanData.OpenCossanInstalledVersion);
-set(handles.textExamples,'string',handles.OpenCossanData.ExamplesInstalledVersion);
-set(handles.textDocs,'string',handles.OpenCossanData.DocsInstalledVersion);
-set(handles.textAddOns,'string',handles.OpenCossanData.AddOnsInstalledVersion);
 set(handles.textVersionApp,'string',handles.OpenCossanData.AppInstalledVersion);
 
+SlicenceShort=['BY CLICKING ON THE "ACCEPT" BUTTON BELOW YOU AGREE TO THE TERMS OF THIS LICENCE WHICH WILL BIND YOU.',...
+    'IF YOU DO NOT AGREE TO THE TERMS OF THIS LICENCE, CLICK ON THE "REJECT" BUTTON BELOW.',...
+    ];
 
+set(handles.LicenseText,'string',SlicenceShort);
 
-% Update handles structure
+set(handles.textInformation,...
+    'String',...
+    'Check the license agreement')
+
+try
+    axes(handles.logoLicense)
+    matlabImage = imread('OpenCossanLogo.WhiteBG.png');
+    image(matlabImage)
+    axis off
+    axis image
+catch
+    set(handles.logoLicense,'Visible','off');
+end
+
+if handles.OpenCossanData.LicenseAgreement
+    set(handles.Run,'Enable','On');
+else
+    set(handles.Run,'Enable','off');
+end
+
+%% Check if some already downloaded packages are available
+if exist(handles.OpenCossanData.ToolboxFullPath,'file')
+    set(handles.Install,'Enable','On');
+else
+    set(handles.Install,'Enable','off');
+end
+
+%% Check if OpenCossan toolbox is installed
+toolboxes = matlab.addons.toolbox.installedToolboxes;
+
+if ~isempty(toolboxes)
+    handles.OpenCossanData.tableToolboxesOpenCossan=toolboxes(arrayfun(@(x)strcmp(x.Name,'OpenCossan'),toolboxes));
+    
+    if ~isempty(handles.OpenCossanData.tableToolboxesOpenCossan)
+        set(handles.Run,'Enable','On');
+        set(handles.Install,'String','Update');
+    else
+        set(handles.Run,'Enable','off');
+        set(handles.Install,'String','Install');
+    end
+else
+    set(handles.Run,'Enable','off');
+    set(handles.Install,'String','Install');
+end
+
+% install handles structure
 guidata(hObject,handles)
 
-% UIWAIT makes OpenCossanApp wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+function initializeVariables(hObject, eventdata, handles) %#ok<INUSL>
+% hObject    handle to pushbuttonManualInstall (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+%
+% This function initialize the variables stored in the matlab file
+% OpenCossanData.mat
 
+if isempty(userpath)
+    handles.OpenCossanData.InstallationPath='N/A';
+else
+    handles.OpenCossanData.InstallationPath=fullfile(userpath,'Add-Ons','Toolboxes');
+end
+
+handles.OpenCossanData.SourcePath=pwd;
+handles.OpenCossanData.OpenCossanInstalledVersion='N/A';
+handles.OpenCossanData.AppInstalledVersion='N/A';
+handles.OpenCossanData.updateOpenCossanNeeded=1;
+handles.OpenCossanData.updateAppNeeded=0;
+handles.OpenCossanData.InstallationFileNameOpenCossan='OpenCossan.mltbx';
+handles.OpenCossanData.InstallationFileNameApp='OpenCossanApp.mlappinstall';
+handles.OpenCossanData.ServerSVNInfoPath='http://cossan.co.uk/svninfo/stable/';
+handles.OpenCossanData.ServerSVNInfoFileOpenCossan='svn_OpenCossan.mltbx.xml';
+handles.OpenCossanData.ServerSVNInfoFileApp='svn_OpenCossanApp.mlappinstall.xml';
+handles.OpenCossanData.URL='https://iru1.liv.ac.uk/svn/OpenCossan/branches/Archives/stable/';
+handles.OpenCossanData.toolboxFile = 'OpenCossan.mltbx';
+handles.OpenCossanData.LicenseAgreement=0;
+handles.OpenCossanData.LicenseAgreementText=0;
+handles.OpenCossanData.WebCredentials=weboptions;
+handles.OpenCossanData.AppFullPath='';
+handles.OpenCossanData.ToolboxFullPath='';
+handles.OpenCossanData.tableToolboxesOpenCossan=[];
+
+
+%Get revision for the COSSAN APP. I am assuming that when the CossanAPP is
+% used for the first time it is up-to-date
+
+try
+    Crevision=getRevision(handles.OpenCossanData.ServerSVNInfoFileApp,handles);
+    handles.OpenCossanData.AppInstalledVersion=Crevision;
+    
+    set(handles.textInformation,...
+        'String',...
+        'For the first use of OpenCossan, please define the installation path')
+catch
+    set(handles.textInformation,...
+        'String',...
+        ['Unable to connect with COSSAN server. Download the file ' handles.OpenCossanData.ServerSVNInfoPath handles.OpenCossanData.ServerSVNInfoFileApp])
+end
+
+
+guidata(hObject,handles)
+
+hold=guidata(hObject); %#ok<NASGU>
 
 % --- Outputs from this function are returned to the command line.
 function varargout = OpenCossanApp_OutputFcn(hObject, eventdata, handles) %#ok<INUSL>
@@ -147,12 +243,10 @@ function Run_Callback(hObject, eventdata, handles) %#ok<INUSL>
 % handles    structure with handles and user data (see GUIDATA)
 
 try
-    addpath(fullfile(handles.OpenCossanData.InstallationPath,'COSSANXengine','src','common'));
-    set(handles.textInformation,'String','Initialising OpenCossan')
-    OpenCossan('ScossanRoot',handles.OpenCossanData.InstallationPath)
+    OpenCossan('ScossanRoot',fullfile(handles.OpenCossanData.InstallationPath,'OpenCossan','code'))
     close OpenCossanApp
-catch
-    set(handles.textInformation,'String','OpenCossan not found. Please check your installation path')
+catch ME
+    set(handles.textInformation,'String',['OpenCossan not found. Please check your installation path', ME.message])
 end
 
 
@@ -167,59 +261,29 @@ handles.OpenCossanData.OpenCossanServerVersion=getRevision(handles.OpenCossanDat
 
 % Compare with the local version
 if ~strcmp(handles.OpenCossanData.OpenCossanServerVersion,handles.OpenCossanData.OpenCossanInstalledVersion)
-    set(handles.textOpenCossan,'string',['Current version: ' char(handles.OpenCossanData.OpenCossanInstalledVersion) ' Available: ' char(handles.OpenCossanData.OpenCossanServerVersion)])
     handles.OpenCossanData.updateCossanNeeded=1;
 else
     handles.OpenCossanData.updateCossanNeeded=0;
 end
 
-% AddOns
-handles.OpenCossanData.AddOnsServerVersion=getRevision(handles.OpenCossanData.ServerSVNInfoFileAddOns,handles);
-% Compare with the local version
-if ~strcmp(handles.OpenCossanData.AddOnsServerVersion,handles.OpenCossanData.AddOnsInstalledVersion)
-    set(handles.textAddOns,'string',['Current version: ' char(handles.OpenCossanData.AddOnsInstalledVersion) ' Available: ' char(handles.OpenCossanData.AddOnsServerVersion)])
-    handles.OpenCossanData.updateAddOnsNeeded=1;
-else
-    handles.OpenCossanData.updateAddOnsNeeded=0;
-end
+set(handles.textOpenCossan,'string',['Current version: ' char(handles.OpenCossanData.OpenCossanInstalledVersion) ' Available: ' char(handles.OpenCossanData.OpenCossanServerVersion)])
 
 
-% Examples
-handles.OpenCossanData.ExamplesServerVersion=getRevision(handles.OpenCossanData.ServerSVNInfoFileExamples,handles);
-% Compare with the local version
-if ~strcmp(handles.OpenCossanData.ExamplesServerVersion,handles.OpenCossanData.ExamplesInstalledVersion)
-    set(handles.textExamples,'string',['Current version: ' char(handles.OpenCossanData.ExamplesInstalledVersion) ' Available: ' char(handles.OpenCossanData.ExamplesServerVersion)])
-    handles.OpenCossanData.updateExamplesNeeded=1;
-else
-    handles.OpenCossanData.updateExamplesNeeded=0;
-end
-
-% Docs
-handles.OpenCossanData.DocsServerVersion=getRevision(handles.OpenCossanData.ServerSVNInfoFileDocs,handles);
-% Compare with the local version
-if ~strcmp(handles.OpenCossanData.DocsServerVersion,handles.OpenCossanData.DocsInstalledVersion)
-    set(handles.textDocs,'string',['Current version: ' char(handles.OpenCossanData.DocsInstalledVersion) ' Available: ' char(handles.OpenCossanData.DocsServerVersion)])
-    handles.OpenCossanData.updateDocsNeeded=1;
-else
-    handles.OpenCossanData.updateDocsNeeded=0;
-end
-
-% CossanApp 
+% CossanApp
 handles.OpenCossanData.AppServerVersion=getRevision(handles.OpenCossanData.ServerSVNInfoFileApp,handles);
 % Compare with the local version
 if ~strcmp(handles.OpenCossanData.AppServerVersion,handles.OpenCossanData.AppInstalledVersion)
-    set(handles.textVersionApp,'string',['Current version: ' char(handles.OpenCossanData.AppInstalledVersion) ' Available: ' char(handles.OpenCossanData.AppServerVersion)])
     handles.OpenCossanData.updateAppNeeded=1;
 else
     handles.OpenCossanData.updateAppNeeded=0;
 end
 
-if any([handles.OpenCossanData.updateCossanNeeded handles.OpenCossanData.updateDocsNeeded handles.OpenCossanData.updateExamplesNeeded handles.OpenCossanData.updateAddOnsNeeded])
-    set(handles.textInformation,'String','One or more Update(s) are available. Set a package path, then press download.')
-    set(handles.Download,'Enable','On');
+set(handles.textVersionApp,'string',['Current version: ' char(handles.OpenCossanData.AppInstalledVersion) ' Available: ' char(handles.OpenCossanData.AppServerVersion)])
+
+if any([handles.OpenCossanData.updateCossanNeeded handles.OpenCossanData.updateAppNeeded])
+    set(handles.textInformation,'String','One or more Update(s) are available and can be downloaded.')
 end
 
-% Update data
 guidata(hObject,handles);
 
 % --- Executes on button press in Download.
@@ -228,86 +292,84 @@ function Download_Callback(hObject, eventdata, handles) %#ok<INUSL>
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Download
 
-set(handles.textInformation,'String','Please be awere that IE and Safary are extracting  the zip files automatically. All the downloaded files must have the extension .zip');
-drawnow()
+[u,p] = getMyCredentials(handles.OpenCossanData.WebCredentials);
+
+if isempty(u) || isempty(p)
+    set(handles.textInformation,'String',...
+        'Without a valid account it is not possible to estabilish a connection with the cossan server');
+    set(handles.textInformation,'ForegroundColor','red');
+    return
+end
+
+options = weboptions('Username',u,'Password',p);
+handles.OpenCossanData.WebCredentials=options;
+
+    % Collect old status
+    RunOldStatus=get(handles.Run,'Enable');
+    InstallOldStatus=get(handles.Install,'Enable');
+    UpdateOldStatus=get(handles.CheckUpdates,'Enable');
+    ResetOldStatus=get(handles.pushbuttonReset,'Enable');
+    DownloadOldStatus=get(handles.Download,'Enable');
+    
+    % Make bottons unavailable while downloading files
+    set(handles.Run,'Enable','off');
+    set(handles.Install,'Enable','off');
+    set(handles.CheckUpdates,'Enable','off');
+    set(handles.pushbuttonReset,'Enable','off');
+    set(handles.Download,'Enable','off');
+
+
+if handles.OpenCossanData.updateAppNeeded
+    set(handles.textInformation,'String','Downloading the OpenCossanApp');
+   
+    drawnow();
+    % Remove old file if exists
+    if exist(handles.OpenCossanData.InstallationFileNameApp,'file')
+        delete(handles.OpenCossanData.InstallationFileNameApp)
+    end
+    
+    try
+        handles.OpenCossanData.AppFullPath=websave('OpenCossanApp',...
+            [handles.OpenCossanData.URL handles.OpenCossanData.InstallationFileNameApp],options);
         
-if handles.OpenCossanData.updateCossanNeeded==1
-    Sname=fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.InstallationFileNameOpenCossan);
-    if exist(Sname,'file')
-        delete(Sname);
+    catch ME
+        set(handles.textInformation,'String',ME.message);
     end
-    
-    url=[handles.OpenCossanData.URL handles.OpenCossanData.InstallationFileNameOpenCossan];
-    web(url,'-browser');
-
-   handles.OpenCossanData.OpenCossanInstalledVersion=getRevision(handles.OpenCossanData.ServerSVNInfoFileOpenCossan,handles);
 end
 
-% AddOns
-if handles.OpenCossanData.updateAddOnsNeeded==1
-    Sname=fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.InstallationFileNameAddOns);
-    if exist(Sname,'file')
-        delete(Sname);
+if handles.OpenCossanData.updateOpenCossanNeeded==1
+    set(handles.textInformation,'String','Downloading the OpenCossan Toolbox! This is a big package and it might take a while');
+    drawnow();
+    
+    % Remove old file if exists
+    if exist(handles.OpenCossanData.InstallationFileNameOpenCossan,'file')
+        delete(handles.OpenCossanData.InstallationFileNameOpenCossan)
     end
     
-    url=[handles.OpenCossanData.URL handles.OpenCossanData.InstallationFileNameAddOns];
-    web(url,'-browser');
-    handles.OpenCossanData.AddOnsInstalledVersion=getRevision(handles.OpenCossanData.ServerSVNInfoFileAddOns,handles);
-end
-
-% Examples
-if handles.OpenCossanData.updateExamplesNeeded==1
-    Sname=fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.InstallationFileNameExamples);
-    if exist(Sname,'file')
-        delete(Sname);
+    try
+        handles.OpenCossanData.ToolboxFullPath=websave('OpenCossan',...
+            [handles.OpenCossanData.URL handles.OpenCossanData.InstallationFileNameOpenCossan],options);
+        
+        set(handles.textInformation,'String','OpenCossan Toolbox downloaded');
+    catch ME
+        set(handles.textInformation,'String',ME.message);
     end
     
-    url=[handles.OpenCossanData.URL handles.OpenCossanData.InstallationFileNameExamples];
-    web(url,'-browser');
-    
-    handles.OpenCossanData.ExamplesInstalledVersion=getRevision(handles.OpenCossanData.ServerSVNInfoFileExamples,handles);
-end
-
-%% Docs
-if handles.OpenCossanData.updateDocsNeeded==1
-    Sname=fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.InstallationFileNameDocs);
-    if exist(Sname,'file')
-        delete(Sname);
-    end
-    
-    url=[handles.OpenCossanData.URL handles.OpenCossanData.InstallationFileNameDocs];
-    web(url,'-browser');
-
-    handles.OpenCossanData.DocsInstalledVersion=getRevision(handles.OpenCossanData.ServerSVNInfoFileDocs,handles);
 end
 
 %% Enable install button
-if any([handles.OpenCossanData.updateDocsNeeded handles.OpenCossanData.updateAddOnsNeeded ...
-        handles.OpenCossanData.updateExamplesNeeded handles.OpenCossanData.updateCossanNeeded] )
-   set(handles.Install,'Enable','On')
-else
-   set(handles.Install,'Enable','Off')
-end
+set(handles.Install,'Enable','On')
 
-%% CossanApp
-if handles.OpenCossanData.updateAppNeeded==1
-    Sname=fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.InstallationFileNameApp);
-    if exist(Sname,'file')
-        delete(Sname);
-    end
+% Restore old status
+set(handles.Run,'Enable',RunOldStatus);
+set(handles.CheckUpdates,'Enable',UpdateOldStatus);
+set(handles.pushbuttonReset,'Enable',ResetOldStatus);
+set(handles.Download,'Enable',DownloadOldStatus);
     
-    url=[handles.OpenCossanData.URL handles.OpenCossanData.InstallationFileNameApp];
-    web(url,'-browser');
-    
-    
-    handles.OpenCossanData.AppInstalledVersion=getRevision(handles.OpenCossanData.ServerSVNInfoFileApp,handles);
-       
-    set(handles.textInformation,'String','Please download the new app and then press "Update App"')
-    set(handles.CossanApp,'Enable','on')
-else
-    set(handles.CossanApp,'Enable','off')
-end
+% refresh GUI
+drawnow();
 
 guidata(hObject,handles);
 
@@ -317,43 +379,75 @@ function Install_Callback(hObject, eventdata, handles) %#ok<INUSL>
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-if ~isdir(handles.OpenCossanData.InstallationPath)
-     set(handles.textInformation,'String','Please define a valid installation path')
-     guidata(hObject,handles);
-     return
+% Collect old status
+RunOldStatus=get(handles.Run,'Enable');
+InstallOldStatus=get(handles.Install,'Enable');
+UpdateOldStatus=get(handles.CheckUpdates,'Enable');
+ResetOldStatus=get(handles.pushbuttonReset,'Enable');
+DownloadOldStatus=get(handles.Download,'Enable');
+
+% Make bottons unavailable while downloading files
+set(handles.Run,'Enable','off');
+set(handles.Install,'Enable','off');
+set(handles.CheckUpdates,'Enable','off');
+set(handles.pushbuttonReset,'Enable','off');
+set(handles.Download,'Enable','off');
+
+drawnow();
+    
+% This function is used to install OpenCossan
+if handles.OpenCossanData.updateOpenCossanNeeded
+    
+    if ~isempty(handles.OpenCossanData.tableToolboxesOpenCossan)
+        Stextupdate='Updating OpenCosssan toolbox. This can take a while.. be patient.';
+        set(handles.textInformation,'String',Stextupdate,'ForegroundColor',[0 0.45 0.74])
+        
+        try
+            matlab.addons.toolbox.uninstallToolbox(handles.OpenCossanData.tableToolboxesOpenCossan)
+            Stextupdate='Old toolbox removed. Installing the new version. This can take a while.. be patient.';
+        catch ME
+            set(handles.textInformation,'String',ME.message,'ForegroundColor','red');
+        end
+    else
+        Stextupdate='Installing OpenCosssan toolbox. This can take a while.. be patient.';
+    end
+    
+    set(handles.textInformation,'String',Stextupdate,'ForegroundColor',[0 0.45 0.74])
+    
+    try
+        handles.OpenCossanData.tableToolboxesOpenCossan = matlab.addons.toolbox.installToolbox(handles.OpenCossanData.ToolboxFullPath);
+        
+        Stextupdate=['Installation completed. Unique toolbox identifier: ', handles.OpenCossanData.tableToolboxesOpenCossan.Guid];
+        set(handles.textInformation,'String',Stextupdate)
+        set(handles.Install,'String','Update');
+    catch ME
+        set(handles.textInformation,'String',ME.message,'ForegroundColor','red');
+    end
 end
 
-if ~isdir(handles.OpenCossanData.SourcePath)
-     set(handles.textInformation,'String','Please define a valid package path')
-     guidata(hObject,handles);
-     return
+if handles.OpenCossanData.updateAppNeeded
+    Stextupdate='Updating OpenCosssan App. ';
+    set(handles.textInformation,'String',Stextupdate)
+
+    try 
+        installedToolbox = matlab.addons.toolbox.installToolbox(handles.OpenCossanData.AppFullPath);
+    catch ME
+       set(handles.textInformation,'String',ME.message,'ForegroundColor','red');
+    end
+    
+    Stextupdate=['Installation completed. Unique toolbox identifier: ', installedToolbox.Guid];
+    set(handles.textInformation,'String',Stextupdate)
+    drawnow();
 end
 
-LupdateOpenCossan=logical(handles.OpenCossanData.updateOpenCossanNeeded);
-LupdateExamples=logical(handles.OpenCossanData.updateExamplesNeeded);
-LupdateAddOns=logical(handles.OpenCossanData.updateAddOnsNeeded);
-
-Stextupdate=InstallOpenCossan(handles,LupdateOpenCossan,LupdateExamples,LupdateAddOns);
-
-set(handles.textInformation,'String',Stextupdate)
+    % Restore old status
+    set(handles.Run,'Enable',RunOldStatus);
+    set(handles.Install,'Enable',InstallOldStatus);
+    set(handles.CheckUpdates,'Enable',UpdateOldStatus);
+    set(handles.pushbuttonReset,'Enable',ResetOldStatus);
+    set(handles.Download,'Enable',DownloadOldStatus);
 
 guidata(hObject,handles);
-
-% --- Executes on button press in CossanApp.
-function CossanApp_Callback(hObject, eventdata, handles)
-% hObject    handle to CossanApp (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-Sfilename=fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.InstallationFileNameApp);
-
-if exist(Sfilename,'file')
-    set(handles.textInformation,'String','Updating the App')
-else
-    set(handles.textInformation,'String','Please download the app first')
-end
-
-guidata(hObject,handles)
 
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, eventdata, handles)
@@ -368,175 +462,30 @@ save(fullfile(handles.OpenCossanData.SAppPath,'OpenCossanData.mat'),'-struct','O
 delete(hObject);
 
 
-
-% --- Executes on button press in pushbuttonInstallationPath.
-function pushbuttonInstallationPath_Callback(hObject, eventdata, handles) %#ok<INUSL>
-% hObject    handle to pushbuttonInstallationPath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-handles.OpenCossanData.SourcePath=uigetdir;
-set(handles.textSourcePath,'string',handles.OpenCossanData.SourcePath);
-
-% Enable manual installation
-if ~strcmp(handles.OpenCossanData.SourcePath,'N/A')||~strcmp(handles.OpenCossanData.InstallationPath,'N/A')
-    set(handles.pushbuttonManualInstall,'enable','on');
-end
-
-if any([handles.OpenCossanData.updateOpenCossanNeeded handles.OpenCossanData.updateExamplesNeeded ...
-        handles.OpenCossanData.updateAddOnsNeeded handles.OpenCossanData.updateDocsNeeded] )
-   set(handles.Install,'Enable','On')  
-else
-   set(handles.Install,'Enable','Off')
-end
-
-
-drawnow()
-guidata(hObject,handles)
-
-
-function pushbuttonManualInstall_CreateFcn(hObject, eventdata, handles) %#ok<INUSD>
-% hObject    handle to pushbuttonInstallationPath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbuttonManualInstall.
-function pushbuttonManualInstall_Callback(hObject, eventdata, handles) %#ok<INUSL>
-% hObject    handle to pushbuttonReset (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-StextInfo='Manual Installation of: ';
-% Check .gtz files availables
-if exist(fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.InstallationFileNameOpenCossan),'file')
-    LupdateOpenCossan=true;
-    StextInfo=[StextInfo 'OpenCossan; '];
-else
-    LupdateOpenCossan=false;       
-end
-  
-if exist(fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.InstallationFileNameExamples),'file')
-    LupdateExamples=true;
-    StextInfo=[StextInfo 'Examples; '];
-else
-    LupdateExamples=false;       
-end
-
-if exist(fullfile(handles.OpenCossanData.SourcePath,handles.OpenCossanData.InstallationFileNameAddOns),'file')
-    LupdateAddOns=true;
-    StextInfo=[StextInfo 'AddOns; '];
-else
-    LupdateAddOns=false;       
-end
-
-if all([LupdateOpenCossan LupdateExamples LupdateAddOns]==false)
-    set(handles.textInformation,'String','No .zip files available!')
-else
-    set(handles.textInformation,'String',StextInfo)
-    StextOut=InstallOpenCossan(handles,LupdateOpenCossan,LupdateExamples,LupdateAddOns);
-    set(handles.textInformation,'String',StextOut)
-end
-
-drawnow()
-guidata(hObject,handles)
-
-% --- Executes on button press in pushbuttonDestination.
-function pushbuttonDestination_Callback(hObject, eventdata, handles) %#ok<INUSL>
-% hObject    handle to pushbuttonDestination (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-%% WHERE COSSAN WILL BE INSTALLED
-handles.OpenCossanData.InstallationPath=uigetdir;
-set(handles.textInstallationPath,'string',handles.OpenCossanData.InstallationPath);
-
-if ~strcmp(handles.OpenCossanData.SourcePath,'N/A')
-    set(handles.pushbuttonManualInstall,'enable','on');
-end
-
-drawnow()
-guidata(hObject,handles)
-
-
-% --- Executes during object creation, after setting all properties.
-function textSourcePath_CreateFcn(hObject, eventdata, handles) %#ok<INUSD>
-% hObject    handle to textSourcePath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-
 % --- Executes on button press in pushbuttonReset.
 function pushbuttonReset_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbuttonReset (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+set(handles.textInformation,'String','Remove all the information stored in the App.')
+drawnow
+
 if exist('OpenCossanData.mat','file')
     delete('OpenCossanData.mat')
 end
 
 initializeVariables(hObject, eventdata, handles);
 
-
-function initializeVariables(hObject, eventdata, handles) %#ok<INUSL>
-% hObject    handle to pushbuttonManualInstall (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-%
-% This function initialize the variables stored in the matlab file
-% OpenCossanData.mat 
-
-handles.OpenCossanData.InstallationPath='N/A';
-handles.OpenCossanData.SourcePath='N/A';
-handles.OpenCossanData.OpenCossanInstalledVersion='N/A';
-handles.OpenCossanData.ExamplesInstalledVersion='N/A';
-handles.OpenCossanData.DocsInstalledVersion='N/A';
-handles.OpenCossanData.AddOnsInstalledVersion='N/A';
-handles.OpenCossanData.AppInstalledVersion='N/A';
-handles.OpenCossanData.updateOpenCossanNeeded=1;
-handles.OpenCossanData.updateExamplesNeeded=1;
-handles.OpenCossanData.updateAddOnsNeeded=1;
-handles.OpenCossanData.updateDocsNeeded=1;
-handles.OpenCossanData.updateAppNeeded=0;
-handles.OpenCossanData.InstallationFileNameOpenCossan='OpenCossan.zip';
-handles.OpenCossanData.InstallationFileNameExamples='OpenCossanExamples.zip';
-handles.OpenCossanData.InstallationFileNameDocs='OpenCossanDocs.zip';
-handles.OpenCossanData.InstallationFileNameAddOns='OpenCossanAddOns.zip';
-handles.OpenCossanData.InstallationFileNameApp='OpenCossanApp.mlappinstall';
-handles.OpenCossanData.ServerSVNInfoPath='http://cossan.co.uk/svninfo/stable/';
-handles.OpenCossanData.ServerSVNInfoFileOpenCossan='svn_OpenCossan.zip.xml';
-handles.OpenCossanData.ServerSVNInfoFileExamples='svn_OpenCossanExamples.zip.xml';
-handles.OpenCossanData.ServerSVNInfoFileDocs='svn_OpenCossanDocs.zip.xml';
-handles.OpenCossanData.ServerSVNInfoFileAddOns='svn_OpenCossanAddOns.zip.xml';
-handles.OpenCossanData.ServerSVNInfoFileApp='svn_OpenCossanApp.mlappinstall.xml';
-handles.OpenCossanData.URL='https://cossan.co.uk/svn/OpenCossan/branches/Archives/stable/';
-
-%Get revision for the COSSAN APP. I am assuming that when the CossanAPP is
-% used for the first time it is up-to-date 
-
-try
-    Crevision=getRevision(handles.OpenCossanData.ServerSVNInfoFileApp,handles);
-    handles.OpenCossanData.AppInstalledVersion=Crevision;
-    
-    set(handles.textInformation,...
-    'String',...
-    'For the first use of OpenCossan, please define the installation path')
-catch
-     set(handles.textInformation,...
-    'String',...
-    ['Unable to connect with COSSAN server. Download the file ' handles.OpenCossanData.ServerSVNInfoPath handles.OpenCossanData.ServerSVNInfoFileApp])
-end
-
-
-guidata(hObject,handles)
-
-hold=guidata(hObject);
+set(handles.LicensePanel,'visible','on')
+set(handles.AcceptLicense,'enable','off')
+set(handles.NoLicense,'enable','off')
 
 
 function [Srevision]=getRevision(filename,handles)
 % Private function to retrieve the revision number from the server
 
-try 
+try
     Xfile=xmlread([handles.OpenCossanData.ServerSVNInfoPath filename]);
     Xout=Xfile.getDocumentElement;
     Xelement=Xout.getElementsByTagName('entry');
@@ -548,50 +497,84 @@ catch
     Srevision='N/A';
 end
 
-function [Stextupdate]=InstallOpenCossan(handles,LupdateOpenCossan,LupdateExamples,LupdateAddOns)
-% This function is used to install OpenCossan using the Manual Installation
-% button or the Automatic Installation
-
-choice = questdlg('Pressing OK the existing installation of OpenCossan will be overwritten. Do you want to continue?', ...
-    'Installing OpenCossan', ...
-    'Yes sure','No thank you','I am not sure','I am not sure');
-% Handle response
-switch choice
-    case 'Yes sure'
-        
-        Stextupdate='Install/Updating ... Please wait';
-        set(handles.textInformation,'String',Stextupdate)
-        drawnow();
-        extractOpenCossan('SdestinationPath',char(handles.OpenCossanData.InstallationPath),...
-            'Ldocumentation',LupdateOpenCossan,...
-            'lexamples',LupdateExamples,...
-            'laddons',LupdateAddOns,...
-            'Sfolder',char(handles.OpenCossanData.SourcePath));
-        Stextupdate='Installation completed';
-        set(handles.textInformation,'String',Stextupdate)
-        drawnow();
-    case 'No thank you'
-        Stextupdate='Installation cancelled';
-    case 'I am not sure'
-        %warndlg(['Never mind... I will do anyway, but on: ' tempdir]);
-        %uiwait
-        Stextupdate=['Never mind... I will do anyway, but on: ' tempdir];
-        set(handles.textInformation,'String',Stextupdate)
-        drawnow();
-        extractOpenCossan('SdestinationPath',tempdir,...
-            'Ldocumentation',LupdateOpenCossan,...
-            'lexamples',LupdateExamples,...
-            'laddons',LupdateAddOns,...
-            'Sfolder',char(handles.OpenCossanData.SourcePath));
-        Stextupdate='Installation simulated (installed on your tempdir)';
-        set(handles.textInformation,'String',Stextupdate)
-        drawnow();
-end
-
-
-
 % --- Executes during object creation, after setting all properties.
-function textOpenCossan_CreateFcn(hObject, eventdata, handles) %#ok<INUSD>
+function textSourcePath_CreateFcn(hObject, eventdata, handles) %#ok<DEFNU,INUSD>
 % hObject    handle to textOpenCossan (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+% --- Executes during object creation, after setting all properties.
+function textOpenCossan_CreateFcn(hObject, eventdata, handles) %#ok<DEFNU,INUSD>
+% hObject    handle to textOpenCossan (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% --- Executes on button press in LicenseAgreement.
+function LicenseAgreement_Callback(hObject, eventdata, handles)
+% hObject    handle to LicenseAgreement (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+choice = questdlg('OpenCossan License agreement \n The full version of the agreement is available here: http://www.cossan.co.uk/software/license.txt', ...
+    'License Agreement ', ...
+    'Yes','No','Yes');
+% Handle response
+switch choice
+    case 'Yes'
+        disp([choice ' Thank you'])
+        handles.OpenCossanData.LicenseAgreement= 1;
+    case 'No'
+        disp([choice ' If you proceed with the installation you implicitly accepting the license agreement'])
+        handles.OpenCossanData.LicenseAgreement= 0;
+end
+
+guidata(hObject,handles)
+
+
+% --- Executes on button press in AcceptLicense.
+function AcceptLicense_Callback(hObject, eventdata, handles)
+% hObject    handle to AcceptLicense (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.OpenCossanData.LicenseAgreement= 1;
+set(handles.LicensePanel,'visible','off')
+
+guidata(hObject,handles)
+
+% --- Executes on button press in NoLicense.
+function NoLicense_Callback(hObject, eventdata, handles)
+% hObject    handle to NoLicense (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+delete(gcf);
+
+% --- Executes on button press in WebLicense.
+function WebLicense_Callback(hObject, eventdata, handles)
+% hObject    handle to WebLicense (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+url = 'license.html';
+web(url)
+
+set(handles.NoLicense,'enable','on')
+set(handles.AcceptLicense,'enable','on')
+
+% --- Executes during object creation, after setting all properties.
+function LicensePanel_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to LicensePanel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% --- Executes when LicensePanel is resized.
+function LicensePanel_SizeChangedFcn(hObject, eventdata, handles)
+% hObject    handle to LicensePanel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in Install.
+function update_Callback(hObject, eventdata, handles)
+% hObject    handle to Install (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
