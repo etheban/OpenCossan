@@ -78,22 +78,22 @@ else
     %CHOSE THE COMPONENTS
     compIdx=randsample(Ncomp, Nsamples,true,Xobj.Vweights/sum(Xobj.Vweights));
     %PREALLOCATE OUTPUT VECTOR
-    Y=zeros(Nsamples,Ndim, superiorfloat(Xobj.MdataSet,Xobj.Mcorrelation));
+    Y=zeros(Nsamples,Ndim, superiorfloat(Xobj.MdataSet,Xobj.Mcovariance));
     if ndims(Xobj.Mcorrelation)== 3
         for i=1:Ncomp
             mbrs = find (compIdz == i);
-            [Y(mbrs,:), rho]= rmvnrnd (Xobj.MdataSet(i,:),Xobj.Mcorrelation(:,:,i),length(mbrs),Xobj.Mcoeff,Xobj.Vconstraints,Xobj.RhoThr);
+            [Y(mbrs,:), rho]= rmvnrnd (Xobj.MdataSet(i,:),Xobj.Mcovariance(:,:,i),length(mbrs),Xobj.Mcoeff,Xobj.Vconstraints,Xobj.RhoThr);
         end
     else % common covariance
         mbrs = find(compIdx == 1);
         Xobj.RhoThr=-1;
         debug=[];
-        [Y(mbrs,:),rho] = rmvnrnd(Xobj.MdataSet(1,:),Xobj.Mcorrelation,length(mbrs),Xobj.Mcoeff,Xobj.Vconstraints,Xobj.RhoThr);
+        [Y(mbrs,:),rho] = rmvnrnd(Xobj.MdataSet(1,:),Xobj.Mcovariance,length(mbrs),Xobj.Mcoeff,Xobj.Vconstraints,Xobj.RhoThr);
         
         for i = 2:Ncomp
             mbrs = find(compIdx == i);
             
-            Y(mbrs,:) = rmvnrnd(Xobj.MdataSet(i,:),Xobj.Mcorrelation,length(mbrs),Xobj.Mcoeff,Xobj.Vconstraints,Xobj.RhoThr);
+            Y(mbrs,:) = rmvnrnd(Xobj.MdataSet(i,:),Xobj.Mcovariance,length(mbrs),Xobj.Mcoeff,Xobj.Vconstraints,Xobj.RhoThr);
         end
     end
     MphysicalSpace=Y;
