@@ -67,9 +67,11 @@ end
 figHandle=figure('Visible',Svisible);
 varargout{1}=figHandle;
 
+Xdstemp = Xobj.Xconstrains(1);
+
 hold on;
 VXdata=Xobj.Xconstrains.Mcoord;
-MYdata=zeros(length(Xobj.Xconstrains(1).Mcoord),length(Xobj.Xconstrains));
+MYdata=zeros(length(Xdstemp.Mcoord),length(Xobj.Xconstrains));
 
 if size(Xobj.Xconstrains(1).Vdata,1)==1
     
@@ -100,8 +102,8 @@ set(gca(figHandle),'Box','on','FontSize',NfontSize)
 title(gca(figHandle),Stitle);
 
 
-xlabel(gca(figHandle),Xobj.Xconstrains(1).SindexUnit)
-ylabel(gca(figHandle),Xobj.Xconstrains(1).SindexName)
+xlabel(gca(figHandle),Xdstemp.SindexUnit)
+ylabel(gca(figHandle),Xdstemp.SindexName)
 
 % Export Figure
 

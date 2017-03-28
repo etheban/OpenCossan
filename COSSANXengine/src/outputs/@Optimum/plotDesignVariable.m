@@ -72,6 +72,8 @@ assert(all(ismember(Cnames,Xobj.CdesignVariableNames)),...
 figHandle=figure('Visible',Svisible);
 varargout{1}=figHandle;
 
+Xdstemp = Xobj.XdesignVariable(1);
+
 hold on;
 VXdata=Xobj.XdesignVariable.Mcoord;
 
@@ -82,7 +84,7 @@ for n=1:length(VnamesIndex)
     MYdata(:,n)=Xobj.XdesignVariable(VnamesIndex(n)).Vdata;
 end
 
-if Xobj.XdesignVariable(1).Nsamples==1
+if Xdstemp.Nsamples==1
     % if it is a classic opt. algorithm
     plot (VXdata,MYdata);
 else
@@ -96,9 +98,9 @@ set(gca(figHandle),'Box','on','FontSize',NfontSize)
 title(gca(figHandle),Stitle);
 
 
-xlabel(gca(figHandle),Xobj.XdesignVariable(1).SindexUnit)
+xlabel(gca(figHandle),Xdstemp.SindexUnit)
 if length(Xobj.XdesignVariable)==1
-    ylabel(gca(figHandle),Xobj.XdesignVariable(1).SindexName)
+    ylabel(gca(figHandle),Xdstemp.SindexName)
 else
     ylabel(gca(figHandle),'Design Variables')
 end
