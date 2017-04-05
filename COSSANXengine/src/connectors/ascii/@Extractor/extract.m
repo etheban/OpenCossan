@@ -1,11 +1,10 @@
-function [Tout,LsuccessfullExtract] = extract(Xe,varargin)
-%EXTRACTOR  extract values form the 3-rd party ASCII output file and create
-%                       a structure Tout
+function [Tout,LsuccessfullExtract] = extract(Xobj,varargin)
+%EXTRACTOR  extract values form a ASCII file and create a structure Tout
 %
 % See Also: http://cossan.co.uk/wiki/index.php/extract@Connector
 %
-% $Copyright~1993-2014,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
-% $Author: Matteo Broggi and Edoardo Patelli $
+% $Copyright~2006-2017,~COSSAN~Working~Group$
+% $Author: Matteo Broggi and Edoardo Patelli$
 
 %
 % =====================================================================
@@ -46,7 +45,7 @@ LsuccessfullExtract = true;
 % extract the property Xresponse from the extractor (performance is greatly
 % improved by using this vector of responses instead of accessing the
 % property of the extractor)
-Xresponse = Xe.Xresponse;
+Xresponse = Xobj.Xresponse;
 % if no responses are defined in the extractor, throws a warning and
 % returns an empty output structure
 if isempty(Xresponse)
@@ -58,14 +57,14 @@ end
 
 %% 3. Access to the output file
 
-[Nfid,Serror] = fopen(fullfile(Xe.Sworkingdirectory,Xe.Srelativepath,Xe.Sfile),'r'); % open ASCII file
-OpenCossan.cossanDisp(['[COSSAN-X.Extractor.extract] Open file : ' fullfile(Xe.Sworkingdirectory,Xe.Srelativepath,Xe.Sfile)],4 )
+[Nfid,Serror] = fopen(fullfile(Xobj.Sworkingdirectory,Xobj.Srelativepath,Xobj.Sfile),'r'); % open ASCII file
+OpenCossan.cossanDisp(['[COSSAN-X.Extractor.extract] Open file : ' fullfile(Xobj.Sworkingdirectory,Xobj.Srelativepath,Xobj.Sfile)],4 )
 
 % Return NaN value if an error occurs in the extractor
 if ~isempty(Serror)
     warning('openCOSSAN:Extractor:extract',...
-        strrep(['The results file ' fullfile(Xe.Sworkingdirectory,Xe.Srelativepath,Xe.Sfile) ' of simulation #' num2str(Nsimulation) ' does not exist'],'\','\\'))
-    for iresponse=1:Xe.Nresponse
+        strrep(['The results file ' fullfile(Xobj.Sworkingdirectory,Xobj.Srelativepath,Xobj.Sfile) ' of simulation #' num2str(Nsimulation) ' does not exist'],'\','\\'))
+    for iresponse=1:Xobj.Nresponse
         if Xresponse(iresponse).Nrows ==1 || Xresponse(iresponse).Ndata ==1
             Tout.(Xresponse(iresponse).Sname)=NaN;
         else
@@ -81,7 +80,7 @@ end
 
 %% Extract the values from file
 
-for iresponse=1:Xe.Nresponse
+for iresponse=1:Xobj.Nresponse
     
     % already_reset is a flag that check whether the end of file have been
     % already reached while looking for the iresponse-th response
@@ -91,7 +90,7 @@ for iresponse=1:Xe.Nresponse
         while 1
             tline = fgetl(Nfid);
             %positioncurrent = ftell(Nfid);
-            if ~ischar(tline),
+            if ~ischar(tline)
                 if already_reset
                     warning('openCOSSAN:Extractor:extract','End of file reached');
                     break
@@ -106,7 +105,7 @@ for iresponse=1:Xe.Nresponse
                 end
             end
             Nfound=regexp(tline, Xresponse(iresponse).Sregexpression,'end');
-            if ~isempty(Nfound),
+            if ~isempty(Nfound)
                 break,
             end
         end
@@ -117,7 +116,7 @@ for iresponse=1:Xe.Nresponse
             Nfound=[];
             while isempty(Nfound)
                 tline = fgetl(Nfid);
-                if ~ischar(tline),
+                if ~ischar(tline)
                     if already_reset
                         warning('openCOSSAN:Extractor:extract','End of file reached');
                         break
@@ -192,10 +191,14 @@ for iresponse=1:Xe.Nresponse
     iresp = 1;
     while countdown > 0
         Mextracted=sscanf(tline, Sformat);
+        if isinf(countdown) && logical(isempty(Mextracted))
+            break
+        else
         assert(logical(~isempty(Mextracted)),...
             'openCOSSAN:Extractor:extract',...
             'Extracted empty string\nLine: "%s"\nFormat: "%s"',...
             tline,Sformat)
+        end
         
         Moutput(iresp,:) = Mextracted; %#ok<AGROW>
         iresp = iresp + 1;
