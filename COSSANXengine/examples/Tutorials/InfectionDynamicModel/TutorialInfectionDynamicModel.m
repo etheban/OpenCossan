@@ -3,7 +3,7 @@
 % This example shows how to perform the global sensitivity analysis of a
 % mathematical model representing an infective process at its early state, where
 % we assume that the infection is propagated through some kind of contact
-% between individuals who do not take any precaution to avoid contgion.   
+% between individuals who do not take any precaution to avoid contagion.   
 %
 % The equatios describe the dynamics of I and S, repesenting the model of the
 % infection process are: 

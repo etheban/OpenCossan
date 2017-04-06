@@ -105,16 +105,17 @@ f1=Xout.plotLines;
 %% Close figure
 close(f1);
 
-% % Line Sampling with adaptive method (under development)
-% XLS=LineSampling('XlocalSensitivityMeasures',XlocalSensitivity,'Nlines',20,'Ladaptive',true);
-% XfailireProbLS2=XLS.computeFailureProbability(XprobModelBeamMatlab);
-% display(XfailireProbLS2);
+% Line Sampling with adaptive method
+OpenCossan.resetRandomNumberGenerator(1241243);
+XALS=AdaptiveLineSampling('Nlines',20);
+XfailireProbLS2=XALS.computeFailureProbability(XprobModelBeamMatlab);
+display(XfailireProbLS2);
 
-% % Validate Solution
-% assert(abs(XfailireProbLS2.pfhat-5.992e-02)<1e-4,...
-%     'CossanX:Tutorials:CantileverBeam',...
-%     'Estimated failure probability (%e) does not match the reference Solution (%e)',...
-%     XfailireProbLS2.pfhat,5.992e-02)
+% Validate Solution
+assert(abs(XfailireProbLS2.pfhat-5.992e-02)<1e-4,...
+    'CossanX:Tutorials:CantileverBeam',...
+    'Estimated failure probability (%e) does not match the reference Solution (%e)',...
+    XfailireProbLS2.pfhat,5.992e-02)
 
 %% Optimization
 % This tutorial continues with the optimization section
