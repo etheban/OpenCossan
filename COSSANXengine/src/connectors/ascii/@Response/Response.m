@@ -15,7 +15,7 @@ classdef Response
         Nrownum= 1             % Row position in the ASCII file of the variables (length(Vcolnum)=Nresponse)
         Nrepeat= 1             % Repeat the extraction of the value Nrepeat times
         LoutputInColumns = true
-        VcoordIndex = []
+        VcoordIndex = []       % Identify which column (if LoutputInColumns is true) is used to identify the Mcoord in Dataseries
         CSindexName = {}
     end
     
@@ -54,6 +54,7 @@ classdef Response
             if nargin==0
                 return
             end
+            SfieldformatInput=[];
             
             %% Setting property values
             for k = 1:2:length(varargin)
@@ -61,9 +62,13 @@ classdef Response
                     case 'sname'
                         Xobj.Sname=varargin{k+1};
                     case {'sfieldformat','sformat'}
-                        Xobj.Sfieldformat=varargin{k+1};
+                        SfieldformatInput=varargin{k+1};
                     case 'clookoutfor'
-                        Xobj.Clookoutfor=varargin{k+1};
+                        if strcmp(varargin{k+1},'')
+                            Xobj.Clookoutfor={};
+                        else
+                            Xobj.Clookoutfor=varargin{k+1};
+                        end
                     case 'svarname'
                         Xobj.Svarname=varargin{k+1};
                     case 'sregexpression'
@@ -78,6 +83,8 @@ classdef Response
                         Xobj.LoutputInColumns=varargin{k+1};
                     case 'vcoordindex'
                         Xobj.VcoordIndex=varargin{k+1};
+                    case 'csindexname'
+                        Xobj.CSindexName=varargin{k+1};
                     otherwise
                         warning('openCOSSAN:Response:Response',['PropertyName ' varargin{k} ' has been ignored'])
                 end
@@ -97,11 +104,22 @@ classdef Response
                 end
                 Xobj.CSindexName = repmat({''},1,Nindex);
             end
-            assert(length(Xobj.CSindexName)==Xobj.Nrows-length(Xobj.VcoordIndex),...
-                'openCOSSAN:Response:Response',...
-                ['The number of elements of CSindexName (' ...
-                num2str(length(Xobj.CSindexName)) ') is not coherent with '...
-                'the dimension of the data to be extracted (' num2str(Xobj.Nrows) ')'])
+            
+%             assert(length(Xobj.CSindexName)==Xobj.Nrows-length(Xobj.VcoordIndex),...
+%                 'openCOSSAN:Response:Response',...
+%                 ['The number of elements of CSindexName (' ...
+%                 num2str(length(Xobj.CSindexName)) ') is not coherent with '...
+%                 'the dimension of the data to be extracted (' num2str(Xobj.Nrows) ')'])
+            
+           % Check Field Format and add termination term and skip term. 
+           % The scanf function skip the Xresponse(iresponse).Ccolnum{1}
+           % characters and than read the real value
+            if Xobj.Ncolnum<=1
+                Xobj.Sfieldformat=[SfieldformatInput '%*'];
+            else
+                Xobj.Sfieldformat=['%*' num2str(Xobj.Ncolnum-1) 'c' SfieldformatInput '%*'];
+            end
+            
         end %end constructor
         
         display(Xobj)
