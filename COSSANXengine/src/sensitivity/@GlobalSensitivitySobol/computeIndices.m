@@ -50,7 +50,6 @@ OpenCossan.cossanDisp('Creating Samples object',4)
 XA=Xobj.Xsimulator.sample('Xinput',Xobj.Xinput);
 XB=Xobj.Xsimulator.sample('Xinput',Xobj.Xinput);
 
-
 % Evaluate the model
 OpenCossan.cossanDisp('Evaluating the model ' ,4)
 ibatch = 1;
@@ -70,6 +69,16 @@ end
 
 % Expectation values of the output variables
 OpenCossan.cossanDisp('Extract quantity of interest from SimulationData ' ,4)
+
+
+% Check if the model contains Dataseries 
+Vindex=strcmp(XoutA.CnamesDataseries,Xobj.Coutputnames);
+if sum(Vindex)>0
+    warning('It is not possible to compute the Sensitivity Analysis with respect a variable that is a DataSeries')
+    fprintf('****** Removing vairables %s from the requested outputs ******\n',Xobj.Coutputnames{Vindex})
+    Xobj.Coutputnames=Xobj.Coutputnames(~Vindex);
+    Noutput=length(Xobj.Coutputnames);    
+end
 
 MoutA=XoutA.getValues('Cnames',Xobj.Coutputnames);
 MoutB=XoutB.getValues('Cnames',Xobj.Coutputnames);
@@ -115,6 +124,8 @@ for irv=1:Ninput
             'Nid',getNextPrimaryID(OpenCossan.getDatabaseDriver,'Simulation'),...
             'XsimulationData',XoutC,'Nbatchnumber',ibatch)  
     end
+    
+    
     MoutC=XoutC.getValues('Cnames',Xobj.Coutputnames);
     
     %estimate V(E(Y|X_i))
