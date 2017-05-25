@@ -10,7 +10,7 @@
 % See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/Infection_Dynamic_Model
 % 
 %
-% $Copyright~1993-2014,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
+% $Copyright~1993-2017,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
 % $Author: Edoardo-Patelli$ 
 
 
@@ -125,3 +125,61 @@ Xsm = XgsS.computeIndices;
 
 % Show the results
 display(Xsm)
+
+
+%% Multiple outputs
+% In this example shows how to perform sensitivity analysis of selected inputs and outputs
+X1   = RandomVariable('Sdistribution','normal','mean',1,'std',3);
+X2   = RandomVariable('Sdistribution','normal','mean',2,'std',2);
+Xrvset = RandomVariableSet('Cmembers',{'X1','X2'},'CXrandomvariables',{X1,X2});
+Xin    = Input('XrandomVariableSet',Xrvset);
+
+% The model is defined using a Mio object
+Xm = Mio('Sscript','Moutput(:,1)=Minput(:,1).*Minput(:,2);Moutput(:,2)=2*Minput(:,1);', ...
+         'Coutputnames',{'Y1' 'Y2'},...
+         'Cinputnames',{'X1' 'X2'},...
+         'Liostructure',false,...
+	     'Lfunction',false,'Liomatrix',true); 
+     
+Xev    = Evaluator('Xmio',Xm);
+Xmdl   = Model('Xinput',Xin,'Xevaluator',Xev);
+
+XgsS = GlobalSensitivitySobol('Xmodel',Xmdl,'Xsimulation',Xmc,'Coutputnames',{'Y1'},'Cinputnames',{'X1'});
+Xsm = XgsS.computeIndices;
+
+% Show the results
+display(Xsm)
+
+
+%% Multiple outputs with Dataseries
+StutorialPath = fileparts(which('TutorialSensitivity.m'));
+
+RV1   = RandomVariable('Sdistribution','normal','mean',1,'std',3);
+RV2   = RandomVariable('Sdistribution','normal','mean',2,'std',2);
+Xrvset = RandomVariableSet('Cmembers',{'RV1','RV2'},'CXrandomvariables',{RV1,RV2});
+Xin    = Input('XrandomVariableSet',Xrvset);
+
+% The model is defined using a Mio object
+Xm  = Mio('Sdescription', 'TestFunction', ...
+                'Spath',fullfile(StutorialPath,'Files4Mio'), ...
+                'Sfile','ExampleMioStructureDataseries', ...
+                'Coutputnames',{'Xds1' 'Out2'},... % This field is mandatory
+                'Cinputnames',{'RV1' 'RV2'},...    % This field is mandatory
+                'Liostructure',true,...     % This flag specify the type of I/O
+                'Liomatrix',false, ...  % This flag specify the type of I/O
+				'Lfunction',false); % This flag specify if the .m file is a script or a function. 
+     
+Xev    = Evaluator('Xmio',Xm);
+Xmdl   = Model('Xinput',Xin,'Xevaluator',Xev);
+Xout=Xmdl.deterministicAnalysis
+
+Xmc=MonteCarlo('Nsamples',1000);
+XgsS = GlobalSensitivitySobol('Xmodel',Xmdl,'Xsimulation',Xmc);
+% A warning message is returned because it is not possible to compute the
+% sensitivity analysis of model returning Dataseries
+Xsm = XgsS.computeIndices;
+
+% However it is still possible to perform sensitivity analysis on
+% Input/Output that are not Dataseries.
+XgsS = GlobalSensitivitySobol('Xmodel',Xmdl,'Xsimulation',Xmc,'Coutputnames',{'Out2'});
+Xsm = XgsS.computeIndices;
