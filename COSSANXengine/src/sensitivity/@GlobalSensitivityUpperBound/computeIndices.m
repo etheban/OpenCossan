@@ -1,6 +1,11 @@
-function varargout=computeIndices(Xobj)
-%COMPUTEINDICES This method does the Local Sensitivity analysis, and
-%computes the local sensitivity indices
+function varargout=computeIndices(Xobj,varargin)
+%COMPUTEINDICES This method computes the upper bound of the Total indices 
+% based on 
+% Patelli, E.; Pradlwarter, H. J. & Schuëller, G. I. Global
+% Sensitivity of Structural Variability by Random Sampling Computer Physics
+% Communications, 2010, 181, 2072-2081  
+%
+% DOI: 10.1016/j.cpc.2010.08.007
 %
 % $Copyright~1993-2012,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
 % $Author: Edoardo-Patelli$
@@ -21,6 +26,22 @@ function varargout=computeIndices(Xobj)
 %  You should have received a copy of the GNU General Public License
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
 % =====================================================================
+
+%% Check inputs
+OpenCossan.validateCossanInputs(varargin{:})
+
+%% Process inputs
+for k=1:2:length(varargin)
+    switch lower(varargin{k})
+        case {'xtarget','xmodel'}
+            Xobj=Xobj.addModel(varargin{k+1}(1));
+        case {'cxtarget','cxmodel'}
+            Xobj=Xobj.addModel(varargin{k+1}{1});
+        otherwise
+            error('openCOSSAN:GlobalSensitivitySobol:computeIndices',...
+                'The PropertyName %s is not allowed',varargin{k});
+    end
+end
 
 % Set the analysis name when not deployed
 if ~isdeployed
@@ -164,14 +185,14 @@ for iout=1:length(Xobj.Coutputnames)
                 'VupperBounds',VupperBounds, ...
                 'VupperBoundsCoV',VupperBoundsCoV, ...
                 'MupperBoundsCI',MupperBoundsCI, ...
-                'Sestimationmethod','Sensitivity.upperBounds');  %#ok<AGROW>
+                'Sestimationmethod','GlobalSensitivityUpperBound');  %#ok<AGROW>
         else
             %% Construct SensitivityMeasure object
             Xsm(iout)=SensitivityMeasures('Cinputnames',Xobj.Cinputnames, ...
                 'Soutputname',  Xobj.Coutputnames{iout},'Xevaluatedobject',Xobj.Xtarget, ...
                 'Sevaluatedobjectname',Xobj.Sevaluatedobjectname, ...
                 'VupperBounds',VupperBounds, ...
-                'Sestimationmethod','Sensitivity.upperBounds');  %#ok<AGROW>
+                'Sestimationmethod','GlobalSensitivityUpperBound');  %#ok<AGROW>
         end
     end    
     

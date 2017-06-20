@@ -1,12 +1,12 @@
-function varargout=computeIndices(Xobj)
+function varargout=computeIndices(Xobj,varargin)
 %COMPUTEINDICES This method computes the indices of for Global Sensitivity
 %analysis based on Random Balance Design methods
 %
 % See Also:
-% http://cossan.cfd.liv.ac.uk/wiki/index.php/computeIndices@GlobalSensitivityRandomBalanceDesign
+% https://cossan.co.uk/wiki/index.php/computeIndices@GlobalSensitivityRandomBalanceDesign
 % 
 %
-% $Copyright~1993-2012,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
+% $Copyright~1993-2017,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
 % $Author: Edoardo-Patelli$
 
 % =====================================================================
@@ -25,6 +25,22 @@ function varargout=computeIndices(Xobj)
 %  You should have received a copy of the GNU General Public License
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
 % =====================================================================
+
+%% Check inputs
+OpenCossan.validateCossanInputs(varargin{:})
+
+%% Process inputs
+for k=1:2:length(varargin)
+    switch lower(varargin{k})
+        case {'xtarget','xmodel'}
+            Xobj=Xobj.addModel(varargin{k+1}(1));
+        case {'cxtarget','cxmodel'}
+            Xobj=Xobj.addModel(varargin{k+1}{1});
+        otherwise
+            error('openCOSSAN:GlobalSensitivityRandomBalanceDesign:computeIndices',...
+                'The PropertyName %s is not allowed',varargin{k});
+    end
+end
 
 % Set the analysis name when not deployed
 if ~isdeployed

@@ -103,15 +103,12 @@ classdef LocalSensitivityFiniteDifference < Sensitivity
     end
     
     methods (Access=public)
-        display(Xobj)                   % Show summary of Sensitivity object
-        varargout=computeIndices(Xobj)  % Perform Local Sensitivity (Returning local measure)
         varargout=computeGradient(Xobj) % Perform Local Sensitivity (returning gradient)
         varargout=computeGradientStandardNormalSpace(Xobj) % Perform Local Sensitivity (returning gradient)
     end
     
     methods (Access=protected)
         varargout=doFiniteDifferences(Xobj)    % Core function for FD methods
-        Xobj=validateSettings(Xobj)      % Performe some initial settings
     end
 end
 

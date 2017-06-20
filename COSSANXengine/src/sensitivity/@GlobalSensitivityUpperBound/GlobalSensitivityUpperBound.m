@@ -86,28 +86,7 @@ classdef GlobalSensitivityUpperBound < Sensitivity
                     case {'cxtarget','cxmodel'}
                         Xmodel=varargin{k+1}{1};
                     case {'nbootstrap'}
-                        Xobj.Nbootstrap=varargin{k+1};
-                    case {'xsimulation'}
-                        if isa(varargin{k+1},'MonteCarlo') || ...
-                                isa(varargin{k+1},'SobolSampling') || ...
-                                isa(varargin{k+1},'HaltonSampling') || ...
-                                isa(varargin{k+1},'LatinHypercubeSampling')
-                            Xobj.Xsimulator=varargin{k+1};
-                        else
-                            error('openCOSSAN:GlobalSensitivityUpperBound',...
-                                'Object of class %s  can not be used',class(varargin{k+1}));
-                        end
-                    case {'cxsimulation'}
-                        if isa(varargin{k+1}{1},'MonteCarlo') || ...
-                                isa(varargin{k+1}{1},'SobolSampling') || ...
-                                isa(varargin{k+1}{1},'HaltonSampling') || ...
-                                isa(varargin{k+1}{1},'LatinHypercubeSampling')
-                            Xobj.Xsimulator=varargin{k+1}{1};
-                        else
-                            error('openCOSSAN:GlobalSensitivityUpperBound',...
-                                ['Object of class ' class(varargin{k+1}{1}) ' can not be used']);
-                        end
-                        
+                        Xobj.Nbootstrap=varargin{k+1};                        
                     case {'sevaluatedobjectname'}
                         Xobj.Sevaluatedobjectname=varargin{k+1};
                     case {'nsamples'}
@@ -133,13 +112,5 @@ classdef GlobalSensitivityUpperBound < Sensitivity
         end % end of constructor
     end
     
-    methods (Access=public)
-        display(Xobj)                   % Show summary of Sensitivity object
-        varargout=computeIndices(Xobj)  % Perform Local Sensitivity (Returning local measure)
-    end
-    
-    methods (Access=protected)
-        Xobj=validateSettings(Xobj)      % Performe some initial settings
-    end
 end
 

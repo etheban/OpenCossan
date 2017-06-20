@@ -103,15 +103,8 @@ classdef GlobalSensitivityRandomBalanceDesign < Sensitivity
         end % end of constructor
     end
     
-    methods (Access=public)
-        display(Xobj)                   % Show summary of Sensitivity object
-        varargout=computeIndices(Xobj)  % Perform Local Sensitivity (Returning local measure)
-        varargout=computeGradient(Xobj) % Perform Local Sensitivity (returning gradient)
-    end
-    
     methods (Access=protected)
         varargout=doMonteCarlo(Xobj)    % Core function for MC methods
-        Xobj=validateSettings(Xobj)      % Performe some initial settings
     end
 end
 

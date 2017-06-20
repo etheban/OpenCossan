@@ -126,15 +126,14 @@ classdef LocalSensitivityMonteCarlo < Sensitivity
         end % end of constructor
     end
     
-    methods (Access=public)
-        display(Xobj)                   % Show summary of Sensitivity object
-        varargout=computeIndices(Xobj)  % Perform Local Sensitivity (Returning local measure)
-        varargout=computeGradient(Xobj) % Perform Local Sensitivity (returning gradient)        
+    methods                 
+        varargout=computeGradient(Xobj,varargin) % Perform Local Sensitivity (returning gradient)        
+        varargout=computeGradientStandardNormalSpace(Xobj,varargin) % Compute the Local Sensitivity in the standard normal space (returning gradient)    
     end
     
     methods (Access=protected)
-        varargout=doMonteCarlo(Xobj)    % Core function for MC methods
-        Xobj=validateSettings(Xobj)      % Performe some initial settings
+        varargout=doMonteCarlo(Xobj)    % Core function for MC sensitivity methods
     end
+    
 end
 

@@ -40,59 +40,16 @@ classdef Sensitivity
         fx0
     end    
        
-    methods (Access=public)
+    methods (Abstract)
         display(Xobj)                   % Show summary of Sensitivity object
-        varargout=apply(Xobj,Xtarget)   % Perform Sensitivity on the Target object
-        varargout=evaluate(Xobj)        % Perform Sensitivity
+        varargout=computeIndices(Xobj,varargin)  % Perform Sensitivity on the Target object
+        Xobj=validateSettings(Xobj)     % Perform Sensitivity
     end
     
     methods (Access=protected)
         Xobj=addModel(Xobj,Xtarget) 
-        Xobj=validateSettings(Xobj)
         setAnalysisName(Xobj)
     end
-    
-    methods (Static) % Define static methods An instance of the sensitivity
-        % object is not required
-        
-        varargout=gradientFiniteDifferences(varargin) % Compute the gradient
-        % using a Finite
-        % Difference Method,
-        
-        varargout=gradientMonteCarlo(varargin)   % Compute the gradient
-        % using Monte Carlo method
-        
-        varargout=localFiniteDifferences(varargin) % Compute the LocalSensitivityMeasures
-        % using a Finite Difference Method,
-        
-        varargout=localMonteCarlo(varargin) % Compute the LocalSensitivityMeasures
-        % using Monte Carlo method
-        
-        %Xobj=fast(varargin) % compute the Fourier amplitude sensitivity test
-        
-        Xobj=randomBalanceDesign(varargin) % compute the first order
-        % sensitivity analysis using the
-        % Fourier Amplitude Sensitivity
-        % Test (Tarantola et al. 2006)
-        
-        Xobj=sobolIndices(varargin) % compute the Sobol' sensitivity indices via
-        % Monte Carlo simulation
-        
-        Xobj=upperBounds(varargin) % compute the upper bounds of the total
-        % sensitivity indicies based on MCMC and
-        % gradiend MC (Patelli et all. 2010)
-        
-        % Xobj=localAnalysis(varargin) % compute local sensitivity analysis
-        
-        % Xobj=globalAnalysis(varargin) % compute global sensitivity analysis
-        
-        % TO BE REMOVED!!! - ONly for GUI compatibility
-        [Xout, varargout]=coreFiniteDifferences(varargin)
-        [Xout, varargout]=coreMonteCarlo(varargin)
-        [Xinput,perturbation,Coutputname]=checkModel(Xtarget,perturbation,LperformanceFunction,Coutputname)
-        
-    end
-    
     
 end
 

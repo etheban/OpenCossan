@@ -1,9 +1,9 @@
 classdef GlobalSensitivitySobol < Sensitivity
-    %GLOBALSENSITIVITYSOBOL Sensitivity Toolbox for
-    %OpenCossan
+    %GLOBALSENSITIVITYSOBOL Global Sensitivity based on Sobol' indices 
     
-    % This is a class for calculation gradient and local sensitivity
-    % indices adopting Monte Carlo simulation
+    % This is a class for global sensitivity analysis based of Sobol'
+    % indices  
+    %
     % See also:
     % https://cossan.co.uk/wiki/index.php/@GlobalSensitivitySobol
     %
@@ -32,13 +32,14 @@ classdef GlobalSensitivitySobol < Sensitivity
     properties (SetAccess=public,GetAccess=public)
         Nbootstrap=100;
         Xsimulator
+        Smethod='Saltelli2008'
     end
     
     methods
         function Xobj=GlobalSensitivitySobol(varargin)
             %GlobalSensitivitySobol
-            % This is a class for calculation gradient and local sensitivity
-            % indices adopting Monte Carlo simulation
+    % This is the constructor for the GlobalSensitivitySobol object. 
+    %
             % See also: https://cossan.co.uk/wiki/index.php/@GlobalSensitivitySobol
             %
             % Author: Edoardo Patelli
@@ -121,14 +122,7 @@ classdef GlobalSensitivitySobol < Sensitivity
             
         end % end of constructor
     end
+   
     
-    methods (Access=public)
-        display(Xobj)                   % Show summary of Sensitivity object
-        varargout=computeIndices(Xobj)  % Perform Local Sensitivity (Returning local measure)
-    end
-    
-    methods (Access=protected)
-        Xobj=validateSettings(Xobj)      % Performe some initial settings
-    end
 end
 

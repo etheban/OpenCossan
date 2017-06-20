@@ -1,4 +1,4 @@
-function varargout=computeIndices(Xobj)
+function varargout=computeIndices(Xobj,varargin)
 %COMPUTEINDICES This method does the Local Sensitivity analysis, and
 %computes the local sensitivity indices
 %
@@ -21,12 +21,27 @@ function varargout=computeIndices(Xobj)
 %  You should have received a copy of the GNU General Public License
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
 % =====================================================================
+%% Check inputs
+OpenCossan.validateCossanInputs(varargin{:})
+
+%% Process inputs
+for k=1:2:length(varargin)
+    switch lower(varargin{k})
+        case {'xtarget','xmodel'}
+            Xobj=Xobj.addModel(varargin{k+1}(1));
+        case {'cxtarget','cxmodel'}
+            Xobj=Xobj.addModel(varargin{k+1}{1});
+        otherwise
+            error('openCOSSAN:GlobalSensitivitySobol:computeIndices',...
+                'The PropertyName %s is not allowed',varargin{k});
+    end
+end
 
 % Set the analysis name when not deployed
 if ~isdeployed
     OpenCossan.setAnalysisName(class(Xobj));
 end
-% set the analyis ID 
+% set the analyis ID
 OpenCossan.setAnalysisID;
 % insert entry in Analysis DB
 if ~isempty(OpenCossan.getDatabaseDriver)
@@ -57,27 +72,27 @@ XoutA=Xobj.Xtarget.apply(XA); % y_A=f(A)
 if ~isempty(OpenCossan.getDatabaseDriver)
     insertRecord(OpenCossan.getDatabaseDriver,'StableType','Simulation', ...
         'Nid',getNextPrimaryID(OpenCossan.getDatabaseDriver,'Simulation'),...
-        'XsimulationData',XoutA,'Nbatchnumber',ibatch)  
+        'XsimulationData',XoutA,'Nbatchnumber',ibatch)
 end
 ibatch = ibatch+1;
 XoutB=Xobj.Xtarget.apply(XB); % y_B=f(B)
 if ~isempty(OpenCossan.getDatabaseDriver)
     insertRecord(OpenCossan.getDatabaseDriver,'StableType','Simulation', ...
         'Nid',getNextPrimaryID(OpenCossan.getDatabaseDriver,'Simulation'),...
-        'XsimulationData',XoutB,'Nbatchnumber',ibatch) 
-end     
+        'XsimulationData',XoutB,'Nbatchnumber',ibatch)
+end
 
 % Expectation values of the output variables
 OpenCossan.cossanDisp('Extract quantity of interest from SimulationData ' ,4)
 
 
-% Check if the model contains Dataseries 
+% Check if the model contains Dataseries
 Vindex=strcmp(XoutA.CnamesDataseries,Xobj.Coutputnames);
 if sum(Vindex)>0
     warning('It is not possible to compute the Sensitivity Analysis with respect a variable that is a DataSeries')
     fprintf('****** Removing vairables %s from the requested outputs ******\n',Xobj.Coutputnames{Vindex})
     Xobj.Coutputnames=Xobj.Coutputnames(~Vindex);
-    Noutput=length(Xobj.Coutputnames);    
+    Noutput=length(Xobj.Coutputnames);
 end
 
 MoutA=XoutA.getValues('Cnames',Xobj.Coutputnames);
@@ -122,7 +137,7 @@ for irv=1:Ninput
     if ~isempty(OpenCossan.getDatabaseDriver)
         insertRecord(OpenCossan.getDatabaseDriver,'StableType','Simulation', ...
             'Nid',getNextPrimaryID(OpenCossan.getDatabaseDriver,'Simulation'),...
-            'XsimulationData',XoutC,'Nbatchnumber',ibatch)  
+            'XsimulationData',XoutC,'Nbatchnumber',ibatch)
     end
     
     
@@ -161,7 +176,7 @@ for n=1:Noutput
     if Xobj.Nbootstrap>0
         VfirstOrderCoV=std(squeeze(Dybs(:,:,n))'./repmat(VDbs(:,n),1,Ninput))./abs(MfirstOrder');
         VtotalCoV=std(1-squeeze(Dzbs(:,:,n))'./repmat(VDbs(:,n),1,Ninput))./abs(Mtotal');
-                
+        
         varargout{1}(n)=SensitivityMeasures('Cinputnames',Xobj.Cinputnames, ...
             'Soutputname',  Xobj.Coutputnames{n},'Xevaluatedobject',Xobj.Xtarget, ...
             'Sevaluatedobjectname',Xobj.Sevaluatedobjectname, ...
