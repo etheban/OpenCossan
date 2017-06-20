@@ -42,4 +42,39 @@ display(Xgs)
 Xsm = Xgs.computeIndices;
 display(Xsm)
 
+%% Saltelli Exercise 3 pag 177 
+% In this examples we consider only 2 normal distributed random variables
+X1   = RandomVariable('Sdistribution','normal','mean',1,'std',3);
+X2   = RandomVariable('Sdistribution','normal','mean',2,'std',2);
+Xrvset = RandomVariableSet('Cmembers',{'X1','X2'},'CXrandomvariables',{X1,X2});
+Xin    = Input('XrandomVariableSet',Xrvset);
+display(Xsm)
+% The model is defined using a Mio object
+Xm3 = Mio('Sscript','Moutput=Minput(:,1).*Minput(:,2);', ...
+         'Coutputnames',{'Y'},...
+         'Cinputnames',{'X1' 'X2'},...
+         'Liostructure',false,...
+         'Liomatrix',true,...
+	     'Lfunction',false); 
+     
+Xev3    = Evaluator('Xmio',Xm3);
+Xmdl3   = Model('Xinput',Xin,'Xevaluator',Xev3);
+
+Xgs=GlobalSensitivityUpperBound('Nbootstrap',100,'CinputNames',{'X1','X2'},'Nsamples',5);
+% It is also possible to pass the model directly to the method
+% computeIndices
+Xsm = Xgs.computeIndices('Xmodel',Xmdl3);
+
+% Show the results using the SensitivityMeasure object
+display(Xsm)
+
+Xgs2=GlobalSensitivityUpperBound('Nbootstrap',100,'CinputNames',{'X1','X2'},'Lfinitedifference',true);
+Xsm2 = Xgs.computeIndices('Xmodel',Xmdl3);
+
+% compare with analytical solution
+TotalAnalytical=[18/19;10/19];
+TotalNumerical=Xsm.VupperBounds';
+Tresults = table(TotalAnalytical,TotalNumerical, ...
+    'RowNames',Xgs.Cinputnames)
+
    

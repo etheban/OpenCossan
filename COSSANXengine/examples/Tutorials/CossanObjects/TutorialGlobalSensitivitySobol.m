@@ -1,14 +1,16 @@
 %% Tutorial for the Global Sensitivity analysis using Sobol' indices
-% The tutorial InfectionDynamicModel expains in very details how to use the
-% Sensitivity Toolbox. For this reason the uses is invited to check the
-% tutorial InfectionDynamicModel. 
+% The tutorial expains the basic usage of the object GlobalSensitivitySobol
 %
-% In this tutorial a very simplified model is considered.  
+% Saltelli Exercises 2 and 3 pags 176-177 are used
+%
+% Saltelli, A.; Ratto, M.; Andres, T.; Campolongo, F.; Cariboni, J.;
+% Gatelli, D.; Salsana, M. & Tarantola, S. Global sensitivity analysis -
+% The primer Wiley, 2008  
 % 
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/Infection_Dynamic_Model
+% See Also: https://cossan.co.uk/wiki/index.php/Infection_Dynamic_Model
 % 
 %
-% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Copyright~1993-2017,~COSSAN~Working~Group$
 % $Author: Edoardo-Patelli$ 
 
 
@@ -44,29 +46,65 @@ display(Xgs)
 Xsm = Xgs.computeIndices;
 display(Xsm)
 
+%% Saltelli Exercise 2 pag 176
+% Pure addictive model with no interaction effect
+X1   = RandomVariable('Sdistribution','normal','mean',1,'std',2);
+X2   = RandomVariable('Sdistribution','normal','mean',2,'std',3);
+Xrvset = RandomVariableSet('Cmembers',{'X1','X2'},'CXrandomvariables',{X1,X2});
+Xin    = Input('XrandomVariableSet',Xrvset);
+Xm2 = Mio('Sscript','Moutput=Minput(:,1) + Minput(:,2);', ...
+         'Coutputnames',{'Y'},...
+         'Cinputnames',{'X1' 'X2'},...
+         'Liostructure',false,...
+         'Liomatrix',true,...
+	     'Lfunction',false);  
+ Xev2    = Evaluator('Xmio',Xm);
+Xmdl2   = Model('Xinput',Xin,'Xevaluator',Xev2);
 
-   
+Xmc=MonteCarlo('Nsamples',10000);
+Xgs=GlobalSensitivitySobol('Xmodel',Xmdl2,'Nbootstrap',100,'Xsimulator',Xmc);
+Xsm = Xgs.computeIndices;
+
+% compare with analytical solution
+FirstAnalytical=[4/13;9/13];
+FirstNumerical=Xsm.VsobolFirstIndices';
+TotalAnalytical=[4/13;9/13];
+TotalNumerical=Xsm.VtotalIndices';
+Tresults = table(FirstAnalytical,FirstNumerical,TotalAnalytical,TotalNumerical, ...
+    'RowNames',Xgs.Cinputnames)
+
 %% Saltelli Exercise 3 pag 177 
-% In this examples we consider only 3 uniform random variables
+% In this examples we consider only 2 normal distributed random variables
 X1   = RandomVariable('Sdistribution','normal','mean',1,'std',3);
 X2   = RandomVariable('Sdistribution','normal','mean',2,'std',2);
 Xrvset = RandomVariableSet('Cmembers',{'X1','X2'},'CXrandomvariables',{X1,X2});
 Xin    = Input('XrandomVariableSet',Xrvset);
 display(Xsm)
 % The model is defined using a Mio object
-Xm = Mio('Sscript','Moutput=Minput(:,1).*Minput(:,2);', ...
+Xm3 = Mio('Sscript','Moutput=Minput(:,1).*Minput(:,2);', ...
          'Coutputnames',{'Y'},...
          'Cinputnames',{'X1' 'X2'},...
          'Liostructure',false,...
          'Liomatrix',true,...
 	     'Lfunction',false); 
      
-Xev    = Evaluator('Xmio',Xm);
-Xmdl   = Model('Xinput',Xin,'Xevaluator',Xev);
+Xev3    = Evaluator('Xmio',Xm3);
+Xmdl3   = Model('Xinput',Xin,'Xevaluator',Xev3);
 
-Xmc=MonteCarlo('Nsamples',1000);
-Xgs=GlobalSensitivitySobol('Xmodel',Xmdl,'Nbootstrap',100,'Xsimulator',Xmc);
-Xsm = Xgs.computeIndices;
+Xmc=MonteCarlo('Nsamples',10000);
+Xgs=GlobalSensitivitySobol('Nbootstrap',100,'Xsimulator',Xmc);
+% It is also possible to pass the model directly to the method
+% computeIndices
+Xsm = Xgs.computeIndices('Xmodel',Xmdl3);
 
-% Show the results
+% Show the results using the SensitivityMeasure object
 display(Xsm)
+
+% compare with analytical solution
+FirstAnalytical=[9/19;1/19];
+FirstNumerical=Xsm.VsobolFirstIndices';
+TotalAnalytical=[18/19;10/19];
+TotalNumerical=Xsm.VtotalIndices';
+Tresults = table(FirstAnalytical,FirstNumerical,TotalAnalytical,TotalNumerical, ...
+    'RowNames',Xgs.Cinputnames)
+

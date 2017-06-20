@@ -5,11 +5,12 @@
 %
 % In this tutorial a very simplified model is considered.  
 % 
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/Infection_Dynamic_Model
+% See Also:
+% https://cossan.co.uk/wiki/index.php/computeIndices@GlobalSensitivityRandomBalanceDesign
 % 
 %
-% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
-% $Author: Edoardo-Patelli$ 
+% $Copyright~1993-2017,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
+% $Author: Edoardo-Patelli$
 
 
 %% Problem setup
@@ -43,4 +44,29 @@ Xgs=GlobalSensitivityRandomBalanceDesign('Xmodel',Xmdl,'Nbootstrap',1,'Nsamples'
 display(Xgs)
 Xsm = Xgs.computeIndices;
 display(Xsm)
+
+%% Saltelli Exercise 2 pag 176
+% Pure addictive model with no interaction effect
+X1   = RandomVariable('Sdistribution','normal','mean',1,'std',2);
+X2   = RandomVariable('Sdistribution','normal','mean',2,'std',3);
+Xrvset = RandomVariableSet('Cmembers',{'X1','X2'},'CXrandomvariables',{X1,X2});
+Xin    = Input('XrandomVariableSet',Xrvset);
+Xm2 = Mio('Sscript','Moutput=Minput(:,1) + Minput(:,2);', ...
+         'Coutputnames',{'Y'},...
+         'Cinputnames',{'X1' 'X2'},...
+         'Liostructure',false,...
+         'Liomatrix',true,...
+	     'Lfunction',false);  
+ Xev2    = Evaluator('Xmio',Xm2);
+Xmdl2   = Model('Xinput',Xin,'Xevaluator',Xev2);
+
+Xmc=MonteCarlo('Nsamples',10000);
+Xgs=GlobalSensitivityRandomBalanceDesign('nharmonics',10,'Nsamples',1000,'CinputNames',{'X1' 'X2'});
+Xsm = Xgs.computeIndices('Xmodel',Xmdl2);
+
+% compare with analytical solution
+FirstAnalytical=[4/13;9/13];
+FirstNumerical=Xsm.VsobolFirstIndices';
+Tresults = table(FirstAnalytical,FirstNumerical,...
+    'RowNames',Xgs.Cinputnames)
    

@@ -1,17 +1,13 @@
 %% Tutorial for the Local Sensitivity analysis using Finite Difference approach 
 %
-% The tutorial InfectionDynamicModel expains in very details how to use the
-% Sensitivity Toolbox. For this reason the uses is invited to check the
-% tutorial InfectionDynamicModel. 
-%
 % In this tutorial very simplified models are considered. Nevertheless, it
 % allows to understand how the LocalSensitivity* methods works in
 % OpenCossan. 
 % 
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/Infection_Dynamic_Model
+% See Also: https://cossan.co.uk/wiki/index.php/Infection_Dynamic_Model
 % 
 %
-% $Copyright~1993-2014,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
+% $Copyright~1993-2017,~COSSAN~Working~Group$
 % $Author: Edoardo-Patelli$ 
 
 

@@ -1,14 +1,11 @@
 %% Tutorial for the Sensitivity analysis
-% The tutorial InfectionDynamicModel expains in very details how to use the
-% Sensitivity Toolbox. For this reason the uses is invited to check the
-% tutorial InfectionDynamicModel. 
 %
 % In this tutorial a very simplified model is considered.  
 % 
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/Infection_Dynamic_Model
+% See Also: https://cossan.co.uk/wiki/index.php/Infection_Dynamic_Model
 % 
 %
-% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Copyright~1993-2017,~COSSAN~Working~Group$
 % $Author: Edoardo-Patelli$ 
 
 
@@ -47,7 +44,7 @@ Xgrad = XlsMC.computeGradientStandardNormalSpace;
 display(Xgrad)
 
 
-% Plese notice that the Gradient method based on MonteCarlo simulation produces
+% Please notice that the Gradient method based on MonteCarlo simulation produces
 % an approximate value of the gradient. It should be used only in high space
 % (i.e. number of input > 50) since it allows to reduce significantly the
 % conputational efforts
