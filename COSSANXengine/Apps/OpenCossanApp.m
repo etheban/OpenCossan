@@ -47,6 +47,26 @@ function varargout = OpenCossanApp(varargin)
 
 % Last Modified by GUIDE v2.5 11-Jan-2017 18:27:24
 
+%% Be sure that the minimum requirements of cossan are satisfied
+
+SrequiredMatlabVersion='9.0';
+
+ if verLessThan('matlab', '8.1')    
+    error('OpenCOSSAN:OpenCOSSAN:checkMatlabversion', ...
+                    ['A Matlab version %s or higher is required!!!!' ...
+                    '\nCurrent Matlab release is R%s\n\n',...
+                    'It is not possible to install OpenCossan using this version of Matlab\n',...
+                    'You can download the zip file from the cossan website (https://cossan.co.uk) and extract it manually in a folder\n'],...
+                    SrequiredMatlabVersion,version)
+    return
+elseif verLessThan('matlab', SrequiredMatlabVersion)
+        warning('OpenCOSSAN:OpenCOSSAN:checkMatlabversion', ...
+                    ['A Matlab version %s or higher is suggested!!!!' ...
+                    '\nCurrent Matlab release is R%s\n\n',...
+                    'Please be aware that some features of OpenCossan may not function properly or this Matlab version!!!!\n'],...
+                    SrequiredMatlabVersion,version)
+end
+
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
@@ -74,6 +94,19 @@ function OpenCossanApp_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to OpenCossanApp (see VARARGIN)
 
+
+% Always initialize variables
+initializeVariables(hObject, eventdata, handles);
+handles=guidata(hObject);
+
+try
+    axis(handles.axesLogo);
+    imshow('OpenCossanIcon2.png')
+catch
+    set(handles.axesLogo,'Visible','off');
+end
+
+
 % Choose default command line output for OpenCossanApp
 handles.output = hObject;
 
@@ -87,28 +120,16 @@ else
     handles.OpenCossanData.SAppPath=Sapps(mg).location;
 end
 
-% Always initialize variables
-initializeVariables(hObject, eventdata, handles);
-handles=guidata(hObject);
-
 if exist(fullfile(handles.OpenCossanData.SAppPath,'OpenCossanData.mat'),'file')
     handles.OpenCossanData=load(fullfile(handles.OpenCossanData.SAppPath,'OpenCossanData.mat'));
     set(handles.textInformation,...
         'String',...
-        'Welcome back to OpenCossanApp')
-    
+        'Welcome back to OpenCossanApp')    
     if handles.OpenCossanData.LicenseAgreement
         set(handles.LicensePanel,'visible','off')
     end
 end
 
-
-try
-    axis(handles.axesLogo);
-    imshow('OpenCossanIcon2.png')
-catch
-    set(handles.axesLogo,'Visible','off');
-end
 
 % install (or initialize) display
 set(handles.textInstallationPath,'string',handles.OpenCossanData.InstallationPath);
@@ -194,7 +215,7 @@ handles.OpenCossanData.InstallationFileNameApp='OpenCossanApp.mlappinstall';
 handles.OpenCossanData.ServerSVNInfoPath='http://cossan.co.uk/svninfo/stable/';
 handles.OpenCossanData.ServerSVNInfoFileOpenCossan='svn_OpenCossan.mltbx.xml';
 handles.OpenCossanData.ServerSVNInfoFileApp='svn_OpenCossanApp.mlappinstall.xml';
-handles.OpenCossanData.URL='https://iru1.liv.ac.uk/svn/OpenCossan/branches/Archives/stable/';
+handles.OpenCossanData.URL='https://cossan.co.uk/svn/OpenCossan/branches/Archives/stable/';
 handles.OpenCossanData.toolboxFile = 'OpenCossan.mltbx';
 handles.OpenCossanData.LicenseAgreement=0;
 handles.OpenCossanData.LicenseAgreementText=0;
@@ -294,7 +315,8 @@ function Download_Callback(hObject, eventdata, handles) %#ok<INUSL>
 
 % Download
 
-[u,p] = getMyCredentials(handles.OpenCossanData.WebCredentials);
+%[u,p] = getMyCredentials(handles.OpenCossanData.WebCredentials);
+[u,p] = logindlg('Title','OpenCossan account');
 
 if isempty(u) || isempty(p)
     set(handles.textInformation,'String',...

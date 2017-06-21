@@ -11,8 +11,8 @@ The software offers the most advanced and recent algorithms for the rational qua
 OpenCossan is an all-in-one package software for the practitioners to perform Uncertainty Quantification, Simulation-based Reliability Analysis, Sensitivity Analysis, Meta-Modelling, Stochastic Finite Elements Analysis, and Robust Design and Reliability-Based Optimization.
 
 See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.description>
-    <param.screenshot>${PROJECT_ROOT}/OpenCossanIcon2.png</param.screenshot>
-    <param.version>1.6</param.version>
+    <param.screenshot>${PROJECT_ROOT}/OpenCossanLogo.png</param.screenshot>
+    <param.version>1.7</param.version>
     <param.output>${PROJECT_ROOT}/OpenCossan.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>
@@ -752,6 +752,7 @@ database/*
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine</file>
     </fileset.rootdir>
     <fileset.rootfiles>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/.project</file>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps</file>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Contents.m</file>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/UnitTest</file>
@@ -787,7 +788,7 @@ database/*
     </fileset.depfun.excluded>
     <fileset.package />
     <build-deliverables>
-      <file location="/home/epatelli/workspace/OpenCossan/branches/Archives/stable" name="OpenCossan.mltbx" optional="false"></file>
+      <file location="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps" name="OpenCossan.mltbx" optional="false">/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps/OpenCossan.mltbx</file>
     </build-deliverables>
     <workflow />
     <matlab>
@@ -810,7 +811,7 @@ database/*
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>4.8.15-300.fc25.x86_64</osver>
+      <osver>4.11.5-300.fc26.x86_64</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>

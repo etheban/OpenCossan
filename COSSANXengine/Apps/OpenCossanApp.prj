@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="3174900138" file="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps/OpenCossanApp.prj" location="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps" name="OpenCossanApp" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2780941680" file="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps/OpenCossanApp.prj" location="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps" name="OpenCossanApp" target="target.mlapps" target-name="Package App">
     <param.appname>OpenCossanApp</param.appname>
     <param.authnamewatermark>Edoardo Patelli</param.authnamewatermark>
     <param.email>info@cossan.co.uk</param.email>
@@ -17,15 +17,21 @@ The software offers the most advanced and recent algorithms for the rational qua
 
 See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.description>
     <param.screenshot>${PROJECT_ROOT}/OpenCossanLogo.WhiteBG.png</param.screenshot>
-    <param.version>1.6</param.version>
+    <param.version>1.7</param.version>
     <param.products.name>
       <item>MATLAB</item>
+      <item>Optimization Toolbox</item>
+      <item>Statistics and Machine Learning Toolbox</item>
     </param.products.name>
     <param.products.id>
       <item>1</item>
+      <item>6</item>
+      <item>19</item>
     </param.products.id>
     <param.products.version>
       <item>9.2</item>
+      <item>7.6</item>
+      <item>11.1</item>
     </param.products.version>
     <param.platforms />
     <param.output>/home/epatelli/workspace/OpenCossan/branches/Archives/stable</param.output>
@@ -38,14 +44,60 @@ See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.de
     <fileset.main>
       <file>${PROJECT_ROOT}/OpenCossanApp.m</file>
     </fileset.main>
-    <fileset.depfun />
+    <fileset.depfun>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@Analysis/Analysis.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@Analysis/display.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/OpenCossan.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/cossanDisp.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/createStartupFile.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/display.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getAnalysis.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getAnalysisID.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getAnalysisName.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getCossanAnalysisName.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getCossanDistributionPath.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getCossanExternalPath.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getCossanRoot.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getCossanWorkingPath.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getDatabaseDriver.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getDeltaTime.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getDescription.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getInfo.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getKillFilename.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getProjectName.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getRandomStream.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getSSHConnection.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/getVerbosityLevel.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/printLogo.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/removePath.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/reset.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/resetRandomNumberGenerator.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setAnalysis.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setAnalysisID.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setAnalysisName.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setDatabaseDriver.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setDescription.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setLaptime.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setPath.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setProjectName.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setSSHConnection.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setVerbosityLevel.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/setWorkingPath.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/showDisp.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@OpenCossan/validateCossanInputs.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/@Timer/Timer.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/utilities/exportFigure.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/src/common/utilities/xticklabel_rotate.m</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/OpenSourceSoftware/src/spinterp_v5.1.1/spinit.m</file>
+      <file>${MATLAB_ROOT}/toolbox/local/userpath.m</file>
+    </fileset.depfun>
     <fileset.resources>
       <file>${PROJECT_ROOT}/OpenCossanApp.fig</file>
       <file>${PROJECT_ROOT}/OpenCossanIcon2.png</file>
       <file>${PROJECT_ROOT}/OpenCossanLogo.WhiteBG.png</file>
-      <file>${PROJECT_ROOT}/getMyCredentials.m</file>
       <file>${PROJECT_ROOT}/license.html</file>
       <file>${PROJECT_ROOT}/license_html_42ac92a50ebcb49a.png</file>
+      <file>${PROJECT_ROOT}/logindlg.m</file>
     </fileset.resources>
     <fileset.package />
     <build-deliverables>
@@ -72,7 +124,7 @@ See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.de
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>4.8.16-300.fc25.x86_64</osver>
+      <osver>4.11.5-300.fc26.x86_64</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>
