@@ -73,7 +73,7 @@ TotalNumerical=Xsm.VtotalIndices';
 Tresults = table(FirstAnalytical,FirstNumerical,TotalAnalytical,TotalNumerical, ...
     'RowNames',Xgs.Cinputnames)
 
-%% Saltelli Exercise 3 pag 177 
+% %% Saltelli Exercise 3 pag 177 
 % In this examples we consider only 2 normal distributed random variables
 X1   = RandomVariable('Sdistribution','normal','mean',1,'std',3);
 X2   = RandomVariable('Sdistribution','normal','mean',2,'std',2);
@@ -91,6 +91,7 @@ Xm3 = Mio('Sscript','Moutput=Minput(:,1).*Minput(:,2);', ...
 Xev3    = Evaluator('Xmio',Xm3);
 Xmdl3   = Model('Xinput',Xin,'Xevaluator',Xev3);
 
+
 Xmc=MonteCarlo('Nsamples',10000);
 Xgs=GlobalSensitivitySobol('Nbootstrap',100,'Xsimulator',Xmc);
 % It is also possible to pass the model directly to the method
@@ -107,4 +108,29 @@ TotalAnalytical=[18/19;10/19];
 TotalNumerical=Xsm.VtotalIndices';
 Tresults = table(FirstAnalytical,FirstNumerical,TotalAnalytical,TotalNumerical, ...
     'RowNames',Xgs.Cinputnames)
+
+%% Anather example with discontinuos output.  
+% In this examples we consider only 2 normal distributed random variables
+X1   = RandomVariable('Sdistribution','normal','mean',1,'std',3);
+X2   = RandomVariable('Sdistribution','normal','mean',2,'std',2);
+X3   = RandomVariable('Sdistribution','normal','mean',0,'std',1);
+Xrvset = RandomVariableSet('Cmembers',{'X1','X2','X3'},'CXrandomvariables',{X1,X2,X3});
+Xin    = Input('XrandomVariableSet',Xrvset);
+% The model is defined using a Mio object
+Xm4 = Mio('Sscript','Moutput=Minput(:,1).*Minput(:,2)+max(Minput(:,3),Minput(:,1));', ...
+         'Coutputnames',{'Y'},...
+         'Cinputnames',{'X1' 'X2' 'X3'},...
+         'Liostructure',false,...
+         'Liomatrix',true,...
+	     'Lfunction',false); 
+     
+Xev4    = Evaluator('Xmio',Xm4);
+Xmdl4   = Model('Xinput',Xin,'Xevaluator',Xev4);
+
+Xmc=MonteCarlo('Nsamples',1000);
+Xgs=GlobalSensitivitySobol('Nbootstrap',100,'Xsimulator',Xmc);
+% It is also possible to pass the model directly to the method
+% computeIndices
+Xsm = Xgs.computeIndices('Xmodel',Xmdl4);
+
 

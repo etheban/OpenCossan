@@ -88,7 +88,7 @@ classdef Input
         
         Cout = evaluateFunction(Xobj,varargin)  % Compute the functions
         
-        MX = getSampleMatrix(Xobj)              % Retrive reliazation in a matrix format
+            MX = getSampleMatrix(Xobj)              % Retrive reliazation in a matrix format
         
         varargout = getMoments(Xobj,varargin)   % Retrive the moments of Random Variables
         varargout = getStatistics(Xobj,varargin)% Retrieve the Statistic of interest
@@ -100,7 +100,7 @@ classdef Input
         varargout=map2physical(Xobj,varargin)
         varargout=map2stdnorm(Xobj,varargin)
         
-        [MphysicalSpace Msamplesdoe] = hypercube2physical(Xinput,MsamplesHypercube)
+        [MphysicalSpace,Msamplesdoe] = hypercube2physical(Xinput,MsamplesHypercube)
         
         % Set methods
         Xobj=setDesignVariable(Xobj,varargin)

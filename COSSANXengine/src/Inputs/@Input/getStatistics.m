@@ -1,99 +1,81 @@
-function varargout = getStatistics(Xobj,varargin)
-%getMoments  Retrieve the first two moments of the Random Variables present
-%in the Input object.
+function [TableOutput, Mout]= getStatistics(Xobj,varargin)
+%GETSTATISTICS Compute the statistics of the variables present in the
+%Input Object
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/getMoments@Input
+% See Also: https://cossan.co.uk/wiki/index.php/getStatistics@SimulationData
 %
-% $Author:~Marco~de~Angelis$
+% Copyright 2012-2017 COSSAN Working Group
+% Author: Edoardo Patelli
+% email address: openengine@cossan.co.uk
+% Website: http://www.cossan.co.uk
 
-%%  Argument Check
-OpenCossan.validateCossanInputs(varargin{:});
+% =====================================================================
+% This file is part of openCOSSAN.  The open general purpose matlab
+% toolbox for numerical analysis, risk and uncertainty quantification.
+%
+% openCOSSAN is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License.
+%
+% openCOSSAN is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+%  You should have received a copy of the GNU General Public License
+%  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
+% =====================================================================
 
-Cnames = Xobj.CnamesRandomVariableSet;
-Crvset = Cnames;
+%% Validate input arguments
+OpenCossan.validateCossanInputs(varargin{:})
 
-LrvNotSet=true;
-for k=1:2:nargin-1,
+%% Process input arguments
+Cnames=Xobj.Cnames;
+
+for k=1:2:nargin-1
     switch lower(varargin{k})
-        case {'sname', 'sobjectname'}
+        case 'sname'
             %check input
-            assert(LrvNotSet,'openCOSSAN:Input:getValues:MultipleDeclarationVariableName',...
-                'One and only one of the fields ''Cnames'' and ''Sname'' can be used')
-            LrvNotSet=false;
             Cnames = varargin(k+1);
-        case {'csnames'}
+        case {'cnames','csname'}
             %check input
-            assert(LrvNotSet,'openCOSSAN:Input:getValues:MultipleDeclarationVariableName',...
-                'One and only one of the fields ''Cnames'' and ''Sname'' can be used')
-            LrvNotSet=false;
             Cnames = varargin{k+1};
-        case {'csstatistics','csstatistic'}
-            CSstat=varargin{k+1};
         otherwise
-            error('openCOSSAN:Input:getStatistics:wrongArgument',...
-                'The field (%s) is not valid for this function!',varargin{k})
+            error('openCOSSAN:Input:getStatistics:wrongInputArgument', ...
+                'PropertyName %s not valid',varargin{k})
     end
 end
 
+assert(all(ismember(Cnames,Xobj.Cnames)),...
+    'openCOSSAN:Input:getStatistics:wrongRequestedVariable', ...
+    'Variable(s) not present in the Input object!\n Required variables: %s\nAvailable variables: %s',...
+    sprintf('"%s" ',Cnames{:}),sprintf('"%s" ',Xobj.Cnames{:}))
 
-%% Check if the variable Sname is present in the Input object
 
-VindexRVS=ismember(Crvset,Cnames); %
-VpositRVS=find(VindexRVS);         % positions where the rvsets are located
-Nrv=length(Cnames)-length(VpositRVS);
-%% Compute total number or RandomVariables
-for n=1:length(VpositRVS)
-    Nrv=Nrv+Xobj.Xrvset.(Cnames{n}).Nrv;
+%% Get the values in a Matrix format
+Mout=Xobj.getValues('Cnames',Cnames);
+
+%% Compute the statistics for the required variables
+% Initialize output
+Mstats=zeros(5,length(Cnames));
+
+for n=1:length(Cnames)
+    % Find the min
+    Mstats(1,n) = min(Mout(:,n));
+    
+    % Find the max
+    Mstats(2,n)  = max(Mout(:,n));
+    
+    % Find the mean
+    Mstats(3,n)  = nanmean(Mout(:,n));
+    
+    % Find the median
+    Mstats(4,n)  = nanmedian(Mout(:,n));
+    
+    % Find the std
+    Mstats(5,n)  = nanstd(Mout(:,n));
 end
 
-% Preallocate memory
-Moutput=zeros(length(CSstat),Nrv);
-Istart=1;
-for k=1:length(Cnames)
-    %% check if the variable is a RandomVariableSet
-    if VindexRVS(k)
-        NrvCurrentSet=Xobj.Xrvset.(Cnames{k}).Nrv;
-        for h=1:length(CSstat)
-            switch lower(CSstat{h})
-                case 'median'
-                    VoutMedian=Xobj.Xrvset.(Cnames{k}).map2physical(zeros(1,NrvCurrentSet));
-                    Iend=Istart+length(VoutMedian)-1;
-                    Moutput(h,Istart:Iend) = VoutMedian;
-                case 'skewness'
-                    %TODO
-                case 'kurtosis'
-                    %TODO
-            end
-        end
-    else
-        Iend=Istart;
-        %% check if the variable is a RandomVariable
-        for n=1:length(Crvset)
-            position=find(ismember(Xobj.Xrvset.(Crvset{n}).Cmembers,Cnames{k}), 1);
-            NrvCurrentSet=Xobj.Xrvset.(Crvset{n}).Nrv;
-            if ~isempty(position)
-                for h=1:length(CSstat)
-                    switch lower(CSstat{h})
-                        case 'median'
-                            Vmedian=(Xobj.Xrvset.(Crvset{n}).map2physical(zeros(1,NrvCurrentSet)));
-                            Moutput(h,Istart) = Vmedian(index);
-                            Istart=Istart+1;
-                        case 'skewness'
-                            %TODO
-                        case 'kurtosis'
-                            %TODO
-                    end
-                end
-            end
-        end
-        
-    end
-    Istart=Iend+1;
-end
+TableOutput = array2table(Mstats,'RowNames',{'Minimum','Maximum','Mean','Median','Standar Deviation'},'VariableNames',Cnames);
 
-% Assign the output
-for h=1:length(CSstat)
-    varargout{h}=Moutput(h,:);
-end
 
-end

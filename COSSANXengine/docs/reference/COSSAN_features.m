@@ -41,6 +41,8 @@
 % * Polynomial Chaos
 % * Response Surface
 %
-% See also <http://cossan.cfd.liv.ac.uk/software/cossan_toolboxes.php "Toolboxes">
-
-% Copyright 2011 COSSAN-X, University of Innsbruck, Austria, EU.
+% See Also: https://cossan.co.uk/
+%
+% $OpenCossan Copyright~2012-2017,~COSSAN~Working~Group$
+%
+% $Author: Edoardo~Patelli$

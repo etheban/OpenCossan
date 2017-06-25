@@ -24,19 +24,19 @@
 %
 % *Available Documentation*
 %
-% * <COSSAN_release_notes.html Release Notes>
-% * <COSSAN_features.html Features>
-% * <COSSAN_getting_started.html Getting Started>
-% * <COSSAN_user_guide.html User Guide>
+% * <release_notes.html Release Notes>
+% * <features.html Features>
+% * <getting_started.html Getting Started>
+% * <user_guide.html User Guide>
 %
 % *See also*
 %
-% * <http://cossan.cfd.liv.ac.uk/wiki/index.php/Category:User_Manual "User Manual">
-% * <http://cossan.cfd.liv.ac.uk/wiki/index.php/Category:Reference_Manual "Reference Manual"> 
-% * <http://cossan.cfd.liv.ac.uk/wiki/index.php/Category:Theory_Manual "Theory Manual"> 
+% * <http://cossan.co.uk/wiki/index.php/Category:User_Manual "User Manual">
+% * <http://cossan.co.uk/wiki/index.php/Category:Reference_Manual "Reference Manual"> 
+% * <http://cossan.co.uk/wiki/index.php/Category:Theory_Manual "Theory Manual"> 
 %
 % 
 % 
 % 
 
-% Copyright 2011, COSSAN Working Group, University of Innsbruck, Austria, EU.
+% Copyright 2017, COSSAN Working Group

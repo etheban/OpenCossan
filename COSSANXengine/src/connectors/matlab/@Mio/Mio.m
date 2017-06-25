@@ -105,7 +105,7 @@ classdef Mio
             OpenCossan.validateCossanInputs(varargin{:})
             
             % Set parameters defined by the user
-            for k=1:2:length(varargin),
+            for k=1:2:length(varargin)
                 switch lower(varargin{k})
                     case 'sdescription'
                         Xobj.Sdescription = varargin{k+1};

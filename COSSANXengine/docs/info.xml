@@ -29,19 +29,19 @@
     % =====================================================================
 -->
   
-    <matlabrelease>R2013b</matlabrelease>
+    <matlabrelease>R2017a</matlabrelease>
     <name>OpenCossan</name>
     <type>toolbox</type>
-    <icon>./graphics/cossanx_16.png</icon>
+    <icon>none</icon>
     <help_location>/html</help_location>
-    <help_contents_icon>$toolbox/matlab/icons/bookicon.gif</help_contents_icon>
+    <help_contents_icon>none</help_contents_icon>
     
     <list>
         
 <listitem>
 <label>Help</label>
 <callback>doc opencossan/</callback>
-<icon>$toolbox/matlab/icons/book_mat.gif</icon>
+<icon>fullfile(OpenCossan.getCossanRoot,'docs','graphics','LogoOpenCossan.png')</icon>
 </listitem>
         
         <listitem>

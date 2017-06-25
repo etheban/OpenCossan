@@ -3,7 +3,7 @@
 % The Input object is uses to generate samples of random variables, collection
 % parameters, function and design variables
 %
-% See Also:  http://cossan.cfd.liv.ac.uk/wiki/index.php/@Input
+% See Also:  https://cossan.co.uk/wiki/index.php/@Input
 %
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author:~Pierre~Beaurepaire$ 

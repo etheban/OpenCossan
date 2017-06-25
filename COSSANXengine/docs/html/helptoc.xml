@@ -3,7 +3,7 @@
 <!-- First tocitem specifies top level in Help browser Contents pane -->
 <!-- This can be a roadmap page, as shown below, or a content page -->
 
-    <tocitem target="COSSAN_product_page">COSSAN-X Toolbox
+    <tocitem target="product_page">OpenCossan Toolbox
         <!-- Nest tocitems to create hierarchical entries in  Contents-->
         <!-- To include icons, use the following syntax for tocitems: -->
         <!-- <tocitem target="foo.html" image="HelpIcon.NAME"> -->
@@ -15,32 +15,32 @@
         <!-- matlabroot/toolbox/matlab/icons -->
         <!-- A Getting Started Guide usually comes first -->
         
-        <tocitem target="http://mechanik.uibk.ac.at/wiki/index.php/Category:Getting_Started" image="HelpIcon.GETTING_STARTED">
-            Getting Started with the COSSAN-X
-            <tocitem target="http://mechanik.uibk.ac.at/wiki/index.php/System_requirements">System Requirements
+        <tocitem target="https://cossan.co.uk/wiki/OpenCossan_Getting_Started" image="HelpIcon.GETTING_STARTED">
+            Getting Started with the OpenCossan
+        <tocitem target="https://cossan.co.uk/wiki/index.php/System_requirements">System Requirements
             </tocitem>
         </tocitem>
         <!-- User Guide comes next -->
-        <tocitem target="http://mechanik.uibk.ac.at/wiki/index.php/Category:User_Manual" 
-            image="HelpIcon.USER_GUIDE">COSSAN-X User Guide
+        <tocitem target="https://cossan.co.uk/wiki/index.php/Category:User_Manual" 
+            image="HelpIcon.USER_GUIDE">User Guide
         </tocitem>
          <!-- User Guide comes next -->
-        <tocitem target="http://mechanik.uibk.ac.at/wiki/index.php/Category:Reference_Manual" 
-            image="HelpIcon.USER_GUIDE">COSSAN-X Reference Guide
+        <tocitem target="https://cossan.co.uk/wiki/index.php/Category:Reference_Manual" 
+            image="HelpIcon.USER_GUIDE">Reference Guide
         </tocitem>
          <!-- User Guide comes next -->
-        <tocitem target="http://mechanik.uibk.ac.at/wiki/index.php/Category:Theory_Manual" 
-            image="HelpIcon.USER_GUIDE">COSSAN-X Theory Guide
+        <tocitem target="https://cossan.co.uk/wiki/index.php/Category:Theory_Manual" 
+            image="HelpIcon.USER_GUIDE">Theory Guide
         </tocitem>
         <!-- Optional List of Examples, with hyperlinks to examples in other files -->
-        <tocitem target="http://mechanik.uibk.ac.at/wiki/index.php/Category:Show_Cases" 
-                 image="HelpIcon.HelpIcon.EXAMPLES">COSSAN-X Examples
+        <tocitem target="https://cossan.co.uk/wiki/index.php/Category:Show_Cases" 
+                 image="HelpIcon.HelpIcon.EXAMPLES">Examples
         </tocitem>
-        <tocitem target="http://mechanik.uibk.ac.at/wiki/index.php/Category:Tutorials" 
-                 image="HelpIcon.HelpIcon.DEMOS">COSSAN-X Tutorials
+        <tocitem target="https://cossan.co.uk/wiki/index.php/Category:Tutorials" 
+                 image="HelpIcon.HelpIcon.DEMOS">Tutorials
         </tocitem>
         <!-- Optional link or links to your or other Web sites -->
-        <tocitem target="http://mechanik.uibk.ac.at/" 
+        <tocitem target="http://cossan.co.uk/" 
                  image="$toolbox/matlab/icons/webicon.gif">
         COSSAN Web Site 
         </tocitem>
