@@ -12,14 +12,13 @@ OpenCossan is an all-in-one package software for the practitioners to perform Un
 
 See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.description>
     <param.screenshot>${PROJECT_ROOT}/OpenCossanLogo.png</param.screenshot>
-    <param.version>1.7</param.version>
+    <param.version>1.8</param.version>
     <param.output>${PROJECT_ROOT}/OpenCossan.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>
       <item>Global Optimization Toolbox</item>
       <item>MATLAB Compiler</item>
       <item>Optimization Toolbox</item>
-      <item>Parallel Computing Toolbox</item>
       <item>Statistics and Machine Learning Toolbox</item>
     </param.products.name>
     <param.products.id>
@@ -27,7 +26,6 @@ See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.de
       <item>90</item>
       <item>28</item>
       <item>6</item>
-      <item>80</item>
       <item>19</item>
     </param.products.id>
     <param.products.version>
@@ -35,7 +33,6 @@ See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.de
       <item>3.4.2</item>
       <item>6.4</item>
       <item>7.6</item>
-      <item>6.10</item>
       <item>11.1</item>
     </param.products.version>
     <param.platforms />
@@ -811,7 +808,7 @@ database/*
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>4.11.5-300.fc26.x86_64</osver>
+      <osver>4.11.8-300.fc26.x86_64</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>

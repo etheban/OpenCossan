@@ -3,11 +3,11 @@ function [TableOutput, Mout]= getStatistics(Xobj,varargin)
 %           SimulationData Object
 %
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/getStatistics@SimulationData
+% See Also: http://cossan.co.uk/wiki/index.php/getStatistics@SimulationData
 %
-% Copyright 1983-2015 COSSAN Working Group, University of Innsbruck, Austria
+% Copyright 2006-2017 COSSAN Working Group,
+%
 % Author: Edoardo Patelli
-%
 % Institute for Risk and Uncertainty, University of Liverpool, UK
 % email address: openengine@cossan.co.uk
 % Website: http://www.cossan.co.uk
@@ -27,7 +27,6 @@ function [TableOutput, Mout]= getStatistics(Xobj,varargin)
 %
 %  You should have received a copy of the GNU General Public License
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
-% =====================================================================
 
 %% Validate input arguments
 OpenCossan.validateCossanInputs(varargin{:})
@@ -36,7 +35,7 @@ OpenCossan.validateCossanInputs(varargin{:})
 %% Process input arguments
 Cnames=Xobj.Cnames;
 
-for k=1:2:nargin-1,
+for k=1:2:nargin-1
     switch lower(varargin{k})
         case 'sname'
             %check input
@@ -68,7 +67,6 @@ if isempty(Xobj.Mvalues)
             'Variable(s) %s not available ',Cnames{:})
         Mout=[];
     else
-        Vsize=size(Cout{1});
         if ~isvector(Cout{1})
             for n=1:length(Cout)
                 Cout{n}=Cout{n}(:);

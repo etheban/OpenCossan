@@ -1,9 +1,10 @@
 function Xobj = split(Xobj,varargin)
 %SPLIT SimulationData objects
 %
-%   MANDATORY ARGUMENTS
+%   One of the following arguments must be passed
 %   - Vindices: Indicies of the samples to be extracted
-%   - Cmembers: Cell array of the variables to be extracted
+%   - Cmembers: Name of the variables kept in the SimulationData
+%   - CremoveNames: Name of the variables removed from the SimulationData
 %
 %   OUTPUT
 %   - Xobj: object of class SimulationData
@@ -12,15 +13,35 @@ function Xobj = split(Xobj,varargin)
 %   Xobj = Xobj.split(PropertyName, PropertyValue, ...)
 %
 %
-% =====================================================
-% COSSAN - COmputational Stochastic Structural Analysis
-% IfM, Chair of Engineering Mechanics, LFU Innsbruck, A
-% =====================================================
+% See Also: https://cossan.co.uk/wiki/index.php/split@SimulationData
+%
+% Author: Edoardo Patelli
+% Institute for Risk and Uncertainty, University of Liverpool, UK
+% email address: openengine@cossan.co.uk
+% Website: http://www.cossan.co.uk
+
+% =====================================================================
+% This file is part of openCOSSAN.  The open general purpose matlab
+% toolbox for numerical analysis, risk and uncertainty quantification.
+%
+% openCOSSAN is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License.
+%
+% openCOSSAN is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+%  You should have received a copy of the GNU General Public License
+%  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
+% =====================================================================
 
 Vindices=[];
-Cmembers=[];
-Cremove=[];
+VremoveNamePosition=[];
 
+% Store list of variable names
+ColdNames=Xobj.Cnames;
 
 %% Validate input arguments
 OpenCossan.validateCossanInputs(varargin{:})
@@ -31,20 +52,16 @@ for k=1:2:length(varargin)
         case 'vindices'
             Vindices=varargin{k+1};
         case {'cmembers', 'cnames'}
-            Cmembers=varargin{k+1};   
+            VremoveNamePosition=~ismember(ColdNames,varargin{k+1});  
         case {'cremove', 'cremovenames'}
-            Cremove=varargin{k+1};   
+            VremoveNamePosition=ismember(ColdNames,varargin{k+1});  
         otherwise
-          error('openCOSSAN:SimulationData:split',...
-          [ varargin{k} ' is not a valid PropertyName']);
+            error('openCOSSAN:SimulationData:split',...
+                [ varargin{k} ' is not a valid PropertyName']);
     end
 end
 
-%% Old names 
-ColdNames=Xobj.Cnames;
-
 %% Remove Realizations
-
 if ~isempty(Vindices)
     % Remove realizations from the structure
     Xobj.Tvalues=Xobj.Tvalues(Vindices);
@@ -56,25 +73,16 @@ if ~isempty(Vindices)
 end
 
 %% Remove Variables
-
-if ~isempty(Cmembers)
-    Cremove=ColdNames(~strcmp(ColdNames,Cmembers(1)));
-    for ires=2:length(Cmembers)
-        Cremove(strcmp(Cremove,Cmembers(ires)))=[];
-    end
-end
-
-if ~isempty(Cremove)
-    Xobj.Tvalues=rmfield(Xobj.Tvalues,Cremove);
+if ~isempty(VremoveNamePosition)
+    Xobj.Tvalues=rmfield(Xobj.Tvalues,ColdNames(VremoveNamePosition));
     
     if ~isempty(Xobj.Mvalues)
         % Remove variables from the Mvalues
-        Lpos=zeros(length(ColdNames),1);
-        for n=1:length(ColdNames);
-            Lpos(n)=any(strcmp(ColdNames(n),Cremove));
-        end
-        Xobj.Mvalues=Xobj.Mvalues(:,~Lpos);
-    end     
+        Xobj.Mvalues=Xobj.Mvalues(:,~VremoveNamePosition);        
+    end
+    
+    % Update LisDataseries field
+    Xobj.LisDataseries(VremoveNamePosition)=[];
 end
 
 

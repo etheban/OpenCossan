@@ -1,22 +1,22 @@
 %% TUTORIALSIMULATIONDATA
 %
-% In this tutorial it is shown how to construct a SimulationData object and 
-% how to use it
+% In this tutorial it is shown how to construct and use a SimulationData
+% object.
+% SimulationData is one of the most important object in OpenCossan and
+% contains all the results of a simuations.
 %
 %
 % See Also: http://cossan.co.uk/wiki/index.php/@SimulationData
 %
-% $Copyright~1993-2016,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Copyright~2006-2017,~COSSAN~Working~Group,$
 % $Author: Edoardo-Patelli~and~Barbara-Goller$ 
 
 % Reset the random number generator in order to always obtain the same results.
 % DO NOT CHANGE THE VALUES OF THE SEED
 OpenCossan.resetRandomNumberGenerator(51125)
 
-%% Create output object by using Mio
-
+%% Create a SimulationData as a results of a simulation 
 % Define an input object containing random variables and parameters
-
 Xrv1    = RandomVariable('Sdistribution','uniform','par1',1,'par2',2);  
 Xrv2    = RandomVariable('Sdistribution','normal','mean',0,'std',1); 
 Xrvs1    = RandomVariableSet('Cmembers',{'Xrv1','Xrv2'});    
@@ -30,22 +30,14 @@ Xpar2   = Parameter('Sdescription','Parameter 2','value',2.5);
 Xpar3   = Parameter('Sdescription','Parameter 1','value',3.5);
 Xpar4   = Parameter('Sdescription','Parameter 2','value',4.5);
 
-Xin1     = Input;             % create input object
-Xin1     = add(Xin1,Xrvs1);     % add random variable set 1 to Input object
-Xin1     = add(Xin1,Xpar1);    % add parameter 1 to Input object
-Xin1     = add(Xin1,Xpar2);    % add parameter 2 to Input object
-
-Xin2     = Input;
-Xin2     = add(Xin2,Xrvs2);     % add random variable set 2 to Input object
-Xin2     = add(Xin2,Xpar3);    % add parameter 3 to Input object
-Xin2     = add(Xin2,Xpar4);    % add parameter 4 to Input object
-
+% Create 2 Input Objects 
+Xin1     = Input('CSmembers',{'Xrvs1','Xpar1','Xpar2'},'CXmembers',{Xrvs1 Xpar1 Xpar2});             
+Xin2     = Input('CSmembers',{'Xrvs2','Xpar3','Xpar4'},'CXmembers',{Xrvs2 Xpar3 Xpar4});
 % Generate some samples
 Xin1     = sample(Xin1,'Nsamples',5);
 Xin2     = sample(Xin2,'Nsamples',5);
 
 %% Define models (using Mio)
-
 % Define model 1
 
 Xm1  = Mio('Sscript',['for i=1:length(Tinput), Toutput(i).add1=Tinput(i).Xrv1+Tinput(i).Xpar1;' ...
@@ -60,7 +52,6 @@ Xmdl1 = Model('Xevaluator',Xev1,'Xinput',Xin1);
       
 
 % Define model 2
-
 Xm2  = Mio('Sscript',['for i=1:length(Tinput), Toutput(i).add2=Tinput(i).Xrv3+Tinput(i).Xpar3;' ...
                                               'Toutput(i).sub2=Tinput(i).Xrv4-Tinput(i).Xpar4;' ... 
                                               'Toutput(i).linfunc2=Tinput(i).Xrv3*Tinput(i).Xpar3; end'], ...
@@ -125,7 +116,6 @@ Xout8 = SimulationData('Sdescription','new output','Tvalues',T);
     
 
 %% Save and load SimulationData
-
 % Save files
 Xout5.save('SfileName',[OpenCossan.getCossanWorkingPath '/SimulationData5']);
 Xout7.save('SfileName',[OpenCossan.getCossanWorkingPath '/SimulationData7']);
@@ -234,11 +224,35 @@ bar(Vcoord,Vpdf,Vwidth(1))
 % The length of Vedges is 1+length(Vpdf)
 [Vedges,Vpdf]=Xout1.getPDF('Vedges',Vedges);
 
-
-
 [Vedges,Vcdf]=Xout1.getCDF('Sname','add1');
 % Plot the data
 Vwidth=diff(Vedges);
 Vcoord=Vedges(1)+cumsum(Vwidth);
 plot(Vcoord,Vcdf)
-        
+
+%% Create SimulationData with a Dataseries
+% Let assume we want to add a Dataseries to an existing SimulationData
+% object
+% The simulationData contains already 2 samples. Hence the new variable
+% should also contain 2 samples. 
+Td(1).d=Dataseries;
+Td(2).d=Dataseries;
+
+Xout9=Xout8.addVariable('Tvalues',Td)
+Xout9.CnamesDataseries
+
+T2(2).e=5;
+Xout9=Xout9.addVariable('Tvalues',T2)     
+
+% The field LisDataseries allows to distiguis if a variable is stored as a
+% Dataseries object. 
+Xout9.LisDataseries
+
+% Now let remove some variables. You can specify which variable to keep and
+% which ones to remove
+Xout10=Xout9.split('Cnames',{'a','b'})
+Xout10=Xout9.split('CremoveNames',{'c','d'})
+
+Xout10.LisDataseries
+Xout10.CnamesDataseries
+Xout10.Cnames

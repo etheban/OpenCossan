@@ -11,10 +11,14 @@ function XsimOut=load(varargin)
 %   USAGE
 %   Status = Xobj.save('SfileName','myFileName')
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/load@SimulationData
+% See Also: http://cossan.co.uk/wiki/index.php/load@SimulationData
 %
-% Copyright 1983-2015 COSSAN Working Group, University of Innsbruck, Austria
+% Copyright 2006-2017 COSSAN Working Group,
+%
 % Author: Edoardo Patelli
+% Institute for Risk and Uncertainty, University of Liverpool, UK
+% email address: openengine@cossan.co.uk
+% Website: http://www.cossan.co.uk
 
 % =====================================================================
 % This file is part of openCOSSAN.  The open general purpose matlab
@@ -31,7 +35,6 @@ function XsimOut=load(varargin)
 %
 %  You should have received a copy of the GNU General Public License
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
-% =====================================================================
 
 % Initialize variables
 Sdescription='';

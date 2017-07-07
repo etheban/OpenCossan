@@ -1,7 +1,7 @@
 classdef SimulationData
     %SIMULATIONDATA Class definition of the SimulationData object
     %
-    % See Also: Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@SimulationData
+    % See Also: Also: https://cossan.co.uk/wiki/index.php/@SimulationData
     
     properties
         Tvalues=struct; % Structure containing the values of the variables
@@ -25,7 +25,7 @@ classdef SimulationData
         % SIMULATIONDATA This method constructs a SimulationData object. The
         % object is used to store the results of the simulation.
         %
-        % See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@SimulationData
+        % See Also: https://cossan.co.uk/wiki/index.php/@SimulationData
         %
         % Author: Edoardo Patelli
         % Institute for Risk and Uncertainty, University of Liverpool, UK
@@ -135,7 +135,7 @@ classdef SimulationData
             % Store output type
             
             Xobj.LisDataseries=false(length(Cnames),1);
-            for n=1:length(Cnames);
+            for n=1:length(Cnames)
                 try
                     Xobj.LisDataseries(n)=isa(vertcat(Xobj.Tvalues.(Cnames{n})),'Dataseries');
                 catch ErrorMessage
