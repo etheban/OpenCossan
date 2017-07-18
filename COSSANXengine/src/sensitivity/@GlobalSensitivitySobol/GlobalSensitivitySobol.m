@@ -32,7 +32,11 @@ classdef GlobalSensitivitySobol < Sensitivity
     properties (SetAccess=public,GetAccess=public)
         Nbootstrap=100;
         Xsimulator
-        Smethod='Saltelli2008'
+        Smethod='saltelli2010'
+    end
+    
+    properties (Constant,Hidden)
+        CmethodNames={'saltelli2008','sobol1993','saltelli2010','jansen1999'}
     end
     
     methods
@@ -107,6 +111,12 @@ classdef GlobalSensitivitySobol < Sensitivity
                         
                     case {'sevaluatedobjectname'}
                         Xobj.Sevaluatedobjectname=varargin{k+1};
+                    case {'smethod'}
+                        assert(ismember(lower(varargin{k+1}),Xobj.CmethodNames), ...
+                            'openCOSSAN:GlobalSensitivitySobol:methodNotValid',...
+                            'The method %s is not a valid name. Available methods are %s',...
+                            varargin{k+1},sprintf('"%s" ',Xobj.CmethodNames{:}))
+                        Xobj.Smethod=varargin{k+1}; 
                     otherwise
                         error('openCOSSAN:GlobalSensitivitySobol',...
                             'The PropertyName %s is not allowed',varargin{k});
