@@ -58,7 +58,7 @@ Xm2 = Mio('Sscript','Moutput=Minput(:,1) + Minput(:,2);', ...
          'Liostructure',false,...
          'Liomatrix',true,...
 	     'Lfunction',false);  
- Xev2    = Evaluator('Xmio',Xm);
+Xev2    = Evaluator('Xmio',Xm2);
 Xmdl2   = Model('Xinput',Xin,'Xevaluator',Xev2);
 
 Xmc=MonteCarlo('Nsamples',10000);
@@ -107,7 +107,7 @@ FirstNumerical=Xsm.VsobolFirstIndices';
 TotalAnalytical=[18/19;10/19];
 TotalNumerical=Xsm.VtotalIndices';
 Tresults = table(FirstAnalytical,FirstNumerical,TotalAnalytical,TotalNumerical, ...
-    'RowNames',Xgs.Cinputnames)
+    'RowNames',Xmdl3.Cinputnames)
 
 %% Anather example with discontinuos output.  
 % In this examples we consider only 2 normal distributed random variables
@@ -133,4 +133,6 @@ Xgs=GlobalSensitivitySobol('Nbootstrap',100,'Xsimulator',Xmc);
 % computeIndices
 Xsm = Xgs.computeIndices('Xmodel',Xmdl4);
 
-
+%% Select different methods for computing Sobol' indices
+Xgs=GlobalSensitivitySobol('Nbootstrap',100,'Xsimulator',Xmc,'Smethod','Jansen1999');
+Xsm2 = Xgs.computeIndices('Xmodel',Xmdl4);
