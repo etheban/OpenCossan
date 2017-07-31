@@ -27,11 +27,10 @@ max_disp = Parameter('value',0.015);
 inertia  = Function('Sexpression','<&width&>.*<&height&>.^3/12');
 
 Xrvs = RandomVariableSet('Cmembers',{'youngs','force','height'}); 
-Xinp = Input('Sdescription','Xinput object');       
-Xinp = add(Xinp,Xrvs);
-Xinp = add(Xinp,width);
-Xinp = add(Xinp,inertia);
-Xinp = add(Xinp,max_disp);
+
+Xinp = Input('Sdescription','Xinput object',...
+    'CXmembers',{Xrvs width inertia max_disp},...                   % object list
+    'CSmembers',{'Xrvs' 'width' 'inertia' 'max_disp'});    % name of the objects 
 
 % See summary of the Input
 display(Xinp)

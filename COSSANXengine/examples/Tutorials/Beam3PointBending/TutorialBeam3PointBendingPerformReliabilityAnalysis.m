@@ -34,7 +34,7 @@ end
 Xmc = MonteCarlo('Nsamples',Nsamples,'Nbatches',1);
 
 % Perform the MonteCarlo simulation
-[Xpf Xo] = Xmc.pf(XprobModel);
+[Xpf,Xo] = Xmc.computeFailureProbability(XprobModel);
 
 % See summary of the results
 display(Xpf)

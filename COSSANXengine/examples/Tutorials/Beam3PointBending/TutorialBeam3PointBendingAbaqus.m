@@ -10,12 +10,13 @@
 %
 % See also http://cossan.cfd.liv.ac.uk/wiki/index.php/Beam_3-point_bending_(overview)
 %
-% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Copyright~1993-2017,~COSSAN~Working~Group,$
 % $Author:~Pierre~Beaurepaire$ 
+% $Author:~Edoardo~Patelli$ 
 
 % Retrieve the directory where this tutorial is stored
 StutorialPath = fileparts(which(mfilename));
-assert(~isempty(StutorialPath),'openCOSSAN:Tutorial','The tutorial folder must be contained in the path.')
+assert(~isempty(StutorialPath),'OpenCossan:Tutorial','The tutorial folder must be contained in the path.')
 % Copy the tutorial files in a working directory. The FE input files can be
 % written or created in this directory. The directory is on a network
 % share, reachable by every cluster machine, and the user has write
@@ -36,15 +37,10 @@ torsion  = Function('Sexpression','<&height&>.*<&width&>.*(<&height&>.^2+<&width
 area     = Function('Sexpression','<&width&>.*<&height&>');
 
 Xrvs = RandomVariableSet('Cmembers',{'youngs','force','height'}); 
-Xinp = Input('Sdescription','Xinput object');       
-Xinp = add(Xinp,Xrvs);
-Xinp = add(Xinp,width);
-Xinp = add(Xinp,inertia1);
-Xinp = add(Xinp,inertia2);
-Xinp = add(Xinp,torsion);
-Xinp = add(Xinp,shear);
-Xinp = add(Xinp,area);
-Xinp = add(Xinp,max_disp);
+Xinp = Input('Sdescription','Xinput object',...
+    'CXmembers',{Xrvs width inertia1 inertia2 torsion shear area max_disp},...                   % object list
+    'CSmembers',{'Xrvs' 'width' 'inertia1' 'inertia2' 'torsion' 'shear' 'area' 'max_disp'});    % name of the objects 
+
 
 % See summary of the Input
 display(Xinp)
@@ -76,7 +72,6 @@ Xextractor = Extractor('Srelativepath','./','Sfile','Abaqus.dat','Xresponse', Xr
 % is set to /tmp. This is done because it is much faster to execute the FE
 % solver on a local folder than on a network shared folder.
 Xconnector = Connector('SpredefinedType','abaqus',...
-               'Sworkingdirectory','/tmp/',...
                'Smaininputpath',Sdirectory,...
                'Smaininputfile','Abaqus.inp',...
                'CXmembers', {Xinjector Xextractor});

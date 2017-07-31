@@ -35,12 +35,11 @@ inertia  = Function('Sexpression','<&width&>.*<&height&>.^3/12');
 area     = Function('Sexpression','<&width&>.*<&height&>');
 
 Xrvs = RandomVariableSet('Cmembers',{'youngs','force','height'}); 
-Xinp = Input('Sdescription','Xinput object');       
-Xinp = add(Xinp,Xrvs);
-Xinp = add(Xinp,width);
-Xinp = add(Xinp,inertia);
-Xinp = add(Xinp,area);
-Xinp = add(Xinp,max_disp);
+
+Xinp = Input('Sdescription','Xinput object',...
+    'CXmembers',{Xrvs width inertia area max_disp},...                   % object list
+    'CSmembers',{'Xrvs' 'width' 'inertia' 'area' 'max_disp'});    % name of the objects 
+
 
 % See summary of the Input
 display(Xinp)
@@ -72,7 +71,6 @@ Xextractor = Extractor('Srelativepath','./','Sfile','Nastran.f06','Xresponse', X
 % is set to /tmp. This is done because it is much faster to execute the FE
 % solver on a local folder than on a network shared folder.
 Xconnector = Connector('SpredefinedType','nastran_x86_64',...
-               'Sworkingdirectory','/tmp/',...
                'Smaininputpath',Sdirectory,...
                'Smaininputfile','Nastran.dat',...
                'CXmembers', {Xinjector Xextractor});

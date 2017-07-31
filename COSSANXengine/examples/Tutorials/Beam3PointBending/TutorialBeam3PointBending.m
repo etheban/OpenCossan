@@ -18,12 +18,13 @@
 % at the middle of the beam.
 %
 % This example  will be studied using several third-party software and various
-% toolboxes of COSSAN-X.   
+% toolboxes of OpenCossan.   
 % 
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/Beam_3-point_bending_(overview)
+% See Also: http://cossan.co.uk/wiki/index.php/Beam_3-point_bending_(overview)
 %
-% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
+% $Copyright~1993-2017,~COSSAN~Working~Group,$
 % $Author:~Pierre~Beaurepaire$ 
+% $Author:~Edoardo~Patelli$ 
 
 
 %% Select the solver

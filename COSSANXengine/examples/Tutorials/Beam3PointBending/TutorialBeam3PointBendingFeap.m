@@ -18,8 +18,6 @@ assert(~isempty(StutorialPath),'openCOSSAN:Tutorial','The tutorial folder must b
 % share, reachable by every cluster machine, and the user has write
 % permission on it.
 
-
-
 SexecutionFolder=fullfile(OpenCossan.getCossanWorkingPath,'TutorialWorkingDir');
 mkdir(SexecutionFolder);
 
@@ -36,11 +34,9 @@ max_disp = Parameter('value',0.015);
 inertia  = Function('Sexpression','<&width&>.*<&height&>.^3/12');
 
 Xrvs = RandomVariableSet('Cmembers',{'youngs','force','height'}); 
-Xinp = Input('Sdescription','Xinput object');       
-Xinp = add(Xinp,Xrvs);
-Xinp = add(Xinp,width);
-Xinp = add(Xinp,inertia);
-Xinp = add(Xinp,max_disp);
+Xinp = Input('Sdescription','Xinput object',...
+    'CXmembers',{Xrvs width inertia  max_disp},...                   % object list
+    'CSmembers',{'Xrvs' 'width' 'inertia'  'max_disp'});    % name of the objects 
 
 % See summary of the Input
 display(Xinp)
@@ -53,7 +49,6 @@ Xinjector  = Injector('Stype','scan','SscanFilePath',Sdirectory,...
 
 %% Construct the connector    
 Xconnector=Connector('SpredefinedType','Feap',...
-                     'Sworkingdirectory',SexecutionFolder, ...
                     'Smaininputpath',Sdirectory,... 
                     'Smaininputfile','Feap','Soutputfile','FeapOut.txt', ...
                  'CSadditionalfiles',{'FeapElement.txt' 'FeapNode.txt'});

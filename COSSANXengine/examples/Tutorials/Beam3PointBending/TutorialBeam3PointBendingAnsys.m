@@ -36,12 +36,10 @@ inertia  = Function('Sexpression','<&width&>.*<&height&>.^3/12');
 area     = Function('Sexpression','<&width&>.*<&height&>');
 
 Xrvs = RandomVariableSet('Cmembers',{'youngs','force','height'}); 
-Xinp = Input('Sdescription','Xinput object');       
-Xinp = add(Xinp,Xrvs);
-Xinp = add(Xinp,width);
-Xinp = add(Xinp,inertia);
-Xinp = add(Xinp,area);
-Xinp = add(Xinp,max_disp);
+  
+Xinp = Input('Sdescription','Xinput object',...
+    'CXmembers',{Xrvs width inertia area max_disp},...                   % object list
+    'CSmembers',{'Xrvs' 'width' 'inertia' 'area' 'max_disp'});    % name of the objects 
 
 % See summary of the Input
 display(Xinp)

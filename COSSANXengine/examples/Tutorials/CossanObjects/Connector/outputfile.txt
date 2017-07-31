@@ -1,0 +1,22 @@
+% this is the first line
+
+10  11              % first value to extract
+20  21              % second value to extract
+
+
+10 11 12 13 % first value to extract
+
+% This might be a header 
+
+1 20.1 30e1
+2 40.2 50e2
+3 60.3 70e3
+4 80.4 90e4
+
+% This is another text 
+% This another table to extract
+5 120 260 315 456
+6 156 264 356 456
+7 161 256 356 456
+
+% last line

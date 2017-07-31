@@ -25,8 +25,18 @@ clear, clc
 % copyfile([StutorialPath '/*'],...
 %     fullfile(OpenCossan.getCossanWorkingPath,'TutorialWorkingDir'),'f');
 
+prompt{1} = 'Username:';
+prompt{2} = 'Password:';
+prompt{3} = 'Remote folder:';
+defAns = {'', ''};
+title = 'Credentials needed for SSH connection';
+answer = inputdlg(prompt, title, [1, 60], defAns, 'on');
+    
+
 OpenCossan('SworkingPath',fullfile(pwd,'workfolder'))
-SSHConnection('SsshHost','cossan.cfd.liv.ac.uk','SsshUser','etubaldi','SsshPassword','sellero7','SremoteWorkFolder','/home/etubaldi/temp');
+
+SSHConnection('SsshHost','iru1.liv.ac.uk', ...
+              'SsshUser',answer{1},'SsshPassword',answer{2},'SremoteWorkFolder',answer{3});
 %% Create the input
 % accelerogram inputs
 wg = Parameter('value',12.5); % Kanai Tajimi  filter circular frequency 
