@@ -47,15 +47,21 @@ if ~isempty(Xobj.Cinputnames)
     OpenCossan.cossanDisp(['* Sensitivity for input variables ', sprintf('%s ',Xobj.Cinputnames{:})],1);
 end
        
-OpenCossan.cossanDisp('----------------------------------------------------',3);
-OpenCossan.cossanDisp(['* Simulator : ',class(Xobj.Xsimulator)],2);
-OpenCossan.cossanDisp(['* Number of samples           : ',sprintf('%i ',Xobj.Xsimulator.Nsamples)],2);
-OpenCossan.cossanDisp(['* Number of bootstrap         : ',sprintf('%i ',Xobj.Nbootstrap)],2);
-OpenCossan.cossanDisp(['* Number of model evaluations : ' num2str(Xobj.Xsimulator.Nsamples*(length(Xobj.Cinputnames)+2))],2)
-OpenCossan.cossanDisp('----------------------------------------------------',3);
-
-
-        
+if isempty(Xobj.Xsimulator) 
+    OpenCossan.cossanDisp(' GlobalSensitivitySobol Object : Given data',3);
+    OpenCossan.cossanDisp('----------------------------------------------------',3);
+    OpenCossan.cossanDisp(['* Type of given input data    : ',class(Xobj.XsimulationData)],2);
+    OpenCossan.cossanDisp(['* Number of samples           : ',sprintf('%i ',length(Xobj.XsimulationData))],2);
+    OpenCossan.cossanDisp(['* Number of bootstrap         : ',sprintf('%i ',Xobj.Nbootstrap)],2);
+    OpenCossan.cossanDisp('----------------------------------------------------',3);
+else 
+    OpenCossan.cossanDisp('----------------------------------------------------',3);
+    OpenCossan.cossanDisp(['* Simulator : ',class(Xobj.Xsimulator)],2);
+    OpenCossan.cossanDisp(['* Number of samples           : ',sprintf('%i ',Xobj.Xsimulator.Nsamples)],2);
+    OpenCossan.cossanDisp(['* Number of bootstrap         : ',sprintf('%i ',Xobj.Nbootstrap)],2);
+    OpenCossan.cossanDisp(['* Number of model evaluations : ' num2str(Xobj.Xsimulator.Nsamples*(length(Xobj.Cinputnames)+2))],2)
+    OpenCossan.cossanDisp('----------------------------------------------------',3);
+end    
         
         
         

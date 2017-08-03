@@ -1,8 +1,8 @@
 classdef GlobalSensitivitySobol < Sensitivity
-    %GLOBALSENSITIVITYSOBOL Global Sensitivity based on Sobol' indices 
+    %GLOBALSENSITIVITYSOBOL Global Sensitivity based on Sobol' indices
     
     % This is a class for global sensitivity analysis based of Sobol'
-    % indices  
+    % indices
     %
     % See also:
     % https://cossan.co.uk/wiki/index.php/@GlobalSensitivitySobol
@@ -33,17 +33,19 @@ classdef GlobalSensitivitySobol < Sensitivity
         Nbootstrap=100;
         Xsimulator
         Smethod='saltelli2010'
+        XsimulationData                 % Store simulationData for computing Sobol' indices using GivenData method
+        NfreqValue          % Required by the Given Data method 
     end
     
     properties (Constant,Hidden)
-        CmethodNames={'saltelli2008','sobol1993','saltelli2010','jansen1999'}
+        CmethodNames={'saltelli2008','sobol1993','saltelli2010','jansen1999','givendata'}
     end
     
     methods
         function Xobj=GlobalSensitivitySobol(varargin)
             %GlobalSensitivitySobol
-    % This is the constructor for the GlobalSensitivitySobol object. 
-    %
+            % This is the constructor for the GlobalSensitivitySobol object.
+            %
             % See also: https://cossan.co.uk/wiki/index.php/@GlobalSensitivitySobol
             %
             % Author: Edoardo Patelli
@@ -116,15 +118,23 @@ classdef GlobalSensitivitySobol < Sensitivity
                             'openCOSSAN:GlobalSensitivitySobol:methodNotValid',...
                             'The method %s is not a valid name. Available methods are %s',...
                             varargin{k+1},sprintf('"%s" ',Xobj.CmethodNames{:}))
-                        Xobj.Smethod=varargin{k+1}; 
+                        Xobj.Smethod=varargin{k+1};
+                    case {'nfrequency'}
+                        Xobj.NfreqValue=varargin{k+1};
+                    case {'xsimulationdata'}
+                        Xobj.XsimulationData=varargin{k+1};
                     otherwise
                         error('openCOSSAN:GlobalSensitivitySobol',...
                             'The PropertyName %s is not allowed',varargin{k});
                 end
             end
             
-            assert(~isempty(Xobj.Xsimulator),'openCOSSAN:GlobalSensitivitySobol',...
-                'It is not possible to define a GlobalSensitivitySobol object without a simulator object')
+            if isempty(Xobj.Xsimulator) || isempty(Xobj.XsimulationData)
+                assert(~isempty(Xobj.Xsimulator) || ~isempty(Xobj.XsimulationData),'openCOSSAN:GlobalSensitivitySobol',...
+                    'It is not possible to define a GlobalSensitivitySobol object without a Simulator object or a SimulationData')
+            end
+            
+            
             
             if exist('Xmodel','var')
                 Xobj=Xobj.addModel(Xmodel);
@@ -132,7 +142,13 @@ classdef GlobalSensitivitySobol < Sensitivity
             
         end % end of constructor
     end
-   
+    
+    methods (Access=private)
+        varargout=useRandomSamples(Xobj); % Use random samples
+        varargout=useGivenData(Xobj); % Use Elmar's method Given Data Sensitivity
+    end
+    
+    
     
 end
 
