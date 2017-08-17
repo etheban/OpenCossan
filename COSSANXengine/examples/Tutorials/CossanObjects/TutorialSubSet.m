@@ -23,8 +23,8 @@ Xpar=Parameter('Sdescription','Define Capacity','value',-3);
 
 % Define of the Input object
 Xin     = Input(); 
-Xin     = add(Xin,Xrvs);
-Xin = Xin.add(Xpar);
+Xin     = add(Xin,'Xmember',Xrvs,'Sname','Xrvs');
+Xin = Xin.add('Xmember',Xpar,'Sname','Xpar');
 
 
 % Define a Model

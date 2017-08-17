@@ -14,20 +14,20 @@ XP = RandomVariable('Sdescription','load at tip of beam',...
 Xh = RandomVariable('Sdescription','height of cross section of beam',...
     'Sdistribution','uniform','par1',0.2,'par2',0.3);
 Xrvset      = RandomVariableSet('Cmembers',{'Xh','XP'});
-Xin         = add(Xin,Xrvset);
+Xin         = add(Xin,'Xmember',Xrvset,'Sname','Xrvset');
 XL = Parameter('Sdescription','length of beam','value',1);
-Xin = add(Xin,XL);
+Xin = add(Xin,'Xmember',XL,'Sname','XL');
 XI = Function('Sdescription','second moment of inertia of beam',...
     'Sexpression','<&Xh&>.^4/12');
-Xin = add(Xin,XI);
+Xin = add(Xin,'Xmember',XI,'Sname','XI');
 XE  = Parameter('Sdescription','Young''s modulus of beam','value',2e11);
-Xin = add(Xin,XE);
+Xin = add(Xin,'Xmember',XE,'Sname','XE');
 
 % this parameters are used in the test computation of pf
 Xthreshold1 = Parameter('Sdescription','Define threshold','value',0.016);
-Xin = add(Xin,Xthreshold1);
+Xin = add(Xin,'Xmember',Xthreshold1,'Sname','Xthreshold1');
 Xthreshold2 = Parameter('Sdescription','Define threshold','value',0.017);
-Xin = add(Xin,Xthreshold2);
+Xin = add(Xin,'Xmember',Xthreshold2,'Sname','Xthreshold2');
 
 %%    Evaluator
 %   An evaluator based on a mio script is defined. This evaluator
