@@ -1,8 +1,8 @@
-function varargout=computeIndices(Xobj)
+function varargout=computeIndices(Xobj,varargin)
 %COMPUTEINDICES This method does the Local Sensitivity analysis, and
 %computes the local sensitivity indices
 %
-% $Copyright~1993-2012,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
+% $Copyright~1993-2017,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
 % $Author: Edoardo-Patelli$
 
 % =====================================================================
@@ -21,6 +21,23 @@ function varargout=computeIndices(Xobj)
 %  You should have received a copy of the GNU General Public License
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
 % =====================================================================
+
+
+%% Check inputs
+OpenCossan.validateCossanInputs(varargin{:})
+% OpenCossan.resetRandomNumberGenerator(357357)
+%% Process inputs
+for k=1:2:length(varargin)
+    switch lower(varargin{k})
+        case {'xtarget','xmodel'}
+            Xobj=Xobj.addModel(varargin{k+1}(1));
+        case {'cxtarget','cxmodel'}
+            Xobj=Xobj.addModel(varargin{k+1}{1});
+        otherwise
+            error('openCOSSAN:LocalSensitivityFiniteDifference:computeIndices:WrontInputArgument',...
+                'The PropertyName %s is not allowed',varargin{k});
+    end
+end
 
 % Set the analysis name when not deployed
 if ~isdeployed

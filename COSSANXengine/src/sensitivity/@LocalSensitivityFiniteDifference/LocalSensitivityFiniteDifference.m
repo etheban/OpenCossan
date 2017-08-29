@@ -103,8 +103,8 @@ classdef LocalSensitivityFiniteDifference < Sensitivity
     end
     
     methods (Access=public)
-        varargout=computeGradient(Xobj) % Perform Local Sensitivity (returning gradient)
-        varargout=computeGradientStandardNormalSpace(Xobj) % Perform Local Sensitivity (returning gradient)
+        varargout=computeGradient(Xobj,varargin) % Perform Local Sensitivity (returning gradient)
+        varargout=computeGradientStandardNormalSpace(Xobj,varargin) % Perform Local Sensitivity (returning gradient)
     end
     
     methods (Access=protected)
