@@ -15,7 +15,7 @@ function Lstop = outputFunctionOptimiser(XOptimizer,Vx,ToptimValues,State)
 %  should quit or continue. The following examples show typical ways to use
 %  the stop flag.
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/addIteration@Optimum
+% See Also: http://cossan.co.uk/wiki/addIteration@Optimum
 % See Also Matlab documentation "optimization-options-reference"
 %
 % Author: Edoardo Patelli

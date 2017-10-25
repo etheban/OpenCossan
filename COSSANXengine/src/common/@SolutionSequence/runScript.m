@@ -23,7 +23,7 @@ assert(length(varargin)==length(XobjSolutionSequence.Cinputnames), ...
  end
  
 %% Execute the script
-    if isempty(XobjSolutionSequence.Sscript),   %checks how the script was defined
+    if isempty(XobjSolutionSequence.Sscript)   %checks how the script was defined
         try
             OpenCossan.cossanDisp('[SolutionSequence:apply] Running user defined script defined in the file',3)
             run(fullfile(XobjSolutionSequence.Spath,XobjSolutionSequence.Sfile));  %runs script contained in a file line by line

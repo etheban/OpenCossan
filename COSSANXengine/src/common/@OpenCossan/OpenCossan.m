@@ -241,24 +241,25 @@ classdef OpenCossan < handle
             
             if isdeployed
                 Status='deployed';
+                disp(['Engine type: ',Status])
             else
                 [Spath, Status]=OpenCossan.getCossanRoot;
             end
             
-            disp(['Engine type: ',Status])
-            
+                     
             %% Set path
             if ~isdeployed %&& isempty(OpenCossan.getCossanRoot)
                 
                 % Check if the toolbox is OpenCossan is installed as a
                 % Toolbox (AddOns)
-                if verLessThan('matlab', '9.0')
+                if verLessThan('matlab', '9.0') || exist('Sroot','var')
                     LsetPath=1;
                 else
                     toolboxes=matlab.addons.toolbox.installedToolboxes;
                    
                     if  any(arrayfun(@(x)strcmp(x.Name,'OpenCossan'),toolboxes))
                         LsetPath=0;
+                        disp(['Using OpenCossan toolbox. Version:  ',toolboxes.Version])
                     else
                         LsetPath=1;
                     end

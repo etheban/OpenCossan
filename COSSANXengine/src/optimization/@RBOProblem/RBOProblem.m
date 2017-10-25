@@ -36,6 +36,7 @@ classdef RBOProblem < OptimizationProblem
         NmaxLocalRBOIteration   % maximum number of iteration for local RBO
         SmetamodelType          % Type of metamodel used for solving the RBOproblem
         CmetamodelProperties    % Cell that contains the properties of the MetaModel
+        CSinnerLoopOutputNames  % Names associated to the quantity of interest
     end
     
     
@@ -95,8 +96,8 @@ classdef RBOProblem < OptimizationProblem
             OpenCossan.validateCossanInputs(varargin{:})
             
             %% Process inputs arguments
-            for k=1:2:length(varargin),
-                switch lower(varargin{k}),
+            for k=1:2:length(varargin)
+                switch lower(varargin{k})
                     %2.1.   Description of the object
                     case 'sdescription'
                         Xobj.Sdescription   = varargin{k+1};
@@ -199,6 +200,8 @@ classdef RBOProblem < OptimizationProblem
                         Xobj.NmaxLocalRBOIteration=varargin{k+1};
                     case 'vperturbation'
                         Xobj.VperturbationSize=varargin{k+1};
+                    case 'csinnerloopoutputnames'
+                        Xobj.CSinnerLoopOutputNames=varargin{k+1};
                     otherwise
                         % The validity of the metamodelProperties is not checked
                         % during the definition of the RBOproblem but only when

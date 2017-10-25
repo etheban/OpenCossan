@@ -45,19 +45,19 @@ Xfun3   = Function('Sdescription','function #2', ...
 Xin=Input('Sdescription','My first Input'); % initialize Input object
 
 % Add parameters to the input object
-Xin = Xin.add(Xconfiguration);
-Xin = Xin.add(Xmat1);
-Xin = Xin.add(Xmat2);
-Xin = Xin.add(Xmat3);
+Xin = Xin.add('Sname','Xconfiguration','Xmember',Xconfiguration);
+Xin = Xin.add('Xmember',Xmat1,'Sname','Xmat1');
+Xin = Xin.add('Xmember',Xmat2,'Sname','Xmat2');
+Xin = Xin.add('Xmember',Xmat3,'Sname','Xmat3');
 % Add RandomVariable
-Xin     = Xin.add(Xrvs1);
-Xin     = Xin.add(Xrvs2);
-Xin     = Xin.add(Xrvs3);
+Xin     = Xin.add('Xmember',Xrvs1,'Sname','Xrvs1');
+Xin     = Xin.add('Xmember',Xrvs2,'Sname','Xrvs2');
+Xin     = Xin.add('Xmember',Xrvs3,'Sname','Xrvs3');
 
 % Add Functions
-Xin = Xin.add(Xfun1);
-Xin = Xin.add(Xfun2);
-Xin = Xin.add(Xfun3);
+Xin = Xin.add('Xmember',Xfun1,'Sname','Xfun1');
+Xin = Xin.add('Xmember',Xfun2,'Sname','Xfun2');
+Xin = Xin.add('Xmember',Xfun3,'Sname','Xfun3');
 
 %% Show summary of the Input object
 display(Xin)

@@ -1,37 +1,34 @@
 <deployment-project plugin="plugin.toolbox" plugin-version="1.0">
-  <configuration file="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps/OpenCossanToolbox.prj" location="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps" name="OpenCossanToolbox" target="target.toolbox" target-name="Package Toolbox">
+  <configuration build-checksum="772300801" file="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps/OpenCossanToolbox.prj" location="/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps" name="OpenCossanToolbox" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>OpenCossan</param.appname>
     <param.authnamewatermark>Edoardo Patelli</param.authnamewatermark>
     <param.email>info@cossan.co.uk</param.email>
     <param.company>Cossan Working Group</param.company>
     <param.summary>OpenCossan - A general purpose software for uncertainty quantification and management</param.summary>
-    <param.description>&lt;b&gt;OpenCossan&lt;/b&gt; is the core of the COSSAN software. It is programmed in a Object Oriented style in order to provide &lt;i&gt;flexibility&lt;/i&gt; and &lt;i&gt;extendibility&lt;/i&gt; of the toolbox. In fact, using this toolbox the users and researchers can modify pre-written solution sequences, explore data, implement new algorithms, etc., in other words simply create custom tools, which enable the solution of specialised problems. 
+    <param.description>&lt;b&gt;OpenCossan&lt;/b&gt; is the core of the Cossan software. It is programmed in a Object Oriented style in order to provide &lt;i&gt;flexibility&lt;/i&gt; and &lt;i&gt;extendibility&lt;/i&gt; of the toolbox. In fact, using this toolbox the users and researchers can modify pre-written solution sequences, explore data, implement new algorithms, etc., in other words simply create custom tools, which enable the solution of specialised problems. 
 
 The software offers the most advanced and recent algorithms for the rational quantification and propagation of uncertainties. Furthermore, since stochastic methods are in general computationally demanding, the resort of high performance computing is required in order to reduce the execution time (wall clock time) of the analysis.  The implementations available in openCossan are coupled with the parallel computing features in order to be able to analyse realistic problems within feasible computational times. 
-OpenCossan is an all-in-one package software for the practitioners to perform Uncertainty Quantification, Simulation-based Reliability Analysis, Sensitivity Analysis, Meta-Modelling, Stochastic Finite Elements Analysis, and Robust Design and Reliability-Based Optimization.
+OpenCossan is an all-in-one package software for the practitioners to perform Uncertainty Quantification, Simulation-based Reliability Analysis, Sensitivity Analysis, Meta-Modelling and Robust Design and Reliability-Based Optimization.
 
 See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.description>
-    <param.screenshot>${PROJECT_ROOT}/OpenCossanLogo.png</param.screenshot>
-    <param.version>1.8</param.version>
+    <param.screenshot>${PROJECT_ROOT}/OpenCossanApp_resources/icon_48.png</param.screenshot>
+    <param.version>1.8.2</param.version>
     <param.output>${PROJECT_ROOT}/OpenCossan.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>
       <item>Global Optimization Toolbox</item>
-      <item>MATLAB Compiler</item>
       <item>Optimization Toolbox</item>
       <item>Statistics and Machine Learning Toolbox</item>
     </param.products.name>
     <param.products.id>
       <item>1</item>
       <item>90</item>
-      <item>28</item>
       <item>6</item>
       <item>19</item>
     </param.products.id>
     <param.products.version>
       <item>9.2</item>
       <item>3.4.2</item>
-      <item>6.4</item>
       <item>7.6</item>
       <item>11.1</item>
     </param.products.version>
@@ -54,8 +51,10 @@ database/*
 % **/.svn
 %
 % All files matching a pattern in all subfolders of the toolbox folder:
-% **/*.bak
-%</param.exclude.filters>
+**/*.bak
+% Ignore Contents.m
+**/Contents.m
+.project</param.exclude.filters>
     <param.examples>&lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;examples&gt;
    &lt;exampleCategory name="Show Cases"&gt;
@@ -729,12 +728,11 @@ database/*
    &lt;/exampleCategory&gt;
 &lt;/examples&gt;</param.examples>
     <param.demosxml />
-    <param.apps />
+    <param.apps>
+      <file>${PROJECT_ROOT}/OpenCossanApp.mlappinstall</file>
+    </param.apps>
     <param.docs>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/docs/info.xml</param.docs>
-    <param.matlabpath.excludes>
-      <item>/database/PCterms</item>
-      <item>/database/DMAP</item>
-    </param.matlabpath.excludes>
+    <param.matlabpath.excludes />
     <param.javaclasspath.excludes />
     <unset>
       <param.authnamewatermark />
@@ -742,16 +740,14 @@ database/*
       <param.output />
       <param.platforms />
       <param.demosxml />
-      <param.apps />
+      <param.matlabpath.excludes />
       <param.javaclasspath.excludes />
     </unset>
     <fileset.rootdir>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine</file>
     </fileset.rootdir>
     <fileset.rootfiles>
-      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/.project</file>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Apps</file>
-      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/Contents.m</file>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/UnitTest</file>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/database</file>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/docs</file>
@@ -808,7 +804,7 @@ database/*
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>4.11.8-300.fc26.x86_64</osver>
+      <osver>4.13.8-300.fc27.x86_64</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>

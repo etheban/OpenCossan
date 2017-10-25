@@ -86,3 +86,5 @@ Xmodel = Model('Xinput',Xinp,'Xevaluator',Xevaluator);
 
 % See summary of the Model
 display(Xmodel)
+
+Xmodel.deterministicAnalysis

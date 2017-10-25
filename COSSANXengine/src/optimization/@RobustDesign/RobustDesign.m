@@ -34,8 +34,8 @@ classdef RobustDesign < OptimizationProblem
             OpenCossan.validateCossanInputs(varargin{:})
             
             %% Process inputs arguments
-            for k=1:2:length(varargin),
-                switch lower(varargin{k}),
+            for k=1:2:length(varargin)
+                switch lower(varargin{k})
                     %2.1.   Description of the object
                     case 'sdescription'
                         Xobj.Sdescription   = varargin{k+1};
