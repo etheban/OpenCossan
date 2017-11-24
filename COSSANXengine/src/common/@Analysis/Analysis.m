@@ -33,7 +33,7 @@ classdef Analysis < handle
         SworkingPath=userpath  % Path of the working folder
         Xtimer                 % Timer object
         SrandomNumberAlgorithm='mt19937ar'; % Random Number generetor Algorithms
-        Nseed=floor(sum(100*clock))   % Seed number for the random number generator
+        Nseed                  % Seed number for the random number generator
         XrandomStream          % Store the current Random stream 
     end    
     
@@ -107,7 +107,11 @@ classdef Analysis < handle
 
             
             %% Set the RandomNumberGenerator
-            Xobj.XrandomStream = RandStream(Xobj.SrandomNumberAlgorithm,'Seed',Xobj.Nseed);
+            if isempty(Xobj.Nseed)
+                Xobj.XrandomStream = RandStream(Xobj.SrandomNumberAlgorithm,'Seed','shuffle');
+            else
+                Xobj.XrandomStream = RandStream(Xobj.SrandomNumberAlgorithm,'Seed',Xobj.Nseed);
+            end
             RandStream.setGlobalStream(Xobj.XrandomStream);
             
             %% Initialize embedded objects

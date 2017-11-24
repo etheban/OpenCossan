@@ -1,8 +1,9 @@
 function reset
-%RESET This static method of OpenCossan allows to clean up the workspace without
+%RESET This static method allows to clean up the workspace without
 % reinitilizing OpenCossan.
-%  The method remove all the variables, close all the open files and figures and
-%  restart the timer object
+% The method removes all the variables, close all the open files and
+% figures, restart the timer object but not the RandomStream. 
+% Use resetRandomNumberGenerator to reset the RandomStream.
 %
 % Author: Edoardo Patelli
 % Institute for Risk and Uncertainty, University of Liverpool, UK
@@ -61,12 +62,6 @@ if OPENCOSSAN.NverboseLevel>1
     end
 end
 
-
 %% Reset Timer
-
 OPENCOSSAN.Xanalysis.Xtimer.reset;
 OPENCOSSAN.Xanalysis.Xtimer.starttime('Sdescription','Start timer from the OpenCossan');
-
-%% Set the RandomNumberGenerator
-OpenCossan.resetRandomNumberGenerator
-

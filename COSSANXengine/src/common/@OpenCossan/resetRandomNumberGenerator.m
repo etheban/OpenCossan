@@ -1,6 +1,12 @@
 function resetRandomNumberGenerator(Nseed)
 % RESETRANDOMNUMBERGENERATOR This static method of OpenCossan allows to
-% reset the status of the random number generator
+% reset the status of the random number generator. 
+%
+% Resetting a stream should be used primarily for reproducing results.
+%
+% If the value of the seed is provides, it is used to reinitilised the
+% random number generator otherwise the  internal state corresponding to
+% the initialised state of the random number generator is used
 %
 % Author: Edoardo Patelli
 % Institute for Risk and Uncertainty, University of Liverpool, UK
@@ -26,17 +32,20 @@ function resetRandomNumberGenerator(Nseed)
 
 global OPENCOSSAN
 
-assert(~isempty(OPENCOSSAN),'openCOSSAN:OpenCossan',...
+assert(~isempty(OPENCOSSAN),'openCOSSAN:OpenCossan:resetRandomNumberGenerator',...
     'OpenCossan has not been initialise. \n Please run OpenCossan! ')
 
 if nargin==0
-    Nseed=OPENCOSSAN.Xanalysis.Nseed;
-elseif nargin>1
-    error('openCOSSAN:OpenCossan',...
-        'This method required only 1 input argument, i.e. the seed of the random number generator')
+    reset(OPENCOSSAN.Xanalysis.XrandomStream);
+elseif nargin==1    
+    OPENCOSSAN.Xanalysis.XrandomStream = RandStream(OPENCOSSAN.Xanalysis.SrandomNumberAlgorithm,'Seed',Nseed);
+    RandStream.setGlobalStream(OPENCOSSAN.Xanalysis.XrandomStream)
+else
+    error('openCOSSAN:OpenCossan:resetRandomNumberGenerator:wrongNumberOfInputArguments',...
+        'This method requires only 1 input argument, i.e. the seed of the random number generator')
 end
     
 
-defaultsStream = RandStream(OPENCOSSAN.Xanalysis.SrandomNumberAlgorithm,'Seed',Nseed);
-RandStream.setGlobalStream(defaultsStream)
+
+
             
