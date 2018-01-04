@@ -8,12 +8,12 @@
     <param.description>&lt;b&gt;OpenCossan&lt;/b&gt; is the core of the Cossan software. It is programmed in a Object Oriented style in order to provide &lt;i&gt;flexibility&lt;/i&gt; and &lt;i&gt;extendibility&lt;/i&gt; of the toolbox. In fact, using this toolbox the users and researchers can modify pre-written solution sequences, explore data, implement new algorithms, etc., in other words simply create custom tools, which enable the solution of specialised problems. 
 
 The software offers the most advanced and recent algorithms for the rational quantification and propagation of uncertainties. Furthermore, since stochastic methods are in general computationally demanding, the resort of high performance computing is required in order to reduce the execution time (wall clock time) of the analysis.  The implementations available in openCossan are coupled with the parallel computing features in order to be able to analyse realistic problems within feasible computational times. 
-OpenCossan is an all-in-one package software for the practitioners to perform Uncertainty Quantification, Simulation-based Reliability Analysis, Sensitivity Analysis, Meta-Modelling and Robust Design and Reliability-Based Optimization.
+OpenCossan is an all-in-one package software for the practitioners to perform Uncertainty Quantification, Simulation-based Reliability and Resilience Analysis, Sensitivity Analysis, Meta-Modelling and Robust Design and Reliability-Based Optimization.
 
 See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.description>
-    <param.screenshot>${PROJECT_ROOT}/OpenCossanApp_resources/icon_48.png</param.screenshot>
-    <param.version>1.9</param.version>
-    <param.output>/home/epatelli/workspace/OpenCossan/branches/Archives/stable/OpenCossan.mltbx</param.output>
+    <param.screenshot>${PROJECT_ROOT}/OpenCossanIcon2018.png</param.screenshot>
+    <param.version>1.9.2</param.version>
+    <param.output>${PROJECT_ROOT}/OpenCossan.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>
       <item>Global Optimization Toolbox</item>
@@ -27,10 +27,10 @@ See more at: &lt;a href="www.cossan.co.uk"&gt;Cossan website&lt;/a&gt;</param.de
       <item>19</item>
     </param.products.id>
     <param.products.version>
-      <item>9.2</item>
-      <item>3.4.2</item>
-      <item>7.6</item>
-      <item>11.1</item>
+      <item>9.3</item>
+      <item>3.4.3</item>
+      <item>8.0</item>
+      <item>11.2</item>
     </param.products.version>
     <param.platforms />
     <param.guid>a9cd2bf2-1595-4c68-98f9-dfb7872dbdc3</param.guid>
@@ -55,50 +55,28 @@ COSSANXengine/database/*
 % Ignore Contents.m
 **/Contents.m
 .project
-% Exclude User_cases
+% Exclude User_cases tools and FE models
 COSSANXengine/tools/*
 COSSANXengine/examples/Show_Cases/*
-COSSANXengine/examples/Models/PATRAN/FIAT_car.db
-COSSANXengine/examples/Models/NASTRAN/CarBodyinWhite/*
+COSSANXengine/examples/Models/FiniteElements
+COSSANXengine/examples/Unit_test
+COSSANXengine/examples/Tutorials/TurbineBlade
+COSSANXengine/examples/Tutorials/CylindricalShell
+COSSANXengine/examples/Tutorials/SuspensionArm
+COSSANXengine/examples/Tutorials/GOCEsatellite
+COSSANXengine/examples/Tutorials/CossanObjects/Connector/ASTER/Cas.base
 
-OpenSourceSoftware/dist/CentOS/*
-OpenSourceSoftware/dist/Fedora/*
-OpenSourceSoftware/dist/glnxa64/*
-OpenSourceSoftware/dist/Mac_OS_X/*
-OpenSourceSoftware/dist/Ubuntu/*
-OpenSourceSoftware/dist/Windows/*
-
-% Exclude Patran plug-ins
-Plug-ins/*</param.exclude.filters>
+% Exclude compiled libraries
+OpenSourceSoftware/dist/*
+% Exclude MEX binary files
+COSSANXengine/mex/bin
+COSSANXengine/mex/src
+% Exclude Patran plug-ins and MASCOT
+Plug-ins/*
+% Exclude Apps and toolboxes
+COSSANXengine/Apps</param.exclude.filters>
     <param.examples>&lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;examples&gt;
-   &lt;exampleCategory name="Show Cases"&gt;
-      &lt;example name="13. 6-Storey Building (Abaqus) - In this example, the variation of the stresses of a structural model with random model parameters are computed by means of MonteCarlo simulation." type="html"&gt;
-         &lt;file type="source"&gt;/COSSANXengine/docs/html/Tutorial6StoreyBuilding.html&lt;/file&gt;
-         &lt;file type="main"/&gt;
-         &lt;file type="thumbnail"/&gt;
-      &lt;/example&gt;
-      &lt;example name="14. Car Model (NASTRAN) - This example shows the simulation of a car body in white" type="html"&gt;
-         &lt;file type="source"&gt;/COSSANXengine/docs/html/TutorialCarModel.html&lt;/file&gt;
-         &lt;file type="main"/&gt;
-         &lt;file type="thumbnail"&gt;/COSSANXengine/docs/html/TutorialCarModel.png&lt;/file&gt;
-      &lt;/example&gt;
-      &lt;example name="15. GOCE Satellite (NASTRAN) - This example shows how to perfor model updateing of the GOCE satellite" type="html"&gt;
-         &lt;file type="source"&gt;/COSSANXengine/docs/html/TutorialGOCEsatellite.html&lt;/file&gt;
-         &lt;file type="main"/&gt;
-         &lt;file type="thumbnail"&gt;/COSSANXengine/docs/html/TutorialGOCEsatellite.png&lt;/file&gt;
-      &lt;/example&gt;
-      &lt;example name="16. Cylindrical Shell (ABAQUS) - This example shows how to perfor buckling analysis of a cylindrical shell" type="html"&gt;
-         &lt;file type="source"&gt;/COSSANXengine/docs/html/TutorialCylindricalShell.html&lt;/file&gt;
-         &lt;file type="main"/&gt;
-         &lt;file type="thumbnail"&gt;/COSSANXengine/docs/html/TutorialCylindricalShell.png&lt;/file&gt;
-      &lt;/example&gt;
-      &lt;example name="17. Suspension Arm (Nastran)" type="html"&gt;
-         &lt;file type="source"&gt;/COSSANXengine/docs/html/TutorialSuspensionArm.html&lt;/file&gt;
-         &lt;file type="main"/&gt;
-         &lt;file type="thumbnail"&gt;/COSSANXengine/docs/html/TutorialSuspensionArm.png&lt;/file&gt;
-      &lt;/example&gt;
-   &lt;/exampleCategory&gt;
    &lt;exampleCategory name="Examples Demos"&gt;
       &lt;example name="1. Cantilever Beam " type="html"&gt;
          &lt;file type="source"&gt;/COSSANXengine/docs/html/TutorialCantileverBeam.html&lt;/file&gt;
@@ -741,12 +719,41 @@ Plug-ins/*</param.exclude.filters>
          &lt;file type="image"&gt;/COSSANXengine/docs/html/TutorialUserDefRandomVariable_04.png&lt;/file&gt;
       &lt;/example&gt;
    &lt;/exampleCategory&gt;
+   &lt;exampleCategory name="Show Cases"&gt;
+      &lt;example name="13. 6-Storey Building (Abaqus) - In this example, the variation of the stresses of a structural model with random model parameters are computed by means of MonteCarlo simulation." type="html"&gt;
+         &lt;file type="source"&gt;/COSSANXengine/docs/html/Tutorial6StoreyBuilding.html&lt;/file&gt;
+         &lt;file type="main"/&gt;
+         &lt;file type="thumbnail"/&gt;
+      &lt;/example&gt;
+      &lt;example name="14. Car Model (NASTRAN) - This example shows the simulation of a car body in white" type="html"&gt;
+         &lt;file type="source"&gt;/COSSANXengine/docs/html/TutorialCarModel.html&lt;/file&gt;
+         &lt;file type="main"/&gt;
+         &lt;file type="thumbnail"&gt;/COSSANXengine/docs/html/TutorialCarModel.png&lt;/file&gt;
+      &lt;/example&gt;
+      &lt;example name="15. GOCE Satellite (NASTRAN) - This example shows how to perfor model updateing of the GOCE satellite" type="html"&gt;
+         &lt;file type="source"&gt;/COSSANXengine/docs/html/TutorialGOCEsatellite.html&lt;/file&gt;
+         &lt;file type="main"/&gt;
+         &lt;file type="thumbnail"&gt;/COSSANXengine/docs/html/TutorialGOCEsatellite.png&lt;/file&gt;
+      &lt;/example&gt;
+      &lt;example name="16. Cylindrical Shell (ABAQUS) - This example shows how to perfor buckling analysis of a cylindrical shell" type="html"&gt;
+         &lt;file type="source"&gt;/COSSANXengine/docs/html/TutorialCylindricalShell.html&lt;/file&gt;
+         &lt;file type="main"/&gt;
+         &lt;file type="thumbnail"&gt;/COSSANXengine/docs/html/TutorialCylindricalShell.png&lt;/file&gt;
+      &lt;/example&gt;
+      &lt;example name="17. Suspension Arm (Nastran)" type="html"&gt;
+         &lt;file type="source"&gt;/COSSANXengine/docs/html/TutorialSuspensionArm.html&lt;/file&gt;
+         &lt;file type="main"/&gt;
+         &lt;file type="thumbnail"&gt;/COSSANXengine/docs/html/TutorialSuspensionArm.png&lt;/file&gt;
+      &lt;/example&gt;
+   &lt;/exampleCategory&gt;
 &lt;/examples&gt;</param.examples>
     <param.demosxml />
     <param.apps>
-      <file>${PROJECT_ROOT}/OpenCossanApp.mlappinstall</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/OpenCossanApp.mlappinstall</file>
     </param.apps>
+    <param.registered.apps />
     <param.docs>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine/docs/info.xml</param.docs>
+    <param.getting.started.guide>/home/epatelli/workspace/OpenCossan/branches/stable/doc/GettingStarted.mlx</param.getting.started.guide>
     <param.matlabpath.excludes />
     <param.javaclasspath.excludes />
     <unset>
@@ -755,6 +762,7 @@ Plug-ins/*</param.exclude.filters>
       <param.output />
       <param.platforms />
       <param.demosxml />
+      <param.registered.apps />
       <param.matlabpath.excludes />
       <param.javaclasspath.excludes />
     </unset>
@@ -765,6 +773,7 @@ Plug-ins/*</param.exclude.filters>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/COSSANXengine</file>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/OpenSourceSoftware</file>
       <file>/home/epatelli/workspace/OpenCossan/branches/stable/Plug-ins</file>
+      <file>/home/epatelli/workspace/OpenCossan/branches/stable/doc</file>
     </fileset.rootfiles>
     <fileset.depfun.included />
     <fileset.depfun.excluded />
@@ -774,7 +783,7 @@ Plug-ins/*</param.exclude.filters>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>/usr/local/MATLAB/R2017a</root>
+      <root>/usr/local/MATLAB/R2017b</root>
       <toolboxes>
         <toolbox name="matlabcoder" />
       </toolboxes>
@@ -793,7 +802,7 @@ Plug-ins/*</param.exclude.filters>
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>4.13.8-300.fc27.x86_64</osver>
+      <osver>4.13.16-302.fc27.x86_64</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>
