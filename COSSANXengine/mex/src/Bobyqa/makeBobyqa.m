@@ -3,7 +3,7 @@
 
 disp('Compiling the BOBYQA mex interface ..');
 
-assert(~isempty(OpenCossan.getCossanRoot),'openCOSSAN:makeBobyqa','Please initialize COSSAN-X')
+assert(~isempty(OpenCossan.getCossanRoot),'openCOSSAN:makeBobyqa','Please initialize OpenCossan')
 
 if ispc
     cc=mex.getCompilerConfigurations();

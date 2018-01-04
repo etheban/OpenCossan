@@ -1,6 +1,6 @@
-disp('Compiling the FANN mex interface (requires the fann library to be installed)..');
+disp('Compiling the FANN mex interface (requires FANN library to be installed)...');
 
-assert(~isempty(OpenCossan.getCossanRoot),'openCOSSAN:makeFann','Please initialize COSSAN-X')
+assert(~isempty(OpenCossan.getCossanRoot),'openCOSSAN:makeFann','Please initialize OpenCossan')
 
 if isunix&&~ismac
     [~,RELEASE]=system('lsb_release -r | awk ''{print $2}''');
@@ -40,6 +40,16 @@ end
 DESTDIR=fullfile(OpenCossan.getCossanRoot,'..','OpenSourceSoftware',...
     'dist',DISTIBRUTION,RELEASE,ARCH);
 
+% Check if the FANN library exists
+
+assert(isfile(fullfile(DESTDIR,filesep,'lib','libfann.so')),...
+    'OpenCossan:noFANNlibrary',['I can not find FANN library (%s) in %s. \n' ...
+    'Check FANN installation'],'libfann.so',fullfile(DESTDIR,filesep,'lib'))
+
+assert(isfile(fullfile(DESTDIR,filesep,'include','fann.h')),...
+    'OpenCossan:noFANNlibrary',['I can not find FANN library (%s) in %s. \n' ...
+    'Check FANN installation'],'fann.h',fullfile(DESTDIR,filesep,'include'))
+
 if isunix
     setenv('LIBRARY_PATH', [getenv('LIBRARY_PATH') ':' DESTDIR filesep 'lib']);
     setenv('C_INCLUDE_PATH', [getenv('C_INCLUDE_PATH') ':' DESTDIR filesep 'include']);
@@ -70,7 +80,22 @@ elseif ispc
     end
 end
 
-movefile('*.mex*',fullfile(OpenCossan.getCossanRoot,'mex','bin'),'f')
+% List of created mex files
+r=dir('*.mex*');
+Spath=fullfile(OpenCossan.getCossanRoot,'mex','bin');
+
+for n=1:length(r)
+    % Move the compiled file in the appropriate folder
+    [status,message,messageid]=movefile(r(n).name,Spath,'f');
+    
+    if status
+        disp(['MEX FILE ' r(n).name ' created and moved in ' Spath ]);
+    else
+        disp(message);
+        disp(messageid);
+    end
+end
+% Clean up!
 if isunix
     delete('helperFann.o')
 elseif ispc

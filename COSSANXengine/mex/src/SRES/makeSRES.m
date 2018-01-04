@@ -3,7 +3,7 @@
 
 disp('Compiling the Stochastic Ranking ED auxiliary mex files ..');
 
-assert(~isempty(OpenCossan.getCossanRoot),'openCOSSAN:makeSRES','Please initialize COSSAN-X')
+assert(~isempty(OpenCossan.getCossanRoot),'openCOSSAN:makeSRES','Please initialize OpenCossan')
 
 % mex for global intermediate recombination (can be ignored...)
 mex CFLAGS#"-D_GNU_SOURCE -fPIC -pthread -fexceptions -D_FILE_OFFSET_BITS=64 -Wall -fPIC -O3" arithx.c

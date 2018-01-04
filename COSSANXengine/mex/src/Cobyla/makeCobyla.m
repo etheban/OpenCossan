@@ -1,12 +1,12 @@
 % Script to generate mex file for COBYLA.
 % Created by Edoardo Patelli
 
-disp('Compiling the COBYLA mex interface ..');
+disp('Compiling the COBYLA MEX interface...');
 
 assert(~isempty(OpenCossan.getCossanRoot),'openCOSSAN:makeCobyla','Please initialize OpenCossan')
 
 if isunix
-    mex CFLAGS#"-D_GNU_SOURCE -fPIC -pthread   -fexceptions -D_FILE_OFFSET_BITS=64 -Wall -fPIC -O3" cobyla_matlab.c cobyla.h cobyla.c
+    mex CFLAGS#"-D_GNU_SOURCE -fPIC -pthread -fexceptions -D_FILE_OFFSET_BITS=64 -Wall -fPIC -O3" cobyla_matlab.c cobyla.c
 elseif ispc
     mex cobyla_matlab.c cobyla.c
 end
