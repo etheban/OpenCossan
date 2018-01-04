@@ -29,7 +29,7 @@ classdef SequentialQuadraticProgramming < Optimizer
             %               poor selection on these parameters may prevent finding the
             %               correct solution.
             %
-            %               SequentialQuadraticProgramming is   intended for solving
+            %               SequentialQuadraticProgramming is intended for solving
             %               the following class of problems
             %
             %                       min     f_obj(x)

@@ -107,7 +107,7 @@ Toptions            = optimset('fmincon');  %Default optimization options
 
 Toptions.Display    = 'iter-detailed';   %Turns on intermediate information about optimization procedure
 Toptions.LargeScale = 'off';                %Turns off Large-Scale optimization features
-Toptions.Algorithm  = 'sqp';                %Solution strategy
+Toptions.Algorithm  = 'sqp'; %'sqp-legacy'; %Solution strategy
 Toptions.GradObj    = 'on';                 %Gradient of objective function is on
 Toptions.GradConstr = 'on';                 %Gradient of constraints is on
 Toptions.MaxFunEvals   = Xobj.Nmax;              %Maximum number of function evaluations that is allowed

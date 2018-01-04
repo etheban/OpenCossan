@@ -251,7 +251,7 @@ classdef OpenCossan < handle
             if ~isdeployed %&& isempty(OpenCossan.getCossanRoot)
                 
                 % Check if the toolbox is OpenCossan is installed as a
-                % Toolbox (AddOns)
+                % Matlab Toolbox 
                 if verLessThan('matlab', '9.0') || exist('Sroot','var')
                     LsetPath=1;
                 else
@@ -259,7 +259,7 @@ classdef OpenCossan < handle
                    
                     if  any(arrayfun(@(x)strcmp(x.Name,'OpenCossan'),toolboxes))
                         LsetPath=0;
-                        disp(['Using OpenCossan toolbox. Version:  ',toolboxes.Version])
+                        disp(['Using OpenCossan toolbox version: ',toolboxes.Version])
                     else
                         LsetPath=1;
                     end
@@ -459,6 +459,15 @@ classdef OpenCossan < handle
                     %rethrow(ME)
                 end
             end
+            
+            %% Check if MEX files exists
+            
+            if ~isdir(fullfile(Xobj.ScossanRoot,Xobj.CmexPathFolders{:}))
+                warning('openCOSSAN:OpenCossan:noMEX', ...
+                        ['MEX folder not available. Please download the source file from cossan.co.uk and compile them' ...
+                        fullfile(Xobj.ScossanRoot,'mex','src')])
+            end
+                
             
             %% Set path for the matlab database files
             if isempty(Xobj.SmatlabDatabasePath)

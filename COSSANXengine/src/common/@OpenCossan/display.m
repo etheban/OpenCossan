@@ -26,7 +26,7 @@ function display(Xobj)
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
 % =====================================================================
 
-OpenCossan.printLogo;
+
 Xobj.cossanDisp('',1);
 Xobj.cossanDisp(['* The enviroment PATH set to: ' Xobj.SbinPath],4);
 Xobj.cossanDisp(['* The enviroment LD_LIBRARY_PATH set to: ' Xobj.SlibPath],4);
@@ -40,11 +40,11 @@ else
     Xobj.cossanDisp(['* Diary Log file created in: ' Xobj.SdiaryFileName],1)
 end
 
-if Xobj.NverboseLevel>2
-    Xobj.cossanDisp('-------------------------------------------------------------',4);
-    display(Xobj.Xanalysis)
-    Xobj.cossanDisp('-------------------------------------------------------------',4);
-end
+% if Xobj.NverboseLevel>2
+%     Xobj.cossanDisp('-------------------------------------------------------------',4);
+%     display(Xobj.Xanalysis)
+%     Xobj.cossanDisp('-------------------------------------------------------------',4);
+% end
 
 Xobj.cossanDisp('----------------------------------------------------------------------------------------',4);
 if ~exist('DatabaseDriver','class')
@@ -70,7 +70,8 @@ switch Xobj.NverboseLevel
         Xobj.cossanDisp('* Verbose level set to DEBUG',1)
 end
 
-Xobj.cossanDisp('----------------------------------------------------------------------------------------',3);
+%Xobj.cossanDisp('----------------------------------------------------------------------------------------',3);
 
+OpenCossan.printLogo;
 
 
