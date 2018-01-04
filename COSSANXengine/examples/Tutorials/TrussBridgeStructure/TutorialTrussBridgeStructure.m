@@ -10,7 +10,7 @@
 %  University of Innsbruck, Austria
 %
 % See Also: 
-% http://cossan.cfd.liv.ac.uk/wiki/index.php/Truss_Bridge_Structure
+% https://cossan.co.uk/wiki/index.php/Truss_Bridge_Structure
 
 % Reset the random number generator in order to always obtain the same results.
 % DO NOT CHANGE THE VALUES OF THE SEED
@@ -29,9 +29,9 @@ Xrvs1 = RandomVariableSet('Xrv',mass1,'Nrviid',33);
 Xrvs2 = RandomVariableSet('Xrv',stiffness1,'Nrviid',131);
 
 % Define Xinput
-Xin = Input('Sdescription','Input truss');
-Xin = add(Xin,Xrvs1);
-Xin = add(Xin,Xrvs2);
+Xin = Input('Sdescription','Input truss',...
+    'CXmembers',{Xrvs1,Xrvs2},'CSmembers',{'Xrvs1','Xrvs2'});
+
 
 % Construct Mio object (computes eigenvalues, eigenvectors, mass and stiffness matrix)
 Sdirectory = fileparts(which('TutorialTrussBridgeStructure.m'));
@@ -46,14 +46,10 @@ Xm=Mio('Sdescription', 'Performance function', ...
 
 % Construct the Evaluator
 Xeval = Evaluator('Xmio',Xm,'Sdescription','Evaluator xmio');
-
 % create the Xmodel
 Xmdl=Model('Xevaluator',Xeval,'Xinput',Xin);
 
-
-
 %% Define the mode-based metamodel - method 1 
-
 load(fullfile(Sdirectory,'mass_matrix_nominal'));
 Nsamples_calibration = 400; % number of calibration samples
 Nsamples_validation = 20; % number of validation samples
@@ -78,16 +74,13 @@ run(fullfile(Sdirectory,'plot_comparison'));
 % apply meta-model
 Xin = sample(Xin,'Nsamples',100); 
 Xout = apply(Xmm,Xin);
-
 %% close figures and validate solution
-
 close(f) % comparison of FRFs
 assert(all(all(abs(Xout(1).Vlambda(1:10)'-[1.6839, 2.9032, 18.0768, 19.3487, ...
         23.9998, 26.7626, 64.5307, 76.7520, 92.0892, 117.1737])<1e-4)),'CossanX:Tutorials:TutorialTrussBridgeStructure', ...
        'Reference solution of approximated eigenvalues does not match.')
 
 %% Define the mode-based metamodel - method 2 
-
 % user-defined points for calibration and validation
 XtrainingInput = sample(Xin,'Nsamples',Nsamples_calibration);
 XvalidationInput = sample(Xin,'Nsamples',Nsamples_validation);

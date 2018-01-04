@@ -1,6 +1,6 @@
 %% TRUSSMAXDISPSCRITP - Main MIO code, script version
 % for each sample
-for isample = 1:length(Tinput),
+for isample = 1:length(Tinput)
     %% construct the antenna structure from the sampled values. D is a
     % structure containing:
     % - nodal coordinate (D.Coord)
