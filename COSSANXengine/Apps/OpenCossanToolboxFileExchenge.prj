@@ -61,11 +61,16 @@ COSSANXengine/examples/Show_Cases/*
 COSSANXengine/examples/Models/FiniteElements
 COSSANXengine/examples/Unit_test
 COSSANXengine/examples/Tutorials/TurbineBlade
+COSSANXengine/examples/Tutorials/CylindricalShell
+COSSANXengine/examples/Tutorials/SuspensionArm
 COSSANXengine/examples/Tutorials/GOCEsatellite
 COSSANXengine/examples/Tutorials/CossanObjects/Connector/ASTER/Cas.base
 
 % Exclude compiled libraries
 OpenSourceSoftware/dist/*
+% Exclude MEX binary files
+COSSANXengine/mex/bin
+COSSANXengine/mex/src
 % Exclude Patran plug-ins and MASCOT
 Plug-ins/*
 % Exclude Apps and toolboxes
