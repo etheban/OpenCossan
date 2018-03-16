@@ -84,7 +84,10 @@ Xte=TableExtractor('Coutputnames',{'OutCol5' 'OutCol3'}, ...
     'CcolumnPosition',{5 3}, ...
     'Sheaderidentifier','#'); 
 
-[Tout, ~]=Xte.extract;
+[Tout, LsuccessfullExtract]=Xte.extract;
+
+assert(LsuccessfullExtract,'OpenCOSSAN:TutorialTableExtractor:WrongFlag',...
+    'LsuccessfullExtract should be true')
 
 % Plot the extracted results
 f1=figure,
@@ -94,7 +97,9 @@ plot(Tout.OutCol5.Mcoord,[Tout.OutCol5.Vdata; Tout.OutCol3.Vdata])
 close(f1)
 
 %% Extract 1 variable spanning multiple columns 
-Xte=TableExtractor('Coutputnames',{'OutColMultiColumns'}, ...
+% This should fail! Data can only be stored in a vector form. Coordinates
+% can also be multidimensionals. 
+Xte=TableExtractor('Coutputnames',{'MultiColumns'}, ...
     'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
     'Sfile','edwards_press.dat',...  
     'CcolumnPosition',{[2 5]}, ...
@@ -105,19 +110,25 @@ Xte=TableExtractor('Coutputnames',{'OutColMultiColumns'}, ...
 disp(LsuccessfullExtract)
 Tout.OutColMultiColumns
 
-%% Extract 1 variable spanning multiple columns with coordinate
+assert(LsuccessfullExtract,'OpenCOSSAN:TutorialTableExtractor:WrongFlag',...
+    'LsuccessfullExtract should be false')
+
+%% Extract 1 variable with coordinate
 Xte=TableExtractor('Coutputnames',{'OutColMultiColumns'}, ...
     'NcoordinateColumn',1, ... % Define the column containing the coordinate 
     'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
     'Sfile','edwards_press.dat',...  
-    'CcolumnPosition',{[2 5]}, ...
+    'CcolumnPosition',{[2]}, ...
     'Sheaderidentifier','#'); 
 
 [Tout, LsuccessfullExtract]=Xte.extract;
 disp(LsuccessfullExtract)
 Tout.OutColMultiColumns
 
-%% Extract 1 variable spanning multiple columns and specified lines with coordinate
+assert(LsuccessfullExtract,'OpenCOSSAN:TutorialTableExtractor:WrongFlag',...
+    'LsuccessfullExtract should be true')
+
+%% Extract 2 variables spanning specified lines with coordinate
 Xte=TableExtractor('Coutputnames',{'OutColMultiColumns','OutCol4'}, ...
     'NcoordinateColumn',1, ... % Define the column containing the coordinate 
     'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
