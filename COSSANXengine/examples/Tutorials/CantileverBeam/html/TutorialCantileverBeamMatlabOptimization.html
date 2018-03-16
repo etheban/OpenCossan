@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>TutorialCantileverBeamMatlabOptimization</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-07-08"><meta name="DC.source" content="TutorialCantileverBeamMatlabOptimization.m"><style type="text/css">
+      --><title>TutorialCantileverBeam: Optimization</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-03-16"><meta name="DC.source" content="TutorialCantileverBeamMatlabOptimization.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,76 +66,72 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>TutorialCantileverBeamMatlabOptimization</h1><!--introduction--><p>Perform optimization using Matlab evaluator</p><p>See Also <a href="http://cossan.cfd.liv.ac.uk/wiki/index.php/Cantilever_Beam">http://cossan.cfd.liv.ac.uk/wiki/index.php/Cantilever_Beam</a></p><p>
-<h3 style="color:#317ECC">Copyright 2006-2014: <b> COSSAN working group</b></h3>
-Author: <b>Edoardo-Patelli</b> <br>
-<i>Institute for Risk and Uncertainty, University of Liverpool, UK</i>
-<br>COSSAN web site: <a href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>
-<br><br>
-<span style="color:gray"> This file is part of <span style="color:orange">openCOSSAN</span>.  The open source general purpose matlab toolbox
-for numerical analysis, risk and uncertainty quantification (<a
-href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>).
-<br>
-<span style="color:orange">openCOSSAN</span> is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License.
-<span style="color:orange">openCOSSAN</span> is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
- You should have received a copy of the GNU General Public License
- along with openCOSSAN.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/"</a>.
-</span></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Preparation of the Input</a></li><li><a href="#2">Prepare Input Object</a></li><li><a href="#3">Preparation of the Evaluator</a></li><li><a href="#4">Preparation of the Physical Model</a></li><li><a href="#5">Check feasibility of the optimization preoblem</a></li><li><a href="#6">Show the quantify of interest</a></li><li><a href="#7">Define the Objective Funtion</a></li><li><a href="#8">Create (inequality) constraint</a></li><li><a href="#9">Create object OptimizationProblem</a></li><li><a href="#10">Perform optimization</a></li><li><a href="#11">Compare Optimizarion results</a></li><li><a href="#12">Validate Solutions</a></li><li><a href="#13">RELIABILITY ANALYSIS</a></li><li><a href="#14">RELIABILITY BASED OPTIMIZAZION</a></li></ul></div><h2>Preparation of the Input<a name="1"></a></h2><p>In this tutorial the random variable are replaced by two design variables</p><p>The optimization analysis requires the definition of Design Variables (i.e. the variables that define new configurations)</p><pre class="codeinput">b=DesignVariable(<span class="string">'value'</span>,0.12,<span class="string">'lowerBound'</span>,0.01,<span class="string">'upperBound'</span>,0.50,<span class="string">'Sdescription'</span>,<span class="string">'Beam width'</span>);
-h=DesignVariable(<span class="string">'value'</span>,0.54,<span class="string">'lowerBound'</span>,0.02,<span class="string">'upperBound'</span>,1,<span class="string">'Sdescription'</span>,<span class="string">'Beam Heigth'</span>);
-
-<span class="comment">% In this example we do not use random variables and we only use Parameters</span>
-L=Parameter(<span class="string">'value'</span>,1.8,<span class="string">'Sdescription'</span>,<span class="string">'Beam Length'</span>);
-MaxW=Parameter(<span class="string">'value'</span>,0.001,<span class="string">'Sdescription'</span>,<span class="string">'Maximum allowed displacement'</span>);
-P=Parameter(<span class="string">'value'</span>,10000,<span class="string">'Sdescription'</span>,<span class="string">'Load'</span>);
-rho=Parameter(<span class="string">'value'</span>,600,<span class="string">'Sdescription'</span>,<span class="string">'density'</span>);
-E=Parameter(<span class="string">'value'</span>,10e9,<span class="string">'Sdescription'</span>,<span class="string">'Young''s modulus'</span>);
-<span class="comment">% Definition of the Function</span>
-I=Function(<span class="string">'Sdescription'</span>,<span class="string">'Moment of Inertia'</span>,<span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;b&amp;&gt;.*&lt;&amp;h&amp;&gt;.^3/12'</span>);
-</pre><h2>Prepare Input Object<a name="2"></a></h2><p>The above prepared objects can be added to an Input Object</p><pre class="codeinput">XinputOptimization=Input(<span class="string">'CXmembers'</span>,{L b P h rho E I MaxW},<span class="keyword">...</span>
+  </style></head><body><div class="content"><h1>TutorialCantileverBeam: Optimization</h1><!--introduction--><p>Perform optimization on the cantilever beam (<a href="TutorialCantileverBeamMatlab.html">TutorialCantileverBeamMatlab.html</a>) using a MATLAB evaluator.</p><p><img vspace="5" hspace="5" src="cantilever-beam.png" alt=""> </p><p>See Also <a href="http://cossan.co.uk/wiki/index.php/Cantilever_Beam">http://cossan.co.uk/wiki/index.php/Cantilever_Beam</a></p><p>Author: <b>Edoardo Patelli</b>, Institute for Risk and Uncertainty, University of Liverpool, UK</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">LICENSE</a></li><li><a href="#2">Setup</a></li><li><a href="#3">Definition of the Input: Design Variables</a></li><li><a href="#4">Definition of the Input: Parameters</a></li><li><a href="#5">Definition of the Input: Function</a></li><li><a href="#6">Definition of the Input: Input</a></li><li><a href="#7">Definition of the Evaluator</a></li><li><a href="#8">Definition of the Physical Model</a></li><li><a href="#9">Design of Experiments Analysis</a></li><li><a href="#10">Results of the Design of Experiments</a></li><li><a href="#11">Definition of the Objective Function</a></li><li><a href="#12">Definition of the Constraint</a></li><li><a href="#13">Definition of the OptimizationProblem</a></li><li><a href="#14">Optimization: Setup</a></li><li><a href="#15">Optimization: Sequential Quadratic Programming</a></li><li><a href="#16">Optimization: Cobyla</a></li><li><a href="#17">Optimization: Genetic Algorithm</a></li><li><a href="#18">Compare Optimization results</a></li><li><a href="#19">Validate Solutions</a></li><li><a href="#20">Next Tutorials</a></li></ul></div><h2 id="1">LICENSE</h2><pre class="codeinput"><span class="comment">%{
+</span><span class="comment">This file is part of OpenCossan &lt;https://cossan.co.uk&gt;.
+</span><span class="comment">Copyright (C) 2006-2018 COSSAN WORKING GROUP
+</span><span class="comment">
+</span><span class="comment">OpenCossan is free software: you can redistribute it and/or modify
+</span><span class="comment">it under the terms of the GNU General Public License as published by
+</span><span class="comment">the Free Software Foundation, either version 3 of the License or,
+</span><span class="comment">(at your option) any later version.
+</span><span class="comment">
+</span><span class="comment">OpenCossan is distributed in the hope that it will be useful,
+</span><span class="comment">but WITHOUT ANY WARRANTY; without even the implied warranty of
+</span><span class="comment">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+</span><span class="comment">GNU General Public License for more details.
+</span><span class="comment">
+</span><span class="comment">You should have received a copy of the GNU General Public License
+</span><span class="comment">along with OpenCossan. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+</span><span class="comment">%}</span>
+</pre><h2 id="2">Setup</h2><p>Set the verbosity level to 2 in order to silence evaluator output messages.</p><pre class="codeinput">OpenCossan.setVerbosityLevel(2);
+</pre><h2 id="3">Definition of the Input: Design Variables</h2><p>In this tutorial the Random Variables are replaced by two Design Variables. The optimization analysis requires the definition of Design Variables, i.e. the variables that define new configurations.</p><pre class="codeinput">b = DesignVariable(<span class="string">'value'</span>,0.12,<span class="string">'lowerBound'</span>,0.01,<span class="string">'upperBound'</span>,0.50,<span class="string">'Sdescription'</span>,<span class="string">'Beam Width'</span>);
+h = DesignVariable(<span class="string">'value'</span>,0.54,<span class="string">'lowerBound'</span>,0.02,<span class="string">'upperBound'</span>,1,<span class="string">'Sdescription'</span>,<span class="string">'Beam Heigth'</span>);
+</pre><h2 id="4">Definition of the Input: Parameters</h2><p>In this example we do not use <tt>RandomVariables</tt> but only <tt>Parameters</tt>.</p><pre class="codeinput">L = Parameter(<span class="string">'value'</span>,1.8,<span class="string">'Sdescription'</span>,<span class="string">'Beam Length'</span>);
+maxDisplacement = Parameter(<span class="string">'value'</span>,0.001,<span class="string">'Sdescription'</span>,<span class="string">'Maximum allowed Displacement'</span>);
+P = Parameter(<span class="string">'value'</span>,10000,<span class="string">'Sdescription'</span>,<span class="string">'Load'</span>);
+rho = Parameter(<span class="string">'value'</span>,600,<span class="string">'Sdescription'</span>,<span class="string">'Density'</span>);
+E = Parameter(<span class="string">'value'</span>,10e9,<span class="string">'Sdescription'</span>,<span class="string">'Young''s modulus'</span>);
+</pre><h2 id="5">Definition of the Input: Function</h2><p>Construct the <tt>Function</tt> object that defines the moment of inertia as</p><p><img src="TutorialCantileverBeamMatlabOptimization_eq03622114468556202004.png" alt="$$I = \frac{bh^3}{12}$$" style="width:49px;height:32px;"></p><pre class="codeinput">I = Function(<span class="string">'Sdescription'</span>,<span class="string">'Moment of Inertia'</span>,<span class="string">'Sexpression'</span>,<span class="string">'&lt;&amp;b&amp;&gt;.*&lt;&amp;h&amp;&gt;.^3/12'</span>);
+</pre><h2 id="6">Definition of the Input: Input</h2><p>Construct the <tt>Input</tt> object grouping the input objects together.</p><pre class="codeinput">XinputOptimization=Input(<span class="string">'CXmembers'</span>,{L b P h rho E I maxDisplacement},<span class="keyword">...</span>
     <span class="string">'CSmembers'</span>,{<span class="string">'L'</span> <span class="string">'b'</span> <span class="string">'P'</span> <span class="string">'h'</span> <span class="string">'rho'</span> <span class="string">'E'</span> <span class="string">'I'</span> <span class="string">'MaxW'</span>});
-<span class="comment">% Show summary of the Input Object</span>
-display(XinputOptimization)
-</pre><pre class="codeoutput">===================================================================
-Input Object  - Description: 
-===================================================================
+<span class="comment">% The summary show that Xinput contains all the previously created</span>
+<span class="comment">% objects:</span>
+display(XinputOptimization);
+</pre><pre class="codeoutput">Input Object  - Description: 
 * 5 Parameter object(s)
 ** Names: "L" "P" "rho" "E" "MaxW" 
 * 1 Functions object(s)
 ** Names: "I" 
 * 2 DesignVariable object(s)
 ** Names: "b" "h" 
-</pre><h2>Preparation of the Evaluator<a name="3"></a></h2><p>Use of a matlab script to compute the Beam displacement</p><pre class="codeinput">Sfolder=fileparts(mfilename(<span class="string">'fullpath'</span>));<span class="comment">% returns the current folder</span>
+</pre><h2 id="7">Definition of the Evaluator</h2><p>Construct the <tt>Evaluator</tt> object by passing an <tt>Mio</tt> (MATLAB-Input-Output) object. The <tt>Mio</tt> is used to calculate the displacement</p><p><img src="TutorialCantileverBeamMatlabOptimization_eq14027056496326548184.png" alt="$$w = \frac{pgbhL^4}{8EI} + \frac{PL^3}{3EI}$" style="width:126px;height:32px;">$,</p><p>using the previously defined objects.</p><pre class="codeinput">Sfolder=fileparts(mfilename(<span class="string">'fullpath'</span>));<span class="comment">% returns the current folder</span>
 Xmio=Mio(<span class="string">'Spath'</span>,fullfile(Sfolder,<span class="string">'MatlabModel'</span>),<span class="string">'Sfile'</span>,<span class="string">'tipDisplacement.m'</span>,<span class="keyword">...</span>
     <span class="string">'Cinputnames'</span>,{<span class="string">'I'</span> <span class="string">'b'</span> <span class="string">'L'</span> <span class="string">'h'</span> <span class="string">'rho'</span> <span class="string">'P'</span>},<span class="string">'Liostructure'</span>,true, <span class="keyword">...</span>
     <span class="string">'Coutputnames'</span>,{<span class="string">'w'</span>});
-<span class="comment">% Add the MIO object to an Evaluator object</span>
+
+<span class="comment">% Create the Evaluator using the Mio</span>
 Xevaluator=Evaluator(<span class="string">'CXmembers'</span>,{Xmio},<span class="string">'CSmembers'</span>,{<span class="string">'Xmio'</span>});
-</pre><h2>Preparation of the Physical Model<a name="4"></a></h2><p>Define the Physical Model</p><pre class="codeinput">Xmodel=Model(<span class="string">'Xinput'</span>,XinputOptimization,<span class="string">'Xevaluator'</span>,Xevaluator);
-</pre><h2>Check feasibility of the optimization preoblem<a name="5"></a></h2><p>The EesignOfExperiment analysis can be used to see if a feasible solution is present in the bounds set for the Design Varaibles Define a user defined DOE object. We evaluate the model at the lower and upper bounds of the design variable plus the current values. Therefore for each design variable we have 3 values and a total of 9 model evaluations are required. The evaluation points are defined by means of the MdeoFactor matrix defined between -1 and 1.</p><pre class="codeinput">MdoeFactors=[-1 -1;
-             0 -1;
-             1 -1;
-            -1  0;
-             0  0;
-             1  0;
-            -1  1;
-             0  1;
-             1  1];
+</pre><h2 id="8">Definition of the Physical Model</h2><p>Construct the <tt>Model</tt> by passing the <tt>Input</tt> and the <tt>Evaluator</tt></p><pre class="codeinput">Xmodel=Model(<span class="string">'Xinput'</span>,XinputOptimization,<span class="string">'Xevaluator'</span>,Xevaluator);
+</pre><h2 id="9">Design of Experiments Analysis</h2><p>The <tt>DesignOfExperiment</tt> analysis can be used to see if a feasible solution is present in the bounds set for the Design Variables.</p><p>Define a user DOE object. We evaluate the model at the lower and upper bounds of the design variable plus at the current values. Therefore, for each design variable we have 3 values and a total of 9 model evaluations are required.</p><p>The evaluation points are defined by means of the MdoeFactor matrix defined between -1 and 1.</p><pre class="codeinput">MdoeFactors=[-1 -1;
+    0 -1;
+    1 -1;
+    -1  0;
+    0  0;
+    1  0;
+    -1  1;
+    0  1;
+    1  1];
 <span class="comment">% When the flag Lusecurrentvalues is set to true the current values of the design</span>
 <span class="comment">% variables is used in corresponcence of the MdoeFactors=0.</span>
 
-Xdoe=DesignOfExperiments(<span class="string">'Sdesigntype'</span>,<span class="string">'UserDefined'</span>,<span class="keyword">...</span>
+Xdoe = DesignOfExperiments(<span class="string">'Sdesigntype'</span>,<span class="string">'UserDefined'</span>,<span class="keyword">...</span>
     <span class="string">'Mdoefactors'</span>,MdoeFactors,<span class="string">'Lusecurrentvalues'</span>,true);
 
 <span class="comment">% Show summary of the design of experimemts</span>
 display(Xdoe)
 
-<span class="comment">% and now, evaluate the model at the points defined by the DesignOfExperiment</span>
-XoutDoe=Xdoe.apply(Xmodel);
+<span class="comment">% Evaluate the model at the points defined by the DesignOfExperiment</span>
+XoutDoe = Xdoe.apply(Xmodel);
 </pre><pre class="codeoutput">===================================================================
  DesignOfExperiment Object  -   Description: 
 ===================================================================
@@ -143,167 +139,100 @@ XoutDoe=Xdoe.apply(Xmodel);
 * Central composite design     : faced
 * Perturbation parameter       : 1
 * Current values of the DesignVariable used
-* Simulation will perform in 1 batches
-[Status:Evaluator  ]       * Processing solver 1/1
-[Simulation:exportResults] Writing partial results (SimulationData_batch_1_of_1) on the folder: /home/ep/Documents/MATLAB/20140708T120527
-Maximum no. of samples reached. Samples computed 1; Maximum allowed samples: 1
-</pre><h2>Show the quantify of interest<a name="6"></a></h2><pre class="codeinput">Cnames={<span class="string">'h'</span> <span class="string">'b'</span> <span class="string">'w'</span>};
-Mdoe=XoutDoe.getValues(<span class="string">'Cnames'</span>,Cnames);
+</pre><h2 id="10">Results of the Design of Experiments</h2><pre class="codeinput">h = XoutDoe.getValues(<span class="string">'Sname'</span>,<span class="string">'h'</span>);
+b = XoutDoe.getValues(<span class="string">'Sname'</span>,<span class="string">'b'</span>);
+w = XoutDoe.getValues(<span class="string">'Sname'</span>,<span class="string">'w'</span>);
+Status = cell(9,1);
 
-<span class="comment">% Show results</span>
-
-fprintf(<span class="string">'%10s | %10s | %10s | %10s\n-------------------------------------------------\n'</span>,Cnames{:}, <span class="string">'Solution status'</span>)
-
-<span class="keyword">for</span> n=1:size(Mdoe,1)
-    <span class="keyword">if</span> Mdoe(n,3)&lt;MaxW.value
-        fprintf(<span class="string">'%10.3e | %10.3e | %10.3e | %10s\n'</span>,Mdoe(n,:),<span class="string">'Feasible Solution'</span>)
+<span class="keyword">for</span> n = 1:numel(w)
+    <span class="keyword">if</span> (w(n) &lt; maxDisplacement.value)
+        Status{n} = <span class="string">'Feasible'</span>;
     <span class="keyword">else</span>
-        fprintf(<span class="string">'%10.3e | %10.3e | %10.3e | %10s\n'</span>,Mdoe(n,:),<span class="string">'Uneasible Solution'</span>)
-
+        Status{n} = <span class="string">'Infeasible'</span>;
     <span class="keyword">end</span>
 <span class="keyword">end</span>
 
-<span class="comment">% There are 3 feasible solutions and this means the the opimization problem is</span>
-<span class="comment">% well define. Now we have to identify the oprimal solution.</span>
-</pre><pre class="codeoutput">         h |          b |          w | Solution status
--------------------------------------------------
- 2.000e-02 |  1.000e-02 |  2.916e+02 | Uneasible Solution
- 2.000e-02 |  1.200e-01 |  2.432e+01 | Uneasible Solution
- 2.000e-02 |  5.000e-01 |  5.855e+00 | Uneasible Solution
- 5.400e-01 |  1.000e-02 |  1.485e-02 | Uneasible Solution
- 5.400e-01 |  1.200e-01 |  1.266e-03 | Uneasible Solution
- 5.400e-01 |  5.000e-01 |  3.281e-04 | Feasible Solution
- 1.000e+00 |  1.000e-02 |  2.342e-03 | Uneasible Solution
- 1.000e+00 |  1.200e-01 |  2.037e-04 | Feasible Solution
- 1.000e+00 |  5.000e-01 |  5.592e-05 | Feasible Solution
-</pre><h2>Define the Objective Funtion<a name="7"></a></h2><p>The aim of this optimization is to minimaze the weight of the beam. The weight can be easely computed using a matlab script.</p><pre class="codeinput">Xobjfun   = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function'</span>, <span class="keyword">...</span>
+results = table(h,b,w,Status);
+format <span class="string">shorte</span>;
+display(results);
+format <span class="string">short</span>;
+<span class="comment">% There are 3 feasible solutions and this means the the opimization problem</span>
+<span class="comment">% is well defined. Now we have to identify the optimal solution.</span>
+</pre><pre class="codeoutput">
+results =
+
+  9&times;4 table
+
+        h             b             w            Status   
+    __________    __________    __________    ____________
+
+    2.0000e-02    1.0000e-02    2.9162e+02    'Infeasible'
+    2.0000e-02    1.2000e-01    2.4323e+01    'Infeasible'
+    2.0000e-02    5.0000e-01    5.8552e+00    'Infeasible'
+    5.4000e-01    1.0000e-02    1.4847e-02    'Infeasible'
+    5.4000e-01    1.2000e-01    1.2664e-03    'Infeasible'
+    5.4000e-01    5.0000e-01    3.2808e-04    'Feasible'  
+    1.0000e+00    1.0000e-02    2.3421e-03    'Infeasible'
+    1.0000e+00    1.2000e-01    2.0367e-04    'Feasible'  
+    1.0000e+00    5.0000e-01    5.5924e-05    'Feasible'  
+
+</pre><h2 id="11">Definition of the Objective Function</h2><p>The goal of this optimization is to minimaze the weight of the beam. The weight can be easely computed using a matlab script (MIO).</p><pre class="codeinput">Xobjfun = ObjectiveFunction(<span class="string">'Sdescription'</span>,<span class="string">'objective function'</span>, <span class="keyword">...</span>
     <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).BeamWeight=Tinput(n).rho*Tinput(n).b*Tinput(n).h*Tinput(n).L;end'</span>,<span class="keyword">...</span>
     <span class="string">'CoutputNames'</span>,{<span class="string">'BeamWeight'</span>},<span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
     <span class="string">'CinputNames'</span>,{<span class="string">'rho'</span> <span class="string">'b'</span> <span class="string">'h'</span> <span class="string">'L'</span>});
-</pre><h2>Create (inequality) constraint<a name="8"></a></h2><p>The maximum displacement of the beam tip</p><pre class="codeinput">XconMaxStress   = Constraint(<span class="string">'Sdescription'</span>,<span class="string">'constraint'</span>, <span class="keyword">...</span>
+</pre><h2 id="12">Definition of the Constraint</h2><p>Construct a <tt>Constraint</tt> defined by the maximum tip displacement of the beam.</p><pre class="codeinput">XconMaxStress = Constraint(<span class="string">'Sdescription'</span>,<span class="string">'constraint'</span>, <span class="keyword">...</span>
     <span class="string">'Sscript'</span>,<span class="string">'for n=1:length(Tinput),Toutput(n).Constraint=Tinput(n).w-Tinput(n).MaxW; end'</span>,<span class="keyword">...</span>
     <span class="string">'CoutputNames'</span>,{<span class="string">'Constraint'</span>},<span class="string">'Liostructure'</span>,true,<span class="keyword">...</span>
     <span class="string">'CinputNames'</span>,{<span class="string">'w'</span> <span class="string">'MaxW'</span> },<span class="keyword">...</span>
     <span class="string">'Linequality'</span>,true);
-</pre><h2>Create object OptimizationProblem<a name="9"></a></h2><pre class="codeinput">Xop     = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
+</pre><h2 id="13">Definition of the OptimizationProblem</h2><p>Construct the <tt>OptimizationProblem</tt> from the <tt>ObjectiveFunction</tt>, the <tt>Constraint</tt> and the <tt>Model</tt>.</p><pre class="codeinput">Xop = OptimizationProblem(<span class="string">'Sdescription'</span>,<span class="string">'Optimization problem'</span>, <span class="keyword">...</span>
     <span class="string">'XobjectiveFunction'</span>,Xobjfun,<span class="string">'CXconstraint'</span>,{XconMaxStress},<span class="string">'Xmodel'</span>,Xmodel);
 
-<span class="comment">% Define Optimizers</span>
-Xsqp=SequentialQuadraticProgramming(<span class="string">'finitedifferenceperturbation'</span>,0.01);
-Xcobyla=Cobyla;
-Xga=GeneticAlgorithms(<span class="string">'Smutationfcn'</span>,<span class="string">'mutationadaptfeasible'</span>,<span class="string">'NmaxIterations'</span>,10, <span class="keyword">...</span>
-    <span class="string">'NPopulationSize'</span>,10);
-</pre><h2>Perform optimization<a name="10"></a></h2><pre class="codeinput"><span class="comment">% Reset the random number generator in order to obtain always the same results.</span>
-<span class="comment">% DO NOT CHANGE THE VALUES OF THE SEED</span>
-OpenCossan.resetRandomNumberGenerator(542727)
-
-<span class="comment">% We start with the Sequential Quadratic Programming method.</span>
-Xoptimum1=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xsqp);
+<span class="comment">% Define the Optimizers</span>
+Xsqp = SequentialQuadraticProgramming(<span class="string">'finitedifferenceperturbation'</span>,0.01);
+Xcobyla = Cobyla();
+Xga = GeneticAlgorithms(<span class="string">'Smutationfcn'</span>,<span class="string">'mutationadaptfeasible'</span>,<span class="string">'NmaxIterations'</span>,50, <span class="keyword">...</span>
+    <span class="string">'NPopulationSize'</span>,200);
+</pre><h2 id="14">Optimization: Setup</h2><p>Reset the random number generator in order to always obtain the same results. <b>DO NOT CHANGE THE VALUES OF THE SEED!</b></p><pre class="codeinput">OpenCossan.resetRandomNumberGenerator(542727);
+</pre><h2 id="15">Optimization: Sequential Quadratic Programming</h2><p>Optimize the beam width using Sequential Quadratic Programming</p><pre class="codeinput">Xoptimum1 = Xop.optimize(<span class="string">'Xoptimizer'</span>,Xsqp);
 <span class="comment">% Show results of the optimization</span>
 display(Xoptimum1)
+</pre><pre class="codeoutput"> Iter  Func-count            Fval   Feasibility   Step Length       Norm of   First-order  
+                                                                       step    optimality
+    0           1    6.998400e+01     2.664e-04     1.000e+00     0.000e+00     5.832e+02  
+    1           3    8.021814e+00     4.710e-03     1.000e+00     2.307e-01     1.028e+04  
+    2           5    1.027388e+01     1.720e-03     1.000e+00     2.085e-01     3.436e+01  
+    3           7    1.607712e+01     5.764e-04     1.000e+00     4.895e-02     3.916e+02  
+    4           9    2.204916e+01     1.519e-04     1.000e+00     5.530e-03     3.466e+01  
+    5          11    2.500979e+01     1.664e-05     1.000e+00     2.741e-03     1.378e+02  
+    6          13    2.542712e+01     1.095e-07     1.000e+00     3.864e-04     1.095e-07  
 
-<span class="comment">% Now we optimize the problem using Cobyla</span>
-Xoptimum2=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xcobyla);
+Optimization completed: The relative first-order optimality measure, 1.013561e-10,
+is less than options.OptimalityTolerance = 1.000000e-06, and the relative maximum constraint
+violation, 1.094645e-07, is less than options.ConstraintTolerance = 1.000000e-03.
+
+Optimization Metric                                            Options
+relative first-order optimality =   1.01e-10       OptimalityTolerance =   1e-06 (selected)
+relative max(constraint violation) =   1.09e-07    ConstraintTolerance =   1e-03 (selected)
+
+Optimum Object  -  Description: 
+|- Design Variables: b h 
+|-- Values: 2.354e-02 
+|-- Values: 1.000e+00 
+|-- Objective function #1 at the optimum: 2.543e+01 
+|
+|-- Inequality constraint (Constraint) values at the optimum: +1.095e-07  Status:  Ok 
+|
+|-- Evaluations of the objective function :  39
+|-- Evaluations of the constraints        :  39
+|-- Evaluations of Phisical Model         :  39
+|-- Number of candidate solutions         :   9
+|-- Termination criterion : First order optimality conditions were satisfied to the specified tolerance
+ Total time:    1.0846 seconds
+</pre><h2 id="16">Optimization: Cobyla</h2><p>Optimize the beam width using Cobyla</p><pre class="codeinput">Xoptimum2 = Xop.optimize(<span class="string">'Xoptimizer'</span>,Xcobyla);
 <span class="comment">% Show results of the optimization</span>
 display(Xoptimum2)
-
-<span class="comment">% Now we optimize the problem using Genetic Algorithms</span>
-Xoptimum3=Xop.optimize(<span class="string">'Xoptimizer'</span>,Xga);
-<span class="comment">% Show results of the optimization</span>
-display(Xoptimum3)
-</pre><pre class="codeoutput">[Status:Evaluator  ]       * Processing solver 1/1
-                                                          Norm of First-order
- Iter F-count            f(x) Feasibility  Steplength        step  optimality
-    0       1    6.998400e+01   2.664e-04                           5.832e+02
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-    1       2    8.021814e+00   2.664e-04   1.000e+00   2.307e-01   1.028e+04
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-    2       9    8.021814e+00   2.664e-04   8.235e-02   9.712e-04   2.664e-04
-
-Optimization completed: The relative first-order optimality measure, 3.320350e-07,
-is less than options.TolFun = 1.000000e-06, and the relative maximum constraint
-violation, 2.663523e-04, is less than options.TolCon = 1.000000e-03.
-
-Optimization Metric                                         Options
-relative first-order optimality =   3.32e-07       TolFun =   1e-06 (selected)
-relative max(constraint violation) =   2.66e-04    TolCon =   1e-03 (selected)
-
-===================================================================
-Optimum Object  -  Description: 
-===================================================================
-|- Design Variables: b h 
-|-- Values: 1.000e-02 
-|-- Values: 7.428e-01 
-|-- Objective function #1 at the optimum: 8.022e+00 
-|
-|-- Inequality constraint (Constraint) values at the optimum: +4.664e-03  Status:  Ok 
-|
-|-- Evaluations of the objective function :  30
-|-- Evaluations of the constraints        :  30
-|-- Evaluations of Phisical Model         :  30
-|-- Number of candidate solutions         :   5
-|-- Termination criterion : First order optimality conditions were satisfied to the specified tolerance
- Total time:    0.75014 seconds
-DesignVariable b_lowerBound added to constraint object!
-DesignVariable b_upperBound added to constraint object!
-DesignVariable h_lowerBound added to constraint object!
-DesignVariable h_upperBound added to constraint object!
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #0
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #1
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #2
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #3
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #4
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #5
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #6
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #7
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #8
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #9
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #10
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #11
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #12
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #13
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #14
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #15
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #16
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #17
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #18
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #19
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #20
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #21
-[Status:Evaluator  ]       * Processing solver 1/1
-[openCOSSAN:Optimum:addIteration] * Iteration #22
-===================================================================
-Optimum Object  -  Description: 
-===================================================================
+</pre><pre class="codeoutput">Optimum Object  -  Description: 
 |- Design Variables: b h 
 |-- Values: 2.300e-02 
 |-- Values: 9.990e-01 
@@ -320,397 +249,299 @@ Optimum Object  -  Description:
 |-- Evaluations of Phisical Model         :  23
 |-- Number of candidate solutions         :  23
 |-- Termination criterion : Normal return from cobyla
-Starting GeneticAlgorithms
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
+</pre><h2 id="17">Optimization: Genetic Algorithm</h2><p>Optimize the beam width using Genetic Algorithm</p><pre class="codeinput">Xoptimum3 = Xop.optimize(<span class="string">'Xoptimizer'</span>,Xga);
+<span class="comment">% Show results of the optimization</span>
+display(Xoptimum3)
+</pre><pre class="codeoutput">Starting GeneticAlgorithms
 
-                           Best       max        Stall
-Generation  f-count        f(x)     constraint  Generations
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-    1         132           540            0      0
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-    2         242       94.5073            0      0
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-    3         364           540            0      0
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-    4         482           540            0      1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-[Status:Evaluator  ]       * Processing solver 1/1
-    5         592       80.0341    0.0004748      0
-Optimization terminated: average change in the fitness value less than options.TolFun
- and constraint violation is less than options.TolCon.
-===================================================================
+                              Best       Max        Stall
+Generation  Func-count        f(x)     Constraint  Generations
+    1          10416           540            0      0
+    2          20616       14.1804    0.0008656      0
+    3          30816       12.9829    0.0009818      0
+    4          41016       12.8214    0.0009996      0
+    5          51216       12.8168        0.001      0
+Optimization terminated: average change in the fitness value less than options.FunctionTolerance
+ and constraint violation is less than options.ConstraintTolerance.
 Optimum Object  -  Description: 
-===================================================================
 |- Design Variables: b h 
-|-- Values: 1.581e-01 
-|-- Values: 4.688e-01 
-|-- Objective function #1 at the optimum: 8.003e+01 
+|-- Values: 1.194e-02 
+|-- Values: 9.937e-01 
+|-- Objective function #1 at the optimum: 1.282e+01 
 |
-|-- Inequality constraint (Constraint) values at the optimum: +1.088e-03  Status:  Ok 
+|-- Inequality constraint (Constraint) values at the optimum: +1.000e-03  Status:  Ok 
 |
-|-- Evaluations of the objective function : 518
-|-- Evaluations of the constraints        : 609
-|-- Evaluations of Phisical Model         : 609
-|-- Number of candidate solutions         :  68
+|-- Evaluations of the objective function : 44411
+|-- Evaluations of the constraints        : 51233
+|-- Evaluations of Phisical Model         : 51233
+|-- Number of candidate solutions         : 268
 |-- Termination criterion : Average cumulative change in value of the fitness function over options.StallGenLimit generations less than options.TolFun and constraint violation less than options.TolCon
- Total time:    4.9538 seconds
-</pre><h2>Compare Optimizarion results<a name="11"></a></h2><pre class="codeinput">Cnames={<span class="string">'SQP'</span>,<span class="string">'COBYLA'</span>,<span class="string">'GA'</span>};
-Sformat=<span class="string">'%10.3e | %10.3e | %10.3e | %12s\n'</span>;
-<span class="comment">% Show results</span>
+ Total time:    13.1528 seconds
+</pre><h2 id="18">Compare Optimization results</h2><p>Show results in a table</p><pre class="codeinput">SQP = [Xoptimum1.NevaluationsObjectiveFunctions;
+       Xoptimum1.getOptimalObjective;
+       Xoptimum1.getOptimalDesign';
+       Xoptimum1.getOptimalConstraint];
 
-fprintf(<span class="string">'%10s | %10s | %10s | %10s\n-------------------------------------------------\n'</span>,Cnames{:}, <span class="string">'Property'</span>)
+COBYLA = [Xoptimum2.NevaluationsObjectiveFunctions;
+          Xoptimum2.getOptimalObjective;
+          Xoptimum2.getOptimalDesign';];
+cobyla_constraints = Xoptimum2.getOptimalConstraint;
+COBYLA(5) = cobyla_constraints(1);
 
-Vev(1)=Xoptimum1.NevaluationsObjectiveFunctions;
-Vev(2)=Xoptimum2.NevaluationsObjectiveFunctions;
-Vev(3)=Xoptimum3.NevaluationsObjectiveFunctions;
-fprintf(Sformat,Vev,<span class="string">'Number evaluations'</span>)
+GA = [Xoptimum3.NevaluationsObjectiveFunctions;
+      Xoptimum3.getOptimalObjective;
+      Xoptimum3.getOptimalDesign';
+      Xoptimum3.getOptimalConstraint];
 
-Voptimim(1)=Xoptimum1.getOptimalObjective;
-Voptimim(2)=Xoptimum2.getOptimalObjective;
-Voptimim(3)=Xoptimum3.getOptimalObjective;
+results = table(SQP,COBYLA,GA,<span class="string">'RowNames'</span>,{<span class="string">'Number of Evaluations'</span>,<span class="keyword">...</span>
+    <span class="string">'Objective Function'</span>, <span class="string">'Design Variable b'</span>, <span class="string">'Design Variable h'</span>,<span class="keyword">...</span>
+    <span class="string">'Constraint'</span>});
 
-fprintf(Sformat,Voptimim,<span class="string">'Objective Function'</span>)
+display(results);
+</pre><pre class="codeoutput">
+results =
 
-Vdv(:,1)=Xoptimum1.getOptimalDesign;
-Vdv(:,2)=Xoptimum2.getOptimalDesign;
-Vdv(:,3)=Xoptimum3.getOptimalDesign;
+  5&times;3 table
 
-fprintf(Sformat,Vdv(:,1),<span class="string">' Design Variable b'</span>)
-fprintf(Sformat,Vdv(:,2),<span class="string">' Design Variable h'</span>)
+                                SQP          COBYLA          GA    
+                             __________    __________    __________
 
-Vcon=zeros(5,3);
-Vcon(:,1)=Xoptimum1.getOptimalConstraint;
-Vcon(:,2)=Xoptimum2.getOptimalConstraint;
-Vcon(:,3)=Xoptimum3.getOptimalConstraint;
-fprintf(Sformat,Vcon(1,:),<span class="string">'Constaint'</span>)
-</pre><pre class="codeoutput">       SQP |     COBYLA |         GA |   Property
--------------------------------------------------
- 3.000e+01 |  2.300e+01 |  5.180e+02 | Number evaluations
- 8.022e+00 |  2.482e+01 |  8.003e+01 | Objective Function
- 1.000e-02 |  7.428e-01 |  3.200e+01 | Design Variable b
- 2.300e-02 |  9.990e-01 |  3.200e+01 | Design Variable h
- 4.664e-03 |  2.638e-05 |  1.088e-03 |    Constaint
-</pre><h2>Validate Solutions<a name="12"></a></h2><pre class="codeinput">Vreference=[ 1.5627e-04   2.6385e-05   9.9860e-04];
-assert(max(Vreference-Voptimim)&lt;1e-4, <span class="string">'Tutorial:TutorialCantileverBeamOptimization'</span>,<span class="keyword">...</span>
-    <span class="string">'Solutions do not match reference values'</span>)
-</pre><h2>RELIABILITY ANALYSIS<a name="13"></a></h2><p>The reliaility analysis is performed by the following tutorial  See Also: <a href="TutorialCantileverBeamMatlabReliabilityAnalysis.html">TutorialCantileverBeamMatlabReliabilityAnalysis.html</a></p><pre class="codeinput"><span class="comment">% echodemo TutorialCantileverBeamMatlabReliabilityAnalysis</span>
-</pre><h2>RELIABILITY BASED OPTIMIZAZION<a name="14"></a></h2><p>The reliability based optimization is shown in the following tutotial See Also: <a href="TutorialCantileverBeamMatlabRBO.html">TutorialCantileverBeamMatlabRBO.html</a></p><pre class="codeinput"><span class="comment">% echodemo TutorialCantileverBeamMatlabRBO</span>
-</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+    Number of Evaluations            39            23         44411
+    Objective Function           25.427        24.819        12.817
+    Design Variable b          0.023544      0.023003      0.011942
+    Design Variable h                 1       0.99902       0.99373
+    Constraint               1.0946e-07    2.6385e-05    0.00099999
+
+</pre><h2 id="19">Validate Solutions</h2><p>Compare the optimal constraints against the reference solutions.</p><pre class="codeinput">Vsolution = [SQP(5) COBYLA(5) GA(5)];
+Vreference=[ 1.01e-07   2.6385e-05   9.9860e-04];
+assert(abs(max(Vsolution-Vreference))&lt;1e-4, <span class="string">'Tutorial:TutorialCantileverBeamOptimization'</span>,<span class="keyword">...</span>
+    <span class="string">'Solutions do not match reference values'</span>);
+</pre><h2 id="20">Next Tutorials</h2><div><ul><li>Cantilever Beam Reliability Analysis: <a href="TutorialCantileverBeamMatlabReliabilityAnalysis.html">TutorialCantileverBeamMatlabReliabilityAnalysis.html</a></li><li>Cantilever Beam Reliability Based Optimization: <a href="TutorialCantileverBeamMatlabRBO.html">TutorialCantileverBeamMatlabRBO.html</a></li></ul></div><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-%% TutorialCantileverBeamMatlabOptimization
-% Perform optimization using Matlab evaluator
+%% TutorialCantileverBeam: Optimization
+% Perform optimization on the cantilever beam
+% (<TutorialCantileverBeamMatlab.html>) using a MATLAB evaluator.
 %
+% <<cantilever-beam.png>>
 %
-% See Also http://cossan.cfd.liv.ac.uk/wiki/index.php/Cantilever_Beam
+% See Also http://cossan.co.uk/wiki/index.php/Cantilever_Beam
 %
-% <html>
-% <h3 style="color:#317ECC">Copyright 2006-2014: <b> COSSAN working group</b></h3>
-% Author: <b>Edoardo-Patelli</b> <br> 
-% <i>Institute for Risk and Uncertainty, University of Liverpool, UK</i>
-% <br>COSSAN web site: <a href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>
-% <br><br>
-% <span style="color:gray"> This file is part of <span style="color:orange">openCOSSAN</span>.  The open source general purpose matlab toolbox
-% for numerical analysis, risk and uncertainty quantification (<a
-% href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>).
-% <br>
-% <span style="color:orange">openCOSSAN</span> is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License.
-% <span style="color:orange">openCOSSAN</span> is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details. 
-%  You should have received a copy of the GNU General Public License
-%  along with openCOSSAN.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/"</a>.
-% </span></html>
+% Author: *Edoardo Patelli*, Institute for Risk and Uncertainty, University
+% of Liverpool, UK
 
+%% LICENSE
+%{
+This file is part of OpenCossan <https://cossan.co.uk>.
+Copyright (C) 2006-2018 COSSAN WORKING GROUP
 
-%% Preparation of the Input
-% In this tutorial the random variable are replaced by two design variables
+OpenCossan is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License or,
+(at your option) any later version.
+	
+OpenCossan is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with OpenCossan. If not, see <http://www.gnu.org/licenses/>.
+%}
+
+%% Setup
+% Set the verbosity level to 2 in order to silence evaluator output
+% messages.
+OpenCossan.setVerbosityLevel(2);
+
+%% Definition of the Input: Design Variables
+% In this tutorial the Random Variables are replaced by two Design
+% Variables. The optimization analysis requires the definition of Design
+% Variables, i.e. the variables that define new configurations.
+
+b = DesignVariable('value',0.12,'lowerBound',0.01,'upperBound',0.50,'Sdescription','Beam Width');
+h = DesignVariable('value',0.54,'lowerBound',0.02,'upperBound',1,'Sdescription','Beam Heigth');
+
+%% Definition of the Input: Parameters
+% In this example we do not use |RandomVariables| but only |Parameters|.
+L = Parameter('value',1.8,'Sdescription','Beam Length');
+maxDisplacement = Parameter('value',0.001,'Sdescription','Maximum allowed Displacement');
+P = Parameter('value',10000,'Sdescription','Load');
+rho = Parameter('value',600,'Sdescription','Density');
+E = Parameter('value',10e9,'Sdescription','Young''s modulus');
+
+%% Definition of the Input: Function
+% Construct the |Function| object that defines the moment of inertia as
 %
-% The optimization analysis requires the definition of Design Variables (i.e.
-% the variables that define new configurations)  
-b=DesignVariable('value',0.12,'lowerBound',0.01,'upperBound',0.50,'Sdescription','Beam width');
-h=DesignVariable('value',0.54,'lowerBound',0.02,'upperBound',1,'Sdescription','Beam Heigth');
+% $$I = \frac{bh^3}{12}$$
 
-% In this example we do not use random variables and we only use Parameters
-L=Parameter('value',1.8,'Sdescription','Beam Length');
-MaxW=Parameter('value',0.001,'Sdescription','Maximum allowed displacement');
-P=Parameter('value',10000,'Sdescription','Load');
-rho=Parameter('value',600,'Sdescription','density');
-E=Parameter('value',10e9,'Sdescription','Young''s modulus');
-% Definition of the Function
-I=Function('Sdescription','Moment of Inertia','Sexpression','<&b&>.*<&h&>.^3/12');
+I = Function('Sdescription','Moment of Inertia','Sexpression','<&b&>.*<&h&>.^3/12');
 
-%% Prepare Input Object
-% The above prepared objects can be added to an Input Object
-XinputOptimization=Input('CXmembers',{L b P h rho E I MaxW},...
+%% Definition of the Input: Input
+% Construct the |Input| object grouping the input objects together.
+XinputOptimization=Input('CXmembers',{L b P h rho E I maxDisplacement},...
     'CSmembers',{'L' 'b' 'P' 'h' 'rho' 'E' 'I' 'MaxW'});
-% Show summary of the Input Object
-display(XinputOptimization)
-%% Preparation of the Evaluator
-% Use of a matlab script to compute the Beam displacement
+% The summary show that Xinput contains all the previously created
+% objects:
+display(XinputOptimization);
+
+%% Definition of the Evaluator
+% Construct the |Evaluator| object by passing an |Mio| (MATLAB-Input-Output) object.
+% The |Mio| is used to calculate the displacement
+%
+% $$w = \frac{pgbhL^4}{8EI} + \frac{PL^3}{3EI}$$,
+%
+% using the previously defined objects.
 Sfolder=fileparts(mfilename('fullpath'));% returns the current folder
 Xmio=Mio('Spath',fullfile(Sfolder,'MatlabModel'),'Sfile','tipDisplacement.m',...
     'Cinputnames',{'I' 'b' 'L' 'h' 'rho' 'P'},'Liostructure',true, ...
     'Coutputnames',{'w'});
-% Add the MIO object to an Evaluator object
+
+% Create the Evaluator using the Mio
 Xevaluator=Evaluator('CXmembers',{Xmio},'CSmembers',{'Xmio'});
 
-%% Preparation of the Physical Model
-% Define the Physical Model
+%% Definition of the Physical Model
+% Construct the |Model| by passing the |Input| and the |Evaluator|
 Xmodel=Model('Xinput',XinputOptimization,'Xevaluator',Xevaluator);
 
-%% Check feasibility of the optimization preoblem
-% The EesignOfExperiment analysis can be used to see if a feasible solution is
-% present in the bounds set for the Design Varaibles 
-% Define a user defined DOE object. 
-% We evaluate the model at the lower and upper bounds of the design variable
-% plus the current values. Therefore for each design variable we have 3 values
-% and a total of 9 model evaluations are required.
-% The evaluation points are defined by means of the MdeoFactor matrix defined
-% between -1 and 1. 
-MdoeFactors=[-1 -1; 
-             0 -1; 
-             1 -1; 
-            -1  0; 
-             0  0; 
-             1  0; 
-            -1  1; 
-             0  1;
-             1  1];
+%% Design of Experiments Analysis
+% The |DesignOfExperiment| analysis can be used to see if a feasible
+% solution is present in the bounds set for the Design Variables.
+%
+% Define a user DOE object. We evaluate the model at the lower and upper
+% bounds of the design variable plus at the current values. Therefore, for
+% each design variable we have 3 values and a total of 9 model evaluations
+% are required.
+%
+% The evaluation points are defined by means of the MdoeFactor matrix
+% defined between -1 and 1.
+MdoeFactors=[-1 -1;
+    0 -1;
+    1 -1;
+    -1  0;
+    0  0;
+    1  0;
+    -1  1;
+    0  1;
+    1  1];
 % When the flag Lusecurrentvalues is set to true the current values of the design
 % variables is used in corresponcence of the MdoeFactors=0.
-         
-Xdoe=DesignOfExperiments('Sdesigntype','UserDefined',...
+
+Xdoe = DesignOfExperiments('Sdesigntype','UserDefined',...
     'Mdoefactors',MdoeFactors,'Lusecurrentvalues',true);
 
-% Show summary of the design of experimemts 
+% Show summary of the design of experimemts
 display(Xdoe)
 
-% and now, evaluate the model at the points defined by the DesignOfExperiment 
-XoutDoe=Xdoe.apply(Xmodel);
+% Evaluate the model at the points defined by the DesignOfExperiment
+XoutDoe = Xdoe.apply(Xmodel);
 
-%% Show the quantify of interest
-Cnames={'h' 'b' 'w'};
-Mdoe=XoutDoe.getValues('Cnames',Cnames);
+%% Results of the Design of Experiments
+h = XoutDoe.getValues('Sname','h');
+b = XoutDoe.getValues('Sname','b');
+w = XoutDoe.getValues('Sname','w');
+Status = cell(9,1);
 
-% Show results
-
-fprintf('%10s | %10s | %10s | %10s\nREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-\n',Cnames{:}, 'Solution status')
-
-for n=1:size(Mdoe,1)
-    if Mdoe(n,3)<MaxW.value
-        fprintf('%10.3e | %10.3e | %10.3e | %10s\n',Mdoe(n,:),'Feasible Solution')
+for n = 1:numel(w)
+    if (w(n) < maxDisplacement.value)
+        Status{n} = 'Feasible';
     else
-        fprintf('%10.3e | %10.3e | %10.3e | %10s\n',Mdoe(n,:),'Uneasible Solution')
-
+        Status{n} = 'Infeasible';
     end
 end
 
-% There are 3 feasible solutions and this means the the opimization problem is
-% well define. Now we have to identify the oprimal solution.
+results = table(h,b,w,Status);
+format shorte;
+display(results);
+format short;
+% There are 3 feasible solutions and this means the the opimization problem
+% is well defined. Now we have to identify the optimal solution.
 
-
-%% Define the Objective Funtion
-% The aim of this optimization is to minimaze the weight of the beam. The weight
-% can be easely computed using a matlab script.  
-Xobjfun   = ObjectiveFunction('Sdescription','objective function', ...
+%% Definition of the Objective Function
+% The goal of this optimization is to minimaze the weight of the beam. The
+% weight can be easely computed using a matlab script (MIO).
+Xobjfun = ObjectiveFunction('Sdescription','objective function', ...
     'Sscript','for n=1:length(Tinput),Toutput(n).BeamWeight=Tinput(n).rho*Tinput(n).b*Tinput(n).h*Tinput(n).L;end',...
     'CoutputNames',{'BeamWeight'},'Liostructure',true,...
     'CinputNames',{'rho' 'b' 'h' 'L'});
 
-%% Create (inequality) constraint
-% The maximum displacement of the beam tip 
-XconMaxStress   = Constraint('Sdescription','constraint', ...
+%% Definition of the Constraint
+% Construct a |Constraint| defined by the maximum tip displacement of the
+% beam.
+XconMaxStress = Constraint('Sdescription','constraint', ...
     'Sscript','for n=1:length(Tinput),Toutput(n).Constraint=Tinput(n).w-Tinput(n).MaxW; end',...
     'CoutputNames',{'Constraint'},'Liostructure',true,...
     'CinputNames',{'w' 'MaxW' },...
     'Linequality',true);
 
-%% Create object OptimizationProblem
-Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
+%% Definition of the OptimizationProblem
+% Construct the |OptimizationProblem| from the |ObjectiveFunction|, the
+% |Constraint| and the |Model|.
+Xop = OptimizationProblem('Sdescription','Optimization problem', ...
     'XobjectiveFunction',Xobjfun,'CXconstraint',{XconMaxStress},'Xmodel',Xmodel);
 
-% Define Optimizers
-Xsqp=SequentialQuadraticProgramming('finitedifferenceperturbation',0.01);
-Xcobyla=Cobyla;
-Xga=GeneticAlgorithms('Smutationfcn','mutationadaptfeasible','NmaxIterations',10, ...
-    'NPopulationSize',10);
+% Define the Optimizers
+Xsqp = SequentialQuadraticProgramming('finitedifferenceperturbation',0.01);
+Xcobyla = Cobyla();
+Xga = GeneticAlgorithms('Smutationfcn','mutationadaptfeasible','NmaxIterations',50, ...
+    'NPopulationSize',200);
 
+%% Optimization: Setup
+% Reset the random number generator in order to always obtain the same
+% results. *DO NOT CHANGE THE VALUES OF THE SEED!*
+OpenCossan.resetRandomNumberGenerator(542727);
 
-%% Perform optimization
-
-% Reset the random number generator in order to obtain always the same results.
-% DO NOT CHANGE THE VALUES OF THE SEED
-OpenCossan.resetRandomNumberGenerator(542727)
-
-% We start with the Sequential Quadratic Programming method.
-Xoptimum1=Xop.optimize('Xoptimizer',Xsqp);
+%% Optimization: Sequential Quadratic Programming
+% Optimize the beam width using Sequential Quadratic Programming
+Xoptimum1 = Xop.optimize('Xoptimizer',Xsqp);
 % Show results of the optimization
 display(Xoptimum1)
 
-% Now we optimize the problem using Cobyla
-Xoptimum2=Xop.optimize('Xoptimizer',Xcobyla);
+%% Optimization: Cobyla
+% Optimize the beam width using Cobyla
+Xoptimum2 = Xop.optimize('Xoptimizer',Xcobyla);
 % Show results of the optimization
 display(Xoptimum2)
 
-% Now we optimize the problem using Genetic Algorithms
-Xoptimum3=Xop.optimize('Xoptimizer',Xga);
+%% Optimization: Genetic Algorithm
+% Optimize the beam width using Genetic Algorithm
+Xoptimum3 = Xop.optimize('Xoptimizer',Xga);
 % Show results of the optimization
 display(Xoptimum3)
 
+%% Compare Optimization results
+% Show results in a table
+SQP = [Xoptimum1.NevaluationsObjectiveFunctions;
+       Xoptimum1.getOptimalObjective;
+       Xoptimum1.getOptimalDesign';
+       Xoptimum1.getOptimalConstraint];
+   
+COBYLA = [Xoptimum2.NevaluationsObjectiveFunctions;
+          Xoptimum2.getOptimalObjective;
+          Xoptimum2.getOptimalDesign';];
+cobyla_constraints = Xoptimum2.getOptimalConstraint;
+COBYLA(5) = cobyla_constraints(1);
+   
+GA = [Xoptimum3.NevaluationsObjectiveFunctions;
+      Xoptimum3.getOptimalObjective;
+      Xoptimum3.getOptimalDesign';
+      Xoptimum3.getOptimalConstraint];
+  
+results = table(SQP,COBYLA,GA,'RowNames',{'Number of Evaluations',...
+    'Objective Function', 'Design Variable b', 'Design Variable h',...
+    'Constraint'});
 
-%% Compare Optimizarion results
-Cnames={'SQP','COBYLA','GA'};
-Sformat='%10.3e | %10.3e | %10.3e | %12s\n';
-% Show results
-
-fprintf('%10s | %10s | %10s | %10s\nREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-\n',Cnames{:}, 'Property')
-
-Vev(1)=Xoptimum1.NevaluationsObjectiveFunctions;
-Vev(2)=Xoptimum2.NevaluationsObjectiveFunctions;
-Vev(3)=Xoptimum3.NevaluationsObjectiveFunctions;
-fprintf(Sformat,Vev,'Number evaluations')
-
-Voptimim(1)=Xoptimum1.getOptimalObjective;
-Voptimim(2)=Xoptimum2.getOptimalObjective;
-Voptimim(3)=Xoptimum3.getOptimalObjective;
-
-fprintf(Sformat,Voptimim,'Objective Function')
-
-Vdv(:,1)=Xoptimum1.getOptimalDesign;
-Vdv(:,2)=Xoptimum2.getOptimalDesign;
-Vdv(:,3)=Xoptimum3.getOptimalDesign;
-
-fprintf(Sformat,Vdv(:,1),' Design Variable b')
-fprintf(Sformat,Vdv(:,2),' Design Variable h')
-
-Vcon=zeros(5,3);
-Vcon(:,1)=Xoptimum1.getOptimalConstraint;
-Vcon(:,2)=Xoptimum2.getOptimalConstraint;
-Vcon(:,3)=Xoptimum3.getOptimalConstraint;
-fprintf(Sformat,Vcon(1,:),'Constaint')
+display(results);
 
 %% Validate Solutions
-Vreference=[ 1.5627e-04   2.6385e-05   9.9860e-04];
-assert(max(Vreference-Voptimim)<1e-4, 'Tutorial:TutorialCantileverBeamOptimization',...
-    'Solutions do not match reference values')
+% Compare the optimal constraints against the reference solutions.
+Vsolution = [SQP(5) COBYLA(5) GA(5)];
+Vreference=[ 1.01e-07   2.6385e-05   9.9860e-04];
+assert(abs(max(Vsolution-Vreference))<1e-4, 'Tutorial:TutorialCantileverBeamOptimization',...
+    'Solutions do not match reference values');
 
-
-%% RELIABILITY ANALYSIS 
-% The reliaility analysis is performed by the following tutorial
-%  See Also: <TutorialCantileverBeamMatlabReliabilityAnalysis.html>
-
-% echodemo TutorialCantileverBeamMatlabReliabilityAnalysis
-
-%% RELIABILITY BASED OPTIMIZAZION 
-% The reliability based optimization is shown in the following tutotial 
-% See Also: <TutorialCantileverBeamMatlabRBO.html>
-
-% echodemo TutorialCantileverBeamMatlabRBO
-
+%% Next Tutorials
+%
+% * Cantilever Beam Reliability Analysis: <TutorialCantileverBeamMatlabReliabilityAnalysis.html>
+% * Cantilever Beam Reliability Based Optimization: <TutorialCantileverBeamMatlabRBO.html>
 ##### SOURCE END #####
 --></body></html>

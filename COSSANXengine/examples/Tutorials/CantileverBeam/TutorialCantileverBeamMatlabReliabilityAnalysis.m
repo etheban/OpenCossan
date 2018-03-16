@@ -1,132 +1,130 @@
-%% TutorialCantileverBeamMatlabReliabilityAnalysis
+%% TutorialCantileverBeam: Reliability Analysis
+% Perform a reliability analysis on a cantilever beam. The 
+% documentation and the problem description of this example is available 
+% at: <http://cossan.co.uk/wiki/index.php/Cantilever_Beam>
 %
-% The documentation and the problem description of this example is available on
-% the User Manual -> Tutorials -> Cantilever_Beam
+% <<cantilever-beam.png>>
 %
-%
-% See Also http://cossan.cfd.liv.ac.uk/wiki/index.php/Cantilever_Beam
-%
-% <html>
-% <h3 style="color:#317ECC">Copyright 2006-2014: <b> COSSAN working group</b></h3>
-% Author: <b>Edoardo-Patelli</b> <br> 
-% <i>Institute for Risk and Uncertainty, University of Liverpool, UK</i>
-% <br>COSSAN web site: <a href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>
-% <br><br>
-% <span style="color:gray"> This file is part of <span style="color:orange">openCOSSAN</span>.  The open source general purpose matlab toolbox
-% for numerical analysis, risk and uncertainty quantification (<a
-% href="http://www.cossan.co.uk">http://www.cossan.co.uk</a>).
-% <br>
-% <span style="color:orange">openCOSSAN</span> is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License.
-% <span style="color:orange">openCOSSAN</span> is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details. 
-%  You should have received a copy of the GNU General Public License
-%  along with openCOSSAN.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/"</a>.
-% </span></html>
+% Author: *Edoardo Patelli*, Institute for Risk and Uncertainty, University
+% of Liverpool, UK
+
+%% LICENSE
+%{
+This file is part of OpenCossan <https://cossan.co.uk>.
+Copyright (C) 2006-2018 COSSAN WORKING GROUP
+
+OpenCossan is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License or,
+(at your option) any later version.
+	
+OpenCossan is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with OpenCossan. If not, see <http://www.gnu.org/licenses/>.
+%}
 
 
-%% Require input 
-% This tutorial requires the Model create by the tutorial TutorialCantileverBeamMatlab
+%% Setup
+% This tutorial requires the Model constructed in the tutorial 
+% <TutorialCantileverBeamMatlab.html>
 
 assert(logical(exist('XmodelBeamMatlab','var')),'openCOSSAN:Tutorial', ...
-    'Please run first the tutorial TutorialCantileverBeamMatlab')
+    'Please run the tutorial TutorialCantileverBeamMatlab first')
 
-
-% Reset the random number generator in order to obtain always the same results.
-% DO NOT CHANGE THE VALUES OF THE SEED
+% Reset the random number generator in order to always obtain the same
+% results. *DO NOT CHANGE THE VALUES OF THE SEED!*
 OpenCossan.resetRandomNumberGenerator(51125);
 
-%% Define a Probabilistic Model
-% Performance Function
-Xperfun = PerformanceFunction('Sdemand','w','Scapacity','maxDiplacement','Soutputname','Vg');
-% Define a Probabilistic Model
-XprobModelBeamMatlab=ProbabilisticModel('Xmodel',XmodelBeamMatlab,'XperformanceFunction',Xperfun);
+% Set the verbosity level to 2 in order to silence evaluator output
+% messages.
+OpenCossan.setVerbosityLevel(2);
 
-%% Reliability Analysis via Monte Carlo Sampling
-% The Monte Carlo simulation is used here to estimate the failure probability
+%% Definition of the Probabilistic Model
+% Construct the |PerformanceFunction|
+Xperfun = PerformanceFunction('Sdemand','w','Scapacity','maxDisplacement','Soutputname','Vg');
+% Construct the ProbabilisticModel from the Model and the
+% PerformanceFunction
+XprobModelBeamMatlab = ProbabilisticModel('Xmodel',XmodelBeamMatlab,'XperformanceFunction',Xperfun);
 
-% Compute Reference Solution
-Xmc=MonteCarlo('Nsamples',1e4,'Nbatches',1);
+%% Reliability Analysis: Monte Carlo Sampling
+% Estimate the probability of failure using Monte Carlo simulation.
+
+% Definition of the Simulation Object
+Xmc = MonteCarlo('Nsamples',1e4,'Nbatches',1);
 
 % Run Reliability Analysis
-XfailireProbMC=Xmc.computeFailureProbability(XprobModelBeamMatlab);
-% Show the estimated failure probability
-display(XfailireProbMC);
+XfailureProbMC = Xmc.computeFailureProbability(XprobModelBeamMatlab);
+% Display the estimated failure probability
+display(XfailureProbMC);
 
 % Validate Solution
-assert(abs(XfailireProbMC.pfhat-7.38e-02)<eps,...
+ assert(abs(XfailureProbMC.pfhat-7.38e-02)<eps,...
     'CossanX:Tutorials:CantileverBeam','Reference Solution pf MCS not matched.')
 
-%% Reliability Analysis via Latin Hypercube Sampling
+%% Reliability Analysis: Latin Hypercube Sampling
+% Estimate the probability of failure using Latin Hypercube Sampling
+
 % Definition of the Simulation object
-Xlhs=LatinHypercubeSampling('Nsamples',1e3);
+Xlhs = LatinHypercubeSampling('Nsamples',1e3);
+
 % Run Reliability Analysis
-XfailireProbLHS=Xlhs.computeFailureProbability(XprobModelBeamMatlab);
-% Show the estimated failure probability
-display(XfailireProbLHS);
+XfailureProbLHS = Xlhs.computeFailureProbability(XprobModelBeamMatlab);
+% Display the estimated failure probability
+display(XfailureProbLHS);
 
 % Validate Solution
-assert(abs(XfailireProbLHS.pfhat-8.30e-02)<eps,...
+assert(abs(XfailureProbLHS.pfhat-8.30e-02)<eps,...
     'CossanX:Tutorials:CantileverBeam','Reference Solution pf LHS not matched.')
 
-%% Reliability Analysis via LineSampling
+%% Reliability Analysis: Line Sampling
 % Line Sampling requires the definition of the so-called important direction.
-% It can be computed usig the sensitivity method. For instance here the Local
+% It can be computed using the sensitivity method. For instance here the Local
 % Sensitivity Analysis is computed.
 
-XlsFD=LocalSensitivityFiniteDifference('Xmodel',XprobModelBeamMatlab,'Coutputname',{'Vg'});
-display(XlsFD)
+XlsFD = LocalSensitivityFiniteDifference('Xmodel',XprobModelBeamMatlab,'Coutputname',{'Vg'});
+display(XlsFD);
 
 % Compute the LocalSensitivityMeasure
 XlocalSensitivity = XlsFD.computeIndices;
 
 OpenCossan.resetRandomNumberGenerator(49564);
 % Use sensitivity information to define the important direction for LineSampling
-XLS=LineSampling('XlocalSensitivityMeasures',XlocalSensitivity,'Nlines',50);
-% Run Analysis
-[XfailireProbLS, Xout]=XLS.computeFailureProbability(XprobModelBeamMatlab);
-% Show Results
-display(XfailireProbLS);
+XLS = LineSampling('XlocalSensitivityMeasures',XlocalSensitivity,'Nlines',50);
+% Run Reliability Analysis
+[XfailureProbLS, Xout]=XLS.computeFailureProbability(XprobModelBeamMatlab);
+% Display results
+display(XfailureProbLS);
 display(Xout);
 
 % Validate Solution
-assert(abs(XfailireProbLS.pfhat-6.085e-002)<2e-5,...
+assert(abs(XfailureProbLS.pfhat-6.085e-002)<2e-5,...
     'CossanX:Tutorials:CantileverBeam',...
     'Estimated failure probability (%e) does not match the reference Solution (%e)',...
-    XfailireProbLS.pfhat,6.1e-002)
+    XfailureProbLS.pfhat,6.1e-002)
 
-%% Plot Results
-% show lines 
-f1=Xout.plotLines;
+%% Plot Line Sampling Results
+% Plot lines 
+f1 = Xout.plotLines;
 
 %% Close figure
 close(f1);
 
+%% Reliability Analysis: Adaptive Line Sampling
+
 % Line Sampling with adaptive method
 OpenCossan.resetRandomNumberGenerator(1241243);
-XALS=AdaptiveLineSampling('Nlines',20);
-XfailireProbLS2=XALS.computeFailureProbability(XprobModelBeamMatlab);
-display(XfailireProbLS2);
+XALS = AdaptiveLineSampling('Nlines',50);
+XfailureProbLS2 = XALS.computeFailureProbability(XprobModelBeamMatlab);
+
+% Display estimated failure probability
+display(XfailureProbLS2);
 
 % Validate Solution
-assert(abs(XfailireProbLS2.pfhat-5.992e-02)<1e-4,...
+assert(abs(XfailureProbLS2.pfhat-5.992e-02)<1e-4,...
     'CossanX:Tutorials:CantileverBeam',...
     'Estimated failure probability (%e) does not match the reference Solution (%e)',...
-    XfailireProbLS2.pfhat,5.992e-02)
-
-%% Optimization
-% This tutorial continues with the optimization section
-% See Also:  <TutorialCantileverBeamMatlabOptimization.html> 
-
-% echodemo TutorialCantileverBeamMatlabOptimization
-
-%% RELIABILITY BASED OPTIMIZAZION 
-% The reliability based optimization is shown in the following tutotial 
-% See Also: <TutorialCantileverBeamMatlabRBO.html>
-
-% echodemo TutorialCantileverBeamMatlabRBO
-
-
+    XfailureProbLS2.pfhat,5.992e-02)
