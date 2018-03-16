@@ -22,8 +22,8 @@ Xpar=Parameter('value',5);
 
 % Define Input object
 Xinp  = Input;
-Xinp  = add(Xinp,Xrvs1);
-Xinp  = add(Xinp,Xpar);
+Xinp  = Xinp.add('Xmember',Xrvs1,'Sname','Xrvs1');
+Xinp  = Xinp.add('Xmember',Xpar,'Sname','Xpar');
 
 % Add some samples to the Input
 Xinp = Xinp.sample('Nsamples',10);

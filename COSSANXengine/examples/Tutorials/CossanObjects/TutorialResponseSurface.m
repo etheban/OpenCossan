@@ -52,11 +52,11 @@ XP          = RandomVariable('Sdescription','load at tip of beam',...
 
 Xrvset      = RandomVariableSet('Cmembers',{'Xh','XP'});
 Xin         = Input;            %Create empty Input object
-Xin         = add(Xin,Xrvset);  %add RandomVariableSet to Input object
+Xin         = Xin.add('Xmember',Xrvset,'Sname','Xrvset');  %add RandomVariableSet to Input object
 
 % this parameters are used in the test computation of pf
 Xthreshold = Parameter('Sdescription','Define threshold','value',0.022);
-Xin = add(Xin,Xthreshold);
+Xin         = Xin.add('Xmember',Xthreshold,'Sname','Xthreshold'); 
 
 %% Definition of the interface for with 3rd party solver  
 % Create Injector

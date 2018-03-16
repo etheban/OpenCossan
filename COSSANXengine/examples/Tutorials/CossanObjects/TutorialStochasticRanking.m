@@ -4,7 +4,7 @@
 % Constrained Evolutionary Optimization", using the Stochastic Ranking
 % Evolution Strategy.
 % 
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@StochasticRankingES
+% See Also: http://cossan.co.uk/wiki/index.php/@StochasticRanking
 %
 % $Copyright~1993-2012,~University~of~Liverpool,~UK$
 % $Author: Matteo~Broggi$ 

@@ -20,8 +20,8 @@ Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'});
 Xdemand=Parameter('Sdescription','Define threshold','value',0);
 % Construct Input Object
 Xin = Input('Sdescription','Input Object of our model');
-Xin = add(Xin,Xrvs1);
-Xin = add(Xin,Xdemand);
+Xin = Xin.add('Xmember',Xrvs1,'Sname','Xrvs1');
+Xin = Xin.add('Xmember',Xdemand,'Sname','Xdemand');
 
 %% Define the Evaluator (i.e. how our model is evaluate)
 % Construct a Mio object

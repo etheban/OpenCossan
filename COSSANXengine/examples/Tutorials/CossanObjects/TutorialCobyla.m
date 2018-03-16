@@ -21,14 +21,14 @@
 % 
 %    
 % 
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@Cobyla
+% See Also: http://cossan.co.uk/wiki/index.php/@Cobyla
 %
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author: Edoardo-Patelli$ 
 
 %% Create input 
 % In this tutorial we create a very simple accademic example in order to show
-% how to used the optimization method. The input object must contain at least 1
+% how to use the optimization method. The input object must contain at least 1
 % Design Variable.
 
 

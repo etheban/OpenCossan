@@ -1,4 +1,4 @@
-function [Tout, LsuccessfullExtract] = extract(Xobj,varargin)
+function [Tout, LsuccessfullExtract] = extract(Xobj)
 %EXTRACT This method read a table and returns a structures with Dataseries
 %
 % See Also: TableExtractor
@@ -24,20 +24,6 @@ function [Tout, LsuccessfullExtract] = extract(Xobj,varargin)
 %  You should have received a copy of the GNU General Public License
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
 % =====================================================================
-
-%% 1. Processing Inputs
-
-OpenCossan.validateCossanInputs(varargin{:});
-for iopt=1:2:length(varargin)
-    switch lower(varargin{iopt})
-        case {'nsimulation'}
-            Nsimulation = varargin{iopt+1};
-        otherwise
-            error('openCOSSAN:TableExtractor:extractWrongInputArgument',...
-                ['Optional parameter ' varargin{iopt} ' not allowed']);
-            
-    end
-end
 
 LsuccessfullExtract = true;
 
@@ -96,7 +82,15 @@ Textract = readtable(Sfile,Carguments{:});
 
 for n=1:length(Xobj.Coutputnames)
     TableData=Textract(Xobj.ClinePosition{n},Xobj.CcolumnPosition{n});
-    Tout.(Xobj.Coutputnames{n})=Dataseries('Mdata',table2array(TableData)');
+    if ~isempty(Xobj.NcoordinateColumn)
+        % Read coordinates from table
+        TableCoord=Textract(Xobj.ClinePosition{n},Xobj.NcoordinateColumn);
+        % Create dataseries
+        Tout.(Xobj.Coutputnames{n})=Dataseries('Vdata',table2array(TableData)',...
+            'Mcoord',table2array(TableCoord)');
+    else
+        Tout.(Xobj.Coutputnames{n})=Dataseries('Vdata',table2array(TableData)');
+    end
 end
 
 % 
@@ -141,13 +135,7 @@ end
 %     end
 % end
 
-% Add coordinate to the Dataseries
-if ~isempty(Xobj.NcoordinateColumn)
-    for n=1:length(Xobj.Coutputnames)
-        TableCoord=Textract(Xobj.ClinePosition{n},Xobj.NcoordinateColumn);
-        Tout.(Xobj.Coutputnames{n}).Mcoord=table2array(TableCoord)';
-    end
-end
+
 
 
 

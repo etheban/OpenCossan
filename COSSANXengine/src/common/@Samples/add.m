@@ -83,7 +83,7 @@ for k=1:2:length(varargin),
         case {'vweights'}
             % Add weights
             Xs.Vweights=[Xs.Vweights; varargin{k+1}];   %add weights
-        case {'xsamples'};
+        case {'xsamples'}
             % Add a Samples object
             assert(isa(varargin{k+1},'Samples'), ...
                 'openCOSSAN:Samples:add',...
@@ -199,7 +199,7 @@ for k=1:2:length(varargin),
     if isempty(Xs.Xdataseries)
         VsamplesDS=0;
     else
-        VsamplesDS = Xs.Xdataseries(1).Nsamples;
+        VsamplesDS = size(Xs.Xdataseries,1);
     end
     
     Vsamples=[size(Xs.MsamplesHyperCube,1) VsamplesDS size(Xs.MdoeDesignVariables,1)];

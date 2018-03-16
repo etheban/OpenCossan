@@ -16,19 +16,19 @@
     %% Create Parameter object
     Xpar1   = Parameter('value',2);
     % Add parameter to the input
-    Xin     = add(Xin,Xpar1);
+    Xin     = Xin.add('Xmember',Xpar1,'Sname','Xpar1');
 
     %%  Create Random Variable  and Random Variable Set objects
     Xrv1    = RandomVariable('Sdistribution','normal','mean',0,'std',1);
     Xrvs1   = RandomVariableSet('Cmembers',{'Xrv1'});
-    Xin     = add(Xin,Xrvs1);
+    Xin     = Xin.add('Xmember',Xrvs1,'Sname','Xrvs1');
 
     %% Create Function object
     % This function returns the sum of the random variable 1 plus the values of
     % the paramter
     Xfun1   = Function('Sdescription','function #1', ...
     'Sexpression','<&Xrv1&>+<&Xpar1&>');
-    Xin     = add(Xin,Xfun1);
+    Xin     = Xin.add('Xmember',Xfun1,'Sname','Xfun1');
     
 %% Evaluate the Function
 % the Input object must be sampled before function evaluation
@@ -75,10 +75,10 @@ disp(Ctypes)
     'Sexpression','2 * <&Xpar2&>');
     
     % Add objects to input
-    Xin     = add(Xin,Xpar1);
-    Xin     = add(Xin,Xpar2);
-    Xin     = add(Xin,Xfunction1);
-    Xin     = add(Xin,Xfunction2);
+    Xin     = Xin.add('Xmember',Xpar1,'Sname','Xpar1');
+    Xin     = Xin.add('Xmember',Xpar2,'Sname','Xpar2');
+    Xin     = Xin.add('Xmember',Xfunction1,'Sname','Xfunction1');
+    Xin     = Xin.add('Xmember',Xfunction2,'Sname','Xfunction2');
     
     values1  =  Xfunction1.evaluate(Xin);   
     values2  =  Xfunction2.evaluate(Xin);  
@@ -108,8 +108,8 @@ disp(values4)
     %   Create Parameter object
     Xpar1   = Parameter('Vvalues',[2;3]);
     Xpar2   = Parameter('Mvalues',[1 2 ; 3 4]);
-    Xin     = add(Xin,Xpar1);
-    Xin     = add(Xin,Xpar2);
+    Xin     = Xin.add('Xmember',Xpar1,'Sname','Xpar1');
+    Xin     = Xin.add('Xmember',Xpar2,'Sname','Xpar2');
     
     %Create Function object
     Xfun1   = Function('Sdescription','function #1', ...

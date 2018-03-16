@@ -1,12 +1,28 @@
+%{
+    This file is part of OpenCossan <https://cossan.co.uk>.
+    Copyright (C) 2006-2018 COSSAN WORKING GROUP
+
+    OpenCossan is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License or,
+    (at your option) any later version.
+    
+    OpenCossan is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with OpenCossan. If not, see <http://www.gnu.org/licenses/>.
+%}
+%
 %% TUTORIALINPUT
 % This turorial shows how to create and use an Input object
 % The Input object is uses to generate samples of random variables, collection
 % parameters, function and design variables
 %
 % See Also:  https://cossan.co.uk/wiki/index.php/@Input
-%
-% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
-% $Author:~Pierre~Beaurepaire$ 
+% Author:~Pierre~Beaurepaire
 
 
 %% Create additional object
@@ -77,23 +93,23 @@ display(Xin)
 %% Using get and dependent field to retrieve information from Xinput
 % get the list of the  RandomVariableSet
 Cname=Xin.CnamesRandomVariableSet;
-display('Name of the RandomVariableSet')
+disp('Name of the RandomVariableSet')
 display(Cname')
 % get the list of the Parameter
 Cname=Xin.CnamesParameter;
-display('Name of the Parameter')
+disp('Name of the Parameter')
 display(Cname')
 % get the list of Function
 Cname=Xin.CnamesFunction;
-display('Name of the Function')
+disp('Name of the Function')
 display(Cname')
 % get the list of StochasticProcess
 Cname=Xin.CnamesStochasticProcess;
-display('Name of the StochasticProcess')
+disp('Name of the StochasticProcess')
 display(Cname')
 % get the list of all variables
 Cname=Xin.Cnames;
-display('Name of the Variable present in the Input')
+disp('Name of the Variable present in the Input')
 display(Cname')
 
 %% Retrieve values from the Input object

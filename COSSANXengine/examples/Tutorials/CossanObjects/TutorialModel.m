@@ -39,7 +39,7 @@ RV2=RandomVariable('Sdistribution','normal', 'mean',0,'std',1);  %#ok<SNASGU>
 Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'}); 
 % Define Xinput
 Xin = Input('Sdescription','Input satellite_inp');
-Xin = add(Xin,Xrvs1);
+Xin  = Xin.add('Xmember',Xrvs1,'Sname','Xrvs1');
 Xin = sample(Xin,'Nsamples',10);
 
 %%  Construct the Model

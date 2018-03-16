@@ -37,7 +37,7 @@ switch class(XaddObject)
     case 'DesignVariable'
         Xinput.Xsamples =[];
         if ~isfield(Xinput.XdesignVariable,Sname)
-            Xinput.XdesignVariable.(inputname(2))=XaddObject;
+            Xinput.XdesignVariable.(Sname)=XaddObject;
             % OpenCossan.cossanDisp('Parameter object added to Input object');
         else
             warning('openCOSSAN:inputs:Inputs:add', ...

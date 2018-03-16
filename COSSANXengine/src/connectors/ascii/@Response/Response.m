@@ -10,13 +10,15 @@ classdef Response
         Sfieldformat = '%e'    % Format string '%' +  Maximum field width + conversion character (see fscanf for more information)
         Clookoutfor = {}       % if present define the string to be searched inside the ASCII file in order to define the relative position
         Svarname = ''          % if present Vcolnum and Vrownum are relative respect to the variable present in Svarname
-        Sregexpression = ''    % Regular expression
         Ncolnum= 1             % Colum position in the ASCII file of the variables (length(Vcolnum)=Nresponse)
         Nrownum= 1             % Row position in the ASCII file of the variables (length(Vcolnum)=Nresponse)
         Nrepeat= 1             % Repeat the extraction of the value Nrepeat times
-        LoutputInColumns = true
-        VcoordIndex = []       % Identify which column (if LoutputInColumns is true) is used to identify the Mcoord in Dataseries
+        NrepeatAnchor=1        % Repeat the extraction search of Clookoutfor NrepeatAnchor
+        VcoordColumn = []       % Identify which column is used to identify the Mcoord in Dataseries
+        VcoordRow = []          % Identify which row is used to identify the Mcoord in Dataseries
         CSindexName = {}
+        LisMatrix=false        % If true the output from rows and colums are stored as a matrix.
+                               % If false the output are concatenate in a single vector
     end
     
     properties (Dependent=true)        
@@ -45,8 +47,12 @@ classdef Response
             %                      variable present in Cvarname
             %   - Ncolnum:         Colum position in the ASCII file of the variables
             %   - Nrownum:         Row position in the ASCII file of the variables
-            %   - Sregexpression:  Regular expression
-            %   - Nrepeat:         Repeat the extraction of values Nrepeat times
+            %   - Nrepeat:         Repeat the extraction of values Nrepeat
+            %                      times.  
+            %   - NrepeatAnchor:   Repeat the extraction of values
+            %                      NrepeatAnchor using the Clookoutfor
+            %   - LisMatrix        Read multiple rows (defined in Nrepeat
+            %                      and NrepeatAnchor and store the results as a matrix vector)
               
             %%  Argument Check
             OpenCossan.validateCossanInputs(varargin{:});
@@ -71,46 +77,48 @@ classdef Response
                         end
                     case 'svarname'
                         Xobj.Svarname=varargin{k+1};
-                    case 'sregexpression'
-                        Xobj.Sregexpression=varargin{k+1};
-                    case {'ncolnum','ncol'}
+                    case {'ncolnum','ncol','colnum'}
                         Xobj.Ncolnum=varargin{k+1};
-                    case {'nrownum','nrow'}
+                    case {'nrownum','nrow','rownum'}
                         Xobj.Nrownum=varargin{k+1};
                     case 'nrepeat'
                         Xobj.Nrepeat=varargin{k+1};
-                    case 'loutputincolumns'
-                        Xobj.LoutputInColumns=varargin{k+1};
-                    case 'vcoordindex'
-                        Xobj.VcoordIndex=varargin{k+1};
+                    case 'nrepeatanchor'
+                        Xobj.NrepeatAnchor=varargin{k+1};
+                    case 'vcoordcolumn'
+                        Xobj.VcoordColumn=varargin{k+1};
+                    case 'vcoordrow'
+                        Xobj.VcoordRow=varargin{k+1};    
                     case 'csindexname'
                         Xobj.CSindexName=varargin{k+1};
+                    case 'lismatrix'
+                        Xobj.LisMatrix=varargin{k+1}; 
                     otherwise
-                        warning('openCOSSAN:Response:Response',['PropertyName ' varargin{k} ' has been ignored'])
+                        error('OpenCossan:Response:wrongInputArgument', ...
+                              'PropertyName %s is not valid', varargin{k})
                 end
                 
             end
                     
-            if isempty(Xobj.Sname)
-                error('openCOSSAN:Response:Response', ...
-                    'Mandatory property Sname (name of the output) must be passed to the Response constructor.')
-            end
+            assert(~isempty(Xobj.Sname), ....
+                   'OpenCossan:Response:NoNameDefined', ...
+                   ['It is necessary to define the name of the output ', ...
+                   'using the mandatory property Sname.'])
             
+               
             if isempty(Xobj.CSindexName)
-                if ~isempty(Xobj.VcoordIndex)
-                    Nindex = length(Xobj.VcoordIndex);
+                if ~isempty(Xobj.VcoordColumn) 
+                    Nindex = length(Xobj.VcoordColumn);
+                elseif ~isempty(Xobj.VcoordRow)
+                    Nindex = length(Xobj.VcoordRow);
                 else
                     Nindex = Xobj.Nrows;
                 end
-                Xobj.CSindexName = repmat({''},1,Nindex);
+                if ~isinf(Nindex)
+                    Xobj.CSindexName = repmat({''},1,Nindex);
+                end
             end
-            
-%             assert(length(Xobj.CSindexName)==Xobj.Nrows-length(Xobj.VcoordIndex),...
-%                 'openCOSSAN:Response:Response',...
-%                 ['The number of elements of CSindexName (' ...
-%                 num2str(length(Xobj.CSindexName)) ') is not coherent with '...
-%                 'the dimension of the data to be extracted (' num2str(Xobj.Nrows) ')'])
-            
+                       
            % Check Field Format and add termination term and skip term. 
            % The scanf function skip the Xresponse(iresponse).Ccolnum{1}
            % characters and than read the real value
@@ -120,10 +128,15 @@ classdef Response
                 Xobj.Sfieldformat=['%*' num2str(Xobj.Ncolnum-1) 'c' SfieldformatInput '%*'];
             end
             
+            assert(~(isempty(Xobj.Clookoutfor) & Xobj.NrepeatAnchor>1), ....
+                   'OpenCossan:Response:NrepeatAnchorNotValid', ...
+                   ['It is not possible to use NrepeatAnchor without defining ', ...
+                   'Clookoutfor.'])
+
         end %end constructor
         
-        display(Xobj)
-        
+        display(Xobj)      
+                
         function Nout = getOutputNrFromFormat(Xobj)
             Nout = length(strfind(Xobj.Sfieldformat,'%')) - ...
                 length(strfind(Xobj.Sfieldformat,'%*'));
@@ -132,23 +145,37 @@ classdef Response
         Xds = createDataseries(Xobj,Moutput)
 
         function Ndata = get.Ndata(Xobj)
-            if Xobj.LoutputInColumns
-                Ndata = Xobj.Nrepeat;
+            if Xobj.LisMatrix
+                Ndata = Xobj.Nrepeat*Xobj.NrepeatAnchor;
             else
-                Ndata = Xobj.getOutputNrFromFormat;
+                Ndata = Xobj.getOutputNrFromFormat*Xobj.Nrepeat*Xobj.NrepeatAnchor;
             end
         end
         
         function Nrows = get.Nrows(Xobj)
-            if Xobj.LoutputInColumns
-                Nrows = Xobj.getOutputNrFromFormat;
+            if Xobj.LisMatrix
+                Nrows = Xobj.getOutputNrFromFormat*Xobj.NrepeatAnchor;
             else
-                assert(~isinf(Xobj.Nrepeat),'openCOSSAN:Response',...
+                assert(~isinf(Xobj.Nrepeat),'OpenCossan:Response',...
                     'Nrepeat must be finite when the outputs are stored in rows.')
-                Nrows = Xobj.Nrepeat;
+
+                Nrows = Xobj.Nrepeat*Xobj.NrepeatAnchor;
             end
         end
         
+        % Extract response from the file with file identifaction Nfid. 
+        % The methods returns a structure with the values extracted and a
+        % second structure with the absolute position of the values
+        % extracted 
+        [Toutput,TresponsePosition,LresponseSuccess]=extract(Xobj,varargin)
     end
     
+    %%    
+    
+    methods (Access=private)
+        % These methods can only be accessed from methods of Response
+        % object. 
+        TfileInfo = findRelativePosition(Xobj,Nfid,TfileInfo)
+        [Toutput,TfileInfo] = readResponse(Xobj,Nfid,TfileInfo)
+    end
 end

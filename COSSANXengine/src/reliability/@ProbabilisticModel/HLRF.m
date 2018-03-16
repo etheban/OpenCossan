@@ -2,7 +2,7 @@ function [Xdp, Xoptimum]= HLRF(Xobj,varargin)
 %HLRF This method computes the so-called design point adopting the gradient of
 %the function by means the linar approximations.
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/HLRF@ProbabilisticModel
+% See Also: https://cossan.co.uk/wiki/index.php/HLRF@ProbabilisticModel
 %
 %
 % $Copyright~1993-2012,~COSSAN~Working~Group,~University~of~Liverpool,~UK$

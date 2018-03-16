@@ -47,6 +47,7 @@ if ~isempty(Mcov)
 elseif ~ isempty(Xsp.Xcovariancefunction)
     Xfun = Xsp.Xcovariancefunction;
 else
+
     error('openCOSSAN:StochasticProcess:KL_terms',...
         'Either the covariance matrix or the covariance function must be provided')
 end
@@ -80,6 +81,7 @@ if ~isempty(Mcov)
     [MPhi Mlam] = eigs(Mcov,NKL_terms,'lm',Topts);
 elseif Lcovarianceassemble
     OpenCossan.cossanDisp(['Assembling covariance matrix and calling eigs method with ' num2str(NKL_terms) ' K-L terms'],4)
+    
     if Xsp.Lhomogeneous && Xsp.Lequallyspaced
         Mcov = zeros(length(Vx));
         Vcov = evaluate(Xfun,[Vx(1)*ones(1,length(Vx));Vx])';

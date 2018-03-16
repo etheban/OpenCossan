@@ -7,7 +7,7 @@
 %
 % This example computes the reliability bounds for the tip displacement of a beam.
 %
-% See also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@TutorialExtremeCase
+% See also: http://cossan.co.uk/wiki/index.php/@TutorialExtremeCase
 %
 % $Author:~Marco~de~Angelis$
 % Institute for Risk and Uncertainty, University of Liverpool, UK

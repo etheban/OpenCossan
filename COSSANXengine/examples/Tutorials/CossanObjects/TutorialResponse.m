@@ -4,10 +4,10 @@
 % use it in an Extractor object
 %
 %
-% See Also:  http://cossan.cfd.liv.ac.uk/wiki/index.php/@Response
+% See Also:  https://cossan.co.uk/wiki/index.php/@Response
 %
-% $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
-% $Author:~Barbara~Goller$ 
+% $Copyright~1993-2018,~COSSAN~Working~Group$
+% $Author:~Edoardo Patelli$
 
 %% Definition of Response object
 
@@ -24,4 +24,5 @@
 % tabled-valued output), the user is referred to the tutorial of
 % TableExtractor
 % -> echodemo TutorialTableExtractor
+
 

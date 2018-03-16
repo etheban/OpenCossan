@@ -3,21 +3,21 @@
 % This tutorial shows how to create and use a RBOProblem object to perform
 % Reliability Based Optimization
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@RBOProblem
-% http://cossan.cfd.liv.ac.uk/wiki/index.php/Reliability_Based_Optimization 
+% See Also: http://cossan.co.uk/wiki/index.php/@RBOProblem
+% http://cossan.co.uk/wiki/index.php/Reliability_Based_Optimization 
 %
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author: Edoardo-Patelli$ 
 
 %% Disclaimer
-% This simple tutorial presents a very simple example that shows how to used the
+% This simple tutorial presents a very simple example that shows how to use the
 % RBOproblem object and the optimize methods in order to perform RBO analysis.
-% This example might be not physically meaningful, nevertheless it can be used
+% This example might be not physically meaningful. Nevertheless, it can be used
 % as a template to prepare solution sequence for solving realistic problems.
 
 %% Define Probabilistic Model 
 % The Reliability based optimization requires the definition of a
-% ProbabilisticModel. The probabilistic model it is based on a very simple input
+% ProbabilisticModel. The probabilistic model is based on a very simple input
 % composed by 1 RandomVariable, and 2 parameters.
 
 % Define the Inpur
@@ -49,7 +49,7 @@ XevalA = Evaluator('Xmio',XmA,'Sdescription','Evaluator xmio','CSnames',{'XmA'})
 XmdlA=Model('Xevaluator',XevalA,'Xinput',XinA);
 
 % Define PerformanceFunction
-% The performance function it is defined as a difference between the value of
+% The performance function is defined as a difference between the value of
 % the parameter Xresistance and the output (out1) of the physical model.
 XpfA=PerformanceFunction('Scapacity','Xresistance','Sdemand','out1','Soutputname','vg');
 % Define Probabilistic Model
@@ -81,7 +81,7 @@ XobjFun = ObjectiveFunction('Sdescription','Minimize Pf',...
 
 
 %% Define a method to estimate the failure probability 
-% The montecarlo object defines the number of simulations to be used, the number
+% The MonteCarlo object defines the number of simulations to be used, the number
 % of batches
 XmcA=MonteCarlo('Nsamples',1000,'Nbatches',1);
 
@@ -103,7 +103,7 @@ XrboProblem = RBOProblem('Sdescription','Simple RBO problem', ...
 %% Performing optimization using Direct Approach. 
 % To perform RBO analysis using Direct approch use the method optimize of the
 % Object RBOproblem
-% The method optimize requires as input a Optimizer object used to define the
+% The method optimize requires as input an Optimizer object used to define the
 % optimization algorithm to be used.
 
 Xoptimum=XrboProblem.optimize('Xoptimizer',Cobyla);
@@ -160,8 +160,8 @@ display(XoptimumGlobal)
 
 
 %% RBO using local metamodel
-% Using this approach a metamodel is trained only in a subdomain defined aroung
-% the current value of the design variables. 
+% Using this approach a metamodel is trained only in a subdomain defined
+% around the current value of the design variables. 
 % In order to use this method it is necessary to specify the size of such
 % subdomain by using the property name 'Vperturbation'.  This property specify
 % the perturbation around the current value of the design variable. It is
@@ -169,7 +169,7 @@ display(XoptimumGlobal)
 
 % Here a responseSurface metamodel is used a DesignOfExperiment using 2 levels
 % factorial is used to define the calibration points. A perturbation of 0.2 is
-% used a a maximum number of local metamodel created is set by the property name
+% used as a maximum number of local metamodel created is set by the property name
 % 'NmaxLocalRBOiterations'
 %
 % Any kind of meta model and Simulations object can be used.

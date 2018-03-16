@@ -1,4 +1,4 @@
-%% Tutorial for the HaltonSampling class
+T%% Tutorial for the HaltonSampling class
 %
 % This tutorial is focus on the use and definition of the
 % HaltonSampling class.
@@ -20,8 +20,8 @@ Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'});
 % Construct Input Object
 Xin = Input('Sdescription','Input Object of our model');
 Xthreshold=Parameter('value',1);
-Xin = add(Xin,Xthreshold);
-Xin = add(Xin,Xrvs1);
+Xin = Xin.add('Xmember',Xthreshold,'Sname','Xthreshold');
+Xin = Xin.add('Xmember',Xrvs1,'Sname','Xrvs1');
 
 %% Define the Evaluator (i.e. how our model is evaluate)
 % Construct a Mio object

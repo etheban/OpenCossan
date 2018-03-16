@@ -41,8 +41,6 @@ for k=1:2:length(varargin)
             Mdata = varargin{k+1};
         case {'mdata'}
             Mdata = varargin{k+1};
-        case {'xdataseries'}
-            Xdataseries = varargin{k+1};
         case {'csamples'}
             for n=1:length(varargin{k+1})
                 Xobj(:,n)=Xobj(:,n).addData('Mdata',varargin{k+1}{n});
@@ -53,29 +51,27 @@ for k=1:2:length(varargin)
     end
 end
 
-% If a dataseries (or a vector of data series is passed the samples are
-% merged
-if exist('Xdataseries','var')
-    for n=1:length(Xdataseries)
-        Xobj(n).Mdata=[Xobj(n).Mdata; Xdataseries(n).Mdata];
-    end
-else
-    %% Add data to a single Dataseries only
-    assert(size(Xobj,2)==1,'openCOSSAN:Dataseries:addSamples:multipleDataseries',...
-        strcat('It is not possible to add samples to a vector of Dataseries\n', ...
-        'Samples can be added to a vector of Dataseries passing the samples as new dataseries'))
+
+%% Add data to a single Dataseries only
+assert(size(Xobj,2)==1,'openCOSSAN:Dataseries:addSamples:multipleDataseries',...
+    strcat('It is not possible to add samples to a vector of Dataseries\n', ...
+    'Samples can be added to a vector of Dataseries passing the samples as new dataseries'))
     
-    if ~exist('Mdata','var')
-        error('openCOSSAN:Dataseries:addData', ...
-            'No samples to be added are defined.');
-    end
-    
-    if size(Xobj.Mcoord,2) ~= size(Mdata,2)
-        error('openCOSSAN:Dataseries:addData',['The no. of columns of Mcoord and of Mdata to be added are not compatible.\n'...
-            ' no. of columns of Mcoord: ' num2str(size(Mcoord,2))...
-            '\n no. of columns of Vdata : ' num2str(size(Mdata,2))])
-    end
-    
-    Xobj.Mdata=[Xobj.Mdata; Mdata];
-    
+if ~exist('Mdata','var')
+    error('openCOSSAN:Dataseries:addData', ...
+        'No samples to be added are defined.');
+end
+
+if size(Xobj(1).Xcoord.Mcoord,2) ~= size(Mdata,2)
+    error('openCOSSAN:Dataseries:addData',['The no. of columns of Mcoord and of Mdata to be added are not compatible.\n'...
+        ' no. of columns of Mcoord: ' num2str(size(Mcoord,2))...
+        '\n no. of columns of Vdata : ' num2str(size(Mdata,2))])
+end
+
+NsamplesAdd = size(Mdata,1);
+NsamplesOriginal = size(Xobj,1);
+for n = 1:NsamplesAdd
+    Xobj(NsamplesOriginal+n) = Xobj(1);
+    Xobj(NsamplesOriginal+n).Vdata = Mdata(n,:);
+end
 end

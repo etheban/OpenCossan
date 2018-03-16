@@ -1,12 +1,12 @@
 %% TUTORIALMINIMAX
 % Tutorial for MiniMax optimization method.
 % This tutorial shows a very simple example to perform multi-objective
-% optimization adoptin min-max method.
+% optimization adopting min-max method.
 %
 % the Aim of this tutorial is to find x that minimize the maximum value of 5
 % objective functions. 
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@MiniMax
+% See Also: http://cossan.co.uk/wiki/index.php/@Minimax
 %
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author:~Edoardo~Patelli$ 

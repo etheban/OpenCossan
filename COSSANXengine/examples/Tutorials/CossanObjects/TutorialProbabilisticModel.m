@@ -41,7 +41,7 @@ Xin = Input('Sdescription','Input satellite_inp','CSmembers',{'Xrvs1'},'CXmember
 
 %% Define a PerformanceFunction 
 Xpar=Parameter('Sdescription','Define Capacity','value',1);
-Xin = Xin.add(Xpar);
+Xin = Xin.add('Xmember',Xpar,'Sname','Xpar');
 Xin = sample(Xin,'Nsamples',10);
 
 Xperfun=PerformanceFunction('Scapacity','Xpar','Sdemand','out1','Soutputname','Vg1');

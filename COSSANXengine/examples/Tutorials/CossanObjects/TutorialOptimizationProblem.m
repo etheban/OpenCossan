@@ -7,9 +7,9 @@
 % to compute variables required to evaluate an ObjectiveFunction and
 % Constraints.      
 %
-% This example minimaze the volume of a beam.
+% This example minimize the volume of a beam.
 %
-% See also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@OptimizationProblem and
+% See also: http://cossan.co.uk/wiki/index.php/@OptimizationProblem and
 % the tutorial TutorialCantileverBeamOptimization
 % 
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
@@ -17,7 +17,7 @@
 
 
 %% Define preliminary object to define an Optimization Problem
-% LetÂ´s define 2 Design Variable
+% Let´s define 2 Design Variable
 H=DesignVariable('Sdescription','Beam Height','lowerBound',10,'upperBound',50,'value',20);
 W=DesignVariable('Sdescription','Beam Width','lowerBound',10,'upperBound',50,'value',20);
 L=Parameter('Sdescription','Beam Length','value',100);

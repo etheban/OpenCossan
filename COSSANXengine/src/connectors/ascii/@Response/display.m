@@ -43,8 +43,4 @@ OpenCossan.cossanDisp([' Col: ' num2str(Xobj.Ncolnum) '; Row: '   ...
     num2str(Xobj.Nrownum) '; Format: ' ...
     Xobj.Sfieldformat '; Repeat: ' num2str(Xobj.Nrepeat)]) ;
 
-if ~isempty(Xobj.Sregexpression)
-    OpenCossan.cossanDisp([' Regular Expression: ' Xobj.Sregexpression])
-end
-
 end

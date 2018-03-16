@@ -32,5 +32,5 @@ if ~isempty(Xobj.Vdata)
 end
 
 OpenCossan.cossanDisp(['* lower and upper bounds: ' sprintf('[%9.3e, %9.3e]', Xobj.lowerBound,Xobj.upperBound) ],1);
-OpenCossan.cossanDisp(['* center: ' sprintf('%9.3e', Xobj.center) ],2);
+OpenCossan.cossanDisp(['* center: ' sprintf('%9.3e', Xobj.centre) ],2);
 OpenCossan.cossanDisp(['* radius: ' sprintf('%9.3e', Xobj.radius) ],2);

@@ -11,55 +11,66 @@ function doInject(Xobj,Tinput)
 
 SfullName=fullfile(Xobj.Sworkingdirectory,Xobj.Srelativepath,Xobj.Sfile);
 
-OpenCossan.cossanDisp(['[COSSAN-X.TableIdentifier.doInject] Filename:' SfullName],4);
+OpenCossan.cossanDisp(['[OpenCossan.TableIdentifier.doInject] Filename:' SfullName],4);
 
 CavailableInputs=fieldnames(Tinput);
 assert(all(ismember(Xobj.Cinputnames,CavailableInputs)),...
-    'openCOSSAN:TableIdentifier.doInject:checkInput', ...
+    'OpenCossan:TableIdentifier.doInject:checkInput', ...
     'Variable(s) not present in the input structure!\n Required variables: %s\nAvailable variables: %s',...
     sprintf('"%s" ',Xobj.Cinputnames{:}),sprintf('"%s" ',CavailableInputs{:}))
 
+%% Assemble data
+% If LinjectCoordinates is true the data (for stochastic process) are
+% written in the following format
+% Coordinate (x,y,z,...) Value 
+% If more than 1 dataserie needs to be written they need to have the same
+% length and share the same coordinates
 
 Mcoord = [];
 Mdata=[];
-for n=1:Xobj.Nvariable
+for nvar=1:Xobj.Nvariable
+    Xdata=Tinput.(Xobj.Cinputnames{nvar});
     % get the value to be injected
-    switch class(Tinput.(Xobj.Cinputnames{n}))
+    switch class(Xdata)
         case 'Dataseries'
-            assert(Xobj.Nvariable==1,'openCOSSAN:TableIdentifier.doInject:DataseriesInjection',...
-                'Only a single Dataseries can be injected in a TableInjector!')
             % if an index is specified, assign to value the content of
             % the property Mdata of the Dataseries object at the
             % specified index
-            Mcoord = Tinput.(Xobj.Cinputnames{n}).Mcoord;
-            Vdata = Tinput.(Xobj.Cinputnames{n}).Vdata;
-            if Xobj.LinjectCoordinates
-                Mdata = [Mcoord; Vdata];
+            
+            if isempty(Xobj.Vindices)
+                Vindx=[1 size(Xdata.Xcoord.Mcoord,2)];
             else
-                Mdata = Vdata;
+                Vindx=Xobj.Vindices;
             end
-            if ~isempty(Xobj.Vindices)
-                Mdata = Mdata(:,Xobj.Vindices); 
+            
+            if nvar==1 && Xobj.LinjectCoordinates
+                Mdata=Xdata.Mcoord(Vindx);
             end
+                
+            Mdata= [Mdata Xdata.Vdata(Vindx)];            
+
         case {'double','single','logical'}
-            Mdata = [Mdata Tinput.(Xobj.Cinputnames{n})];
+            Mdata = [Mdata Xdata]; %#ok<AGROW>
         otherwise
-            error('openCOSSAN:TableIdentifier:doInject:wrongClass',['It is not possible '...
+            error('OpenCossan:TableIdentifier:doInject:wrongClass',['It is not possible '...
                 'to inject values from object of class %s'], ...
-                class(Tinput.(Xobj.Cinputnames{n})))
+                class(Xdata))
     end
 end
 
+%% Write header
+Nfid = fopen(SfullName,'w');    
+% Write headers
+[nrows,~] = size(Xobj.Cheaderlines);
+for row = 1:nrows
+    fprintf(Nfid,'%s\n',Xobj.Cheaderlines{row,:});
+end
+fclose(Nfid);
 
-% Vfield=ismember(Xobj.Cinputnames,CavailableInputs);
-% %% Convert structure to cell
-% Cout=struct2cell(Tvalues);
-% % removed unrequested values
-% Cout(~Vfield,:)=[];
-% % removed unrequested names
-% Mout=cell2mat(Cout)'; %#ok<NASGU>
 
 switch lower(Xobj.Stype)
+    case {'.mat'}
+        save(SfullName,'Mdata');
     case {'matlab8'}
         save(SfullName,'Mdata', '-ascii', '-tabs');
     case {'matlab16'}
@@ -69,7 +80,7 @@ switch lower(Xobj.Stype)
             % you are injecting a Dataseries
             assert(size(Mcoord,1)==1,...
                 'openCOSSAN:TableIdentifier:doInject:wrongDataSeriesFormat',...
-                'Cannot inject a Dataseries with coordinates dimensions greater than 1.') 
+                'Cannot inject a Dataseries with coordinates dimensions greater than 1.')
         end
         
         Vdatatime = Mdata(:);
@@ -92,7 +103,7 @@ switch lower(Xobj.Stype)
             % you are injecting a Dataseries
             assert(size(Mcoord,1)==1,...
                 'openCOSSAN:TableIdentifier:doInject:wrongDataSeriesFormat',...
-                'Cannot inject a Dataseries with coordinates dimensions greater than 1.') 
+                'Cannot inject a Dataseries with coordinates dimensions greater than 1.')
         end
         
         Vdatatime = Mdata(:);
@@ -112,13 +123,21 @@ switch lower(Xobj.Stype)
         if nremaining == 6
             fprintf(Nfid, '%16.7e,%16.7e,%16.7e,%16.7e,%16.7e,%16.7e,', Vdatatime(end-5:end));
         end
-        fclose(Nfid);
+        
         
     case {'userdefined'}
-        error('TO BE IMPLEMENTED')
+        Nfid = fopen(SfullName,'a');
+        
+        [nrows,~] = size(Mdata);
+        
+        for row = 1:nrows
+            fprintf(fileID,Xobj.Sformat,Mdata(row,:));
+        end        
+        fclose(Nfid);
+
     otherwise
-        error('openCOSSAN:TableInjector:doInject',...
-            'Injector Type (%s) is not a valid format', Xobj.Stype)
+        error('OpenCossan:TableInjector:doInject',...
+            'Injector Type (%s) is not a valid. ', Xobj.Stype)
 end
 
 

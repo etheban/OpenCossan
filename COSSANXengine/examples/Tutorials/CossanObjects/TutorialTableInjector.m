@@ -8,12 +8,10 @@
 % The injector is never used directly but it is embedded in a Connector
 % object.
 %
-% See Also:  TutorialConnector
+% See Also:  TutorialConnector TutorialInjector TutorialExtractor 
 %
-% $Copyright~1993-2013,~COSSAN~Working~Group,~University~of~Liverpool,~UK,EU$
-% $Author:~Edoardo~Patelli$
-% $email address: openengine@cossan.co.uk$
-% $Website: http://www.cossan.co.uk$
+% $Copyright~2006-2018,~COSSAN~Working~Group$
+% $Author: Edoardo-Patelli$ 
 
 % =====================================================================
 % This file is part of openCOSSAN.  The open general purpose matlab
@@ -71,9 +69,10 @@ Xinp = Xinp.sample('Nsamples',1);
 
 Tinput=Xinp.getStructure;
 
+% Write testTableInjector.txt in CWD
 Xin.inject(Tinput)
 
-%% USAGE OF TABLEINJECTOT AND STOCHASTICPROCESS
+%% Use TableInjector with stochastic process
 % This part of the tutorial shows how to use a TableInjector Object to
 % write the realization of a StochasticProcess in a ASCII file and in
 % tabular format 
@@ -83,8 +82,8 @@ Emod  = RandomVariable('Sdistribution','normal','mean',200.E9,'std',200E8);
 density  = RandomVariable('Sdistribution','normal','mean',7800.,'std',780.);
 Cmems   = {'Emod'; 'density'};
 Xrvs1     = RandomVariableSet('Cmembers',Cmems);
-Xin     = Input;
-Xin     = add(Xin,Xrvs1);
+Xin     = Input('CXmembers',{Xrvs1},'CSmembers',{'Xrvs1'});
+
 
 % Definition of stochastic process
 Xcovfun  = CovarianceFunction('Sdescription','covariance function', ...
@@ -95,24 +94,43 @@ Xcovfun  = CovarianceFunction('Sdescription','covariance function', ...
 time   = 0:0.001:0.5;
 SP1    = StochasticProcess('Sdistribution','normal','Vmean',1.0,'Xcovariancefunction',Xcovfun,'Mcoord',time,'Lhomogeneous',true);
 SP1    = KL_terms(SP1,'NKL_terms',30,'Lcovarianceassemble',false);
-Xin    = add(Xin,SP1);
+Xin    = add(Xin,'Xmember',SP1,'Sname','SP1');
 
 SP2    = StochasticProcess('Sdistribution','normal','Vmean',5.0,'Xcovariancefunction',Xcovfun,'Mcoord',time,'Lhomogeneous',true);
 SP2    = KL_terms(SP2,'NKL_terms',20,'Lcovarianceassemble',false);
-Xin    = add(Xin,SP2);
+Xin    = add(Xin,'Xmember',SP2,'Sname','SP2');
 
 % Define a TableInjector
-XtableInjector=TableInjector('Sfile','testTableInjectorSP.txt','Stype','matlab16',...
-    'CinputNames',{'SP1','SP2'});
+XtableInjector=TableInjector('Sfile','testTableInjector.txt',...
+    'CSheaderlines',{'% Example of header (line 1)', '% Line 2'},...
+    'Stype','matlab16',...
+    'Linjectcoordinates',true,...
+    'CinputNames',{'SP1'});
 
 % Add the TableInjector into a connector
-Xconn1 = Connector('Smaininputpath',OpenCossan.getCossanWorkingPath,...
-    'Smaininputfile','crane.inp',...
-    'Sexecmd','time', ...
-    'Xinjector',XtableInjector);
+Xconn1 = Connector('Smaininputpath',pwd,...
+'Smaininputfile','testTableInjector.txt',...
+    'Sexecmd','time','Xinjector',XtableInjector);
 
 % Generate sample
 Xin=Xin.sample('Nsamples',3);
 
 % Run a FAKE simulations 
 XSimOut = run(Xconn1,Xin);
+
+% Testing different TableInjectors
+Tinput=Xin.getStructure;
+
+% The stochastic process has 501 points for each realisation. 
+XtableInjector1=TableInjector('Sfile','testTableInjector.txt',...
+    'CSheaderlines',{'% Example of header (line 1)', '% Coordinates and values'},...
+    'Stype','matlab16',...
+    'Linjectcoordinates',false,...
+    'CinputNames',{'SP1' 'SP2'});
+
+% Write testTableInjector.txt in CWD
+XtableInjector1.inject(Tinput(1))
+
+% Write testTableInjector.txt with coordinates
+XtableInjector1.LinjectCoordinates=true;
+XtableInjector1.inject(Tinput(1))

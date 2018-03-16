@@ -12,7 +12,7 @@
 % See Also: http://cossan.co.uk/wiki/index.php/@TableExtractor
 %
 %
-% $Copyright~2006-2016,~COSSAN~Working~Group$
+% $Copyright~2006-2018,~COSSAN~Working~Group$
 % $Author: Edoardo-Patelli$ 
 
 % Reset the random number generator in order to always obtain the same results.
@@ -40,7 +40,7 @@ Xte=TableExtractor('Coutputnames',{'test1', 'test2'},'Sfile','dummyFileName');
 display(Xte)
 
 % The following exames are using a table stored in Connector CATHENA
-SrelativePath=fullfile('Connector','CATHENA');
+SrelativePath=fullfile(fileparts(which('TutorialTableExtractor')),'Connector','CATHENA');
 
 % It is possible to skip a predifined number of lines (for the headers)
 % using the "Nheaderlines" or skip all the first lines starting with a
@@ -122,7 +122,7 @@ Xte=TableExtractor('Coutputnames',{'OutColMultiColumns','OutCol4'}, ...
     'NcoordinateColumn',1, ... % Define the column containing the coordinate 
     'Srelativepath',SrelativePath, ... % relative path to the Sworkingdirectory where the input file is 
     'Sfile','edwards_press.dat',...  
-    'CcolumnPosition',{[2 5], 4}, ...
+    'CcolumnPosition',{5, 4}, ...
     'ClinePosition',{[1:10], [11:15]}, ...
     'Sheaderidentifier','#'); 
 
@@ -157,7 +157,7 @@ Xte2=TableExtractor('Coutputnames',{'damper_force_history1','damper_force_histor
 
 Tout.damper_force_history1.plot
 
-%% Advance features
+%% Advanced features
 % It is possible to pass some advanced feautures but usually they are not
 % required
 % When reading delimited text files, you can specify any of the name-value

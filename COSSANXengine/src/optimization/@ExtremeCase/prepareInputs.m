@@ -125,7 +125,7 @@ else % when interval hyper-parameters are defined the input mapping is provided 
                 DV=DesignVariable('lowerBound',VlowerBounds(i),'upperBound',VupperBounds(i));
                 XinputMapping.XdesignVariable.([CnamesInterval{i}])=DV;
                 CinputMappingNew(istart+i,:)={CnamesInterval{i},Sname,'mean','parametervalue'};
-                XinputParameters=XinputParameters.add(CXintervalParameter{i},'Sname',Sname);
+                XinputParameters=XinputParameters.add('Xmember',CXintervalParameter{i},'Sname',Sname);
             end
         end
         XinputProbabilistic.Xbset=rmfield(XinputProbabilistic.Xbset,CnamesBoundedSet{n});
@@ -135,7 +135,7 @@ else % when interval hyper-parameters are defined the input mapping is provided 
     % the input object
     XintervalRvset=RandomVariableSet('CXrandomVariables',CXintervalRvset,...
         'CSmembers',CnamesIntervalRvset);
-    XinputProbabilistic=XinputProbabilistic.add(XintervalRvset);
+    XinputProbabilistic=XinputProbabilistic.add('Xmember',XintervalRvset,'Sname','XintervalRvset');
     % a new design mapping is added to the class object
     Xobj.CdesignMapping=CinputMappingNew;
 end

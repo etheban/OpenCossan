@@ -107,7 +107,7 @@ else
     % convert a matrix of Dataseries in a cell array where each element is 
     % a Dataseries containing a single samples
     Xds = Xinput.Xsamples.Xdataseries;
-    Cspvalue = cell(Xds(1).Nsamples,size(Xds,2));
+    Cspvalue = cell(size(Xds,1),size(Xds,2));
     for isample = 1:Nsamples
         Cspvalue(isample,:) = num2cell(Xds(isample,:));
     end

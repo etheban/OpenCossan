@@ -3,6 +3,16 @@ classdef TableInjector < Injector
     %
     % This class is a child class of Injector and it is used to prepare a
     % input file in a table format.
+    %   
+    % Stype: '.mat' Binary MAT-file format (default).
+    %        'matlab8' Tab-delimited 8-digit ASCII format.
+    %        'matlab16' Tab-delimited 16-digit ASCII format.
+    %        'nastran16_table' NASTRAN dedicated format
+    %        'abaqus_table'    ABAQUS dedicated format
+    %        'userdefined'  use the format defined in Sformat
+    %
+    % Sformat: 
+    %
     %
     % See also: https://cossan.co.uk/wiki/index.php/@TableInjector
     %
@@ -33,6 +43,7 @@ classdef TableInjector < Injector
         Cheaderlines         % headerlines
         Vindices             % indices of the dataseries 
         LinjectCoordinates = true  % specify if you want to inject the coordinates of the Dataseries in the table
+        Sformat              % Format for user defined Table injector
     end
         
     methods
@@ -44,7 +55,7 @@ classdef TableInjector < Injector
             %
             % See also: https://cossan.co.uk/wiki/index.php/@TableInjector
             %
-            % Copyright~1993-2013,~COSSAN~Working~Group
+            % Copyright~1993-2018,~COSSAN~Working~Group
             %
             % Author:Edoardo Patelli
             % Institute for Risk and Uncertainty, University of Liverpool, UK
@@ -84,6 +95,8 @@ classdef TableInjector < Injector
                 switch lower(varargin{k})
                     case {'stype'}
                         Xobj.Stype=varargin{k+1};
+                    case {'sformat'}
+                        Xobj.Sformat=varargin{k+1};
                     case {'sdescription'}
                         Xobj.Sdescription=varargin{k+1};
                     case {'srelativepath'}
@@ -107,7 +120,7 @@ classdef TableInjector < Injector
                             Xobj.Sscanfilepath  = [Xobj.Sscanfilepath filesep];
                         end
                     otherwise
-                        error('openCOSSAN:TableInjector:inputValidation',...
+                        error('OpenCossan:TableInjector:inputValidation',...
                             strcat('PropertyName %s is not a valid input',...
                             'for the TableInjector object'),varargin{k})
                 end
@@ -117,10 +130,6 @@ classdef TableInjector < Injector
                
         % Other methods
         doInject(Xobj,Tinput) %Inject method        
-        display(Xobj) % Display method        
-
-    end
-    
-    
-    
+        display(Xobj) % Display method    
+    end 
 end

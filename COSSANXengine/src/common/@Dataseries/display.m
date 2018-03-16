@@ -25,7 +25,7 @@ function display(Xobj)
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
 % =====================================================================
 
-if length(Xobj)>1
+if size(Xobj,2)>1
     OpenCossan.cossanDisp('===================================================================',3);
     OpenCossan.cossanDisp([' Dataseries object  '],3);
     OpenCossan.cossanDisp('===================================================================',3);
@@ -35,10 +35,10 @@ if length(Xobj)>1
 else    
     %% Name and description
     OpenCossan.cossanDisp('===================================================================',3);
-    OpenCossan.cossanDisp([' Dataseries object  -  Description: ' Xobj.Sdescription ],1);
+    OpenCossan.cossanDisp([' Dataseries object  -  Description: ' Xobj(1).Sdescription ],1);
     OpenCossan.cossanDisp('===================================================================',3);
-    OpenCossan.cossanDisp(['* Dataseries lengths  : ' num2str(Xobj.VdataLength) ],2);
+    OpenCossan.cossanDisp(['* Dataseries lengths  : ' num2str(Xobj(1).VdataLength) ],2);
 end
-    OpenCossan.cossanDisp(['* Number of Samples   : ' num2str(Xobj(1).Nsamples) ],2);
+    OpenCossan.cossanDisp(['* Number of Samples   : ' num2str(size(Xobj,1)) ],2);
     
 return;

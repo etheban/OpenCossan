@@ -8,7 +8,7 @@
 % This example computes the reliability bounds for the tip displacement of a beam.
 %
 % See also:
-% http://cossan.cfd.liv.ac.uk/wiki/index.php/@TutorialUncertaintyPropagation
+% http://cossan.co.uk/wiki/index.php/@TutorialUncertaintyPropagation
 %
 % $Author:~Marco~de~Angelis$
 clear('global','NiterationsUP','Lmaximize')

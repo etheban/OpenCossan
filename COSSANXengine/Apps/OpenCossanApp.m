@@ -58,7 +58,6 @@ SrequiredMatlabVersion='9.0';
                     'It is not possible to install OpenCossan using this version of Matlab\n',...
                     'You can download the zip file from the cossan website (https://cossan.co.uk) and extract it manually in a folder\n'],...
                     SrequiredMatlabVersion,version)
-    return
 elseif verLessThan('matlab', SrequiredMatlabVersion)
         warning('OpenCOSSAN:OpenCOSSAN:checkMatlabversion', ...
                     ['A Matlab version %s or higher is suggested!!!!' ...
@@ -129,6 +128,10 @@ if exist(fullfile(handles.OpenCossanData.SAppPath,'OpenCossanData.mat'),'file')
     if handles.OpenCossanData.LicenseAgreement
         set(handles.LicensePanel,'visible','off')
     end
+else
+    set(handles.textInformation,...
+    'String',...
+    'Check the license agreement')
 end
 
 
@@ -144,9 +147,6 @@ SlicenceShort=['BY CLICKING ON THE "ACCEPT" BUTTON BELOW YOU AGREE TO THE TERMS 
 
 set(handles.LicenseText,'string',SlicenceShort);
 
-set(handles.textInformation,...
-    'String',...
-    'Check the license agreement')
 
 try
     axes(handles.logoLicense)
@@ -232,10 +232,6 @@ handles.OpenCossanData.tableToolboxesOpenCossan=[];
 try
     Crevision=getRevision(handles.OpenCossanData.ServerSVNInfoFileApp,handles);
     handles.OpenCossanData.AppInstalledVersion=Crevision;
-    
-    set(handles.textInformation,...
-        'String',...
-        'For the first use of OpenCossan, please define the installation path')
 catch
     set(handles.textInformation,...
         'String',...
@@ -454,12 +450,11 @@ if handles.OpenCossanData.updateAppNeeded
 
     try 
         installedToolbox = matlab.addons.toolbox.installToolbox(handles.OpenCossanData.AppFullPath);
+        Stextupdate=['Installation completed. Unique toolbox identifier: ', installedToolbox.Guid];
+        set(handles.textInformation,'String',Stextupdate)
     catch ME
        set(handles.textInformation,'String',ME.message,'ForegroundColor','red');
     end
-    
-    Stextupdate=['Installation completed. Unique toolbox identifier: ', installedToolbox.Guid];
-    set(handles.textInformation,'String',Stextupdate)
     drawnow();
 end
 

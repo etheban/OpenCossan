@@ -156,6 +156,9 @@ classdef DesignPoint
         %%  Function for getting Euclidean norm of design point
         function ReliabilityIndex = get.ReliabilityIndex(Xobj)
             ReliabilityIndex   = norm(Xobj.VDesignPointStdNormal);
+            if ~isempty(Xobj.perfomanceAtOrigin)
+                ReliabilityIndex = ReliabilityIndex*sign(Xobj.perfomanceAtOrigin);
+            end
         end
         %%  Function for getting design point in Standard Normal space
         function VDesignPointStdNormal = get.VDesignPointStdNormal(Xobj)
@@ -169,11 +172,7 @@ classdef DesignPoint
         
         %%  Function for getting FORM
         function form = get.form(Xobj)
-            if Xobj.perfomanceAtOrigin > 0
-                form  =  normcdf(-Xobj.ReliabilityIndex);
-            else
-                form  =  normcdf(Xobj.ReliabilityIndex);
-            end
+            form  = 1 - normcdf(Xobj.ReliabilityIndex);
         end
         
     end     %of methods

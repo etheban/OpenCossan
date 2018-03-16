@@ -29,8 +29,8 @@ function [ varargout ] = plot(Xobj,varargin)
 %% Check input
 OpenCossan.validateCossanInputs(varargin{:})
 
-assert(length(Xobj)==1,'OpenCossan:Dataseries:plot',...
-    'Cannot call method plot on an array of Dataseries')
+% assert(length(Xobj)==1,'OpenCossan:Dataseries:plot',...
+%     'Cannot call method plot on an array of Dataseries')
 
 NfontSize=16;
 Svisible='on';
@@ -42,15 +42,15 @@ Sstyle='';
 assert(size(Xobj,2)==1,'openCOSSAN:Dataseries:addData', ...
     'plot method can only be applied to a single Dataseries object or to a Dataseries array');
 
-Vsamples = 1:Xobj.Nsamples;
+Vsamples = 1:size(Xobj,1);
 %% Parse varargin input
 for k=1:2:length(varargin)
-    switch lower(varargin{k}),
+    switch lower(varargin{k})
         case{'vsamples'}
             Vsamples = varargin{k+1};
         case{'nsample'}            
             Vsamples = varargin{k+1};
-        case{'sfigurename'},
+        case{'sfigurename'}
             SfigureName = varargin{k+1};
         case 'nfontsize'
             NfontSize=varargin{k+1};
@@ -76,8 +76,11 @@ figHandle=figure('Visible',Svisible);
 varargout{1}=figHandle;
 
 %% create plot according to 
-Mcoord = Xobj.Mcoord;
-Mdata = Xobj.Mdata;
+Mcoord = Xobj(1).Xcoord.Mcoord;
+Mdata = zeros(length(Vsamples),Xobj(1).VdataLength);
+for i=1:length(Vsamples)
+    Mdata(i,:) = Xobj(Vsamples(i)).Vdata; 
+end
 switch size(Mcoord,1)
     case 1
         set(gca(figHandle), 'ColorOrder', varycolor(length(Vsamples)));
@@ -93,7 +96,7 @@ switch size(Mcoord,1)
         end
         axis(gca(figHandle), [min(Mcoord) max(Mcoord)...
             min(min(Mdata(Vsamples,:)))*0.98 max(max(Mdata(Vsamples,:)))*1.02])
-        xlabel(gca(figHandle),[Xobj.CSindexName{1} ' [' Xobj.CSindexUnit{1} ']'],...
+        xlabel(gca(figHandle),[Xobj(1).Xcoord.CSindexName{1} ' [' Xobj(1).Xcoord.CSindexUnit{1} ']'],...
             'FontSize',NfontSize);
         ylabel(gca(figHandle),'Data values','FontSize',NfontSize);
     case 2
@@ -118,9 +121,9 @@ switch size(Mcoord,1)
             ZZ = reshape(Xobj(Vsamples(1)).Vdata(idxsorted),[],ncuts);
             surf(XX,YY,ZZ)
         end
-        xlabel(gca(figHandle),[Xobj.CSindexName{1} ' [' Xobj.CSindexUnit{1} ']'],...
+        xlabel(gca(figHandle),[Xobj(1).Xcoord.CSindexName{1} ' [' Xobj(1).Xcoord.CSindexUnit{1} ']'],...
             'FontSize',NfontSize);
-        ylabel(gca(figHandle),[Xobj.CSindexName{2} ' [' Xobj.CSindexUnit{2} ']'],...
+        ylabel(gca(figHandle),[Xobj(1).Xcoord.CSindexName{2} ' [' Xobj(1).Xcoord.CSindexUnit{2} ']'],...
             'FontSize',NfontSize);
         zlabel(gca(figHandle),'Data values','FontSize',NfontSize);
     case 3
@@ -128,8 +131,8 @@ switch size(Mcoord,1)
             warning('openCOSSAN:Dataseries:plot',...
             'It is possible to draw only one data for 3d dataseries')
         end
-        CScoordinateNames = regexp(Xobj.CSindexName{1,1},',','split');
-        CScoordinateUnits = regexp(Xobj.CSindexUnit{1,1},',','split');
+        CScoordinateNames = regexp(Xobj(1).Xcoord.CSindexName{1,1},',','split');
+        CScoordinateUnits = regexp(Xobj(1).Xcoord.CSindexUnit{1,1},',','split');
         scatter3(Mcoord(1,:),Mcoord(2,:),Mcoord(3,:),12,Mdata(1,:),'filled')
         xlabel(gca(figHandle),[CScoordinateNames{1} ' [' CScoordinateUnits{1} ']'],...
             'FontSize',NfontSize);

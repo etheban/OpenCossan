@@ -1,4 +1,4 @@
-function Xobj=checkDistribution(Xobj)   
+    function Xobj=checkDistribution(Xobj)   
 % Private function of RandomVariable
 %
 %  See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@RandomVariable

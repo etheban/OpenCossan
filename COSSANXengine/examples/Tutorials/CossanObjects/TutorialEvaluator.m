@@ -40,9 +40,9 @@ Xpar2=Parameter('value',6);
 Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'});
 % Define Xinput
 Xin = Input('Sdescription','Input for Tutorial Evaluator');
-Xin = add(Xin,Xrvs1);
-Xin = add(Xin,Xpar1);
-Xin = add(Xin,Xpar2);
+Xin = Xin.add('Xmember',Xrvs1,'Sname','Xrvs1');
+Xin = Xin.add('Xmember',Xpar1,'Sname','Xpar1');
+Xin = Xin.add('Xmember',Xpar2,'Sname','Xpar2');
 Xin = sample(Xin,'Nsamples',2);
 
 %% TestX evaluetor

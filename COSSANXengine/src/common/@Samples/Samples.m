@@ -467,10 +467,10 @@ classdef Samples
                 
             end
             
-            if length(Xobj.CnamesStochasticProcess)~=length(Xobj.Xdataseries)
+            if length(Xobj.CnamesStochasticProcess)~=size(Xobj.Xdataseries,2)
                 warning('OpenCossan:Samples:noStochasticProcessName',...
                     'The length of StochasticProcess names (%i) does not match the number of dataseries (%i)',...
-                    length(Xobj.CnamesStochasticProcess),length(Xobj.Xdataseries))
+                    length(Xobj.CnamesStochasticProcess),size(Xobj.Xdataseries,2))
             end
             
         end     %of constructor
@@ -503,7 +503,7 @@ classdef Samples
             if ~isempty(Xobj.MsamplesHyperCube)
                 Nsamples = size(Xobj.MsamplesHyperCube,1);
             elseif ~isempty(Xobj.Xdataseries)
-                Nsamples = Xobj.Xdataseries.Nsamples;
+                Nsamples = size(Xobj.Xdataseries,1);
             elseif ~isempty(Xobj.MdoeDesignVariables)
                 Nsamples = size(Xobj.MdoeDesignVariables,1);
             elseif ~isempty(Xobj.MsamplesUnitHypercube)

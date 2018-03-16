@@ -4,15 +4,15 @@
 % 
 % 
 % where f(x) represents the objective function 
-% x1 and x2 are continuos design variables defined in (-5,5)
+% X1 and X2 are continuos design variables defined in (-5,5)
 % 
 %    
 % 
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@Bobyqa
+% See Also: http://cossan.co.uk/wiki/index.php/@Bobyqa
 
 %% Create input 
 % In this tutorial we create a very simple accademic example in order to show
-% how to used the optimization method. The input object must contain at least 1
+% how to use the optimization method. The input object must contain at least 1
 % Design Variable.
 
 
@@ -40,7 +40,7 @@ Xm  = Mio('Sdescription','the objective function is the Rosenbrock function', ..
 
 %%  Create objective function
 % The objective function corresponds to the output of the model. It is not
-% necessary to have a Model to perform and optimization. 
+% necessary to have a Model to perform an optimization. 
 
 Xofun1   = ObjectiveFunction('Sdescription','objective function', ...
     'Sscript','for n=1:length(Toutput), Toutput(n).fobj=Tinput(n).mioout; end',...
@@ -55,7 +55,7 @@ Xop     = OptimizationProblem('Sdescription','Optimization problem', ...
     'XobjectiveFunction',Xofun1);
 
 %% Create optimizer
-% A COBYLA objet is a optimizer with 2 dedicate parameters:
+% A COBYLA object is a optimizer with 2 dedicate parameters:
 % * initialTrustRegion = define the radious of the initial spheric trust region
 % * finalTrustRegion = define the minimum radius of the spheric trust region
 

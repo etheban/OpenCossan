@@ -13,7 +13,7 @@ classdef Extractor
         Sdescription = ''       % Description of the connector
         Srelativepath = ''      % path of the output file
         Sfile                   % name of the output file     
-        Sworkingdirectory = ''  % directory where the FE simulation is performed - set by Connector
+        Sworkingdirectory = ''  % directory where the simulation is performed - set by Connector
         Xresponse               % Array of Response objects
     end
     

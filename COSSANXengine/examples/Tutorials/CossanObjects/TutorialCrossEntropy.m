@@ -2,7 +2,7 @@
 % This turorial shows how to perform Optimization of Himmelblau Function using 
 %   the Cross Entropy Method
 %
-% See Also:  http://cossan.cfd.liv.ac.uk/wiki/index.php/@CrossEntropy
+% See Also:  http://cossan.co.uk/wiki/index.php/@CrossEntropy
 %
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author:~Edoardo~Patelli$ 

@@ -23,9 +23,9 @@ Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'},'CXrv',{RV1 RV2});
 Xin = Input('Sdescription','Input satellite_inp');
 Xthreshold=Parameter('value',1);
 Xadditionalparameter=Parameter('Vvalue',rand(100,1));
-Xin = add(Xin,Xrvs1);
-Xin = add(Xin,Xthreshold);
-Xin = add(Xin,Xadditionalparameter);
+Xin = Xin.add('Xmember',Xrvs1,'Sname','Xrvs1');
+Xin = Xin.add('Xmember',Xthreshold,'Sname','Xthreshold');
+Xin = Xin.add('Xmember',Xadditionalparameter,'Sname','Xadditionalparameter');
 
 %% Define the evaluator
 % Construct a Mio object

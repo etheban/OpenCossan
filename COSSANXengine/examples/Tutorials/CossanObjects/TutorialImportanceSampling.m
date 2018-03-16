@@ -37,9 +37,9 @@ RV2=RandomVariable('Sdistribution','normal', 'mean',0,'std',2);
 Xrvs1=RandomVariableSet('Cmembers',{'RV1', 'RV2'});
 % Construct Input Object
 Xin = Input('Sdescription','Input Object of our model');
-Xin = add(Xin,Xrvs1);
+Xin = Xin.add('Xmember',Xrvs1,'Sname','Xrvs1');
 Xthreshold=Parameter('value',1);
-Xin = add(Xin,Xthreshold);
+Xin = Xin.add('Xmember',Xthreshold,'Sname','Xthreshold');
 
 %% Define the Evaluator (i.e. how our model is evaluate)
 % Construct a Mio object

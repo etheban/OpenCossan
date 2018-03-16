@@ -1,6 +1,6 @@
 %% Tutorial BFGS 
 %
-% This tutorial show how to perform unconstrained multivaable optimization using
+% This tutorial show how to perform unconstrained multivariable optimization using
 % the quasi-Newton BFGS method. This tutorial presents a simple and academic
 % example. The objective function to be minimize is:
 %
@@ -9,7 +9,7 @@
 % where $x_1$ and $x_2$ are the design variable. The initial starting point
 % used to find the minimum is (7,2) and the minimum is at (0,0)
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@BFGS
+% See Also: https://cossan.co.uk/wiki/index.php/@BFGS
 %
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author:~Edoardo~Patelli$ 
@@ -41,7 +41,7 @@ Xoptimizer    = BFGS('SfiniteDifferenceType','forward','finiteDifferencePerturba
 % Summary of the optimizer object
 display(Xoptimizer)
 
-%% Performe the optimization
+%% Perform the optimization
 Xopt = Xoptimizer.apply('XOptimizationProblem',Xop);
 % Show results
 display(Xopt)
@@ -51,14 +51,14 @@ VreferenceSolution=[0;0];
 Mdata = cell2mat({Xopt.XdesignVariable.Vdata}');
 
 assert(max(VreferenceSolution-Mdata(:,end))<1e-3,...
-    'openCOSSAN:Tutorials:BFGS','Optained solution does not match the Reference solution ')
+    'openCOSSAN:Tutorials:BFGS','Obtained solution does not match the Reference solution ')
 
 % Check values of the first gradient
 % [2X1,2X2] -> [14 24] 
 VreferenceSolutionGradient=[12,24];
 MdataGradient=Xopt.XobjectiveFunctionGradient(1).Vdata(:,1);
 assert(max(VreferenceSolutionGradient-MdataGradient(:,end)')<1e-2,...
-    'openCOSSAN:Tutorials:BFGS','Optained solution does not match the Reference solution ')
+    'openCOSSAN:Tutorials:BFGS','Obtained solution does not match the Reference solution ')
 
 OpenCossan.cossanDisp(' ');
 OpenCossan.cossanDisp('Reference solution');

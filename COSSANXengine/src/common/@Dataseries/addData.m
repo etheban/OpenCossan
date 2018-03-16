@@ -42,7 +42,7 @@ function Xobj = addData(Xobj,varargin)
 
 %% Argument Check
 OpenCossan.validateCossanInputs(varargin{:})
-
+Mcoord=[];
 %% Process input options
 for k=1:2:length(varargin)
     switch lower(varargin{k}),
@@ -72,30 +72,26 @@ if size(Xobj,2)>1
     % Add check on the number of samples of each dataseries   
     
 else
-
-    if ~exist('Mcoord','var')
-        if isempty(Xobj.Mcoord)
-            Mcoord=(1:size(Mdata,2));
-        else
-            Mcoord=(1:size(Mdata,2))+Xobj.Mcoord(end);
-        end
-    end
-
-    if size(Mcoord,2) ~= size(Mdata,2)
-        error('openCOSSAN:Dataseries:addData',['The no. of columns of Mcoord and of Mdata to be added are not compatible.\n'...
+    if isempty(Mcoord)
+        Mcoord = 1:length(Mdata(1,:));
+    else
+        assert(size(Mcoord,2) == size(Mdata,2),...
+            'openCOSSAN:Dataseries:addData',['The no. of columns of Mcoord and of Mdata to be added are not compatible.\n'...
             ' no. of columns of Mcoord: ' num2str(size(Mcoord,2))...
             '\n no. of columns of Vdata : ' num2str(size(Mdata,2))])
+        
     end
     
-    if ~isempty(Xobj.Mcoord)
-        assert(size(Mcoord,1)== size(Xobj.Mcoord,1),...
+    if ~isempty(Xobj(1).Xcoord.Mcoord)
+        assert(size(Mcoord,1)== size(Xobj(1).Xcoord.Mcoord,1),...
             'openCOSSAN:Dataseries:addData', ...
-                'The size of Mcoord to be added is not consistent with Mcoord present in the object.');
-        Xobj.Mcoord=[Xobj.Mcoord, Mcoord];
+                'The size of Mcoord to be added is not consistent with Xcoord present in the object.');
+        Xobj(1).Xcoord.Mcoord=[Xobj(1).Xcoord.Mcoord, Mcoord];
     else
-        % Update object
-        Xobj.Mcoord=Mcoord;
+        Xobj(1).Xcoord.Mcoord=Mcoord;
     end
     
-    Xobj.Mdata=[Xobj.Mdata, Mdata];
+    for n = 1:size(Xobj,1)
+        Xobj(n).Vdata=[Xobj(n).Vdata, Mdata(n,:)];
+    end
 end

@@ -1,79 +1,76 @@
 function Xobj = add(Xobj,varargin)
-%ADD  add a response to the extract object
+%ADD This method adds a Response object to the extract object. 
 %
 %   Arguments:
 %   ==========
 %
 %   MANDATORY ARGUMENTS:
-%      - Xobj (extractor object)
-%      - Sname Name of the associate COSSAN variables
+%      - 'Xresponse' Response object to be added
 %
 %   OPTIONAL ARGUMENTS:
-%   - Sfieldformat:       Index of the variable (only for vector and matrix)
-%   - Clookoutfor:        if present define the string to be searched inside
-%                         the ASCII file in order to define the relative position  Format string
-%   - Svarname:           if present Ncolnum and Nrownum are relative respect to the
-%                         variable present in Cvarname
-%   - Ncolnum:            Colum position in the ASCII file of the variables
-%   - Nrownum:            Row  position in the ASCII file of the variables
-%   - Sregexpression:     Regular expression
-%   - Nrepeat:            Repeat the extraction Nrepeat times (default=1)
-%   - Xresponse:          object of class Response
+%   - Nposition: Specify the position of the Response object
 %
 %   EXAMPLES:
-%   Usage:  Xe  =add(Xe,'Sname','Out1','Sfieldformat','%8.2e','Ncolnum',1,Nrownum,2)
-%       
-%           Xresponse = Response('Sname','Out1','Sfieldformat','%8.2e','Ncolnum',1,Nrownum,2);
-%           Xe  = add(Xe,'Xresponse',Xresponse);
+%   Usage:  Xe  =add(Xe,'Xresponse','Xresponse2','Nposition',2)
 %
-% =====================================================
-% COSSAN - COmputational Stochastic Structural Analysis
-% IfM, Chair of Engineering Mechanics, LFU Innsbruck, A
-% Copyright 1993-2008 IfM
-% =====================================================
+% See Also: https://cossan.co.uk/wiki/index.php/@Extractor
 %
-%   see also: add, remove, edit , extractor
+% $Copyright~2006-2018,~COSSAN~Working~Group$
+% $Author: Edoardo Patelli$
+
+% =====================================================================
+% This file is part of OpenCossan.  The open general purpose matlab
+% toolbox for numerical analysis, risk and uncertainty quantification.
+%
+% OpenCossan is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License.
+%
+% OpenCossan is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+%  You should have received a copy of the GNU General Public License
+%  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
+% =====================================================================
+
 
 %% 1. Processing Inputs
 
-% Process all the optional arguments and assign them the corresponding
-% default value if not passed as argument
-% Check consistency of the input vector
-if rem(length(varargin),2)~=0
-    error('The optional parameters must be passed an pair (name,value)');
-end
-
-
-Cresponseproperties={};
-for iVopt=1:2:length(varargin)
-    if strcmpi(varargin{iVopt},'Xresponse')
-        % if a response object is passed to the constructor
-        Xresponse = varargin{iVopt+1};
-    else
-        % create the Response from the input parameters passed in pairs
-        switch lower(varargin{iVopt})
-            case {'sname','sfieldformat','clookoutfor','svarname',...
-                    'sregexpression','ncolnum','nrownum','nrepeat'}
-                warning('openCOSSAN:Extractor','Passing response information to Extractor add is deprecated and will be discontinued. Please add a Response object instead')
-                Cresponseproperties{end+1} = varargin{iVopt};    %#ok<AGROW>
-                Cresponseproperties{end+1} = varargin{iVopt+1};  %#ok<AGROW>
-            otherwise
-                warning('openCOSSAN:Extractor',['optional parameter ' num2str(varargin{iVopt}) ' ignored']);
-        end
-        Xresponse = Response(Cresponseproperties{:});
+%% Processing Inputs
+OpenCossan.validateCossanInputs(varargin{:});
+for iopt=1:2:length(varargin)
+    switch lower(varargin{iopt})
+        case {'xresponse'}
+            Xresponse = varargin{iopt+1};
+        case {'nposition'}
+            Nposition = varargin{iopt+1};
+        otherwise
+            warning('OpenCossan:Extractor:add:wrongOption',...
+                ['Optional parameter ' varargin{iopt} ' not allowed']);
     end
 end
 
-%% 2. Add the response to the extractor
+assert(logical(exist('Xresponse','var')),...
+        'OpenCossan:Extractor:add:NoResponseDefined',...
+        'It is necessary to provide and object of type Response!')
+
+assert(isa(Xresponse,'Response'),...
+        'OpenCossan:Extractor:add:wrongObject',...
+        ['It is necessary to provide and object of type Response!\n' ...
+        'Provided object of class %s is not valid'],class(Xresponse))
+    
 % Check if the output is already present in the connector
-for i=1:Xobj.Nresponse
-    if strcmpi(Xresponse.Sname,Xobj.Xresponse(i).Sname)
-        error('openCOSSAN:Extractor:add',['Output ' Xobj.Xresponse(i).Sname ' is already present in Extractor'])
-    end
-end
+assert(~ismember(Xresponse.Sname,Xobj.Coutputnames),...
+        'OpenCossan:Extractor:add:ResponseAlreadyPresent',...
+        ['Response %s is already available in the Extractor object.\n (%s)' ... 
+        'List of response defined in the Extractor: %s'],Xresponse.Sname, ...
+        sprintf(' "%s" ',Xobj.Coutputnames{:}))
 
-if isempty(Xobj.Xresponse)
-    Xobj.Xresponse = Xresponse;
+    
+if logical(exist('Nposition','var'))
+    Xobj.Xresponse = [Xobj.Xresponse(1:Nposition-1) Xresponse Xobj.Xresponse(Nposition:end)];
 else
     Xobj.Xresponse(end+1) = Xresponse;
 end

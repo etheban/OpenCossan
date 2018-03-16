@@ -6,7 +6,7 @@ function Xobj=checkDistribution(Xobj)
 if isempty(Xobj.Sdistribution), return, end
 %% Compute the missing values if possible
     switch lower(Xobj.Sdistribution)
-         case {'norm','normal'}
+         case {'norm','normal','whitenoise'}
 %             Xobj=normal(Xobj);
         otherwise
             error('openCOSSAN:StochasticProcess:checkDistribution',...

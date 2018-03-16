@@ -2,7 +2,7 @@
 % This tutorial shows how to optimize the Rastrigin's function using
 % GeneticAlgorithms
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@GeneticAlgorithms
+% See Also: http://cossan.co.uk/wiki/index.php/@GeneticAlgorithms
 %
 % $Copyright~1993-2014,~COSSAN~Working~Group,~University~of~Liverpool,~UK$
 %

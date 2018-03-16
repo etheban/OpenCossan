@@ -73,7 +73,7 @@ else
     OpenCossan.cossanDisp('-----------------------------------------------------------',2)
     OpenCossan.cossanDisp ('Stochastic process ',2)
     for n=1:length(Xobj.XstochasticProcess)
-        Nsamples=min(5,Xobj.Xdataseries(1).Nsamples);
+        Nsamples=min(5,size(Xobj.Xdataseries,1));
         NlengthDataseries = min(5,size(Xobj.XstochasticProcess{n}.Mcoord,2));
         OpenCossan.cossanDisp([Xobj.CnamesStochasticProcess{n} ':'])
         for icoord = 1:length(Xobj.XstochasticProcess{n}.CScoordinateNames)

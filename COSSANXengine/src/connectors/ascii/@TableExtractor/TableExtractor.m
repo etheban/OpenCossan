@@ -160,7 +160,7 @@ classdef TableExtractor < Extractor
 
         end %end constructor
         
-        [Tout, LsuccessfullExtract] = extract(Xe,varargin)
+        [Tout, LsuccessfullExtract] = extract(Xe)
         
     end
     

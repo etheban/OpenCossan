@@ -4,7 +4,7 @@
 %   Evolution Strategy
 %   
 %
-% See Also:  http://cossan.cfd.liv.ac.uk/wiki/index.php/@EvolutionStrategy
+% See Also:  http://cossan.co.uk/wiki/index.php/@EvolutionStrategy
 %
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author:~Edoardo~Patelli$ 

@@ -19,8 +19,7 @@ RV3   = RandomVariable('Sdistribution','normal', 'mean',1,'std',0.2);
 Xrvs1 = RandomVariableSet('Cmembers',{'RV1','RV2','RV3'},'CXmembers',{RV1,RV2,RV3});
 % Create an Input object
 Xin = Input('Sdescription','Input Object of our model');
-Xin   = add(Xin,Xrvs1);
-
+Xin = Xin.add('Xmember',Xrvs1,'Sname','Xrvs1');
 %% BOX-BEHNKEN
 
 % here we use the Box-Behnken type of DOE in order to generate the samples
@@ -130,9 +129,9 @@ Xin2 = Input('Sdescription','Input Object of our model');
 DV1 = DesignVariable('value',3,'Vsupport',1:2:9);
 DV2 = DesignVariable('value',17,'lowerbound',10,'upperbound',20);
 DV3 = DesignVariable('value',42,'lowerbound',40,'upperbound',60);
-Xin2 = add(Xin2,DV1);
-Xin2 = add(Xin2,DV2);
-Xin2 = add(Xin2,DV3);
+Xin2 = Xin2.add('Xmember',DV1,'Sname','DV1');
+Xin2 = Xin2.add('Xmember',DV2,'Sname','DV2');
+Xin2 = Xin2.add('Xmember',DV3,'Sname','DV3');
 
 %% BOX-BEHNKEN
 

@@ -17,23 +17,23 @@ Xin  = Input();
 
 % Initial length of the cracks
 a=Parameter('value',1e-3);
-Xin = add(Xin,a);
+Xin = Xin.add('Xmember',a,'Sname','a');
 
 % Coefficient C in Paris equation
 C=Parameter('value',2.5e-23);
-Xin = add(Xin,C);
+Xin = Xin.add('Xmember',C,'Sname','C');
 
 % Fracture toughness
 Kic=Parameter('value',3e7);
-Xin = add(Xin,Kic);
+Xin = Xin.add('Xmember',Kic,'Sname','Kic');
 
 % Coefficient m in Paris equation
 m=Parameter('value',2);
-Xin = add(Xin,m);
+Xin = Xin.add('Xmember',m,'Sname','m');
 
 % Maximum applied stress
 smax=Parameter('value',100e6);
-Xin = add(Xin,smax);
+Xin = Xin.add('Xmember',smax,'Sname','smax');
 
 % Minimum applied stress is zero and not defined here
 

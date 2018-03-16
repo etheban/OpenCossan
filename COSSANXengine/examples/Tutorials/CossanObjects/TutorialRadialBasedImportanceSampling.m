@@ -26,7 +26,7 @@ switch casestudy
         Xin = Input('Sdescription','Input satellite_inp','CSmembers',{'Xrvs1'},'CXmembers',{Xrvs1});
         %% Define a PerformanceFunction 
         Xpar=Parameter('Sdescription','Define Capacity','value',-146.14);
-        Xin = Xin.add(Xpar);
+        Xin = Xin.add('Xmember',Xpar,'Sname','Xpar');
         % Xin = sample(Xin,'Nsamples',10);
         Xperfun=PerformanceFunction('Scapacity','Xpar','Sdemand','out1','Soutputname','Vg1');
         exactpf=1.46e-07;
@@ -51,7 +51,7 @@ switch casestudy
         Xin = Input('Sdescription','Input satellite_inp','CSmembers',{'Xrvs1'},'CXmembers',{Xrvs1});
         %% Define a PerformanceFunction 
         Xpar=Parameter('Sdescription','Define Capacity','value',2);
-        Xin = Xin.add(Xpar);
+        Xin = Xin.add('Xmember',Xpar,'Sname','Xpar');
         % Xin = sample(Xin,'Nsamples',10);
         Xperfun=PerformanceFunction('Scapacity','Xpar','Sdemand','out1','Soutputname','Vg1');
         exactpf=3.47e-02;
@@ -76,7 +76,7 @@ switch casestudy
         Xin = Input('Sdescription','Input satellite_inp','CSmembers',{'Xrvs1'},'CXmembers',{Xrvs1});
         %% Define a PerformanceFunction 
         Xpar=Parameter('Sdescription','Define Capacity','value',2.5);
-        Xin = Xin.add(Xpar);
+        Xin = Xin.add('Xmember',Xpar,'Sname','Xpar');
         % Xin = sample(Xin,'Nsamples',10);
         Xperfun=PerformanceFunction('Scapacity','Xpar','Sdemand','out1','Soutputname','Vg1');
         exactpf=4.16e-03;
@@ -101,7 +101,7 @@ switch casestudy
         Xin = Input('Sdescription','Input satellite_inp','CSmembers',{'Xrvs1'},'CXmembers',{Xrvs1});
         %% Define a PerformanceFunction 
         Xpar=Parameter('Sdescription','Define Capacity','value',3);
-        Xin = Xin.add(Xpar);
+        Xin = Xin.add('Xmember',Xpar,'Sname','Xpar');
         % Xin = sample(Xin,'Nsamples',10);
         Xperfun=PerformanceFunction('Scapacity','Xpar','Sdemand','out1','Soutputname','Vg1');
         exactpf=1.05e-01; 
@@ -126,7 +126,7 @@ switch casestudy
         Xin = Input('Sdescription','Input satellite_inp','CSmembers',{'Xrvs1'},'CXmembers',{Xrvs1});
         %% Define a PerformanceFunction 
         Xpar=Parameter('Sdescription','Define Capacity','value',3);
-        Xin = Xin.add(Xpar);
+        Xin = Xin.add('Xmember',Xpar,'Sname','Xpar');
         % Xin = sample(Xin,'Nsamples',10);
         Xperfun=PerformanceFunction('Scapacity','Xpar','Sdemand','out1','Soutputname','Vg1');
         exactpf=2.86e-03;
@@ -151,7 +151,7 @@ switch casestudy
         Xin = Input('Sdescription','Input satellite_inp','CSmembers',{'Xrvs1'},'CXmembers',{Xrvs1});
         %% Define a PerformanceFunction 
         Xpar=Parameter('Sdescription','Define Capacity','value',3);
-        Xin = Xin.add(Xpar);
+        Xin = Xin.add('Xmember',Xpar,'Sname','Xpar');
         % Xin = sample(Xin,'Nsamples',10);
         Xperfun=PerformanceFunction('Scapacity','Xpar','Sdemand','out1','Soutputname','Vg1');
         exactpf=1.8e-04; 

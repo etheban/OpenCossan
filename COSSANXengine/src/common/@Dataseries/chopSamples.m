@@ -36,17 +36,15 @@ function Xobj = chopSamples(Xobj,Pindex)
 if (ischar(Pindex) && strcmp(Pindex,':'))
     Pindex = 1:Xobj(1).Nsamples;
 elseif islogical(Pindex) % logical indexing
-    assert((isrow(Pindex) || icolumn(Pindex)) && length(Pindex)<=Xobj(1).Nsamples,...
+    assert((isrow(Pindex) || icolumn(Pindex)) && length(Pindex)<=size(Xobj,1),...
         'OpenCossan:Dataseries:chopSamples','Index exceeds number of samples.')
 elseif isnumeric(Pindex) % numerical indexing
-    assert((isrow(Pindex) || icolumn(Pindex)) && max(Pindex)<=Xobj(1).Nsamples,...
+    assert((isrow(Pindex) || icolumn(Pindex)) && max(Pindex)<=size(Xobj,1),...
         'OpenCossan:Dataseries:chopSamples','Index exceeds number of samples.')
 else
     error('OpenCossan:Dataseries:chopSamples','Subscript indices must either be real positive integers or logicals.')
 end
 
-for icol=1:length(Xobj)
-    Xobj(icol).Mdata(Pindex,:) = [];
-end
+Xobj(Pindex,:) = [];
 
 end

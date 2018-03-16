@@ -7,7 +7,7 @@
 %
 % This example computes the volume's bounds of a beam.
 %
-% See also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@intervalAnalysis
+% See also: http://cossan.co.uk/wiki/index.php/@intervalAnalysis
 %
 % $Author:~Marco~de~Angelis$
 % SmainPath='C:\Users\mda\MATLAB\OPENCOSSAN\TUTORIALS_IntervalAnalysis\TutorialVolume';

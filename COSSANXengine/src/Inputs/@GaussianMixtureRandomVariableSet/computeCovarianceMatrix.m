@@ -49,7 +49,7 @@ Xobj.Mcovariance=MR*MR';
 %Xobj.Mcovariance=MR^2;
 %s = sqrt(diag(Xobj.Mcovariance)); % diag(MR)
 
-Xobj.Mcorrelation = coorcov(Xobj.Mcovariance);
+Xobj.Mcorrelation = corrcov(Xobj.Mcovariance);
 
 % Xobj.Mcorrelation = (diag(diag(MR))\Xobj.Mcovariance)/diag(diag(MR)); % CORRELATION coefficient
 

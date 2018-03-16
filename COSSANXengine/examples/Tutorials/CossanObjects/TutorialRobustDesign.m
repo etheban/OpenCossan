@@ -3,7 +3,7 @@
 % This tutorial shows how to create and use a RobustDesign object to perform
 % Robust Design Optimization
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@RobustDesign
+% See Also: http://cossan.co.uk/wiki/index.php/@RobustDesign
 %
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author: Matteo Broggi$ 
@@ -13,8 +13,8 @@
 OpenCossan.resetRandomNumberGenerator(51125)
 
 %% Disclaimer
-% This simple tutorial presents a very simple example that shows how to used the
-% RobustDesign object and the optimize methods in order to perform a Robust design optimization.
+% This simple tutorial presents a very simple example that shows how to use the
+% RobustDesign object and the optimized methods in order to perform a Robust design optimization.
 % This example might be not physically meaningful, nevertheless it can be used
 % as a template to prepare solution sequence for solving realistic problems.
 
@@ -79,7 +79,7 @@ XobjFun = ObjectiveFunction('Sscript',...
 % containing Design Variables and finally a mapping between 
 % DesignVariable(s) and input(s) of the Inner loop model.
 
-% The montecarlo object defines the number of simulations to be used and
+% The MonteCarlo object defines the number of simulations to be used and
 % the number of batches to generate samples of the inner loop model.
 XmcA=MonteCarlo('Nsamples',1000,'Nbatches',1);
    
@@ -101,7 +101,7 @@ Xrd = RobustDesign('Sdescription','Simple RBO problem', ...
 %% Performing optimization. 
 % To perform Robust design optimization use the method optimize of the
 % Object RobustDesign.
-% The method optimize requires as input a Optimizer object used to define 
+% The method optimize requires as input an Optimizer object used to define 
 % the optimization algorithm to be used.
 
 Xoptimum=Xrd.optimize('Xoptimizer',MiniMax);

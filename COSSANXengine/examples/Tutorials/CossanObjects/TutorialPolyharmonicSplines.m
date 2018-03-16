@@ -101,7 +101,7 @@ MXX3 = ones(201,201);
 Vx1=MXX1(:); Vx2 = MXX2(:);Vx3=MXX3(:);
 Minput = [Vx1,Vx2,Vx3];
 Xs = Samples('Xrvset',Xrvset,'MsamplesPhysicalSpace',Minput);
-Xin = Xin.add(Xs);
+Xin = Xin.add('Xmember',Xs,'Sname','Xs');
 
 Xoutreal = Xmio.run(Xin);
 Xoutps1 = Xps1.apply(Xin);

@@ -1,14 +1,14 @@
 function [Tout,LsuccessfullExtract] = extract(Xobj,varargin)
 %EXTRACTOR  extract values form a ASCII file and create a structure Tout
 %
-% See Also: http://cossan.co.uk/wiki/index.php/extract@Connector
+% See Also: https://cossan.co.uk/wiki/index.php/extract@Connector
 %
-% $Copyright~2006-2017,~COSSAN~Working~Group$
+% $Copyright~2006-2018,~COSSAN~Working~Group$
 % $Author: Matteo Broggi and Edoardo Patelli$
 
 %
 % =====================================================================
-% This file is part of openCOSSAN.  The open general purpose matlab
+% This file is part of OpenCossan.  The open general purpose matlab
 % toolbox for numerical analysis, risk and uncertainty quantification.
 %
 % openCOSSAN is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ function [Tout,LsuccessfullExtract] = extract(Xobj,varargin)
 %  along with openCOSSAN.  If not, see <http://www.gnu.org/licenses/>.
 % =====================================================================
 
-%% 1. Initialisation
+%% Initialisation
 % Nsimulation is only use to display messages.
 Nsimulation = 1;
 LresponseSuccessfullExtract = false(Xobj.Nresponse,1);
@@ -34,38 +34,38 @@ LresponseSuccessfullExtract = false(Xobj.Nresponse,1);
 % property of the extractor)
 Xresponse = Xobj.Xresponse;
 
-%% 2. Processing Inputs
+%% Processing Inputs
 OpenCossan.validateCossanInputs(varargin{:});
 for iopt=1:2:length(varargin)
     switch lower(varargin{iopt})
         case {'nsimulation'}
             Nsimulation = varargin{iopt+1};
         otherwise
-            warning('openCOSSAN:Extractor:extract',...
+            warning('OpenCossan:Extractor:extract:wrongOption',...
                 ['Optional parameter ' varargin{iopt} ' not allowed']);
     end
 end
 
 % if no responses are defined in the extractor, throws a warning and
 % returns an empty output structure
+Tout = struct;
 if isempty(Xresponse)
-    warning('openCOSSAN:Extractor:extract',...
-        'The Extractor has no responses. Define some responses or remove the Extractor')
-    Tout = struct;
+    warning('OpenCossan:Extractor:extract:NoResponses',...
+        'The Extractor has no responses.\n Define at least one Response object or remove the Extractor object from the Connector')
     LsuccessfullExtract=false;
     return
 end
 
-%% 3. Access to the output file
+%% Access to the output file
 SfullFileName=fullfile(Xobj.Sworkingdirectory,Xobj.Srelativepath,Xobj.Sfile);
 % open ASCII file
-[Nfid,Serror] = fopen(SfullFileName,'r'); 
-OpenCossan.cossanDisp(['[COSSAN-X.Extractor.extract] Open file : ' ...
-                        SfullFileName],4 )
+[Nfid,Serror] = fopen(SfullFileName,'r');
+OpenCossan.cossanDisp(['[OpenCossan.Extractor.extract] Open file : ' ...
+    SfullFileName],4 )
 
 % Return NaN value if an error occurs in the extractor
 if ~isempty(Serror)
-    warning('openCOSSAN:Extractor:extract',...
+    warning('OpenCossan:Extractor:extract:noFile',...
         strrep(['The results file ' SfullFileName ...
         ' of simulation #' num2str(Nsimulation) ' does not exist'],'\','\\'))
     for iresponse=1:Xobj.Nresponse
@@ -78,185 +78,21 @@ if ~isempty(Serror)
     end
     return;
 else
-    OpenCossan.cossanDisp('[COSSAN-X.Extractor.extract] File Open correctly',4 )
+    OpenCossan.cossanDisp(['[OpenCossan.Extractor.extract] File ' SfullFileName ...
+        ' open correctly'],4 )
 end
 
-%% 4. Extract the values from file
-
+%% Extract the values from file
+% Initialise structure storing values of variables 
+TfileInfo=struct('Vpos',[],'out',[],'status',[]);
+LresponseSuccess=true(1,Xobj.Nresponse);
 for iresponse=1:Xobj.Nresponse
+    % Process     
+    [Tresponse,TfileInfo,LresponseSuccess(iresponse)]= ...
+        Xresponse(iresponse).extract('Nfid',Nfid,...
+        'Nsimulation',Nsimulation,'TresponsePosition',TfileInfo);
+    Tout.(Xresponse(iresponse).Sname)=Tresponse.(Xresponse(iresponse).Sname);
     
-    % already_reset is a flag that check whether the end of file have been
-    % already reached while looking for the iresponse-th response
-    already_reset = false;
-    
-    if ~isempty(Xresponse(iresponse).Sregexpression)
-        while 1
-            tline = fgetl(Nfid);
-            %positioncurrent = ftell(Nfid);
-            if ~ischar(tline)
-                if already_reset
-                    warning('openCOSSAN:Extractor:extract', ...
-                        ['End of file reached while lusing regular expresssion for the '...
-                        num2str(iresponse) '-th response.\n']);
-                    % No string identified in the file
-                    Tout.(Xresponse(iresponse).Sname)=NaN;
-                    continue
-                else
-                    already_reset = true; % set the flag to true
-                    warning('openCOSSAN:Extractor:extract',...
-                        ['File position reset while looking for the '...
-                        num2str(iresponse) '-th response.\n'...
-                        'Be sure to define reponses in the order they appear in the output file to improve performance'])
-                    fseek(Nfid, 0, 'bof'); % reset file position
-                    tline = fgetl(Nfid);
-                end
-            end
-            Nfound=regexp(tline, Xresponse(iresponse).Sregexpression,'end');
-            if ~isempty(Nfound)
-                 % No string identified in the file
-                 Tout.(Xresponse(iresponse).Sname)=NaN;
-                 continue
-            end
-        end
-        
-    elseif ~isempty(Xresponse(iresponse).Clookoutfor)
-        % Search the Clookoutfor strings
-        for ilook=1:length(Xresponse(iresponse).Clookoutfor)
-            Nfound=[];
-            while isempty(Nfound)
-                tline = fgetl(Nfid);
-                if ~ischar(tline)
-                    if already_reset
-                        warning('openCOSSAN:Extractor:extract',...
-                            ['End of file reached (again) while looking for the '...
-                            num2str(iresponse) '-th response.\n'])
-                        
-                        % No string identified in the file
-                        Tout.(Xresponse(iresponse).Sname)=NaN;
-                        continue
-                    else
-                        already_reset = true; % set the flag to true
-                        warning('openCOSSAN:Extractor:extract',...
-                            ['File position reset while looking for the '...
-                            num2str(iresponse) '-th response.\n'...
-                            'Be sure to define reponses in the order they appear in the output file to improve performance'])
-                        fseek(Nfid, 0, 'bof'); % reset file position
-                        tline = fgetl(Nfid);
-                    end
-                end
-                Nfound = regexp(tline, Xresponse(iresponse).Clookoutfor{ilook}, 'end');
-            end
-        end
-    elseif ~isempty(Xresponse(iresponse).Svarname)
-        try
-            positioncurrent = Tpos.(Xresponse(iresponse).Svarname);
-        catch ME
-            warning('openCOSSAN:Extractor:extract',...
-                ['Position of the response ' Xresponse(iresponse).Svarname ' not found \n ' ME.message])
-            OpenCossan.cossanDisp('Continue with the next response',1)
-            Tout.(Xresponse(iresponse).Sname)=NaN;
-            continue
-        end
-        Serror= fseek(Nfid, positioncurrent, 'bof');
-        if Serror~=0
-            warning('openCOSSAN:Extractor:extract',...
-                ['Seeking position of ' Xresponse(iresponse).Svarname ' not found \n '])
-            Tout.(Xresponse(iresponse).Sname)=NaN;
-            continue
-        end
-    else
-        % Extract using absolute position
-        fseek(Nfid, 0, 'bof'); % reset file position
-    end
-    
-    %% Now skip Nrownum from the current position   
-    for i=1:Xresponse(iresponse).Nrownum
-        tline=fgetl(Nfid);
-        if tline==-1, break, end % exit from the loop if the end of file is found
-    end
-    
-    if tline==-1
-        warning('openCOSSAN:Extractor:extract',...
-            ['Problems extracting value(s) for ' Xresponse(iresponse).Sname ...
-            ' of simulation #' num2str(Nsimulation)]);
-        Tout.(Xresponse(iresponse).Sname)=NaN;
-        Tpos.(Xresponse(iresponse).Sname)=NaN;
-        continue
-    end
-    
-    % and now read the variable
-    Sformat=Xresponse(iresponse).Sfieldformat;
-    
-    Moutput=[]; % initialise the output matrix for each response. 
-        
-    % introduce countdown counter for support for both finite and infinite
-    % Nrepeat (infinite means repeat until the end of the file)
-
-    iRow=1;
-    
-    while iRow <= Xresponse(iresponse).Nrepeat
-        % Read data form text file using the format specified in the
-        % Response. File data might be returned as a column vector, matrix,
-        % character vector or character array. However, only numerical
-        % values are accepted by OpenCossan 
-        
-        MDataExtracted=sscanf(tline, Sformat);
-        if isinf(Xresponse(iresponse).Nrepeat) && logical(isempty(MDataExtracted))
-            OpenCossan.cossanDisp(['[openCOSSAN:Extractor:extract] Response #' ...
-                num2str(iresponse) ': ' num2str(iRow) ' lines extracted' ],4 )
-            break
-        elseif logical(isempty(MDataExtracted))
-            warning('openCOSSAN:Extractor:extract',...
-            ['Extracted empty string\nLine: "%s"\nFormat: "%s" \n ' ...
-            'Response: %s; Required lines: %i; Extracted Lines: %i; \n '],...
-            tline,Sformat, Xresponse(iresponse).Sname,Xresponse(iresponse).Nrepeat,iRow-1)
-        
-            Tout.(Xresponse(iresponse).Sname)=NaN;
-            continue
-        end
-        
-        Moutput(iRow,:)=MDataExtracted; %#ok<AGROW>
-        
-        % get the next line
-        tline=fgetl(Nfid);
-        if ~ischar(tline)
-           warning('openCOSSAN:Extractor:extract',...
-                  'End of file reached while looking extracting values response %s\n',...
-                   Xresponse(iresponse).Sname)
-                    
-                   % No string identified in the file
-                   Tout.(Xresponse(iresponse).Sname)=NaN;
-                   continue
-        end
-        % Process next row
-        iRow=iRow+1;
-    end
-    
-    % Associate read value with the output parameter
-    try
-        OpenCossan.cossanDisp(['[COSSAN-X.Extractor.extract] Response #' num2str(iresponse) ': ' ],4 )
-        OpenCossan.cossanDisp('[COSSAN-X.Extractor.extract] Value(s) extracted: ' ,4 )
-        if OpenCossan.getVerbosityLevel>3
-            Moutput %#ok<NOPRT>
-        end
-        % check the size of Moutput to assign to the right object
-        if numel(Moutput)==1
-            % Moutput is a scalar, thus it is saved directly in the output
-            % structure
-            Tout.(Xresponse(iresponse).Sname)=Moutput;
-        else
-            % Moutput is a vector/matrix, thus it is saved in a Dataseries
-            % according to the properties of the response object
-            Tout.(Xresponse(iresponse).Sname)= Xresponse(iresponse).createDataseries(Moutput);
-        end
-        LresponseSuccessfullExtract(iresponse)=true;
-    catch ME
-        OpenCossan.cossanDisp(['[COSSAN-X.Extractor.extract] Failed to associate extracted value to the output ( ' ME.message ')' ],4 )
-        fclose(Nfid);
-        return
-    end
-    % save the position of the last extracted value
-    Tpos.(Xresponse(iresponse).Sname)=ftell(Nfid);
 end
 
 % close the file

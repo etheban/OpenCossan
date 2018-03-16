@@ -4,7 +4,7 @@
 %   using derivative-free method (the Nelder-Mead simplex direct search)
 %   
 %
-% See Also: http://cossan.cfd.liv.ac.uk/wiki/index.php/@Simplex
+% See Also: http://cossan.co.uk/wiki/index.php/@Simplex
 %
 % $Copyright~1993-2011,~COSSAN~Working~Group,~University~of~Innsbruck,~Austria$
 % $Author: Edoardo~Patelli$ 
