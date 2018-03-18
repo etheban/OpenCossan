@@ -39,3 +39,5 @@ disp('The open general purpose software for numerical analysis, risk and uncerta
 disp('(c) Cossan Working Group, Contacts: W:<a href = "https://www.cossan.co.uk">cossan.co.uk</a>; E:<a href ="mailto:info@cossan.co.uk">info@cossan.co.uk</a>');
 disp('Supported by: University of Liverpool (UK) and Leibniz Universität Hannover (DE)');
 disp('----------------------------------------------------------------------------------------------------------');
+disp('<a href ="matlab: open OpenCossanAbout.html">Getting started</a> and <a href ="matlab: demo toolbox OpenCossan">OpenCossan Demo</a> are available on these links.' )
+

@@ -8,14 +8,14 @@ function setPath(varargin)
 % Website: http://www.cossan.co.uk
 
 % =====================================================================
-% This file is part of openCOSSAN.  The open general purpose matlab
+% This file is part of OpenCossan.  The open general purpose matlab
 % toolbox for numerical analysis, risk and uncertainty quantification.
 %
-% openCOSSAN is free software: you can redistribute it and/or modify
+% OpenCossan is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation, either version 3 of the License.
 %
-% openCOSSAN is distributed in the hope that it will be useful,
+% OpenCossan is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
@@ -83,10 +83,17 @@ else
     addpath(Sroot); %#ok<*MCAP>
     
     %% Add path 
-    CSpaths=[CsrcPathFolders CmexPathFolders CtutorialPathFolders CdocPathFolders];
+    CSpaths=[CsrcPathFolders CmexPathFolders CtutorialPathFolders];
     for n=1:length(CSpaths)
         addpath(fullfile(SpredefinedRoot,CSpaths{n}));
         fprintf('*** Adding: %s\n',fullfile(SpredefinedRoot,CSpaths{n}))
+    end
+    
+    %% Documentation
+    for n=1:length(CdocPathFolders)
+        Sfullpath=fullfile(SpredefinedRoot,'..',CdocPathFolders{n});
+        addpath(Sfullpath);
+        fprintf('*** Adding: %s\n',Sfullpath)
     end
     
     %% Add Extras path (Non-Free class)
