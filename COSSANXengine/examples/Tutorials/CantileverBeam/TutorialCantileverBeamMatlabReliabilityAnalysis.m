@@ -61,8 +61,8 @@ XfailureProbMC = Xmc.computeFailureProbability(XprobModelBeamMatlab);
 % Display the estimated failure probability
 display(XfailureProbMC);
 
-% Validate Solution
- assert(abs(XfailureProbMC.pfhat-7.38e-02)<eps,...
+% Validate Solution (reference computed with 1e6 MC samples)
+assert(abs(XfailureProbMC.pfhat-0.0696)<2.81*XfailureProbMC.stdPfhat,...
     'CossanX:Tutorials:CantileverBeam','Reference Solution pf MCS not matched.')
 
 %% Reliability Analysis: Latin Hypercube Sampling
@@ -77,7 +77,7 @@ XfailureProbLHS = Xlhs.computeFailureProbability(XprobModelBeamMatlab);
 display(XfailureProbLHS);
 
 % Validate Solution
-assert(abs(XfailureProbLHS.pfhat-8.30e-02)<eps,...
+assert(abs(XfailureProbLHS.pfhat-0.0696)<2.81*XfailureProbLHS.stdPfhat,...
     'CossanX:Tutorials:CantileverBeam','Reference Solution pf LHS not matched.')
 
 %% Reliability Analysis: Line Sampling
@@ -101,10 +101,10 @@ display(XfailureProbLS);
 display(Xout);
 
 % Validate Solution
-assert(abs(XfailureProbLS.pfhat-6.085e-002)<2e-5,...
+assert(abs(XfailureProbLS.pfhat-0.0696)<2.81*XfailureProbLS.stdPfhat,...
     'CossanX:Tutorials:CantileverBeam',...
-    'Estimated failure probability (%e) does not match the reference Solution (%e)',...
-    XfailureProbLS.pfhat,6.1e-002)
+    'Estimated failure probability (%e) is not in 99%% interval of the reference solution (%e)',...
+    XfailureProbLS.pfhat,0.0696)
 
 %% Plot Line Sampling Results
 % Plot lines 
@@ -116,7 +116,7 @@ close(f1);
 %% Reliability Analysis: Adaptive Line Sampling
 
 % Line Sampling with adaptive method
-OpenCossan.resetRandomNumberGenerator(1241243);
+OpenCossan.resetRandomNumberGenerator(135235135);
 XALS = AdaptiveLineSampling('Nlines',50);
 XfailureProbLS2 = XALS.computeFailureProbability(XprobModelBeamMatlab);
 
@@ -124,7 +124,20 @@ XfailureProbLS2 = XALS.computeFailureProbability(XprobModelBeamMatlab);
 display(XfailureProbLS2);
 
 % Validate Solution
-assert(abs(XfailureProbLS2.pfhat-5.992e-02)<1e-4,...
+assert(abs(XfailureProbLS2.pfhat-0.0696)<2.81*XfailureProbLS2.stdPfhat,...
     'CossanX:Tutorials:CantileverBeam',...
-    'Estimated failure probability (%e) does not match the reference Solution (%e)',...
-    XfailureProbLS2.pfhat,5.992e-02)
+    'Estimated failure probability (%e) is not in 99%% interval of the reference solution (%e)',...
+    XfailureProbLS2.pfhat,0.0696)
+
+%% Optimization
+% This tutorial continues with the optimization section
+% See Also:  <TutorialCantileverBeamMatlabOptimization.html> 
+
+% echodemo TutorialCantileverBeamMatlabOptimization
+
+%% RELIABILITY BASED OPTIMIZAZION 
+% The reliability based optimization is shown in the following tutotial 
+% See Also: <TutorialCantileverBeamMatlabRBO.html>
+
+% echodemo TutorialCantileverBeamMatlabRBO
+
