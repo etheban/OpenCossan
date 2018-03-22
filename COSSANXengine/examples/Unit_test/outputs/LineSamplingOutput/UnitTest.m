@@ -5,7 +5,7 @@ clear variables
 
 itest=1;
 try
-    Xlso1 = LineSamplingOutput('sperformancefunctionname','Xrv3','vnumpointline',[2 3]);
+    Xlso1 = LineSamplingOutput('Sperformancefunctionname','Xrv3','Vnumpointline',[2 3]);
     Vtest(itest)=true;
     Crk{itest}='';
 catch ME
@@ -17,7 +17,7 @@ end
 %% invalid vnumpointline
 itest=itest+1;
 try
-    Xlso2 = LineSamplingOutput('sperformancefunctionname','Xrv3','vnumpointline',[2 3 4 5; 1 2 3 6]);
+    Xlso2 = LineSamplingOutput('Sperformancefunctionname','Xrv3','Vnumpointline',[2 3 4 5; 1 2 3 6]);
     Vtest(itest)=false;
         Crk{itest}='';
 catch ME
@@ -27,8 +27,8 @@ catch ME
 end
 %% accessory data
 
-Xlso2 = LineSamplingOutput('sperformancefunctionname','Xrv3','vnumpointline',[2 3]');
-Xlso3 = LineSamplingOutput('sperformancefunctionname','Vg2','vnumpointline',[2 3]');
+Xlso2 = LineSamplingOutput('Sperformancefunctionname','Xrv3','Vnumpointline',[2 3]');
+Xlso3 = LineSamplingOutput('Sperformancefunctionname','Vg2','Vnumpointline',[2 3]');
 
 
 
