@@ -254,13 +254,15 @@ classdef OpenCossan < handle
                 if verLessThan('matlab', '9.0') || exist('Sroot','var')
                     LsetPath=1;
                 else
-                    toolboxes=matlab.addons.toolbox.installedToolboxes;
-                   
-                    if  any(arrayfun(@(x)strcmp(x.Name,'OpenCossan'),toolboxes))
-                        LsetPath=0;
-                        disp(['Using OpenCossan toolbox version: ',toolboxes.Version])
-                    else
-                        LsetPath=1;
+                    if (usejava('desktop'))
+                        toolboxes=matlab.addons.toolbox.installedToolboxes;
+
+                        if  any(arrayfun(@(x)strcmp(x.Name,'OpenCossan'),toolboxes))
+                            LsetPath=0;
+                            disp(['Using OpenCossan toolbox version: ',toolboxes.Version])
+                        else
+                            LsetPath=1;
+                        end
                     end
                 end
                 
