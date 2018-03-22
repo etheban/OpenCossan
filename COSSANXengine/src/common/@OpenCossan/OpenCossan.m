@@ -469,33 +469,6 @@ classdef OpenCossan < handle
                         '3. Copy the mex files into the folder: ',...
                         fullfile(Xobj.ScossanRoot,'mex','src')])
             end
-                
-            
-            %% Set path for the matlab database files
-            if isempty(Xobj.SmatlabDatabasePath)
-                if isdeployed
-                    Xobj.SmatlabDatabasePath=fullfile(Xobj.SexternalPath,'SFEM','database');
-                    if exist(fullfile(Xobj.SmatlabDatabasePath),'dir')
-                        disp('SFEM database available')
-                    else
-                        disp('SFEM database NOT available')
-                    end
-                else
-                    
-                    Xobj.SmatlabDatabasePath=[Xobj.ScossanRoot filesep 'database'];
-                    
-                    if exist(fullfile(Xobj.SmatlabDatabasePath),'dir')
-                        disp('Initialize SFEM database')
-                        Sfile=fullfile(Xobj.SmatlabDatabasePath,'initializeSFEMdatabase');
-                        disp(Sfile)
-                        run(Sfile)
-                    else
-                        disp('SFEM database NOT available')
-                    end
-                    
-                    
-                end
-            end
             
             %% Assign Object to global variable
             OPENCOSSAN=Xobj;
