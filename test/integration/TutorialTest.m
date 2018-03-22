@@ -23,6 +23,9 @@ classdef (Abstract) TutorialTest < matlab.unittest.TestCase
             run(testCase.TutorialName);
             % Do the assertions
             for i = 1:numel(testCase.CoutputNames)
+                if (ischar(testCase.Ctolerance{i}))
+                    testCase.Ctolerance{i} = eval(testCase.Ctolerance{i});
+                end
                 testCase.verifyEqual(eval(testCase.CoutputNames{i}),testCase.CvaluesExpected{i},'AbsTol',testCase.Ctolerance{i});
             end
         end
