@@ -263,6 +263,8 @@ classdef OpenCossan < handle
                         else
                             LsetPath=1;
                         end
+                    else
+                        LsetPath = 1;
                     end
                 end
                 
